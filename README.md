@@ -32,9 +32,10 @@ meta-prompting/
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.12+
 - Azure OpenAI API access
 - DSPy framework
+- uv package manager
 
 ### Installation
 
@@ -44,12 +45,12 @@ git clone https://github.boschdevcloud.com/WAX3SYV/meta-prompting.git
 cd meta-prompting
 ```
 
-2. Install virtual environment and dependencies:
-```bash
-python -m venv .venv
-source .venv/bin/activate # Windows: .venv\Scripts\activate
-pip install dspy python-dotenv
-```
+2. Install dependencies with [`uv`](https://docs.astral.sh/uv/) package and activate the virtual environment:
+   ```bash
+    uv sync
+    # activate the virtual env:
+    source .venv/bin/activate # Windows: .venv\Scripts\activate
+    ```
 
 3. Configure environment variables in `.env`:
 ```bash
