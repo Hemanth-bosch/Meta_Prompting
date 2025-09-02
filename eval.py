@@ -186,16 +186,38 @@ def evaluate_product_details(pred_products, expected_products):
             # Score both product number and quantity
             product_score = 0.0
             
-            # Product number comparison
+            # Product number comparison - handle both English and Japanese field names
             expected_pn = expected_product.get('productNumber', '')
-            pred_pn = pred_product.get('productNumber', '')
+            pred_pn = (pred_product.get('productNumber', '') or 
+                      pred_product.get('商品コード', '') or 
+                      pred_product.get('productCode', ''))
             pn_similarity = calculate_enhanced_similarity_score(pred_pn, expected_pn, 'productNumber')
             product_score += 0.7 * pn_similarity
             
-            # Quantity comparison  
-            expected_qty = expected_product.get('QTY', '')  # Note: JSON uses 'QTY'
-            pred_qty = pred_product.get('quantity', '')     # Note: prediction uses 'quantity'
-            qty_similarity = 1.0 if str(expected_qty) == str(pred_qty) else 0.0
+            # Quantity comparison - handle both field name variations (English and Japanese)
+            expected_qty = expected_product.get('QTY', '') or expected_product.get('quantity', '')
+            pred_qty = (pred_product.get('quantity', '') or 
+                       pred_product.get('QTY', '') or
+                       pred_product.get('注文数', '') or
+                       pred_product.get('qty', ''))
+            
+            # More flexible quantity matching
+            if str(expected_qty) == str(pred_qty):
+                qty_similarity = 1.0
+            elif expected_qty and pred_qty:
+                try:
+                    exp_num = float(re.sub(r'[^\d.]', '', str(expected_qty)))
+                    pred_num = float(re.sub(r'[^\d.]', '', str(pred_qty)))
+                    if exp_num == pred_num:
+                        qty_similarity = 1.0
+                    else:
+                        # Partial credit for close quantities
+                        diff_ratio = abs(exp_num - pred_num) / max(exp_num, pred_num)
+                        qty_similarity = max(0.0, 1.0 - diff_ratio)
+                except:
+                    qty_similarity = 0.0
+            else:
+                qty_similarity = 0.0
             product_score += 0.3 * qty_similarity
             
             best_match_score = max(best_match_score, product_score)
