@@ -40,9 +40,9 @@ class JapaneseOrderExtraction(dspy.Signature):
     companyName: str = dspy.OutputField(desc="Recipient company name - company receiving the goods.")
     
     # Order Details
-    comments: str = dspy.OutputField(desc="Special comments or instructions (特記事項) - may include delivery instructions.")
+    comments: str = dspy.OutputField(desc="Special comments for delivery instructions (from 特記事項): output '直送' if direct delivery is indicated, otherwise output empty string ''")
     PO: List[str] = dspy.OutputField(desc="Purchase Order numbers - usually starts with P followed by digits like P45829")
-    productDetail: List[Dict[str, str]] = dspy.OutputField(desc="Product details with exact productNumber/商品コード and quantity/注文数 from product table")
+    productDetail: List[Dict[str, str]] = dspy.OutputField(desc="Product details with exact 'productNumber' (from 商品コード) and 'QTY' (from 注文数) from product table")
 
 # Create extractor
 order_extractor = dspy.ChainOfThought(JapaneseOrderExtraction)
