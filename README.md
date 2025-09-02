@@ -38,6 +38,14 @@ meta-prompting/
 
 ### Installation
 
+0. Prepare data within the `data` folder. 
+```
+data/
+├── json  # folder for storing groundtruth output structured information             
+├── png   # folder for storing input image
+```
+Data link: [One Drive link (access granted on demand)](https://bosch-my.sharepoint.com/:u:/r/personal/wax3syv_bosch_com/Documents/aim205/meta-agents/meta-prompting-data.zip?csf=1&web=1&e=HGZVem)
+
 1. Clone the repository:
 ```bash
 git clone https://github.boschdevcloud.com/WAX3SYV/meta-prompting.git
