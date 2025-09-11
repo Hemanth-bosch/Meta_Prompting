@@ -1,7 +1,7 @@
 from utils import load_japanese_order_dataset, split_order_dataset
 from config import *
 from eval import japanese_order_extraction_metric
-from opt import create_custom_strategy, OptimizationRunner
+from opt import create_custom_strategy, OptimizationRunner, create_bootstrap_strategy
 from posthoc_analysis import analyze_model_performance
 
 from datetime import datetime
@@ -48,8 +48,9 @@ class JapaneseOrderExtraction(dspy.Signature):
 order_extractor = dspy.ChainOfThought(JapaneseOrderExtraction)
 
 # Load cached extractor if available
-if os.path.exists(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_PATH")):
-    order_extractor.load(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_PATH"))
+cached_extractor_path = dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_PATH")
+if os.path.exists(cached_extractor_path) and os.path.isfile(cached_extractor_path) and cached_extractor_path.endswith(".pkl"):
+    order_extractor.load(cached_extractor_path)
 
 # Evaluation function
 evaluate_order_extraction = dspy.Evaluate(
@@ -62,7 +63,7 @@ evaluate_order_extraction = dspy.Evaluate(
 
 # Start optimization
 custom_strategies = [
-    create_custom_strategy(
+    create_bootstrap_strategy(
         name="Enhanced Bootstrap",
         description="Enhanced BootstrapFewShotWithRandomSearch with balanced parameters",
         max_labeled_demos=4,
@@ -71,7 +72,7 @@ custom_strategies = [
         num_threads=4,
         max_rounds=2,
     ),
-    create_custom_strategy(
+    create_bootstrap_strategy(
         name="Conservative Bootstrap",
         description="Conservative approach with more labeled examples, fewer bootstrapped",
         max_labeled_demos=6,
@@ -98,6 +99,11 @@ field_score, total_score = analyze_model_performance(optimized_extractor, val_se
 model_name = os.getenv("MODEL_NAME", "Unknown Model").replace("/", "_")
 current_time = datetime.now().strftime("%Y%m%d%H")
 
-with open(f"{model_name}_performance_analysis_{current_time}.json", "w") as f:
-    json.dump({"field_scores": field_score, "total_scores": total_score}, f)
+# mkdir if not exists
+if not os.path.exists(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR")):
+    os.makedirs(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR"))
+optimized_extractor.save(os.path.join(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR"), f"{model_name}_optimized_extractor_{current_time}.pkl"))
+
+# with open(f"{model_name}_performance_analysis_{current_time}.json", "w") as f:
+#     json.dump({"field_scores": field_score, "total_scores": total_score}, f)
 
