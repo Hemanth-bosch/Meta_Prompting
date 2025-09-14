@@ -1,7 +1,7 @@
 from utils import load_japanese_order_dataset, split_order_dataset
 from config import *
 from eval import japanese_order_extraction_metric
-from opt import create_custom_strategy, OptimizationRunner, create_bootstrap_strategy
+from opt import create_custom_strategy, OptimizationRunner, create_bootstrap_strategy, create_miprov2_strategy
 from posthoc_analysis import analyze_model_performance
 
 from datetime import datetime
@@ -80,7 +80,12 @@ custom_strategies = [
         num_candidate_programs=20,
         num_threads=4,
         max_rounds=1,
-    )
+    ),
+    # create_miprov2_strategy(
+    #     name="MiProV2",
+    #     description="MiProV2 with balanced demo and candidate settings",
+    #     auto="medium"
+    # )
 ]
 
 runner = OptimizationRunner(
@@ -98,12 +103,13 @@ field_score, total_score = analyze_model_performance(optimized_extractor, val_se
 # # save results
 model_name = os.getenv("MODEL_NAME", "Unknown Model").replace("/", "_")
 current_time = datetime.now().strftime("%Y%m%d%H")
+best_strategy_name = runner.best_strategy_name.replace(" ", "_") if hasattr(runner, 'best_strategy_name') else "Unknown"
 
 # mkdir if not exists
 if not os.path.exists(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR")):
     os.makedirs(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR"))
-optimized_extractor.save(os.path.join(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR"), f"{model_name}_optimized_extractor_{current_time}.pkl"))
+optimized_extractor.save(os.path.join(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR"), f"{model_name}_{best_strategy_name}_optimized_extractor_{current_time}.pkl"))
 
-# with open(f"{model_name}_performance_analysis_{current_time}.json", "w") as f:
-#     json.dump({"field_scores": field_score, "total_scores": total_score}, f)
+with open(  os.path.join(dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR"), f"{model_name}_{best_strategy_name}_performance_analysis_{current_time}.json"), "w") as f:
+    json.dump({"field_scores": field_score, "total_scores": total_score}, f)
 

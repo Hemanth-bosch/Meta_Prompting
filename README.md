@@ -8,8 +8,10 @@ A meta-prompting system for extracting structured information from images using 
 
 ### Key Features
 
-- **Meta-Prompt Optimization**: Automated prompt engineering for information extraction tasks
-- **Comprehensive Evaluation**: Field-specific scoring with Japanese text normalization and fuzzy matching
+- **Meta-Prompt Optimization**: Automated prompt engineering for information extraction tasks, including optimizers: 
+   - Fewshot learning optimization: boostrap examples with random search
+   - Instruction optimization: MIPROv2, SIMBA
+- **Comprehensive Evaluation**: Field-specific scoring with text normalization and extact/fuzzy matching
 
 ## 📋 Project Structure
 
@@ -77,6 +79,15 @@ Execute the main pipeline:
 ```bash
 python main.py
 ```
+
+
+### Performance
+| Model      | Baseline Prompting | Meta-Prompting        | Improvement |
+|------------|--------------------|-----------------------|-------------|
+| gpt 4o-mini| 73.68%             | 84.29%                | 10.62%      |
+| gpt 4o     | 49.81%             | 91.85%                | 42.04%      |
+| gpt 5      | 86.98%             | **98.26%**                | 11.28%      |
+
 
 ---
 

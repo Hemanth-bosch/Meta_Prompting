@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Literal, Dict, Any
-from dspy.teleprompt import BootstrapFewShotWithRandomSearch, MIPROv2
+from dspy.teleprompt import BootstrapFewShotWithRandomSearch, MIPROv2, SIMBA
 from dspy import GEPA
 
 
@@ -10,7 +10,7 @@ class OptimizationConfig:
     # Core identification
     name: str = "Default"
     description: str = "Default optimization strategy"
-    optimizer_type: Literal["bootstrap", "gepa", "miprov2"] = "bootstrap"
+    optimizer_type: Literal["bootstrap", "gepa", "miprov2", "simba"] = "bootstrap"
     
     # Common parameters - aligned with DSPy defaults where applicable
     num_threads: int = None  # DSPy default: None (uses system default)
@@ -36,7 +36,8 @@ class OptimizationConfig:
         defaults = {
             "bootstrap": 16,  # DSPy default
             "gepa": 4,        # Common default
-            "miprov2": 4      # DSPy default
+            "miprov2": 4,     # DSPy default
+            "simba": 4        # SIMBA default
         }
         return defaults.get(self.optimizer_type, 4)
     
@@ -45,7 +46,8 @@ class OptimizationConfig:
         defaults = {
             "bootstrap": 4,   # DSPy default
             "gepa": 4,        # Common default  
-            "miprov2": 4      # DSPy default
+            "miprov2": 4,     # DSPy default
+            "simba": 4        # SIMBA default
         }
         return defaults.get(self.optimizer_type, 4)
     
@@ -66,6 +68,12 @@ class OptimizationConfig:
                 # DSPy defaults: auto='light', max_labeled_demos=4, 
                 # max_bootstrapped_demos=4, seed=9
                 "auto": "light"
+            },
+            "simba": {
+                # SIMBA defaults: max_steps=8, bsize=32, num_candidates=6, max_demos=4
+                "max_steps": 8,
+                "bsize": 32,
+                "num_candidates": 6
             }
         }
         return defaults.get(self.optimizer_type, {})
@@ -143,6 +151,7 @@ class OptimizationRunner:
                 print(f"  ⚠️  Score not better than current best ({best_score:.1f}%)")
         
         self._print_final_results(best_strategy_name, baseline_score, best_score)
+        self.best_strategy_name = best_strategy_name  # Store for external access
         return best_extractor, best_score
     
     def _evaluate_baseline(self) -> float:
@@ -187,6 +196,23 @@ class OptimizationRunner:
             
         elif config.optimizer_type == "miprov2":
             optimizer = self._create_miprov2_optimizer(config)
+            
+        elif config.optimizer_type == "simba":
+            simba_kwargs = {
+                "metric": self.metric,
+                "max_steps": config.get_param("max_steps", 8),  # SIMBA default
+                "max_demos": config.max_labeled_demos,  # Use common demo parameter
+                "bsize": config.get_param("bsize", 32),  # SIMBA default
+                "num_candidates": config.get_param("num_candidates", 6),  # SIMBA default
+            }
+            # Add num_threads only if specified (let DSPy handle None default)
+            if config.num_threads is not None:
+                simba_kwargs["num_threads"] = config.num_threads
+            # Add any additional SIMBA parameters from optimizer_params
+            for param_name, param_value in config.optimizer_params.items():
+                if param_name not in simba_kwargs and param_value is not None:
+                    simba_kwargs[param_name] = param_value
+            optimizer = SIMBA(**simba_kwargs)
             
         else:
             raise ValueError(f"Unknown optimizer type: {config.optimizer_type}")
@@ -327,6 +353,34 @@ def create_miprov2_strategy(name: str, description: str, auto="light",
     )
 
 
+def create_simba_strategy(name: str, description: str, max_steps=8,
+                         max_labeled_demos=4, max_bootstrapped_demos=None,
+                         num_threads=None, bsize=32, num_candidates=6,
+                         **simba_params) -> OptimizationConfig:
+    """
+    Helper function to create SIMBA optimization strategies with intuitive interface.
+    """
+    # Set common SIMBA parameters in optimizer_params
+    optimizer_params = {
+        "max_steps": max_steps,
+        "bsize": bsize,
+        "num_candidates": num_candidates
+    }
+    
+    # Add any additional SIMBA-specific parameters
+    optimizer_params.update(simba_params)
+    
+    return OptimizationConfig(
+        name=name,
+        description=description,
+        optimizer_type="simba",
+        num_threads=num_threads,
+        max_labeled_demos=max_labeled_demos,
+        max_bootstrapped_demos=max_bootstrapped_demos,
+        optimizer_params=optimizer_params
+    )
+
+
 # Example usage with custom strategies:
 if __name__ == "__main__":
     
@@ -373,29 +427,7 @@ if __name__ == "__main__":
             # minibatch=True,
             # minibatch_size=25,
             # view_data_batch_size=5
-        ),
-        # create_miprov2_strategy(
-        #     name="MIPROv2 Balanced Japanese", 
-        #     description="MIPROv2 medium optimization with balanced performance",
-        #     auto="medium",
-        #     minibatch=True,
-        #     minibatch_size=50,
-        #     view_data_batch_size=10,
-        #     num_trials=15
-        # ),
-        # create_miprov2_strategy(
-        #     name="MIPROv2 Comprehensive Japanese",
-        #     description="MIPROv2 heavy optimization with comprehensive search",
-        #     auto="heavy",
-        #     num_threads=6,
-        #     max_labeled_demos=6,
-        #     max_bootstrapped_demos=6,
-        #     minibatch=True,
-        #     minibatch_size=75,
-        #     view_data_batch_size=15,
-        #     num_trials=25,
-        #     seed=42  # For reproducibility
-        # )
+        )
     ]
     
     # Combine all strategies
