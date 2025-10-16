@@ -4,6 +4,10 @@ import json
 import os
 import random
 
+from pytesseract import Output
+import pytesseract
+from PIL import Image
+
 def load_japanese_order_dataset(data_dir: str) -> List[dspy.Example]:
 
     images_dir = os.path.join(data_dir, "png")
@@ -93,6 +97,46 @@ def split_order_dataset(dataset, train_ratio=0.6, val_ratio=0.3, test_ratio=0.1,
     print(f"  test set: {len(test_set)} samples ({len(test_set)/total:.1%})")
     
     return train_set, val_set, test_set
+
+### PDF to image processing functions
+# Render a PDF into PIL images using PyMuPDF (fitz)
+def process_pdf_into_image(pdf_path: str, dpi: int = 200):
+    import fitz  # PyMuPDF
+    images = []
+    doc = fitz.open(pdf_path)
+    try:
+        zoom = dpi / 72.0
+        mat = fitz.Matrix(zoom, zoom)
+        for page in doc:
+            pix = page.get_pixmap(matrix=mat, alpha=False)
+            mode = "RGB" if pix.n < 4 else "RGBA"
+            im = Image.frombytes(mode, (pix.width, pix.height), pix.samples)
+            if mode == "RGBA":
+                im = im.convert("RGB")
+            images.append(im)
+    finally:
+        doc.close()
+    return images
+
+# process the pdf files within a given directory into images into another directory
+def process_pdf_files_into_images_with_rotation(pdf_dir: str, image_dir: str):
+    import os
+    os.makedirs(image_dir, exist_ok=True)
+    for pdf_file in os.listdir(pdf_dir):
+        if pdf_file.endswith('.pdf'):
+            pdf_path = os.path.join(pdf_dir, pdf_file)
+            images = process_pdf_into_image(pdf_path)
+            base = os.path.splitext(pdf_file)[0]
+            for idx, image in enumerate(images, start=1):
+                # add page number to the image name (1-based)
+                image_name = f"{base}_page_{idx}.png"
+                # do the rotation of the image
+                osd_data = pytesseract.image_to_osd(image, output_type=Output.DICT)
+                rotate_angle = osd_data['rotate']
+                print("Detected rotation angle: ", rotate_angle)
+                image = image.rotate(-rotate_angle, expand=True)
+                out_path = os.path.join(image_dir, image_name)
+                image.save(out_path)
 
 
 if __name__ == "__main__":
