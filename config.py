@@ -17,6 +17,7 @@ REFLECTION_MODEL_NAME = dotenv.get_key(_dotenv_file, "REFLECTION_LM_NAME")
 def create_lm(model_name: Optional[str] = None,
               temperature: Optional[float] = None,
               max_tokens: Optional[int] = None,
+              cache: bool = True,
               **kwargs) -> dspy.LM:
     """
     Create a DSPy LM instance with Azure OpenAI credentials.
@@ -25,15 +26,17 @@ def create_lm(model_name: Optional[str] = None,
         model_name: Model name (defaults to MODEL_NAME from .env)
         temperature: Temperature setting (auto-set to 1.0 for gpt-5 if not specified)
         max_tokens: Max tokens (auto-set to 20000 for gpt-5 if not specified)
+        cache: Enable/disable response caching (default: True, matches dspy.LM default)
         **kwargs: Additional parameters for dspy.LM
 
     Returns:
         dspy.LM instance configured with Azure OpenAI
 
     Examples:
-        >>> lm = create_lm()  # Uses MODEL_NAME from .env
+        >>> lm = create_lm()  # Uses MODEL_NAME from .env with cache enabled
         >>> lm = create_lm("gpt-4o")  # Custom model
         >>> lm = create_lm("gpt-4o", temperature=0.7)  # Custom params
+        >>> lm = create_lm("gpt-4o", cache=False)  # Disable caching for debugging
     """
     # Use default model if not specified
     if model_name is None:
@@ -53,6 +56,7 @@ def create_lm(model_name: Optional[str] = None,
         "api_key": AZURE_API_KEY,
         "api_base": AZURE_ENDPOINT,
         "api_version": AZURE_API_VERSION,
+        "cache": cache,
         **kwargs
     }
 
