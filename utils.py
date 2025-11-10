@@ -139,6 +139,72 @@ def process_pdf_files_into_images_with_rotation(pdf_dir: str, image_dir: str):
                 image.save(out_path)
 
 
+def load_yanase_order_dataset(images_dir: str = "data/YANASE_images",
+                               ground_truth_dir: str = "data/YANASE_ground_truth") -> List[dspy.Example]:
+    """
+    Load YANASE order dataset with paired images and ground truth labels
+
+    Args:
+        images_dir: Directory containing PNG images
+        ground_truth_dir: Directory containing ground truth JSON files
+
+    Returns:
+        List of dspy.Example objects with image inputs and expected outputs
+    """
+    from pathlib import Path
+
+    gt_path = Path(ground_truth_dir)
+    images_path = Path(images_dir)
+
+    if not gt_path.exists():
+        raise ValueError(f"Ground truth directory not found: {ground_truth_dir}")
+    if not images_path.exists():
+        raise ValueError(f"Images directory not found: {images_dir}")
+
+    examples = []
+
+    # Iterate through all ground truth files
+    for gt_file in sorted(gt_path.glob("*_ground_truth.json")):
+        base_name = gt_file.stem.replace("_ground_truth", "")
+        image_file = images_path / f"{base_name}.png"
+
+        if not image_file.exists():
+            print(f"⚠️  Image not found for {gt_file.name}, skipping...")
+            continue
+
+        try:
+            # Load ground truth JSON
+            with open(gt_file, 'r', encoding='utf-8') as f:
+                gt_data = json.load(f)
+
+            # Load image
+            dspy_image = dspy.Image.from_file(str(image_file))
+
+            # Create dspy.Example with inputs and expected outputs
+            example = dspy.Example(
+                image=dspy_image,
+                image_filename=base_name,
+                # Seller information
+                expected_soldName1=gt_data.get("soldName1", ""),
+                expected_soldName2=gt_data.get("soldName2", ""),
+                expected_soldPostal=gt_data.get("soldPostal", ""),
+                expected_soldAddress=gt_data.get("soldAddress", ""),
+                expected_soldTex=gt_data.get("soldTex", ""),
+                expected_soldFax=gt_data.get("soldFax", ""),
+                # Product orders (list of dicts)
+                expected_productOrders=gt_data.get("productOrders", [])
+            ).with_inputs("image")
+
+            examples.append(example)
+
+        except Exception as e:
+            print(f"❌ Error loading {gt_file.name}: {e}")
+            continue
+
+    print(f"✅ Successfully loaded {len(examples)} YANASE examples")
+    return examples
+
+
 if __name__ == "__main__":
     dataset_path = "./data"
     dataset = load_japanese_order_dataset(dataset_path)
