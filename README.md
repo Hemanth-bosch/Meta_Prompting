@@ -17,8 +17,8 @@ A meta-prompting system for extracting structured information from images using 
 
 ```
 meta-prompting/
-├── main.py                   # Japanese order extraction pipeline
-├── mainv2.py                 # YANASE order extraction pipeline
+├── extract_jo.py             # Japanese order extraction pipeline
+├── extract_yanase.py         # YANASE order extraction pipeline
 ├── config.py                 # Model configuration and DSPy setup
 ├── utils.py                  # Dataset loading and preprocessing utilities
 ├── eval.py                   # Evaluation metrics and scoring functions
@@ -59,7 +59,7 @@ uv sync
 source .venv/bin/activate # Windows: .venv\Scripts\activate
 ```
 
-3. Configure environment variables in `.env`:
+3. Configure environment variables in `.env`. A template is provided in `.emv.template`:
 ```bash
 # Azure OpenAI configuration
 AZURE_OPENAI_API_KEY=your_api_key_here
@@ -110,16 +110,44 @@ data/
 
 
     
-### Running the Pipeline
+## Running the Pipeline
 
-#### Japanese Order Extraction (main.py)
+### PDF Preprocessing (Optional)
+
+If your source data is in PDF format, you can convert it to images with automatic rotation correction:
+
+**Prerequisites:**
+- Install Tesseract OCR for rotation detection:
+  ```bash
+  # macOS
+  brew install tesseract
+
+  # Ubuntu/Debian
+  sudo apt-get install tesseract-ocr
+
+  # Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki
+  ```
+
+    **Usage:**
+    ```python
+    from utils import process_pdf_files_into_images_with_rotation
+
+    # Convert PDFs to rotation-corrected images
+    pdf_dir = "data/YANASE"              # Directory containing PDF files
+    output_dir = "data/YANASE_images"     # Output directory for PNG images
+
+    process_pdf_files_into_images_with_rotation(pdf_dir, output_dir)
+    ```
+
+
+### Japanese Order Extraction with Prompt Optimization (extract_jo.py)
 Execute the Japanese order extraction pipeline:
 ```bash
 # Basic usage (uses defaults from .env)
-python main.py
+python extract_jo.py
 
 # With custom configuration
-python main.py \
+python extract_jo.py \
     --images-dir ./data/png \
     --gt-dir ./data/json \
     --model-name azure/gpt-4o-mini \
@@ -134,14 +162,14 @@ python main.py \
 # --analyze-sets [val|test|both]  Which dataset to analyze (default: test)
 ```
 
-#### YANASE Order Extraction (mainv2.py)
+### YANASE Order Extraction with Prompt Optimization (extract_yanase.py)
 Execute the YANASE order extraction pipeline:
 ```bash
 # Basic usage (uses defaults from .env)
-python mainv2.py
+python extract_yanase.py
 
 # With custom configuration
-python mainv2.py \
+python extract_yanase.py \
     --images-dir data/YANASE_images \
     --ground-truth-dir data/YANASE_ground_truth \
     --model-name azure/gpt-4o-mini \
@@ -149,7 +177,7 @@ python mainv2.py \
     --save-model \
     --save-results
 
-# Same options as main.py available
+# Same options as extract_jo.py available
 ```
 
 
@@ -158,7 +186,7 @@ python mainv2.py \
 #### Japanese Order (JO) Dataset
 Extraction accuracy on Japanese business order documents with 13 fields:
 
-| Model       | Baseline Prompting | Meta-Prompting | Improvement |
+| Model       | Human-crafted Prompts | Meta-Prompting | Improvement |
 |-------------|--------------------| ---------------|-------------|
 | gpt-4o-mini | 73.68%             | 84.29%         | +10.62%     |
 | gpt-4o      | 49.81%             | 91.85%         | +42.04%     |
@@ -177,10 +205,12 @@ Extraction accuracy on Japanese business order documents with 13 fields:
 #### YANASE Order Dataset
 Extraction accuracy on YANASE automotive parts order documents with 16 fields:
 
-| Model       | Baseline Prompting | Meta-Prompting | Improvement |
-|-------------|--------------------| ---------------|-------------|
-| gpt-4o-mini | TBD                | TBD            | TBD         |
-| gpt-5       | TBD                | TBD            | TBD         |
+| Model       | Human-crafted Prompts | Meta-Prompting | Improvement |
+|-------------|-----------------------| ---------------|-------------|
+| gpt-4o-mini | 71.3%                 | 79.8%          | +8.5%       |
+| gpt-4o      | 73.9%                 | 83.8%          | +9.9%       |
+| gpt-4.1     | 68.9%                 | **88.1%**      | +19.2%      |
+| gpt-5       | 71.1%                 | 79.0%          | +7.9%       |
 
 <!-- 
 **Extracted Fields:**
