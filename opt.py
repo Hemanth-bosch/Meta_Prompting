@@ -386,36 +386,36 @@ if __name__ == "__main__":
     
     # Create custom Bootstrap strategies
     bootstrap_strategies = [
-        # create_bootstrap_strategy(
-        #     name="High Exploration Bootstrap",
-        #     description="High candidate exploration with moderate demos",
-        #     max_labeled_demos=5,
-        #     max_bootstrapped_demos=3,
-        #     num_candidate_programs=30,
-        #     num_threads=6,
-        #     max_rounds=1
-        # ),
-        # create_bootstrap_strategy(
-        #     name="Deep Refinement Bootstrap",
-        #     description="Multiple rounds of refinement with fewer candidates",
-        #     max_labeled_demos=3,
-        #     max_bootstrapped_demos=5,
-        #     num_candidate_programs=10,
-        #     num_threads=4,
-        #     max_rounds=3
-        # )
+        create_bootstrap_strategy(
+            name="High Exploration Bootstrap",
+            description="High candidate exploration with moderate demos",
+            max_labeled_demos=5,
+            max_bootstrapped_demos=3,
+            num_candidate_programs=30,
+            num_threads=6,
+            max_rounds=1
+        ),
+        create_bootstrap_strategy(
+            name="Deep Refinement Bootstrap",
+            description="Multiple rounds of refinement with fewer candidates",
+            max_labeled_demos=3,
+            max_bootstrapped_demos=5,
+            num_candidate_programs=10,
+            num_threads=4,
+            max_rounds=3
+        )
     ]
     
     # Create custom GEPA strategies for Japanese order extraction
     gepa_strategies = [
-        # create_gepa_strategy(
-        #     name="GEPA Light Japanese",
-        #     description="GEPA light optimization for Japanese order extraction with fast iteration",
-        #     auto="light",
-        #     num_threads=4,
-        #     track_stats=True,
-        #     use_merge=False
-        # )
+        create_gepa_strategy(
+            name="GEPA Light Japanese",
+            description="GEPA light optimization for Japanese order extraction with fast iteration",
+            auto="light",
+            num_threads=4,
+            track_stats=True,
+            use_merge=False
+        )
     ]
     
     # Create custom MIPROv2 strategies for Japanese order extraction
