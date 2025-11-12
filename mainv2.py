@@ -1,5 +1,5 @@
 import dspy
-from utils import load_yanase_order_dataset, stratified_split_yanase_dataset
+from utils import load_yanase_order_dataset, stratified_split_yanase_dataset, split_order_dataset
 from config import *
 from config import reconfigure_lm
 from eval import yanase_order_extraction_metric
@@ -55,13 +55,23 @@ print(f"{'='*80}\n")
 
 # Load YANASE data with ground truth
 dataset = load_yanase_order_dataset()
+
+# original splitting method
+# train_set, val_set, test_set = split_order_dataset(
+#     dataset,
+#     train_ratio=0.5,
+#     val_ratio=0.3,
+#     test_ratio=0.2,
+#     random_seed=42
+# )
+
 train_set, val_set, test_set = stratified_split_yanase_dataset(
     dataset,
-    train_ratio=0.6,
-    val_ratio=0.2,
+    train_ratio=0.5,
+    val_ratio=0.3,
     test_ratio=0.2,
-    max_examples_per_seller=3,  # Downsample to prevent overfitting to dominant seller
     random_seed=42,
+    stratify_by="shipPostal",  # Use expected_* prefix and shipPostal for better stratification
     verbose=True
 )
 print("train set: ", len(train_set))
@@ -232,7 +242,6 @@ print(f"Baseline Test Score: {baseline_test_score:.3f} ({baseline_test_score:.1%
 print(f"\n{'='*80}")
 print(f"Starting Optimization...")
 print(f"{'='*80}\n")
-
 optimized_extractor, best_score = runner.run_optimization(custom_strategies)
 
 # Calculate and display improvement
