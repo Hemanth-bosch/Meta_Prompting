@@ -17,8 +17,16 @@ dotenv.load_dotenv(override=True)
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description='Japanese Order Extraction Optimization')
+# Data path arguments
+parser.add_argument('--images-dir', type=str, default=None,
+                    help='Path to Japanese order images directory (default: from env JAPANESE_ORDER_IMAGES_DIR or "./data/png")')
+parser.add_argument('--gt-dir', type=str, default=None,
+                    help='Path to ground truth JSON directory (default: from env JAPANESE_ORDER_GT_DIR or "./data/json")')
+# Model and caching arguments
 parser.add_argument('--model-name', type=str, default=None,
                     help='Model name to use (default: from .env MODEL_NAME)')
+parser.add_argument('--no-cache', action='store_true',
+                    help='Disable LLM response caching (default: caching enabled)')
 parser.add_argument('--load-extractor', type=str, default=None,
                     help='Path to previously saved extractor to load (default: from .env CACHED_EXTRACTOR_PATH)')
 parser.add_argument('--skip-load', action='store_true',
@@ -32,29 +40,39 @@ parser.add_argument('--save-results', action='store_true', default=False,
 
 args = parser.parse_args()
 
-# Reconfigure model if custom model name provided
-if args.model_name:
-    print(f"\n🔄 Reconfiguring DSPy with custom model: {args.model_name}")
-    reconfigure_lm(args.model_name)
-    print(f"✅ Model switched to: {args.model_name}\n")
+# Reconfigure model if custom model name or cache setting provided
+cache_enabled = not args.no_cache
+if args.model_name or args.no_cache:
+    model_to_use = args.model_name or os.getenv('MODEL_NAME')
+    print(f"\n🔄 Reconfiguring DSPy with model: {model_to_use}, cache: {cache_enabled}")
+    reconfigure_lm(model_to_use, cache=cache_enabled)
+    print(f"✅ Model configured: {model_to_use}, cache: {cache_enabled}\n")
+
+# Determine data paths (from args, env, or defaults)
+images_dir = args.images_dir or os.getenv("JAPANESE_ORDER_IMAGES_DIR", "./data/png")
+gt_dir = args.gt_dir or os.getenv("JAPANESE_ORDER_GT_DIR", "./data/json")
 
 # Display configuration
 print(f"\n{'='*80}")
 print(f"🔧 Configuration:")
 print(f"  Model: {args.model_name or os.getenv('MODEL_NAME', 'Unknown')}")
+print(f"  Cache: {cache_enabled}")
 print(f"  Load extractor: {args.load_extractor or dotenv.get_key(dotenv.find_dotenv(), 'CACHED_EXTRACTOR_PATH') if not args.skip_load else 'No'}")
 print(f"  Analyze sets: {args.analyze_sets}")
 print(f"  Save model: {args.save_model}")
 print(f"  Save results: {args.save_results}")
+print(f"\n📁 Data Paths:")
+print(f"  Images: {images_dir}")
+print(f"  Ground truth: {gt_dir}")
 print(f"{'='*80}\n")
 
 # Load data
-dataset_path = "./data"
-dataset = load_japanese_order_dataset(dataset_path)
+dataset = load_japanese_order_dataset(images_dir=images_dir, gt_dir=gt_dir)
 train_set, val_set, test_set = split_order_dataset(dataset)
 print("train set: ", len(train_set))
 print("val set: ", len(val_set))
 print("test set: ", len(test_set))
+
 
 # Extractor
 class JapaneseOrderExtraction(dspy.Signature):

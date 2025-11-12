@@ -17,6 +17,12 @@ dotenv.load_dotenv(override=True)
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description='YANASE Order Extraction Optimization')
+# Data path arguments
+parser.add_argument('--images-dir', type=str, default=None,
+                    help='Path to YANASE images directory (default: from env YANASE_IMAGES_DIR or "data/YANASE_images")')
+parser.add_argument('--ground-truth-dir', type=str, default=None,
+                    help='Path to ground truth JSON directory (default: from env YANASE_GT_DIR or "data/YANASE_ground_truth")')
+# Model and caching arguments
 parser.add_argument('--model-name', type=str, default=None,
                     help='Model name to use (default: from .env MODEL_NAME)')
 parser.add_argument('--no-cache', action='store_true',
@@ -32,6 +38,7 @@ parser.add_argument('--save-model', action='store_true', default=False,
 parser.add_argument('--save-results', action='store_true', default=False,
                     help='Save performance analysis results to JSON')
 
+
 args = parser.parse_args()
 
 # Reconfigure model if custom model name or cache setting provided
@@ -42,6 +49,10 @@ if args.model_name or args.no_cache:
     reconfigure_lm(model_to_use, cache=cache_enabled)
     print(f"✅ Model configured: {model_to_use}, cache: {cache_enabled}\n")
 
+# Determine data paths (from args, env, or defaults)
+images_dir = args.images_dir or os.getenv("YANASE_IMAGES_DIR", "data/YANASE_images")
+ground_truth_dir = args.ground_truth_dir or os.getenv("YANASE_GT_DIR", "data/YANASE_ground_truth")
+
 # Display configuration
 print(f"\n{'='*80}")
 print(f"🔧 Configuration:")
@@ -51,10 +62,13 @@ print(f"  Load extractor: {args.load_extractor or dotenv.get_key(dotenv.find_dot
 print(f"  Analyze sets: {args.analyze_sets}")
 print(f"  Save model: {args.save_model}")
 print(f"  Save results: {args.save_results}")
+print(f"\n📁 Data Paths:")
+print(f"  Images: {images_dir}")
+print(f"  Ground truth: {ground_truth_dir}")
 print(f"{'='*80}\n")
 
 # Load YANASE data with ground truth
-dataset = load_yanase_order_dataset()
+dataset = load_yanase_order_dataset(images_dir=images_dir, ground_truth_dir=ground_truth_dir)
 
 # original splitting method
 # train_set, val_set, test_set = split_order_dataset(
