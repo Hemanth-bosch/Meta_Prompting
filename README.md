@@ -85,9 +85,11 @@ JAPANESE_ORDER_GT_DIR=./data/json
 
 4. Prepare data within the `data` folder:
 
+>Please email data owners of the JO and YANASE data (Matthew Deng (Matthew.DENG@cn.bosch.com) and Vinayak Kumar (Vinayak.Kumar2@sg.bosch.com)) and send their confirmation email proofs to xingbo.wang@us.bosch.com
+
 **4.1 Japanese Order (JO) Dataset**
 
-Download from: [JO data - OneDrive link (access granted on demand)](https://bosch-my.sharepoint.com/:u:/r/personal/wax3syv_bosch_com/Documents/aim205/meta-agents/meta-prompting-data.zip?csf=1&web=1&e=HGZVem)
+Download from: [JO data - OneDrive link (access granted on demand)](https://bosch-my.sharepoint.com/:u:/r/personal/wax3syv_bosch_com/Documents/aim205/meta-agents/JO-data.zip?csf=1&web=1&e=liwUyV) 
 
 Extract to create the following structure:
 ```
