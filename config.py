@@ -102,13 +102,16 @@ def create_lm(model_name: Optional[str] = None,
     if model_name is None:
         model_name = DEFAULT_MODEL_NAME
 
+    # Default max_tokens to 16000 to avoid truncation on structured outputs
+    if max_tokens is None:
+        max_tokens = 16000
+
     # Auto-configure gpt-5 models with special settings
     is_gpt5 = "gpt-5" in model_name.lower()
     if is_gpt5:
         if temperature is None:
             temperature = 1.0
-        if max_tokens is None:
-            max_tokens = 20000
+        max_tokens = 20000
 
     # Build LM parameters: provider-specific credentials + common params
     lm_params = {
@@ -127,7 +130,7 @@ def create_lm(model_name: Optional[str] = None,
 
 
 # Initialize main language model
-lm = create_lm(DEFAULT_MODEL_NAME)
+lm = create_lm(DEFAULT_MODEL_NAME, max_tokens=20000)
 
 # Initialize reflection language model (used by GEPA and similar optimizers)
 reflectin_lm = create_lm(REFLECTION_MODEL_NAME, temperature=1.0, max_tokens=20000)
