@@ -74,6 +74,31 @@ def _get_provider_params(model_name: str) -> dict:
         return {}
 
 
+def _get_default_max_tokens(model_name: str) -> int:
+    """Return a safe default max_tokens for the given model, staying within provider limits."""
+    name_lower = model_name.lower()
+    # Strip provider prefix for matching (e.g. "azure/gpt-4o-mini" → "gpt-4o-mini")
+    base = name_lower.split("/", 1)[-1] if "/" in name_lower else name_lower
+
+    # Model-specific limits (output token limits from provider docs)
+    if "gpt-5" in base:
+        return 20000
+    if "gpt-4.1" in base:
+        return 16384
+    if "gpt-4o-mini" in base:
+        return 16384
+    if "gpt-4o" in base:
+        return 16384
+    if "o3" in base or "o4" in base:
+        return 16384  # reasoning models
+    if "gemini" in base:
+        return 8192
+    if "claude" in base:
+        return 8192
+    # Conservative fallback
+    return 8192
+
+
 def create_lm(model_name: Optional[str] = None,
               temperature: Optional[float] = None,
               max_tokens: Optional[int] = None,
@@ -92,7 +117,7 @@ def create_lm(model_name: Optional[str] = None,
     Args:
         model_name: Model name with provider prefix (defaults to MODEL_NAME from .env)
         temperature: Temperature setting (auto-set to 1.0 for gpt-5 if not specified)
-        max_tokens: Max tokens (auto-set to 20000 for gpt-5 if not specified)
+        max_tokens: Max tokens (auto-derived per model if not specified)
         cache: Enable/disable response caching (default: True)
         **kwargs: Additional parameters for dspy.LM
 
@@ -102,16 +127,15 @@ def create_lm(model_name: Optional[str] = None,
     if model_name is None:
         model_name = DEFAULT_MODEL_NAME
 
-    # Default max_tokens to 16000 to avoid truncation on structured outputs
+    # Auto-select max_tokens based on model limits if not explicitly provided
     if max_tokens is None:
-        max_tokens = 16000
+        max_tokens = _get_default_max_tokens(model_name)
 
     # Auto-configure gpt-5 models with special settings
     is_gpt5 = "gpt-5" in model_name.lower()
     if is_gpt5:
         if temperature is None:
             temperature = 1.0
-        max_tokens = 20000
 
     # Build LM parameters: provider-specific credentials + common params
     lm_params = {
@@ -130,10 +154,10 @@ def create_lm(model_name: Optional[str] = None,
 
 
 # Initialize main language model
-lm = create_lm(DEFAULT_MODEL_NAME, max_tokens=20000)
+lm = create_lm(DEFAULT_MODEL_NAME)
 
 # Initialize reflection language model (used by GEPA and similar optimizers)
-reflectin_lm = create_lm(REFLECTION_MODEL_NAME, temperature=1.0, max_tokens=20000)
+reflectin_lm = create_lm(REFLECTION_MODEL_NAME, temperature=1.0)
 
 # Configure DSPy with the main LM
 dspy.configure(lm=lm)

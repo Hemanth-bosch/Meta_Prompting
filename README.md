@@ -17,22 +17,42 @@ A meta-prompting system for extracting structured information from images using 
 
 ```
 meta-prompting/
-├── extract_jo.py             # Japanese order extraction pipeline
-├── extract_yanase.py         # YANASE order extraction pipeline
-├── config.py                 # Model configuration and DSPy setup
-├── utils.py                  # Dataset loading and preprocessing utilities
-├── eval.py                   # Evaluation metrics and scoring functions
-├── opt.py                    # Optimization strategies and runner classes
-├── posthoc_analysis.py       # Performance analysis and reporting
-├── debug_products.py         # Product detail debugging utilities
-├── data/                     # Dataset directory
-│   ├── json/                # Japanese order ground truth JSON (50 files)
-│   ├── png/                 # Japanese order images (50 files)
-│   ├── YANASE_ground_truth/ # YANASE ground truth JSON annotations
-│   ├── YANASE_images/       # YANASE processed PNG images
-│   └── YANASE/              # YANASE original PDF documents
-├── .cache/                   # Cached optimized extractors
-└── .env                      # Environment configuration
+├── extract_jo.py              # Japanese order extraction pipeline
+├── extract_yanase.py          # YANASE order extraction pipeline
+├── config.py                  # Model configuration and DSPy setup (multi-provider)
+│
+├── signatures/                # DSPy Signature definitions
+│   ├── jo.py                  #   JO extraction fields
+│   └── yanase.py              #   YANASE extraction fields
+│
+├── evaluation/                # Evaluation metrics and analysis
+│   ├── common.py              #   Shared helpers (normalization, similarity)
+│   ├── jo_metric.py           #   JO-specific metrics
+│   ├── yanase_metric.py       #   YANASE-specific metrics
+│   └── posthoc_analysis.py    #   Performance analysis and reporting
+│
+├── utils/                     # Data utilities
+│   ├── data_loading.py        #   Dataset loading functions
+│   ├── splitting.py           #   Train/val/test splitting
+│   └── pdf_processing.py      #   PDF-to-image conversion
+│
+├── optimization/              # Optimization strategies
+│   └── opt.py                 #   OptimizationRunner and strategy builders
+│
+├── tests/                     # Test and example scripts
+│   ├── test_model_comparison.py
+│   ├── test_vertex_gemini.py
+│   └── ...
+│
+├── data/                      # Dataset directory
+│   ├── json/                  #   JO ground truth JSON (50 files)
+│   ├── png/                   #   JO order images (50 files)
+│   ├── YANASE_ground_truth/   #   YANASE ground truth JSON annotations
+│   ├── YANASE_images/         #   YANASE processed PNG images
+│   └── YANASE/                #   YANASE original PDF documents
+│
+├── .cache/                    # Cached optimized extractors
+└── .env                       # Environment configuration
 ```
 
 ## 🚀 Quick Start
@@ -40,7 +60,7 @@ meta-prompting/
 ### Prerequisites
 
 - Python 3.12+
-- Azure OpenAI API access
+- LLM API access (Azure OpenAI, Vertex AI, OpenAI, or Anthropic)
 - DSPy framework
 - uv package manager
 
@@ -59,26 +79,28 @@ uv sync
 source .venv/bin/activate # Windows: .venv\Scripts\activate
 ```
 
-3. Configure environment variables in `.env`. A template is provided in `.emv.template`:
+3. Configure environment variables in `.env`. A template is provided in `.env.template`:
 ```bash
-# Azure OpenAI configuration
+# Model configuration (prefix determines provider)
+MODEL_NAME=azure/gpt-4o-mini          # Azure OpenAI
+# MODEL_NAME=vertex_ai/gemini-2.0-flash # Vertex AI Gemini
+# MODEL_NAME=openai/gpt-4o             # OpenAI direct
+# MODEL_NAME=anthropic/claude-sonnet-4-20250514  # Anthropic direct
+
+# Azure OpenAI (required for azure/ models)
 AZURE_OPENAI_API_KEY=your_api_key_here
 AZURE_OPENAI_ENDPOINT=your_endpoint_here
 AZURE_OPENAI_API_VERSION=2025-04-01-preview
 
-# Model configuration
-MODEL_NAME=azure/gpt-4o-mini
-REFLECTION_LM_NAME=azure/gpt-5
+# Vertex AI (required for vertex_ai/ models)
+# VERTEX_PROJECT=your_project_id
+# VERTEX_LOCATION=us-central1
 
-# Path to the cached extractor
+# Caching and data paths
 CACHED_EXTRACTOR_PATH=.cache/
 CACHED_EXTRACTOR_DIR=.cache/
-
-# YANASE Dataset Paths (optional - defaults shown)
 YANASE_IMAGES_DIR=data/YANASE_images
 YANASE_GT_DIR=data/YANASE_ground_truth
-
-# Japanese Order Dataset Paths (optional - defaults shown)
 JAPANESE_ORDER_IMAGES_DIR=./data/png
 JAPANESE_ORDER_GT_DIR=./data/json
 ```
@@ -223,4 +245,4 @@ Extraction accuracy on YANASE automotive parts order documents with 16 fields:
 
 ---
 
-**Note**: This project requires access to Azure OpenAI services and is optimized for image order document processing. Ensure proper API quotas and rate limiting when running optimization experiments.
+**Note**: This project supports multiple LLM providers (Azure OpenAI, Vertex AI, OpenAI, Anthropic) via LiteLLM routing. Set the `MODEL_NAME` prefix to select a provider. Ensure proper API quotas and rate limiting when running optimization experiments.
