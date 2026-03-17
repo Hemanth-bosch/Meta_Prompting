@@ -3,7 +3,7 @@
 A meta-prompting system for extracting structured information from images using multimodal language models with automated prompt optimization.
 
 ## Use Case
-- Japanese Order Extraction from Images
+- Information Extraction from Images
 
 
 ### Key Features
