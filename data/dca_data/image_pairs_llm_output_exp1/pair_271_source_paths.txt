@@ -1,0 +1,13 @@
+zip_file:     pdf_3.zip
+original:     C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_3\ee4a8572-ffe7-468d-885b-eba4cbdbf31e\SFS_107_VCU_System State and PLC state HLD_v3.8\SFS_107_VCU_System State and PLC state HLD_v3.8_figures\figure_52_1.png
+reimage:      C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_3\ee4a8572-ffe7-468d-885b-eba4cbdbf31e\SFS_107_VCU_System State and PLC state HLD_v2.5\SFS_107_VCU_System State and PLC state HLD_v2.5_figures\figure_62_1.png
+
+--- LLM Settings ---
+model:        gpt-4.1
+max_tokens:   2048
+top_p:        1
+response_fmt: json_object
+api_version:  2024-08-01-preview
+endpoint:     https://aiq212-openai.openai.azure.com
+image_detail: auto (no override — original size/quality)
+timestamp:    2026-02-27 21:25:58

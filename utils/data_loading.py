@@ -146,3 +146,156 @@ def load_yanase_order_dataset(images_dir: str = None,
 
     print(f"✅ Successfully loaded {len(examples)} YANASE examples")
     return examples
+
+
+def load_dca_dataset(
+    pairs_dir: str = "data/dca_data/image_pairs",
+    gt_dir: str = "data/dca_data/image_pairs_llm_output_exp1"
+) -> List[dspy.Example]:
+    """Load DCA image pair dataset for discard_image classification.
+
+    Each pair consists of:
+    - pairs_dir/<pair_name>/original.png       — original document image
+    - pairs_dir/<pair_name>/reimage.png        — re-imaged / updated version
+    - gt_dir/<pair_name>.json                  — ground truth annotation
+
+    The ground truth JSON supports two naming conventions (both handled):
+      Current:  {"human_label_discard_image": bool, "human_label_changes": str}
+      Legacy:   {"human_evaluation_for_classification": bool,
+                 "human_evaluation_for_change_summary": str}
+
+    Semantic meaning of the boolean label:
+      true  = discard the image pair (images identical / only trivial differences)
+      false = keep (meaningful visual changes exist between original and reimage)
+
+    Returns list of dspy.Example with:
+      image_original:           dspy.Image (input)
+      image_reimage:            dspy.Image (input)
+      expected_discard_image:   str "true" or "false" (label)
+      expected_changes:         str human change summary (auxiliary label, for reference)
+      pair_name:                str metadata
+
+        Note on one-sided pairs:
+            Some dataset entries intentionally contain only one side (original or reimage)
+            and mark the other side as sentinel N/A in source_paths.txt. For these cases,
+            the loader reuses the available image for the missing side so the two-image
+            DSPy signature can still be executed and the pair remains in evaluation.
+    """
+    examples = []
+
+    pairs_dir = os.getenv("DCA_IMAGE_PAIRS_DIR", pairs_dir)
+    gt_dir = os.getenv("DCA_GT_DIR", gt_dir)
+
+    if not os.path.exists(pairs_dir):
+        print(f"Directory {pairs_dir} not found. Returning empty dataset.")
+        return examples
+    if not os.path.exists(gt_dir):
+        print(f"Directory {gt_dir} not found. Returning empty dataset.")
+        return examples
+
+    # List all pair directories
+    pair_dirs = sorted([
+        d for d in os.listdir(pairs_dir)
+        if os.path.isdir(os.path.join(pairs_dir, d))
+    ])
+
+    print(f"Found {len(pair_dirs)} pair directories in {pairs_dir}")
+
+    skipped_no_gt = 0
+    skipped_no_human = 0
+    skipped_missing_img = 0
+    fallback_missing_original = 0
+    fallback_missing_reimage = 0
+
+    for pair_name in pair_dirs:
+        pair_path = os.path.join(pairs_dir, pair_name)
+        original_path = os.path.join(pair_path, "original.png")
+        reimage_path = os.path.join(pair_path, "reimage.png")
+        gt_path = os.path.join(gt_dir, f"{pair_name}.json")
+
+        # Validate image files
+        original_exists = os.path.exists(original_path)
+        reimage_exists = os.path.exists(reimage_path)
+
+        if not original_exists and not reimage_exists:
+            skipped_missing_img += 1
+            continue
+
+        # Sentinel case support: if one side is intentionally missing in export,
+        # reuse the available side so each example still has two image inputs.
+        if not original_exists and reimage_exists:
+            original_path = reimage_path
+            fallback_missing_original += 1
+        elif original_exists and not reimage_exists:
+            reimage_path = original_path
+            fallback_missing_reimage += 1
+
+        # Validate ground truth
+        if not os.path.exists(gt_path):
+            skipped_no_gt += 1
+            continue
+
+        try:
+            with open(gt_path, "r", encoding="utf-8") as f:
+                gt = json.load(f)
+        except Exception as e:
+            print(f"  Warning: Failed to parse {gt_path}: {e}")
+            continue
+
+        # Extract human ground truth.
+        # The current DCA data export uses "human_label_discard_image" (bool)
+        # and "human_label_changes" (str). An older naming convention used
+        # "human_evaluation_for_classification" and
+        # "human_evaluation_for_change_summary". Both are supported here so the
+        # loader works on both current and any legacy GT exports without change.
+        if "human_label_discard_image" in gt:
+            human_classification = gt["human_label_discard_image"]
+            expected_changes = gt.get("human_label_changes", "")
+        elif "human_evaluation_for_classification" in gt:
+            human_classification = gt["human_evaluation_for_classification"]
+            expected_changes = gt.get("human_evaluation_for_change_summary", "")
+        else:
+            skipped_no_human += 1
+            continue
+
+        # Convert boolean to lowercase string for DSPy OutputField matching
+        # (DSPy compares string outputs; the metric normalises both)
+        expected_discard = "true" if human_classification else "false"
+
+        # Load images
+        try:
+            image_original = dspy.Image.from_file(original_path)
+            image_reimage = dspy.Image.from_file(reimage_path)
+        except Exception as e:
+            print(f"  Warning: Failed to load images for {pair_name}: {e}")
+            continue
+
+        example = dspy.Example(
+            image_original=image_original,
+            image_reimage=image_reimage,
+            expected_discard_image=expected_discard,
+            expected_changes=expected_changes,
+            pair_name=pair_name,
+        ).with_inputs("image_original", "image_reimage")
+
+        examples.append(example)
+
+    print(f"Loaded {len(examples)} valid DCA image pairs")
+    if skipped_no_gt:
+        print(f"  Skipped (no ground truth JSON): {skipped_no_gt}")
+    if skipped_no_human:
+        print(f"  Skipped (no human_evaluation_for_classification): {skipped_no_human}")
+    if skipped_missing_img:
+        print(f"  Skipped (missing original/reimage): {skipped_missing_img}")
+    if fallback_missing_original:
+        print(f"  Fallback (missing original -> reimage used): {fallback_missing_original}")
+    if fallback_missing_reimage:
+        print(f"  Fallback (missing reimage -> original used): {fallback_missing_reimage}")
+
+    if examples:
+        discard_true = sum(1 for e in examples if e.expected_discard_image == "true")
+        discard_false = len(examples) - discard_true
+        print(f"  discard_image=true (discard): {discard_true}")
+        print(f"  discard_image=false (keep):   {discard_false}")
+
+    return examples

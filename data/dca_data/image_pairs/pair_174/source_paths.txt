@@ -1,0 +1,3 @@
+zip_file:     pdf_2.zip
+original:     C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_2\6a4aefb3-039e-43b2-91c3-df0a5fb8f899\SFS_103_Networking Architecture_v181.1\SFS_103_Networking Architecture_v181.1_figures\Figure_39__Ethernet_Switch_Firmware_Update.png
+reimage:      N/A (sentinel)

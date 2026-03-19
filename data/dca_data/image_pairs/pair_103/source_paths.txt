@@ -1,0 +1,3 @@
+zip_file:     pdf_1.zip
+original:     C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_1\2028a7f6-8cd5-4f55-aa4a-d2ff379bf461\CTRS_GM_v1\CTRS_GM_v1_figures\figure_303_1.png
+reimage:      C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_1\2028a7f6-8cd5-4f55-aa4a-d2ff379bf461\CTRS_GM_V2\CTRS_GM_V2_figures\figure_303_1.png

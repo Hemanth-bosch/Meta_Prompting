@@ -19,4 +19,9 @@ from evaluation.posthoc_analysis import (
     analyze_model_performance,
     analyze_yanase_model_performance,
     analyze_val_test_gap,
+    analyze_dca_performance,
+)
+from evaluation.dca_metric import (
+    dca_comparison_metric,
+    dca_comparison_metric_with_feedback,
 )

@@ -1,0 +1,3 @@
+zip_file:     pdf_4.zip
+original:     N/A (sentinel)
+reimage:      C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_4\SFS-119 Rear View Camera Design Specification v0.31\SFS-119 Rear View Camera Design Specification v0.31_figures\Figure_2_VCU_Mid_B2_SERDES_connectivity_6.6.3_GM_VCU_HIGH_A1.png

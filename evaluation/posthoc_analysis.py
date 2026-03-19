@@ -374,3 +374,111 @@ def analyze_val_test_gap(val_field_scores: dict,
         'avg_gap': avg_gap,
         'max_gap': max_gap
     }
+
+
+def analyze_dca_performance(extractor, dataset, verbose=True):
+    """Analyze binary classification performance for DCA image comparison.
+
+    positive class = discard_image=true (discard / images are identical/trivial)
+    negative class = discard_image=false (keep / meaningful changes exist)
+
+    Computes confusion matrix, accuracy, precision, recall, F1.
+
+    Args:
+        extractor: Compiled ChainOfThought(DCAImageComparison) module
+        dataset: List of dspy.Example with expected_discard_image
+        verbose: Print detailed output
+
+    Returns:
+        dict with accuracy, precision, recall, f1, confusion matrix, misclassified
+    """
+    results = []
+    true_values = {"true", "yes", "1"}
+
+    for example in dataset:
+        try:
+            prediction = extractor(
+                image_original=example.image_original,
+                image_reimage=example.image_reimage,
+            )
+            pred_raw = str(getattr(prediction, "discard_image", "")).strip().lower()
+            pred_bool = pred_raw in true_values
+            pred_label = "discard" if pred_bool else "keep"
+        except Exception as e:
+            pair = getattr(example, "pair_name", "?")
+            print(f"  Error on {pair}: {e}")
+            pred_label = "error"
+
+        expected_raw = str(example.expected_discard_image).strip().lower()
+        expected_bool = expected_raw in true_values
+        expected_label = "discard" if expected_bool else "keep"
+
+        results.append({
+            "pair_name": getattr(example, "pair_name", "unknown"),
+            "expected": expected_label,
+            "predicted": pred_label,
+            "correct": pred_label == expected_label,
+        })
+
+    # Confusion matrix (positive class = discard)
+    tp = sum(1 for r in results if r["expected"] == "discard" and r["predicted"] == "discard")
+    tn = sum(1 for r in results if r["expected"] == "keep" and r["predicted"] == "keep")
+    fp = sum(1 for r in results if r["expected"] == "keep" and r["predicted"] == "discard")
+    fn = sum(1 for r in results if r["expected"] == "discard" and r["predicted"] == "keep")
+    errors = sum(1 for r in results if r["predicted"] == "error")
+
+    total = len(results)
+    accuracy = (tp + tn) / total if total > 0 else 0
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+
+    if verbose:
+        print(f"\n{'='*55}")
+        print(f"DCA IMAGE COMPARISON ANALYSIS ({total} examples)")
+        print(f"{'='*55}")
+
+        print(f"\nConfusion Matrix (positive = 'discard'):")
+        print(f"  +-------------+--------------+--------------+")
+        print(f"  |             | Pred Keep    | Pred Discard |")
+        print(f"  +-------------+--------------+--------------+")
+        print(f"  | GT Keep     | TN = {tn:<6}  | FP = {fp:<6}  |")
+        print(f"  | GT Discard  | FN = {fn:<6}  | TP = {tp:<6}  |")
+        print(f"  +-------------+--------------+--------------+")
+        if errors > 0:
+            print(f"  Errors (invalid output): {errors}")
+
+        print(f"\nMetrics:")
+        print(f"  Accuracy:  {accuracy:.1%}")
+        print(f"  Precision: {precision:.1%} (of predicted 'discard', how many correct)")
+        print(f"  Recall:    {recall:.1%} (of actual 'discard', how many found)")
+        print(f"  F1 Score:  {f1:.1%}")
+
+        misclassified = [r for r in results if not r["correct"]]
+        if misclassified:
+            print(f"\nMisclassified ({len(misclassified)}):")
+            for r in misclassified[:20]:
+                print(f"  {r['pair_name']}: expected={r['expected']}, predicted={r['predicted']}")
+            if len(misclassified) > 20:
+                print(f"  ... and {len(misclassified) - 20} more")
+        else:
+            print(f"\nAll examples classified correctly!")
+
+        discard_total = sum(1 for r in results if r["expected"] == "discard")
+        keep_total = sum(1 for r in results if r["expected"] == "keep")
+
+        print(f"\nPer-class accuracy:")
+        if keep_total > 0:
+            print(f"  Keep (discard=false):    {tn}/{keep_total} ({tn/keep_total:.1%})")
+        if discard_total > 0:
+            print(f"  Discard (discard=true):  {tp}/{discard_total} ({tp/discard_total:.1%})")
+
+    return {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "tp": tp, "tn": tn, "fp": fp, "fn": fn,
+        "errors": errors,
+        "misclassified": [r for r in results if not r["correct"]],
+    }

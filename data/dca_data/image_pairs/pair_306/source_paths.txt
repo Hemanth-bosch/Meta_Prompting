@@ -1,0 +1,3 @@
+zip_file:     pdf_3.zip
+original:     N/A (sentinel)
+reimage:      C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_3\ee4a8572-ffe7-468d-885b-eba4cbdbf31e\SFS_107_VCU_System State and PLC state HLD_v2.5\SFS_107_VCU_System State and PLC state HLD_v2.5_figures\figure_104_1.png
