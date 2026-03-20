@@ -1,4 +1,4 @@
-# Running Human Prompts — Guide
+# DCA Human Prompt Baseline Runs — Guide
 
 This directory contains scripts for executing LLM-based experiments on document image pairs using various prompts and model configurations.
 
@@ -25,6 +25,13 @@ The human prompts pipeline runs inference on image pair datasets using different
   - `gpt-5.2` — Reasoning-capable model
   - `gpt-5-mini` — Reasoning-capable mini model
 
+### Pipeline at a Glance
+
+1. Pick a prompt from `human_prompts/`.
+2. Run `human_prompt_runs/run_with_human_prompts.py` (single run) or `human_prompt_runs/run_all_experiments.py` (batch).
+3. Outputs are written back to pair JSONs under `data/dca_data/image_pairs_llm_output_exp1/`.
+4. Evaluate and compare runs with `eval_runs.py`.
+
 ---
 
 ## Prerequisites
@@ -44,6 +51,7 @@ The human prompts pipeline runs inference on image pair datasets using different
 3. **Data Structure**:
    - Image pairs in: `data/dca_data/image_pairs/`
    - Output JSONs in: `data/dca_data/image_pairs_llm_output_exp1/`
+  - Note: DCA data is currently placed under `data/dca_data/` for active experimentation; this placement is temporary and may be removed or reorganized later.
 
 ---
 

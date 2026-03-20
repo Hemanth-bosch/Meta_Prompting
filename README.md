@@ -3,7 +3,11 @@
 A meta-prompting system for extracting structured information from images using multimodal language models with automated prompt optimization.
 
 ## Use Case
-- Information Extraction from Images
+- Information Extraction from Images:
+    - Japanese Order (JO)
+    - YANASE
+- DCA:
+    - document image-pair comparison, classification, and change summary
 
 
 ### Key Features
@@ -11,22 +15,26 @@ A meta-prompting system for extracting structured information from images using 
 - **Meta-Prompt Optimization**: Automated prompt engineering for information extraction tasks, including optimizers: 
    - Fewshot learning optimization: boostrap examples with random search
    - Instruction optimization: MIPROv2, SIMBA
+- **DCA Human-Run Baselines**: Prompt-based image-pair comparison workflow with classification and change-summary generation.
 - **Comprehensive Evaluation**: Field-specific scoring with text normalization and extact/fuzzy matching
 
 ## 📋 Project Structure
 
 ```
 meta-prompting/
+├── extract_dca.py             # DCA extraction/experimentation entrypoint
 ├── extract_jo.py              # Japanese order extraction pipeline
 ├── extract_yanase.py          # YANASE order extraction pipeline
 ├── config.py                  # Model configuration and DSPy setup (multi-provider)
 │
 ├── signatures/                # DSPy Signature definitions
+│   ├── dca.py                 #   DCA fields
 │   ├── jo.py                  #   JO extraction fields
 │   └── yanase.py              #   YANASE extraction fields
 │
 ├── evaluation/                # Evaluation metrics and analysis
 │   ├── common.py              #   Shared helpers (normalization, similarity)
+│   ├── dca_metric.py          #   DCA-specific metrics
 │   ├── jo_metric.py           #   JO-specific metrics
 │   ├── yanase_metric.py       #   YANASE-specific metrics
 │   └── posthoc_analysis.py    #   Performance analysis and reporting
@@ -45,6 +53,7 @@ meta-prompting/
 │   └── ...
 │
 ├── data/                      # Dataset directory
+│   ├── dca_data/              #   DCA pairs and experiment JSON outputs (temporary for experimentation)
 │   ├── json/                  #   JO ground truth JSON (50 files)
 │   ├── png/                   #   JO order images (50 files)
 │   ├── YANASE_ground_truth/   #   YANASE ground truth JSON annotations
@@ -203,6 +212,16 @@ python extract_yanase.py \
 
 # Same options as extract_jo.py available
 ```
+
+### DCA Human-Run Baseline Pipeline (Brief)
+
+The DCA workflow currently runs from `evaluation/dca_baseline_runs/` and focuses on image-pair triage/change assessment using human-authored prompts.
+
+- Single run: `evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py`
+- Batch orchestration: `evaluation/dca_baseline_runs/human_prompt_runs/run_all_experiments.py`
+- Metrics and reports: `evaluation/dca_baseline_runs/eval_runs.py`
+
+For detailed usage and prompt/model combinations, see `evaluation/dca_baseline_runs/README.md`.
 
 
 ### Performance
