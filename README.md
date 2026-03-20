@@ -6,8 +6,8 @@ A meta-prompting system for extracting structured information from images using 
 - Information Extraction from Images:
     - Japanese Order (JO)
     - YANASE
-- DCA:
-    - document image-pair comparison, classification, and change summary
+- Image comparision: Classification, and Change summary for DCA:
+    - DCA: Document Comparison Assist is a document image-pair comparison, classification, and change summary tool. It outputs a json with classification labels (whether to discard image pairs) and change summary for each image pair. The current baseline workflow is human-prompt based, and we are using it as a basis for testing the effectiveness of meta-prompt optimization in improving LLM performance on this task.
 
 
 ### Key Features
@@ -15,7 +15,7 @@ A meta-prompting system for extracting structured information from images using 
 - **Meta-Prompt Optimization**: Automated prompt engineering for information extraction tasks, including optimizers: 
    - Fewshot learning optimization: boostrap examples with random search
    - Instruction optimization: MIPROv2, SIMBA
-- **DCA Human-Run Baselines**: Prompt-based image-pair comparison workflow with classification and change-summary generation.
+- **DCA Human-Run Baselines**: Human Prompt-based image-pair comparison workflow with classification and change-summary generation.
 - **Comprehensive Evaluation**: Field-specific scoring with text normalization and extact/fuzzy matching
 
 ## 📋 Project Structure

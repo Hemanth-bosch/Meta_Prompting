@@ -7,16 +7,20 @@ __pycache__
 .venv
 DS_Store
 *.pkl
-log/
-
+data/*                                                                                                                                                                                                  
+!data/.gitkeep
 !data/dca_data
 !data/README.md
+
+# Log files
+log/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
+# VENV
 .meta-prompting
 
 # C extensions

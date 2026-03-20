@@ -1,6 +1,7 @@
 {
   "human_label_changes": "Image 2 has been crossed out",
   "human_label_discard_image": false,
+  "human_label_category": "",
   "v0_prompt_midas_OLD_gpt41_changes": "Images are identical - no changes",
   "v0_prompt_midas_OLD_gpt41_discard_image": true,
   "v0_prompt_midas_gpt41_changes": "Images are identical - no changes",
