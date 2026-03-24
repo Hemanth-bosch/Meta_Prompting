@@ -1,7 +1,36 @@
 import dspy
-from typing import List
+from typing import Any, List
 import json
 import os
+
+
+class AbsentImage(dspy.Image):
+    """Sentinel for a missing image in a one-sided DCA pair.
+
+    Instead of sending a real image to the LLM, format() returns a text
+    content block that tells the model this slot has no document.  This
+    lets the two-input DCAImageComparison signature run normally while
+    the model sees an explicit "[IMAGE ABSENT]" message and can apply
+    the correct one-sided branch (NoMatchFound / non-informational etc.).
+    """
+
+    def format(self) -> list[dict[str, Any]] | str:
+        return [
+            {
+                "type": "text",
+                "text": (
+                    ""
+                    "Treat this slot as missing/ as absent."
+                ),
+            }
+        ]
+
+    def __repr__(self):
+        return "AbsentImage()"
+
+
+# Singleton: reuse one instance everywhere (frozen & stateless)
+_ABSENT_IMAGE = AbsentImage(url="absent:no-image")
 
 
 def load_japanese_order_dataset(images_dir: str = None,
@@ -148,6 +177,7 @@ def load_yanase_order_dataset(images_dir: str = None,
     return examples
 
 
+# TODO check in this function why we are doing original_path = reimage_path ?
 def load_dca_dataset(
     pairs_dir: str = "data/dca_data/image_pairs",
     gt_dir: str = "data/dca_data/image_pairs_llm_output_exp1"
@@ -179,8 +209,10 @@ def load_dca_dataset(
         Note on one-sided pairs:
             Some dataset entries intentionally contain only one side (original or reimage)
             and mark the other side as sentinel N/A in source_paths.txt. For these cases,
-            the loader reuses the available image for the missing side so the two-image
-            DSPy signature can still be executed and the pair remains in evaluation.
+            the loader uses an AbsentImage sentinel for the missing side.  AbsentImage is
+            a dspy.Image subclass whose format() returns a text block "[IMAGE ABSENT] ..."
+            instead of real image data, so the model sees an explicit "missing" signal and
+            can apply the correct one-sided branch (NoMatchFound / non-informational etc.).
     """
     examples = []
 
@@ -222,13 +254,11 @@ def load_dca_dataset(
             skipped_missing_img += 1
             continue
 
-        # Sentinel case support: if one side is intentionally missing in export,
-        # reuse the available side so each example still has two image inputs.
+        # One-sided pair: use AbsentImage sentinel so the model sees
+        # "[IMAGE ABSENT]" instead of a duplicate of the other side.
         if not original_exists and reimage_exists:
-            original_path = reimage_path
             fallback_missing_original += 1
         elif original_exists and not reimage_exists:
-            reimage_path = original_path
             fallback_missing_reimage += 1
 
         # Validate ground truth
@@ -245,17 +275,11 @@ def load_dca_dataset(
 
         # Extract human ground truth.
         # The current DCA data export uses "human_label_discard_image" (bool)
-        # and "human_label_changes" (str). An older naming convention used
-        # "human_evaluation_for_classification" and
-        # "human_evaluation_for_change_summary". Both are supported here so the
-        # loader works on both current and any legacy GT exports without change.
+        # and "human_label_changes" (str). 
+        # DONE by salil (2025-03-24): The loader now does NOT support legacy keys "human_evaluation_for_classification". It only supports human_label_discard_image. The legacy keys were only used in an early internal export and are not present in the current dataset export, so we can remove support for them to simplify the code and avoid confusion.
         if "human_label_discard_image" in gt:
             human_classification = gt["human_label_discard_image"]
             expected_changes = gt.get("human_label_changes", "")
-            expected_category = gt.get("human_label_category", "Unknown")
-        elif "human_evaluation_for_classification" in gt:
-            human_classification = gt["human_evaluation_for_classification"]
-            expected_changes = gt.get("human_evaluation_for_change_summary", "")
             expected_category = gt.get("human_label_category", "Unknown")
         else:
             skipped_no_human += 1
@@ -286,10 +310,16 @@ def load_dca_dataset(
         # (DSPy compares string outputs; the metric normalises both)
         expected_discard = "true" if human_classification else "false"
 
-        # Load images
+        # Load images (use AbsentImage sentinel for missing side)
         try:
-            image_original = dspy.Image.from_file(original_path)
-            image_reimage = dspy.Image.from_file(reimage_path)
+            image_original = (
+                dspy.Image.from_file(original_path) if original_exists
+                else _ABSENT_IMAGE
+            )
+            image_reimage = (
+                dspy.Image.from_file(reimage_path) if reimage_exists
+                else _ABSENT_IMAGE
+            )
         except Exception as e:
             print(f"  Warning: Failed to load images for {pair_name}: {e}")
             continue
@@ -314,9 +344,9 @@ def load_dca_dataset(
     if skipped_missing_img:
         print(f"  Skipped (missing original/reimage): {skipped_missing_img}")
     if fallback_missing_original:
-        print(f"  Fallback (missing original -> reimage used): {fallback_missing_original}")
+        print(f"  AbsentImage sentinel (missing original): {fallback_missing_original}")
     if fallback_missing_reimage:
-        print(f"  Fallback (missing reimage -> original used): {fallback_missing_reimage}")
+        print(f"  AbsentImage sentinel (missing reimage): {fallback_missing_reimage}")
 
     if examples:
         discard_true = sum(1 for e in examples if e.expected_discard_image == "true")

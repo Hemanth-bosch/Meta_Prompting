@@ -10,11 +10,15 @@ os.environ.setdefault("SSL_CERT_FILE", _ca)
 
 # ---------- CONFIG ----------
 client = _get_azure_client()
+
+# TODO add this model into config with a unique name
 MODEL = "gpt-5.2"
 
 #############################################################################
 # DCA (Document Change Analysis) Metrics
 #############################################################################
+
+# TODO Check the metric in depth
 
 def dca_comparison_metric(example, prediction, trace=None):
     """ Weighted classification metric for image discard classification and change summary generation for DCA image comparison.
@@ -35,10 +39,11 @@ def dca_comparison_metric(example, prediction, trace=None):
     """
     expected_discard = str(getattr(example, "expected_discard_image", "")).strip().lower()
     predicted_discard = str(getattr(prediction, "discard_image", "")).strip().lower()
-    expected_changes = str(getattr(example, "expected_changes", "")).strip().lower()
-    predicted_changes = str(getattr(prediction, "changes", "")).strip().lower()
+    expected_changes = str(getattr(example, "expected_changes", "")).strip()
+    predicted_changes = str(getattr(prediction, "changes", "")).strip()
 
 
+    # TODO I think we can change this to 0.5 and 0.5
     field_weights = {
         'discard_image': 0.6,  # Primary focus on discard_image classification
         'changes': 0.4          # Secondary focus on change description accuracy
@@ -64,6 +69,12 @@ def dca_comparison_metric(example, prediction, trace=None):
 
     return total_score
 
+# TODO in dca metric file, i think we can change- Both images present AND both informational AND fully identical → "Images are identical - no changes"
+# to
+# - Both images present AND both informational AND fully identical or just trivial differences (minor such as layout shift, spelling errors, etc.) → "Images are identical - no changes"
+
+
+# TODO Remove score in prompt, because in output JSON from this prompt - we are not using it
 def judge_summary_metric(human, model):
 
     prompt = f"""
@@ -73,7 +84,7 @@ The human (ground truth) summary was produced using these rules:
 - Only one image present AND it is informational → "NoMatchFound"
 - Only one image present AND it is non-informational → "Only one image and it is non informational"
 - Both images present AND both non-informational → "Both images are non informational and contain only logo/watermark etc. no meaningful content"
-- Both images present AND both informational AND fully identical → "Images are identical - no changes"
+- Both images present AND both informational AND fully identical or just trivial differences (minor such as layout shift, spelling errors, etc.) → "Images are identical - no changes"
 - Both images present AND one is non-informational → describe the informational image and note that the other is non-informational
 - Image is crossed out → "Image has been crossed out"
 - Image is tiny/corrupted → "Could not infer"
@@ -91,19 +102,19 @@ Model summary:
 
 STEP 1 — Determine evaluation mode:
 
-**DIRECT mode:** Use this when the human summary falls into any special case:
+**BREAKDOWN mode:** Use this only when the human summary describes actual meaningful differences between two images in detail
+  (i.e. both images are informational and different).
+  → Extract distinct changes from each summary (human and model), compare them, and calculate correct_matches, missed_changes, and hallucinated_changes based on the overlap of change details.
+  → For example, if human describes 3 distinct changes and model describes 2 of them correctly but misses 1 and adds 1 hallucinated change, then correct_matches=2, missed_changes=1, hallucinated_changes=1.
+
+**DIRECT mode:** Use this when the human summary falls into any special case (and does not describe meaningful differences) such as:
   "NoMatchFound", "Images are identical - no changes", one/both images non-informational,
-  image crossed out, could not infer, or only one image present.
+  image fully crossed out, could not infer, or only one image present.
   → The model is expected to produce a summary that conveys the same category/conclusion as the human.
   → Treat the human's conclusion as a single "change" item and the model's conclusion as a single "change" item.
-  → Score 5 if they match, score 1 if they do not.
   → human_changes: [human conclusion], model_changes: [model conclusion]
   → correct_matches: 1 if they match else 0, missed_changes: 0 if they match else 1, hallucinated_changes: 0 if they match else 4.
 
-**BREAKDOWN mode:** Use this only when the human summary describes actual meaningful differences
-  (i.e. both images are informational and different).
-  → Extract distinct changes from each summary, match them, and score 1–5 based on coverage and accuracy.
-  → Score guide: 5 = all key changes captured with no hallucinations, 3 = roughly half captured or some hallucinations, 1 = no meaningful overlap.
 
 STEP 2 — Return JSON:
 
@@ -114,14 +125,15 @@ STEP 2 — Return JSON:
   "correct_matches": 0,
   "missed_changes": 0,
   "hallucinated_changes": 0,
-  "reasoning": "If there are missed_changes or hallucinated_changes, mention briefly the difference between human and model summary, and your reasoning for deciding what are the correct matches, missed changes and hallucinated changes. Else mention human and model summaries are in agreement."
+  "reasoning": "If there are missed_changes or hallucinated_changes, mention briefly the difference between human/ ground-truth and LLM model summary, and your reasoning for deciding the missed changes and hallucinated changes. Else mention human/ ground-truth and LLM model summaries are fully in agreement."
 }}
 
 """
-
+    # TODO add response format
     response = client.chat.completions.create(
         model=MODEL,
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        response_format="json"
     )
 
     text = response.choices[0].message.content
@@ -150,6 +162,7 @@ STEP 2 — Return JSON:
     return fbeta, reasoning
 
 
+# TODO Jahnavi to look into this
 def _change_score_label(score: float) -> str:
     """Map a change_score (weighted F-beta, 0–1) to a quality label.
 
@@ -168,7 +181,7 @@ def _change_score_label(score: float) -> str:
     else:
         return "No match"
 
-
+# TODO Jahnavi to look into this
 def dca_comparison_metric_with_feedback(example, prediction, trace=None, pred_name=None, pred_trace=None):
     """DCA comparison metric with textual feedback for GEPA/MIPROv2 optimization.
 

@@ -224,7 +224,7 @@ gt_dir    = args.gt_dir    or os.getenv("DCA_GT_DIR",           "data/dca_data/i
 
 # ── Display Configuration ────────────────────────────────────────
 print(f"\n{'='*80}")
-print(f"🔧 DCA Pipeline Configuration:")
+print(f" DCA Pipeline Configuration:")
 print(f"  Model: {args.model_name or os.getenv('MODEL_NAME', 'Unknown')}")
 print(f"  Cache: {cache_enabled}")
 print(f"  Optimizer: {args.optimizer} (MIPROv2 auto={args.miprov2_auto}, SimBA steps={args.simba_max_steps}, GEPA auto={args.gepa_auto})")
@@ -232,7 +232,7 @@ print(f"  Load extractor: {args.load_extractor if not args.skip_load else 'No'}"
 print(f"  Analyze sets: {args.analyze_sets}")
 print(f"  Save model: {args.save_model}")
 print(f"  Save results: {args.save_results}")
-print(f"\n📁 Data Paths:")
+print(f"\n Data Paths:")
 print(f"  Image pairs: {pairs_dir}")
 print(f"  Ground truth: {gt_dir}")
 print(f"{'='*80}\n")
@@ -241,11 +241,12 @@ print(f"{'='*80}\n")
 # ── Data Loading ─────────────────────────────────────────────────
 dataset = load_dca_dataset(pairs_dir, gt_dir)
 if len(dataset) == 0:
-    print("❌ ERROR: No valid DCA image pairs found. Check your data paths.")
+    print("ERROR: No valid DCA image pairs found. Check your data paths.")
     exit(1)
 
 split_seed = 42
 
+# TODO we already are using seed, why do we need to save and load test, val etc sets, We can just save val and test pair numbers in a json with seed?
 
 def _build_split_entries(examples: List[dspy.Example]) -> Dict[str, Any]:
     pair_names = [
@@ -378,21 +379,21 @@ evaluate = dspy.Evaluate(
     display_table=True,
 )
 
+# TODO Why we need this?
+# # ── Baseline Evaluation ──────────────────────────────────────────
+# print(f"\n{'='*80}")
+# print(f"📊 Baseline Evaluation (Before Optimization)")
+# print(f"{'='*80}\n")
 
-# ── Baseline Evaluation ──────────────────────────────────────────
-print(f"\n{'='*80}")
-print(f"📊 Baseline Evaluation (Before Optimization)")
-print(f"{'='*80}\n")
+# print("Evaluating baseline on validation set...")
+# baseline_val_result = evaluate(comparator, devset=val_set)
+# baseline_val_score = baseline_val_result.score  # EvaluationResult.score is 0-100 scale
+# print(f"Baseline Val Score: {baseline_val_score:.1f}%\n")
 
-print("Evaluating baseline on validation set...")
-baseline_val_result = evaluate(comparator, devset=val_set)
-baseline_val_score = baseline_val_result.score  # EvaluationResult.score is 0-100 scale
-print(f"Baseline Val Score: {baseline_val_score:.1f}%\n")
-
-print("Evaluating baseline on test set...")
-baseline_test_result = evaluate(comparator, devset=test_set)
-baseline_test_score = baseline_test_result.score  # EvaluationResult.score is 0-100 scale
-print(f"Baseline Test Score: {baseline_test_score:.1f}%")
+# print("Evaluating baseline on test set...")
+# baseline_test_result = evaluate(comparator, devset=test_set)
+# baseline_test_score = baseline_test_result.score  # EvaluationResult.score is 0-100 scale
+# print(f"Baseline Test Score: {baseline_test_score:.1f}%")
 
 
 # ── Optimization Strategies ──────────────────────────────────────
@@ -403,6 +404,7 @@ print(f"Baseline Test Score: {baseline_test_score:.1f}%")
 # The best compiled program and its val score are returned at the end.
 custom_strategies = []
 
+# TODO Jahnavi to look into
 if args.optimizer in ("bootstrap", "all"):
     # Two Bootstrap variants with different labeled/bootstrapped demo ratios.
     # Running both lets us learn whether human-verified ground truth examples
@@ -414,9 +416,9 @@ if args.optimizer in ("bootstrap", "all"):
         create_bootstrap_strategy(
             name="Balanced_DCA_Bootstrap",
             description="Balanced approach with equal labeled and bootstrapped demos for DCA classification",
-            max_labeled_demos=3,        # Low due to image context overhead; each demo adds tokens
-            max_bootstrapped_demos=3,   # Teacher-generated demos drawn from correct train predictions
-            num_candidate_programs=12,  # Random candidates to evaluate; more = better coverage
+            max_labeled_demos=4,        # Image context overhead; each demo adds tokens
+            max_bootstrapped_demos=4,   # Teacher-generated demos drawn from correct train predictions
+            num_candidate_programs=16,  # Random candidates to evaluate; more = better coverage
             num_threads=4,              # Parallel LLM calls during candidate evaluation
             max_rounds=2,               # Second round refines demo quality; >2 risks overfitting
         ),
@@ -426,8 +428,8 @@ if args.optimizer in ("bootstrap", "all"):
         create_bootstrap_strategy(
             name="Label_Heavy_DCA_Bootstrap",
             description="Label-heavy approach focusing on ground truth examples for DCA classification",
-            max_labeled_demos=4,        # One extra human-verified example vs balanced variant
-            max_bootstrapped_demos=2,   # Fewer teacher demos to reduce noise risk
+            max_labeled_demos=6,        # One extra human-verified example vs balanced variant
+            max_bootstrapped_demos=4,   # Fewer teacher demos to reduce noise risk
             num_candidate_programs=16,  # Slightly more candidates for broader coverage
             num_threads=4,
             max_rounds=2,
@@ -455,6 +457,7 @@ if args.optimizer in ("miprov2", "all"):
         ),
     )
 
+# TODO Jahnavi to look into
 if args.optimizer in ("gepa", "all"):
     # GEPA uses a stronger reflection_lm (set via REFLECTION_LM_NAME in .env)
     # to analyze failure cases from the training set and generate improved
@@ -509,14 +512,15 @@ print(f"\n📋 Optimization strategies ({len(custom_strategies)}):")
 for i, s in enumerate(custom_strategies, 1):
     print(f"  {i}. {s.name} ({s.optimizer_type}): {s.description}")
 
+# TODO Jahnavi to look into reflection and metric with feedback
 runner = OptimizationRunner(
     metric=dca_comparison_metric,
     student_model=comparator,
     train_set=train_set,
     val_set=val_set,
     evaluate_fn=evaluate,
-    metric_with_feedback=dca_comparison_metric_with_feedback,
-    reflection_lm=reflectin_lm,
+    # metric_with_feedback=dca_comparison_metric_with_feedback,
+    # reflection_lm=reflectin_lm,
 )
 
 print(f"\n{'='*80}")
@@ -534,7 +538,6 @@ print(f"\n{'='*80}")
 print(f"📈 Optimization Results Summary")
 print(f"{'='*80}")
 print(f"Best Strategy Val Score: {best_score:.1f}%")
-print(f"Improvement from Baseline: {(best_score - baseline_val_score):+.1f}%")
 print(f"{'='*80}\n")
 
 
@@ -638,9 +641,6 @@ if args.save_model or args.save_results:
                     "model": model_name,
                     "best_strategy": best_strategy_name,
                     "best_score": best_score,
-                    "baseline_val_score": baseline_val_score,
-                    "baseline_test_score": baseline_test_score,
-                    "improvement": best_score - baseline_val_score,
                     "optimizer": args.optimizer,
                     "miprov2_auto": args.miprov2_auto,
                     "gepa_auto": args.gepa_auto,
