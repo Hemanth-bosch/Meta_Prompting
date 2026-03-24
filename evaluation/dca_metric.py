@@ -141,11 +141,32 @@ STEP 2 — Return JSON:
     precision = correct / model_total if model_total > 0 else None
     recall = correct / human_total if human_total > 0 else None
 
-    fbeta = (5 * precision * recall / (2*precision + 3*recall)
-          if precision is not None and recall is not None and (precision + recall) > 0
-          else (0 if precision is not None and recall is not None else None))
+    # Weighted F-score: precision carries 60% weight, recall 40%
+    # Equivalent to F_beta with beta^2 = 2/3  →  5*P*R / (2*P + 3*R)
+    fbeta = (5 * precision * recall / (2 * precision + 3 * recall)
+             if precision is not None and recall is not None and (precision + recall) > 0
+             else (0 if precision is not None and recall is not None else None))
 
     return fbeta, reasoning
+
+
+def _change_score_label(score: float) -> str:
+    """Map a change_score (weighted F-beta, 0–1) to a quality label.
+
+    Thresholds derived from empirical score distribution (precision-weighted 60 / recall 40):
+      Exact match  >= 0.95  — effectively perfect; aligns with the dominant 1.0 cluster
+      Good         >= 0.70  — solid quality, minor misses or hallucinations
+      Partial      >= 0.35  — meaningful overlap but notable gaps or hallucinations - change summary needs major improvement
+      No match      < 0.35  — aligns with the 0.0 cluster and near-zero scores - unacceptable quality
+    """
+    if score >= 0.95:
+        return "Exact match"
+    elif score >= 0.70:
+        return "Good"
+    elif score >= 0.35:
+        return "Partial"
+    else:
+        return "No match"
 
 
 def dca_comparison_metric_with_feedback(example, prediction, trace=None, pred_name=None, pred_trace=None):
@@ -190,25 +211,29 @@ def dca_comparison_metric_with_feedback(example, prediction, trace=None, pred_na
         if change_score is None:
             change_score = 0.0
 
+        change_label = _change_score_label(change_score)
+
         total_score = field_weights['discard_image'] * classification_score + field_weights['changes'] * change_score
 
         if classification_score == 1.0:
             feedback = (
-                f"Feedback for Discard Image Classification: CORRECT: Predicted discard_image='{predicted_discard_image}' matches ground truth (expected='{expected_discard_image}'). Feedback for Changes:"+reasoning
+                f"Feedback for Discard Image Classification: CORRECT: Predicted discard_image='{predicted_discard_image}' "
+                f"matches ground truth (expected='{expected_discard_image}'). "
+                f"Feedback for Changes [{change_label} | score={change_score:.3f}]: {reasoning}"
             )
 
         else:
             if expected_bool and not predicted_bool:
                 feedback = (
-                    f"Feedback for Discard Image Classification: FALSE NEGATIVE (pair={pair_name}): Predicted discard_image='false' "
-                    f"but the images should be discarded."
-                    f"Feedback for Changes: {reasoning}"
+                    f"Feedback for Discard Image Classification: FALSE NEGATIVE (pair={pair_name}): "
+                    f"Predicted discard_image='false' but the images should be discarded. "
+                    f"Feedback for Changes [{change_label} | score={change_score:.3f}]: {reasoning}"
                 )
             else:
                 feedback = (
-                    f"Feedback for Discard Image Classification: FALSE POSITIVE (pair={pair_name}): Predicted discard_image='true' "
-                    f"but meaningful changes exist between the images. "
-                    f"Feedback for Changes: {reasoning}"
+                    f"Feedback for Discard Image Classification: FALSE POSITIVE (pair={pair_name}): "
+                    f"Predicted discard_image='true' but meaningful changes exist between the images. "
+                    f"Feedback for Changes [{change_label} | score={change_score:.3f}]: {reasoning}"
                 )
 
         feedback += f"\nTotal score: {total_score:.3f}"

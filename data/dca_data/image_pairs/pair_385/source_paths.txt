@@ -1,0 +1,6 @@
+synthetic:    true
+method:       B1_corruption (too_tiny_40x40)
+source_pair:  pair_303
+corrupted:    original
+original:     pair_303/original.png (corrupted with too_tiny_40x40)
+reimage:      pair_303/reimage.png (intact)

@@ -173,6 +173,7 @@ def load_dca_dataset(
       image_reimage:            dspy.Image (input)
       expected_discard_image:   str "true" or "false" (label)
       expected_changes:         str human change summary (auxiliary label, for reference)
+            expected_human_label_category: str one of A1/A2/B1/B2/B3/B4/B5a/B5b or "Unknown"
       pair_name:                str metadata
 
         Note on one-sided pairs:
@@ -251,12 +252,35 @@ def load_dca_dataset(
         if "human_label_discard_image" in gt:
             human_classification = gt["human_label_discard_image"]
             expected_changes = gt.get("human_label_changes", "")
+            expected_category = gt.get("human_label_category", "Unknown")
         elif "human_evaluation_for_classification" in gt:
             human_classification = gt["human_evaluation_for_classification"]
             expected_changes = gt.get("human_evaluation_for_change_summary", "")
+            expected_category = gt.get("human_label_category", "Unknown")
         else:
             skipped_no_human += 1
             continue
+
+        if not isinstance(expected_category, str):
+            expected_category = str(expected_category)
+        expected_category = expected_category.strip() or "Unknown"
+        category_lower = expected_category.lower()
+        if category_lower.startswith("a1"):
+            expected_category = "A1"
+        elif category_lower.startswith("a2"):
+            expected_category = "A2"
+        elif category_lower.startswith("b1"):
+            expected_category = "B1"
+        elif category_lower.startswith("b2"):
+            expected_category = "B2"
+        elif category_lower.startswith("b3"):
+            expected_category = "B3"
+        elif category_lower.startswith("b4"):
+            expected_category = "B4"
+        elif category_lower.startswith("b5a"):
+            expected_category = "B5a"
+        elif category_lower.startswith("b5b"):
+            expected_category = "B5b"
 
         # Convert boolean to lowercase string for DSPy OutputField matching
         # (DSPy compares string outputs; the metric normalises both)
@@ -275,6 +299,8 @@ def load_dca_dataset(
             image_reimage=image_reimage,
             expected_discard_image=expected_discard,
             expected_changes=expected_changes,
+            expected_human_label_category=expected_category,
+            doubt=gt.get("doubt", False),
             pair_name=pair_name,
         ).with_inputs("image_original", "image_reimage")
 

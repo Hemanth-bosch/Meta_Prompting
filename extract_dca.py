@@ -9,8 +9,12 @@ each pair as:
   discard_image = "false"  — meaningful changes exist (text edits, removed
                              content, diagram modifications, cross-out marks)
 
+Also, provides a change summary between the original and re-imaged versions in an image pair, based on the following rules:
+
+
+
 This script uses DSPy prompt optimization to improve the accuracy of that
-binary classification decision.  Four optimization strategies are supported
+binary classification decision and change summary generation.  Four optimization strategies are supported
 and can be selected via --optimizer (or run all four at once with "all"):
 
   bootstrap   BootstrapFewShotWithRandomSearch — explores random candidate
@@ -241,13 +245,6 @@ if len(dataset) == 0:
     exit(1)
 
 split_seed = 42
-train_set, val_set, test_set = stratified_split_yanase_dataset(
-    dataset, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2,
-    random_seed=split_seed, stratify_by="expected_discard_image", verbose=True
-)
-print(f"train set: {len(train_set)}")
-print(f"val set:   {len(val_set)}")
-print(f"test set:  {len(test_set)}")
 
 
 def _build_split_entries(examples: List[dspy.Example]) -> Dict[str, Any]:
@@ -271,39 +268,73 @@ def _build_split_entries(examples: List[dspy.Example]) -> Dict[str, Any]:
     }
 
 
-split_manifest = {
-    "created_at": datetime.now().isoformat(timespec="seconds"),
-    "seed": split_seed,
-    "stratify_by": "expected_discard_image",
-    "ratios": {
-        "train": 0.6,
-        "val": 0.2,
-        "test": 0.2,
-    },
-    "total_examples": len(dataset),
-    "train": _build_split_entries(train_set),
-    "val": _build_split_entries(val_set),
-    "test": _build_split_entries(test_set),
-    "val_pair_numbers": _build_split_entries(val_set)["pair_numbers"],
-    "test_pair_numbers": _build_split_entries(test_set)["pair_numbers"],
-}
-
 split_dir = ".cache"
 if not os.path.exists(split_dir):
     os.makedirs(split_dir)
 
-split_ts = datetime.now().strftime("%Y%m%d%H%M%S")
 split_latest_path = os.path.join(split_dir, f"dca_split_seed{split_seed}.json")
-split_versioned_path = os.path.join(split_dir, f"dca_split_seed{split_seed}_{split_ts}.json")
 
-for split_path in [split_latest_path, split_versioned_path]:
-    with open(split_path, "w", encoding="utf-8") as f:
-        json.dump(split_manifest, f, indent=2)
+# ── Load or compute split ────────────────────────────────────────
+# The split manifest is written once and reused on every subsequent run so
+# that the test set is frozen.  New pairs added to the dataset are silently
+# assigned to train/val/test according to the saved pair_names lists; any pair
+# not covered by the manifest falls into the train set by default.
+# Delete .cache/dca_split_seed42.json to force a fresh stratified split.
+dataset_by_name = {str(getattr(ex, "pair_name", "")): ex for ex in dataset}
 
-print(f"🧩 Saved deterministic split manifest: {split_latest_path}")
-print(f"🧩 Saved timestamped split manifest:    {split_versioned_path}")
-print(f"   Val pair count: {len(split_manifest['val_pair_numbers'])}")
-print(f"   Test pair count: {len(split_manifest['test_pair_numbers'])}")
+if os.path.exists(split_latest_path):
+    with open(split_latest_path, "r", encoding="utf-8") as f:
+        split_manifest = json.load(f)
+
+    saved_train = set(split_manifest["train"]["pair_names"])
+    saved_val   = set(split_manifest["val"]["pair_names"])
+    saved_test  = set(split_manifest["test"]["pair_names"])
+
+    test_set  = [dataset_by_name[n] for n in saved_test  if n in dataset_by_name]
+    val_set   = [dataset_by_name[n] for n in saved_val   if n in dataset_by_name]
+    # New pairs not in any saved split go to train
+    all_saved = saved_train | saved_val | saved_test
+    train_set = (
+        [dataset_by_name[n] for n in saved_train if n in dataset_by_name]
+        + [ex for ex in dataset if str(getattr(ex, "pair_name", "")) not in all_saved]
+    )
+
+    print(f"📂 Loaded existing split manifest: {split_latest_path}")
+    print(f"   Test set locked to {len(saved_test)} pairs (found {len(test_set)} in current dataset)")
+else:
+    train_set, val_set, test_set = stratified_split_yanase_dataset(
+        dataset, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2,
+        random_seed=split_seed, stratify_by=["expected_discard_image","expected_human_label_category","doubt"], verbose=True
+    )
+
+    split_ts = datetime.now().strftime("%Y%m%d%H%M%S")
+    split_versioned_path = os.path.join(split_dir, f"dca_split_seed{split_seed}_{split_ts}.json")
+
+    split_manifest = {
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "seed": split_seed,
+        "stratify_by": ["expected_discard_image","expected_human_label_category","doubt"],
+        "ratios": {"train": 0.6, "val": 0.2, "test": 0.2},
+        "total_examples": len(dataset),
+        "train": _build_split_entries(train_set),
+        "val": _build_split_entries(val_set),
+        "test": _build_split_entries(test_set),
+        "val_pair_numbers": _build_split_entries(val_set)["pair_numbers"],
+        "test_pair_numbers": _build_split_entries(test_set)["pair_numbers"],
+    }
+
+    for split_path in [split_latest_path, split_versioned_path]:
+        with open(split_path, "w", encoding="utf-8") as f:
+            json.dump(split_manifest, f, indent=2)
+
+    print(f"🧩 Saved deterministic split manifest: {split_latest_path}")
+    print(f"🧩 Saved timestamped split manifest:    {split_versioned_path}")
+    print(f"   Val pair count: {len(split_manifest['val_pair_numbers'])}")
+    print(f"   Test pair count: {len(split_manifest['test_pair_numbers'])}")
+
+print(f"train set: {len(train_set)}")
+print(f"val set:   {len(val_set)}")
+print(f"test set:  {len(test_set)}")
 
 
 # ── Create Extractor ─────────────────────────────────────────────
@@ -333,8 +364,10 @@ else:
 # reassign the devset per call (evaluate(comparator, devset=val_set)).
 # num_threads=4 parallelises LLM inference across examples; increase to 8 on
 # machines with more cores, but watch Azure OpenAI rate limits (TPM/RPM).
-# dca_comparison_metric returns 1.0 for a correct binary classification and
-# 0.0 otherwise; dspy.Evaluate reports scores on a 0–100 scale (× 100).
+# dca_comparison_metric returns a weighted float 0–1:
+#   0.6 × classification_score (1.0 if discard_image correct, else 0.0)
+#   0.4 × change_score         (precision-60 / recall-40 F-beta via judge_summary_metric)
+# dspy.Evaluate reports scores on a 0–100 scale (× 100).
 # display_table=True prints a sample of predictions after each evaluation,
 # which helps debug label format issues (e.g. model outputting "True" vs "true").
 evaluate = dspy.Evaluate(
@@ -507,13 +540,22 @@ print(f"{'='*80}\n")
 
 # ── Post-hoc Analysis ────────────────────────────────────────────
 # analyze_dca_performance() runs the optimized comparator on the specified
-# split and returns a detailed dict: accuracy, precision, recall, F1 score,
-# full confusion matrix (TP/TN/FP/FN), and a list of misclassified examples.
+# split and returns a detailed dict covering two evaluation dimensions:
+#
+#   Classification (discard_image field):
+#     accuracy, precision, recall, F1, full confusion matrix (TP/TN/FP/FN),
+#     per-actual-class breakdown (how many TP/FN for discard, TN/FP for keep).
+#
+#   Change summary quality (changes field):
+#     avg_change_score  — mean weighted F-beta (precision 60%, recall 40%)
+#     change_quality    — per-label counts: Exact match / Good / Partial / No match
+#     Co-failure analysis — pairs that failed both classification AND summary
+#     FP/FN drill-down  — change quality broken out by error type
+#
 # This is separate from dspy.Evaluate (which only reports an aggregate score)
-# and provides the per-class breakdown needed to diagnose error patterns —
-# e.g. whether the model over-predicts "discard" (too many FPs) or misses
-# real changes (too many FNs).  Results are printed to stdout and optionally
-# serialized to JSON in the Save Results section below.
+# and provides the per-class + per-dimension breakdown needed to diagnose
+# error patterns and guide further prompt optimization.
+# Results are printed to stdout and optionally serialized to JSON below.
 print(f"\n{'='*80}")
 print(f"📊 Performance Analysis")
 print(f"{'='*80}\n")
@@ -523,13 +565,23 @@ all_results = {}
 if args.analyze_sets in ["val", "both"]:
     print(f"Analyzing validation set ({len(val_set)} examples)...")
     val_results = analyze_dca_performance(optimized_comparator, val_set)
-    print(f"\n✅ Validation set accuracy: {val_results['accuracy']:.3f}\n")
+    chq = val_results.get("change_quality", {})
+    print(f"\n✅ Validation — accuracy: {val_results['accuracy']:.3f} "
+          f"| avg change score: {val_results.get('avg_change_score') or 0:.3f} "
+          f"| change quality: Exact={chq.get('Exact match',0)}, "
+          f"Good={chq.get('Good',0)}, Partial={chq.get('Partial',0)}, "
+          f"No match={chq.get('No match',0)}\n")
     all_results["val"] = val_results
 
 if args.analyze_sets in ["test", "both"]:
     print(f"Analyzing test set ({len(test_set)} examples)...")
     test_results = analyze_dca_performance(optimized_comparator, test_set)
-    print(f"\n✅ Test set accuracy: {test_results['accuracy']:.3f}\n")
+    chq = test_results.get("change_quality", {})
+    print(f"\n✅ Test — accuracy: {test_results['accuracy']:.3f} "
+          f"| avg change score: {test_results.get('avg_change_score') or 0:.3f} "
+          f"| change quality: Exact={chq.get('Exact match',0)}, "
+          f"Good={chq.get('Good',0)}, Partial={chq.get('Partial',0)}, "
+          f"No match={chq.get('No match',0)}\n")
     all_results["test"] = test_results
 
 
@@ -540,8 +592,8 @@ if args.analyze_sets in ["test", "both"]:
 # optimized_comparator.save(<path>) serializes the DSPy program state — the
 # optimized instruction text, any few-shot demos, and module metadata — to a
 # JSON file.  It can be reloaded on a fresh run via --load-extractor <path>.
-# misclassified entries are excluded from the serialized results JSON to keep
-# file sizes manageable; only the count is stored (misclassified_count).
+# misclassified and results (per-example list) are excluded from the serialized
+# JSON to keep file sizes manageable; their counts are stored instead.
 model_name = (args.model_name or os.getenv("MODEL_NAME", "Unknown_Model")).replace("/", "_")
 current_time = datetime.now().strftime("%Y%m%d%H")
 best_strategy_name = runner.best_strategy_name.replace(" ", "_") if hasattr(runner, "best_strategy_name") else "Unknown"
@@ -571,10 +623,13 @@ if args.save_model or args.save_results:
         for split_name, result_dict in all_results.items():
             serializable_results[split_name] = {
                 k: v for k, v in result_dict.items()
-                if k != "misclassified"
+                if k not in ("misclassified", "results")
             }
             serializable_results[split_name]["misclassified_count"] = len(
                 result_dict.get("misclassified", [])
+            )
+            serializable_results[split_name]["results_count"] = len(
+                result_dict.get("results", [])
             )
 
         with open(results_path, "w") as f:

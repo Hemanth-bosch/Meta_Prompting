@@ -1,0 +1,6 @@
+synthetic:    true
+method:       B1_corruption (extreme_gaussian_blur_sigma25)
+source_pair:  pair_292
+corrupted:    original
+original:     pair_292/original.png (corrupted with extreme_gaussian_blur_sigma25)
+reimage:      pair_292/reimage.png (intact)

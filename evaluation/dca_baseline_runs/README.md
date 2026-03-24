@@ -9,15 +9,18 @@ This directory contains scripts for executing LLM-based experiments on document 
 The human prompts pipeline runs inference on image pair datasets using different prompt versions and LLM models:
 
 - **Scripts**:
-  - `human_prompt_runs/run_with_human_prompts.py` — Execute a single prompt on image pairs
-  - `human_prompt_runs/run_all_experiments.py` — Orchestrate multiple runs sequentially with logging
-  - `human_prompt_runs/run_v4_human_prompt.py` — V4 multi-step triage + diff pipeline
+  - `run_human_prompts/run_with_human_prompts.py` — Execute a single prompt on image pairs
+  - `run_human_prompts/run_all_experiments.py` — Orchestrate multiple runs sequentially with logging
+  - `run_human_prompts/run_v4_human_prompt.py` — V4 multi-step triage + diff pipeline
+  - `run_human_prompts/run_support_prompt_for_categorization_of_data.py` — Assign `human_label_category` codes from existing human labels
 
 - **Prompts** (in `human_prompts/` directory):
   - `v0_prompt_midas.md` — MIDAS prompt version 0 - this is original MIDAS prompt
   - `v1_prompt_midas.md` — MIDAS prompt version 1 - this has been adapted to latest rules and decision table - after rounds of discussion
   - `v2_prompt_cr.md` — prompt version 2 - made using claude 4.6 opus and using decision tree style format
   - `v3_prompt_cr.md` — prompt version 3 - made using claude 4.6 opus and using decision tree style format but with extra thinking area key in output json. This thinking area is nothing related to reasoning tokens, but in output json we instruct LLM to output this extra key.
+  - `v4_prompt_cr.md` — prompt version 4 - multi-step triage + diff pipeline (uses `run_v4_human_prompt.py`)
+  - `support_prompt_for_categorization_of_data.md` — maps `human_label_discard_image` + `human_label_changes` to category codes `A1/A2/B1/B2/B3/B4/B5a/B5b`
 
 - **Models** (via Azure OpenAI):
   - `gpt-4.1` — Standard GPT-4.1
@@ -28,9 +31,9 @@ The human prompts pipeline runs inference on image pair datasets using different
 ### Pipeline at a Glance
 
 1. Pick a prompt from `human_prompts/`.
-2. Run `human_prompt_runs/run_with_human_prompts.py` (single run) or `human_prompt_runs/run_all_experiments.py` (batch).
+2. Run `run_human_prompts/run_with_human_prompts.py` (single run) or `run_human_prompts/run_all_experiments.py` (batch).
 3. Outputs are written back to pair JSONs under `data/dca_data/image_pairs_llm_output_exp1/`.
-4. Evaluate and compare runs with `eval_runs.py`.
+4. Evaluate and compare runs with `eval_human_runs.py`.
 
 ---
 
@@ -55,14 +58,14 @@ The human prompts pipeline runs inference on image pair datasets using different
 
 ---
 
-## Single Run: `human_prompt_runs/run_with_human_prompts.py`
+## Single Run: `run_human_prompts/run_with_human_prompts.py`
 
 Execute a single prompt with a specific model and store results in JSON files.
 
 ### Basic Syntax
 
 ```powershell
-python evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py `
+python evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py `
     --key-prefix <KEY_PREFIX> `
     --prompt <PROMPT_FILE> `
     --deployment <MODEL_NAME> `
@@ -109,19 +112,19 @@ python evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py 
 #### Example 1: Run v3_prompt_cr with GPT-5.2
 
 ```powershell
-python evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py --key-prefix v3_prompt_cr_gpt52 --deployment gpt-5.2 --model-name gpt-5.2 --verbose --save-full-response --prompt v3_prompt_cr.md
+python evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py --key-prefix v3_prompt_cr_gpt52 --deployment gpt-5.2 --model-name gpt-5.2 --verbose --save-full-response --prompt v3_prompt_cr.md
 ```
 
 #### Example 2: Run v2_prompt_cr with GPT-5.2
 
 ```powershell
-python evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py --key-prefix v2_prompt_cr_gpt52 --deployment gpt-5.2 --model-name gpt-5.2 --verbose --save-full-response --prompt v2_prompt_cr.md --no-thinking-area
+python evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py --key-prefix v2_prompt_cr_gpt52 --deployment gpt-5.2 --model-name gpt-5.2 --verbose --save-full-response --prompt v2_prompt_cr.md --no-thinking-area
 ```
 
 #### Example 3: Run v1_prompt_midas on subset (pairs 1-50)
 
 ```powershell
-python evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py `
+python evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py `
     --key-prefix v1_prompt_midas_gpt41_mini `
     --prompt v1_prompt_midas.md `
     --deployment gpt-4.1-mini `
@@ -134,14 +137,14 @@ python evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py 
 
 ---
 
-## Batch Runs: `human_prompt_runs/run_all_experiments.py`
+## Batch Runs: `run_human_prompts/run_all_experiments.py`
 
 Sequentially execute multiple predefined experiments with full logging.
 
 ### Usage
 
 ```powershell
-python evaluation/dca_baseline_runs/human_prompt_runs/run_all_experiments.py
+python evaluation/dca_baseline_runs/run_human_prompts/run_all_experiments.py
 ```
 
 ### Features
@@ -160,7 +163,7 @@ RUNS = [
     {
         "label": "v3_prompt_cr_gpt52_reason_low",
         "args": [
-            PYTHON, "evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py",
+            PYTHON, "evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py",
             "--key-prefix", "v3_prompt_cr_gpt52_reason_low",
             "--deployment", "gpt-5.2",
             "--model-name", "gpt-5.2",
@@ -197,23 +200,56 @@ All runs completed at 2026-03-16 11:00:00.  Overall: SUCCESS
 
 ---
 
+## Human Label Category Coding
+
+Assign branch codes to `human_label_category` using existing human labels (`human_label_discard_image`, `human_label_changes`):
+
+```powershell
+python evaluation/dca_baseline_runs/run_human_prompts/run_support_prompt_for_categorization_of_data.py `
+  --prompt support_prompt_for_categorization_of_data.md `
+  --deployment gpt-4.1-mini `
+  --start 1 `
+  --end 100 `
+  --verbose
+```
+
+Allowed codes written to JSON:
+- `A1`, `A2`, `B1`, `B2`, `B3`, `B4`, `B5a`, `B5b`
+
+Then analyze category distribution and cross-tabs:
+
+```powershell
+python evaluation/dca_baseline_runs/run_human_prompts/analyze_labels.py `
+  --input-dir data/dca_data/image_pairs_llm_output_exp1 `
+  --output-dir data/dca_data/human_label_stats
+```
+
+---
+
 ## Output Format
 
 ### Key Fields
 
-- **`discard_image`**: Boolean classification (true=discard, false=keep)
-- **`changes`**: String description of detected changes
-- **`thinking_area`**: (Optional) Extra key from model
-- **`metadata`**: Complete request/response data + timing + retry log
-
-### Check JSON Output
-
-View results in `data/dca_data/image_pairs_llm_output_exp1/pair_*.json`:
-
-```powershell
-# View one pair
-cat data/dca_data/image_pairs_llm_output_exp1/pair_001.json | jq '.v3_prompt_cr_gpt52'
+```json
+{
+  "doubt": false,
+  "human_label_category": "B5a",
+  "human_label_discard_image": true,
+  "human_label_changes": "Images are identical - no changes",
+  "discard_image": true,
+  "changes": "<LLM-generated change description>",
+  "is_synthetic": false
+}
 ```
+
+- `doubt` (`bool`): whether this pair has uncertain/disputed ground truth labels
+- `human_label_discard_image` (`bool`): ground truth label
+  - `true`  = discard — images are identical or differ only trivially
+  - `false` = keep — at least one meaningful change exists
+- `human_label_changes` (`str`): human-verified change description
+- `human_label_category` (`str`): category code (`A1/A2/B1/B2/B3/B4/B5a/B5b`)
+- `is_synthetic` (`bool`): whether this pair was generated by `augment_rare_categories.py` (present only for synthetic pairs)
+- `discard_image` / `changes`: LLM-generated outputs
 
 ---
 
@@ -221,9 +257,10 @@ cat data/dca_data/image_pairs_llm_output_exp1/pair_001.json | jq '.v3_prompt_cr_
 
 After running experiments:
 
-1. **Evaluate Results**: See `evaluation/dca_baseline_runs/eval_runs.py`
+1. **Evaluate Results**: See `evaluation/dca_baseline_runs/eval_human_runs.py` (outputs to `eval_results/`)
 2. **Analyze Metrics**: Generate classification report, confusion matrix, token usage plots
 3. **Compare Models**: Run multiple models and visualize differences
+4. **Data Augmentation**: If class imbalance is an issue, generate synthetic pairs with `utils/dca_data_generation/augment_rare_categories.py` (see root README for details)
 
 ---
 
@@ -246,6 +283,6 @@ $env:AOAI_CA_BUNDLE = "C:\path\to\ca-bundle.crt"
 
 ## See Also
 
-- **Evaluation**: `evaluation/dca_baseline_runs/eval_runs.py`
+- **Evaluation**: `evaluation/dca_baseline_runs/eval_human_runs.py`
 - **Prompt Files**: `evaluation/dca_baseline_runs/human_prompts/v*.md`
 - **Data**: `data/dca_data/image_pairs_llm_output_exp1/`

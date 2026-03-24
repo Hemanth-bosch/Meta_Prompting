@@ -1,0 +1,5 @@
+synthetic:    true
+method:       B2_cross_mark (color=rgb(255, 0, 0), thickness=1px, alpha=80/255)
+source_pair:  pair_290
+original:     pair_290/original.png (untouched)
+reimage:      pair_290/reimage.png (X cross-mark overlaid)

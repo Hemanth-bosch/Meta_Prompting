@@ -34,15 +34,23 @@ meta-prompting/
 │
 ├── evaluation/                # Evaluation metrics and analysis
 │   ├── common.py              #   Shared helpers (normalization, similarity)
-│   ├── dca_metric.py          #   DCA-specific metrics
+│   ├── dca_metric.py          #   DCA weighted metric (0.6 classification + 0.4 change summary)
 │   ├── jo_metric.py           #   JO-specific metrics
 │   ├── yanase_metric.py       #   YANASE-specific metrics
-│   └── posthoc_analysis.py    #   Performance analysis and reporting
+│   ├── posthoc_analysis.py    #   Performance analysis and reporting
+│   └── dca_baseline_runs/     #   DCA human-prompt baseline experiments
+│       ├── eval_human_runs.py #     Metrics, plots, confusion matrices
+│       ├── eval_results/      #     Generated charts and eval_summary.csv
+│       ├── human_prompts/     #     Prompt markdown files (v0–v4)
+│       └── run_human_prompts/ #     Runners: single, batch, v4 triage, categorization
 │
 ├── utils/                     # Data utilities
 │   ├── data_loading.py        #   Dataset loading functions
 │   ├── splitting.py           #   Train/val/test splitting
-│   └── pdf_processing.py      #   PDF-to-image conversion
+│   ├── pdf_processing.py      #   PDF-to-image conversion
+│   └── dca_data_generation/   #   DCA dataset generation tools
+│       ├── generate_from_zips.py  # Generate image pairs from PDF zips
+│       └── augment_rare_categories.py  # Synthetic data for B1/B2/B4 categories
 │
 ├── optimization/              # Optimization strategies
 │   └── opt.py                 #   OptimizationRunner and strategy builders
@@ -217,11 +225,53 @@ python extract_yanase.py \
 
 The DCA workflow currently runs from `evaluation/dca_baseline_runs/` and focuses on image-pair triage/change assessment using human-authored prompts.
 
-- Single run: `evaluation/dca_baseline_runs/human_prompt_runs/run_with_human_prompts.py`
-- Batch orchestration: `evaluation/dca_baseline_runs/human_prompt_runs/run_all_experiments.py`
-- Metrics and reports: `evaluation/dca_baseline_runs/eval_runs.py`
+- Single run: `evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py`
+- Multi-step v4 pipeline: `evaluation/dca_baseline_runs/run_human_prompts/run_v4_human_prompt.py`
+- Batch orchestration: `evaluation/dca_baseline_runs/run_human_prompts/run_all_experiments.py`
+- Metrics and reports: `evaluation/dca_baseline_runs/eval_human_runs.py`
 
 For detailed usage and prompt/model combinations, see `evaluation/dca_baseline_runs/README.md`.
+
+### DCA Data Augmentation
+
+The original DCA dataset had severe class imbalance (B1=0, B2=2, B4=5 samples). Synthetic pairs were generated to bring each underrepresented category to ≥20 samples:
+
+```bash
+# Preview what would be generated
+python utils/dca_data_generation/augment_rare_categories.py --dry-run --verbose
+
+# Generate synthetic pairs (appended after pair_376)
+python utils/dca_data_generation/augment_rare_categories.py --verbose
+```
+
+| Category | Method | Count |
+|----------|--------|-------|
+| B1 (corrupted/unreadable) | Gaussian blur, pixelation, resize-to-tiny | 20 |
+| B2 (crossed-out) | Semi-transparent diagonal X overlay (1px, alpha 45–100) | 18 |
+| B4 (one info + one non-info) | Recombination from A1/B3 + B5a/B5b pools | 15 |
+
+All synthetic pairs include `is_synthetic: true`, `source_pairs`, and `data_augmentation_explain_in_detail` for traceability. Total dataset: 429 pairs (376 original + 53 synthetic).
+
+### DCA Prompt Optimization Pipeline
+
+The `extract_dca.py` script runs DSPy-based prompt optimization on the DCA dataset:
+
+```bash
+# MIPROv2 optimization (default)
+uv run python extract_dca.py --optimizer miprov2 --miprov2-auto medium
+
+# SIMBA optimization
+uv run python extract_dca.py --optimizer simba --simba-max-steps 8
+
+# Run all optimizers
+uv run python extract_dca.py --optimizer all --analyze-sets both --save-model --save-results
+```
+
+The pipeline uses a frozen train/val/test split (saved in `.cache/dca_split_seed42.json`) stratified by `expected_discard_image`, `expected_human_label_category`, and `doubt`. New pairs added to the dataset are automatically assigned to the train set.
+
+Evaluation covers two dimensions:
+- **Classification** (discard_image): accuracy, precision, recall, F1, confusion matrix
+- **Change summary** (changes): weighted F-beta via GPT-5.2 judge (precision 60% / recall 40%)
 
 
 ### Performance
