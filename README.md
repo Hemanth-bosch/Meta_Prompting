@@ -44,19 +44,12 @@ meta-prompting/
 │       │   │   ├── run_eval/
 │       │   │   │   └── eval_human_runs.py          # Classification metrics, plots, confusion matrices, CSV
 │       │   │   └── eval_results/                   # Generated outputs
-│       │   │       ├── classification_metrics.png
-│       │   │       ├── confusion_matrices.png
-│       │   │       ├── token_usage.png
-│       │   │       ├── response_time.png
-│       │   │       ├── failures.png
-│       │   │       └── eval_summary.csv
 │       │   └── change_summary_eval/                # Change-summary quality evaluation
 │       │       ├── run_eval/
 │       │       │   ├── midas_summary_eval.py        # LLM judge + semantic sim over all model versions
 │       │       │   ├── visualize_all_metrics.py     # Heatmap + bar charts from summary_eval_results.json
 │       │       │   └── fbeta_quartile_analysis.py   # Precision-60/Recall-40 F-beta quartile breakdown
-│       │       └── eval_results/                   # Generated outputs
-│       │           ├── summary_eval_results.json    # Per-pair + averaged metrics 
+│       │       └── eval_results/                   # Generated outputs 
 │       ├── human_prompts/     #     Prompt markdown files (v0–v4)
 │       └── run_human_prompts/ #     Runners: single, batch, v4 triage, categorization
 │
