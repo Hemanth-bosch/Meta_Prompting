@@ -23,7 +23,7 @@ Usage
   1. Create a .env file in the same directory as this script:
        AZURE_OPENAI_ENDPOINT=https://<your-endpoint>.openai.azure.com/
        AZURE_OPENAI_API_VERSION=2024-08-01-preview
-       AZURE_OPENAI_DEPLOYMENT=gpt-4.1
+       MODEL_NAME=gpt-4.1
        # Optional: AOAI_CA_BUNDLE=C:/path/to/bundle.pem
   2. Log in via Azure CLI BEFORE activating the venv:
        deactivate
@@ -76,7 +76,7 @@ LOG_FILE:        Path = DCA_DATA_DIR / f"pipeline_{datetime.now().strftime('%Y%m
 
 # ── Experiment & model tag (used in LLM output folder name) ──────────────────
 EXPERIMENT_NAME: str = "exp1"
-MODEL_NAME:      str = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4.1")
+MODEL_NAME:      str = os.getenv("MODEL_NAME", "gpt-4.1")
 LLM_OUTPUT_DIR:  Path = DCA_DATA_DIR / f"image_pairs_llm_output_{MODEL_NAME}_{EXPERIMENT_NAME}"
 
 
@@ -285,7 +285,7 @@ def build_openai_client() -> Tuple[AzureOpenAI, str, str, str]:
     """Returns (client, deployment, api_version, endpoint)."""
     endpoint    = os.getenv("AZURE_OPENAI_ENDPOINT",    "https://aiq212-openai.openai.azure.com/")
     api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview")
-    deployment  = os.getenv("AZURE_OPENAI_DEPLOYMENT",  "gpt-4.1")
+    deployment  = os.getenv("MODEL_NAME",  "gpt-4.1")
 
     logger.info(f"Building Azure OpenAI client | endpoint={endpoint} | deployment={deployment}")
 

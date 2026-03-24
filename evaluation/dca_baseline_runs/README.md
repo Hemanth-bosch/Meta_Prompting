@@ -301,7 +301,6 @@ Set these before running (or let defaults apply):
 ```powershell
 $env:AZURE_OPENAI_ENDPOINT = "https://aiq212-openai.openai.azure.com/"
 $env:AZURE_OPENAI_API_VERSION = "2024-08-01-preview"
-$env:AZURE_OPENAI_DEPLOYMENT = "gpt-4.1-mini"  # Default if not specified
 ```
 
 For CA certificate on corporate networks:

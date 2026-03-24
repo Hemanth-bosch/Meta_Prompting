@@ -112,30 +112,43 @@ uv sync
 source .venv/bin/activate # Windows: .venv\Scripts\activate
 ```
 
-3. Configure environment variables in `.env`. A template is provided in `.env.template`:
+3. Configure environment variables by creating a `.env` file in the repo root. All variables with defaults are optional:
 ```bash
-# Model configuration (prefix determines provider)
-MODEL_NAME=azure/gpt-4o-mini          # Azure OpenAI
-# MODEL_NAME=vertex_ai/gemini-2.0-flash # Vertex AI Gemini
-# MODEL_NAME=openai/gpt-4o             # OpenAI direct
-# MODEL_NAME=anthropic/claude-sonnet-4-20250514  # Anthropic direct
+# ── Model configuration (prefix determines provider) ────────────────────────
+MODEL_NAME=azure/gpt-4.1-mini        # Azure OpenAI (default)
+# MODEL_NAME=vertex_ai/gemini-2.0-flash
+# MODEL_NAME=openai/gpt-4o
+# MODEL_NAME=anthropic/claude-sonnet-4-20250514
+REFLECTION_LM_NAME=azure/gpt-5       # Used by GEPA optimizer
 
-# Azure OpenAI (required for azure/ models)
-AZURE_OPENAI_API_KEY=your_api_key_here
-AZURE_OPENAI_ENDPOINT=your_endpoint_here
-AZURE_OPENAI_API_VERSION=2025-04-01-preview
+# ── Azure OpenAI ─────────────────────────────────────────────────────────────
+# Leave AZURE_OPENAI_API_KEY empty to use `az login` (Azure CLI) auth instead
+AZURE_OPENAI_API_KEY=
+AZURE_OPENAI_ENDPOINT=https://your-endpoint.openai.azure.com
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
-# Vertex AI (required for vertex_ai/ models)
-# VERTEX_PROJECT=your_project_id
+# ── Corporate TLS (Bosch / proxy environments) ───────────────────────────────
+# Path to CA bundle PEM for SSL verification. If unset, the code merges
+# certifi with any PEMs found in %TEMP%\bosch-ca\ automatically.
+REQUESTS_CA_BUNDLE=
+
+# ── Vertex AI (for vertex_ai/ models) ────────────────────────────────────────
+# VERTEX_PROJECT=your-gcp-project-id
 # VERTEX_LOCATION=us-central1
 
-# Caching and data paths
+# ── OpenAI / Anthropic direct ────────────────────────────────────────────────
+# OPENAI_API_KEY=sk-...
+# ANTHROPIC_API_KEY=sk-ant-...
+
+# ── Cache and data paths (defaults shown) ────────────────────────────────────
 CACHED_EXTRACTOR_PATH=.cache/
 CACHED_EXTRACTOR_DIR=.cache/
 YANASE_IMAGES_DIR=data/YANASE_images
 YANASE_GT_DIR=data/YANASE_ground_truth
 JAPANESE_ORDER_IMAGES_DIR=./data/png
 JAPANESE_ORDER_GT_DIR=./data/json
+DCA_IMAGE_PAIRS_DIR=data/dca_data/image_pairs
+DCA_GT_DIR=data/dca_data/image_pairs_llm_output_exp1
 ```
 
 4. Prepare data within the `data` folder:

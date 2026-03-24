@@ -35,4 +35,4 @@ dataset = load_yanase_order_dataset()
 dataset = load_japanese_order_dataset()
 ```
 
-Paths default to the above but can be overridden via `.env` (see `.env.template`).
+Paths default to the above but can be overridden via `.env` (see the env-vars section in the root README).

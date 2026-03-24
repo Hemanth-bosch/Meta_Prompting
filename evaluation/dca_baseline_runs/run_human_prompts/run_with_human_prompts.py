@@ -553,7 +553,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Append configurable prompt outputs into existing pair JSON files.")
     parser.add_argument("--json-dir", type=Path, default=DEFAULT_JSON_DIR)
     parser.add_argument("--image-pairs-dir", type=Path, default=DEFAULT_IMAGE_PAIRS_DIR)
-    parser.add_argument("--deployment", default=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4.1-mini"))
+    parser.add_argument("--deployment", default=os.getenv("MODEL_NAME", "gpt-4.1-mini"))
     parser.add_argument("--model-name", default=None, help="Alias for deployment; overrides --deployment if provided")
     parser.add_argument("--key-prefix", required=True, help="Example: v3_prompt_cr_gpt41, v3_prompt_cr_gpt52, v3_prompt_cr_gpt41_mini")
     parser.add_argument("--prompt", default="v3_prompt_cr.md", help="Prompt markdown file name in human_prompts directory")
