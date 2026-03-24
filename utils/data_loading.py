@@ -4,6 +4,9 @@ import json
 import os
 
 
+import pydantic
+
+
 class AbsentImage(dspy.Image):
     """Sentinel for a missing image in a one-sided DCA pair.
 
@@ -13,6 +16,15 @@ class AbsentImage(dspy.Image):
     the model sees an explicit "[IMAGE ABSENT]" message and can apply
     the correct one-sided branch (NoMatchFound / non-informational etc.).
     """
+
+    @pydantic.model_validator(mode="before")
+    @classmethod
+    def validate_input(cls, values):
+        """Accept the same inputs as Image, plus AbsentImage instances."""
+        if isinstance(values, AbsentImage):
+            return {"url": values.url}
+        # Fall back to parent behaviour for str / dict
+        return super().validate_input(values)
 
     def format(self) -> list[dict[str, Any]] | str:
         return [
