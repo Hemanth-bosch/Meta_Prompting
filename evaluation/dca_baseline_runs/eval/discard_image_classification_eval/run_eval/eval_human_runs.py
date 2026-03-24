@@ -16,8 +16,8 @@ Generates:
   - eval_summary.csv
 
 Usage:
-    python evaluation/dca_baseline_runs/eval_human_runs.py
-    python evaluation/dca_baseline_runs/eval_human_runs.py --json-dir path/to/jsons --output-dir evaluation/dca_baseline_runs/eval_results
+    python evaluation/dca_baseline_runs/eval/discard_image_classification_eval/run_eval/eval_human_runs.py
+    python evaluation/dca_baseline_runs/eval/discard_image_classification_eval/run_eval/eval_human_runs.py --json-dir path/to/jsons --output-dir evaluation/dca_baseline_runs/eval/discard_image_classification_eval/eval_results
 """
 
 from __future__ import annotations
@@ -41,9 +41,11 @@ import numpy as np
 # Paths
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[1]
+# File lives at evaluation/dca_baseline_runs/eval/discard_image_classification_eval/run_eval/
+# so parents[4] is the repo root.
+REPO_ROOT = SCRIPT_DIR.parents[4]
 DEFAULT_JSON_DIR = REPO_ROOT / "data" / "dca_data" / "image_pairs_llm_output_exp1"
-DEFAULT_OUTPUT_DIR = REPO_ROOT / "evaluation" / "dca_baseline_runs" / "eval_results"
+DEFAULT_OUTPUT_DIR = REPO_ROOT / "evaluation" / "dca_baseline_runs" / "eval" / "discard_image_classification_eval" / "eval_results"
 
 # ---------------------------------------------------------------------------
 # The 7 runs to evaluate (key prefixes)

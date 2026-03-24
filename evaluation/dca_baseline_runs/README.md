@@ -28,12 +28,42 @@ The human prompts pipeline runs inference on image pair datasets using different
   - `gpt-5.2` — Reasoning-capable model
   - `gpt-5-mini` — Reasoning-capable mini model
 
+### `eval/` Folder Structure
+
+```
+eval/
+├── discard_image_classification_eval/
+│   ├── run_eval/
+│   │   └── eval_human_runs.py           # Classification metrics, grouped bar plots, confusion matrices, CSV
+│   └── eval_results/                    # Generated outputs (created on first run)
+│       ├── classification_metrics.png
+│       ├── confusion_matrices.png
+│       ├── token_usage.png
+│       ├── response_time.png
+│       ├── failures.png
+│       └── eval_summary.csv
+└── change_summary_eval/
+    ├── run_eval/
+    │   ├── midas_summary_eval.py        # LLM judge + semantic similarity across all model/version combos
+    │   ├── visualize_all_metrics.py     # Heatmap + bar charts from summary_eval_results.json
+    │   └── fbeta_quartile_analysis.py   # Precision-60/Recall-40 F-beta quartile breakdown (gpt41m, gpt5m)
+    └── eval_results/                    # Generated outputs (created on first run)
+        ├── summary_eval_results.json    # Per-pair + averaged metrics (written by midas_summary_eval.py)
+        ├── heatmap_quality.png
+        ├── bars_precision.png
+        ├── bars_recall.png
+        ├── bars_f1.png
+        ├── bars_hallucination_rate.png
+        └── bars_llm_score.png
+```
+
 ### Pipeline at a Glance
 
 1. Pick a prompt from `human_prompts/`.
 2. Run `run_human_prompts/run_with_human_prompts.py` (single run) or `run_human_prompts/run_all_experiments.py` (batch).
 3. Outputs are written back to pair JSONs under `data/dca_data/image_pairs_llm_output_exp1/`.
-4. Evaluate and compare runs with `eval_human_runs.py`.
+4. Evaluate classification with `eval/discard_image_classification_eval/run_eval/eval_human_runs.py`.
+5. Evaluate change summaries with `eval/change_summary_eval/run_eval/midas_summary_eval.py`, then visualize with `visualize_all_metrics.py`.
 
 ---
 
@@ -257,7 +287,7 @@ python evaluation/dca_baseline_runs/run_human_prompts/analyze_labels.py `
 
 After running experiments:
 
-1. **Evaluate Results**: See `evaluation/dca_baseline_runs/eval_human_runs.py` (outputs to `eval_results/`)
+1. **Evaluate Results**: See `evaluation/dca_baseline_runs/eval/discard_image_classification_eval/run_eval/eval_human_runs.py` (outputs to `eval/discard_image_classification_eval/eval_results/`)
 2. **Analyze Metrics**: Generate classification report, confusion matrix, token usage plots
 3. **Compare Models**: Run multiple models and visualize differences
 4. **Data Augmentation**: If class imbalance is an issue, generate synthetic pairs with `utils/dca_data_generation/augment_rare_categories.py` (see root README for details)
@@ -283,6 +313,6 @@ $env:AOAI_CA_BUNDLE = "C:\path\to\ca-bundle.crt"
 
 ## See Also
 
-- **Evaluation**: `evaluation/dca_baseline_runs/eval_human_runs.py`
+- **Evaluation**: `evaluation/dca_baseline_runs/eval/discard_image_classification_eval/run_eval/eval_human_runs.py`
 - **Prompt Files**: `evaluation/dca_baseline_runs/human_prompts/v*.md`
 - **Data**: `data/dca_data/image_pairs_llm_output_exp1/`

@@ -39,8 +39,24 @@ meta-prompting/
 │   ├── yanase_metric.py       #   YANASE-specific metrics
 │   ├── posthoc_analysis.py    #   Performance analysis and reporting
 │   └── dca_baseline_runs/     #   DCA human-prompt baseline experiments
-│       ├── eval_human_runs.py #     Metrics, plots, confusion matrices
-│       ├── eval_results/      #     Generated charts and eval_summary.csv
+│       ├── eval/              #     All evaluation outputs
+│       │   ├── discard_image_classification_eval/
+│       │   │   ├── run_eval/
+│       │   │   │   └── eval_human_runs.py          # Classification metrics, plots, confusion matrices, CSV
+│       │   │   └── eval_results/                   # Generated outputs
+│       │   │       ├── classification_metrics.png
+│       │   │       ├── confusion_matrices.png
+│       │   │       ├── token_usage.png
+│       │   │       ├── response_time.png
+│       │   │       ├── failures.png
+│       │   │       └── eval_summary.csv
+│       │   └── change_summary_eval/                # Change-summary quality evaluation
+│       │       ├── run_eval/
+│       │       │   ├── midas_summary_eval.py        # LLM judge + semantic sim over all model versions
+│       │       │   ├── visualize_all_metrics.py     # Heatmap + bar charts from summary_eval_results.json
+│       │       │   └── fbeta_quartile_analysis.py   # Precision-60/Recall-40 F-beta quartile breakdown
+│       │       └── eval_results/                   # Generated outputs
+│       │           ├── summary_eval_results.json    # Per-pair + averaged metrics 
 │       ├── human_prompts/     #     Prompt markdown files (v0–v4)
 │       └── run_human_prompts/ #     Runners: single, batch, v4 triage, categorization
 │
@@ -228,7 +244,7 @@ The DCA workflow currently runs from `evaluation/dca_baseline_runs/` and focuses
 - Single run: `evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py`
 - Multi-step v4 pipeline: `evaluation/dca_baseline_runs/run_human_prompts/run_v4_human_prompt.py`
 - Batch orchestration: `evaluation/dca_baseline_runs/run_human_prompts/run_all_experiments.py`
-- Metrics and reports: `evaluation/dca_baseline_runs/eval_human_runs.py`
+- Metrics and reports: `evaluation/dca_baseline_runs/eval/discard_image_classification_eval/run_eval/eval_human_runs.py`
 
 For detailed usage and prompt/model combinations, see `evaluation/dca_baseline_runs/README.md`.
 
