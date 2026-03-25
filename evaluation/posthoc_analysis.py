@@ -377,6 +377,7 @@ def analyze_val_test_gap(val_field_scores: dict,
     }
 
 
+# TODO review or remove
 def analyze_dca_performance(extractor, dataset, verbose=True):
     """Analyze classification and change summary performance for DCA image comparison.
 
@@ -426,7 +427,7 @@ def analyze_dca_performance(extractor, dataset, verbose=True):
             expected_changes = getattr(example, "expected_changes", None)
             if expected_changes is not None:
                 predicted_changes = str(getattr(prediction, "changes", ""))
-                change_score, change_reasoning = judge_summary_metric(
+                change_score = judge_summary_metric(
                     str(expected_changes), predicted_changes
                 )
                 if change_score is None:

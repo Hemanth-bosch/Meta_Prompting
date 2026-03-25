@@ -1,4 +1,5 @@
 import dspy
+from typing import Optional
 
 
 class DCAImageComparison(dspy.Signature):
@@ -39,11 +40,11 @@ class DCAImageComparison(dspy.Signature):
 
         For meaningful differences, describe observable changes faithfully and avoid hallucinations.
         """
-        image_original: dspy.Image = dspy.InputField(
-            desc="Original document image (Image 1) - the reference version"
+        image_original: Optional[dspy.Image] = dspy.InputField(
+            desc="Original document image (Image 1) - the reference version", default=None
         )
-        image_reimage: dspy.Image = dspy.InputField(
-            desc="Re-imaged/updated version of the same document (Image 2) - compare against original"
+        image_reimage: Optional[dspy.Image] = dspy.InputField(
+            desc="Re-imaged/updated version of the same document (Image 2) - compare against original", default=None
         )
         discard_image: str = dspy.OutputField(
             desc="Output exactly 'true' or 'false' (lowercase). "

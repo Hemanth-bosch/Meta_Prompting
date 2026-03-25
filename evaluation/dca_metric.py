@@ -2,21 +2,111 @@ import dspy
 import json
 import os
 
-from config import _build_ca_bundle, _get_azure_client
+from config import _build_ca_bundle, _get_azure_client, DCA_JUDGE_MODEL_NAME
+
 _ca = _build_ca_bundle()
 os.environ.setdefault("REQUESTS_CA_BUNDLE", _ca)
 os.environ.setdefault("CURL_CA_BUNDLE", _ca)
 os.environ.setdefault("SSL_CERT_FILE", _ca)
 
 # ---------- CONFIG ----------
-client = _get_azure_client()
+# TODO Azure client is lazily initialised on the first LLM call so that importing
+# this module (e.g. in evaluation scripts) does not spin up the client.
+_client = None
 
-# TODO add this model into config with a unique name
-MODEL = "gpt-5.2"
+
+def _get_client():
+    global _client
+    if _client is None:
+        _client = _get_azure_client()
+    return _client
+
+
+#  TODO Judge model — defined in config.DCA_JUDGE_MODEL_NAME
+MODEL = DCA_JUDGE_MODEL_NAME
+
+# ---------------------------------------------------------------------------
+# TODO Field weights
+# ---------------------------------------------------------------------------
+FIELD_WEIGHT_CLS    = 0.6   # discard_image classification weight
+FIELD_WEIGHT_CHANGE = 0.4   # change summary quality weight
+
+# ---------------------------------------------------------------------------
+# TODO Rule-based fast-path for DIRECT-mode special cases
+#
+# These canonical phrases are output verbatim (or near-verbatim) and can be
+# matched without an LLM call.  Any human summary that does NOT match one of
+# these patterns is a BREAKDOWN-mode case and still goes to the LLM.
+# ---------------------------------------------------------------------------
+_SPECIAL_CASE_RULES = [
+    {
+        "label": "NoMatchFound",
+        "detect": lambda h: "nomatchfound" in h.replace(" ", "") or "no match found" in h,
+        "match":  lambda h, m: "nomatchfound" in m.replace(" ", "") or "no match found" in m,
+    },
+    {
+        "label": "Could not infer",
+        "detect": lambda h: "could not infer" in h and len(h) < 30,
+        "match":  lambda h, m: "could not infer" in m and len(m) < 30,
+    },
+    {
+        "label": "Image has been crossed out",
+        "detect": lambda h: "crossed out" in h.replace(" ", "") and len(h) < 30,
+        "match":  lambda h, m: "crossed out" in m.replace(" ", "") and len(m) < 30,
+    },
+    {
+        "label": "Images are identical - no changes",
+        "detect": lambda h: "identical" in h.replace(" ", "") and "no change" in h.replace(" ", "") and  len(h) < 50,
+        "match":  lambda h, m: "identical" in m.replace(" ", "") and "no change" in m.replace(" ", "") and len(m) < 50,
+    },
+    # "Images are identical - no changes" is intentionally omitted:
+    # phrasing is too variable across runs → handled by the LLM judge instead.
+]
+
+# TODO Add
+def _try_rule_based_match(human: str, model: str):
+    """Try to score the pair without an LLM call for known special-case summaries.
+
+    Returns (fbeta, reasoning, matched) where matched=True means a rule fired.
+    fbeta is 1.0 (agreement) or 0.0 (disagreement).
+    If no rule applies, returns (None, "", False) → caller should use the LLM.
+    """
+    h = human.lower().strip()
+    m = model.lower().strip()
+
+    for rule in _SPECIAL_CASE_RULES:
+        if rule["detect"](h):
+            agrees = rule["match"](h, m)
+            label  = rule["label"]
+            if agrees:
+                return (
+                    1.0,
+                    f"Rule-based DIRECT match [{label}]: human and model summaries agree.",
+                    True,
+                )
+            else:
+                return (
+                    0.0,
+                    f"Rule-based DIRECT mismatch [{label}]: human='{human[:80]}' but model='{model[:80]}'.",
+                    True,
+                )
+
+    return None, "", False
 
 #############################################################################
 # DCA (Document Change Analysis) Metrics
 #############################################################################
+
+
+def compute_classification_score(expected: bool, predicted: bool) -> float:
+    """Return 1.0 if predicted matches expected discard_image, else 0.0."""
+    return 1.0 if predicted == expected else 0.0
+
+
+def compute_total_score(cls_score: float, change_score: float) -> float:
+    """Weighted combination: FIELD_WEIGHT_CLS * cls + FIELD_WEIGHT_CHANGE * change."""
+    return FIELD_WEIGHT_CLS * cls_score + FIELD_WEIGHT_CHANGE * change_score
+
 
 # TODO Check the metric in depth
 
@@ -44,28 +134,18 @@ def dca_comparison_metric(example, prediction, trace=None):
 
 
     # TODO I think we can change this to 0.5 and 0.5
-    field_weights = {
-        'discard_image': 0.6,  # Primary focus on discard_image classification
-        'changes': 0.4          # Secondary focus on change description accuracy
-    }
-
-    total_score = 0.0
-
-    #Evaluate discard_image classification
-    # Normalize various boolean representations
     true_values = {"true", "yes", "1"}
-
     expected_bool = expected_discard in true_values
     predicted_bool = predicted_discard in true_values
 
-    if predicted_bool == expected_bool:
-        total_score += field_weights['discard_image'] * 1.0  # Correct classification
-    else:
-        total_score += field_weights['discard_image'] * 0.0  # Incorrect classification
+    cls_score = compute_classification_score(expected_bool, predicted_bool)
 
     # Evaluate change description accuracy using F1 score
-    change_score, reasoning = judge_summary_metric(expected_changes, predicted_changes)
-    total_score += field_weights['changes'] * change_score
+    change_score = judge_summary_metric(expected_changes, predicted_changes)
+
+    if change_score is None:
+        change_score = 0.0
+    total_score = compute_total_score(cls_score, change_score)
 
     return total_score
 
@@ -73,9 +153,24 @@ def dca_comparison_metric(example, prediction, trace=None):
 # to
 # - Both images present AND both informational AND fully identical or just trivial differences (minor such as layout shift, spelling errors, etc.) → "Images are identical - no changes"
 
+# TODO → correct_matches: 1 if they match else 0, missed_changes: 0 if they match else 1, hallucinated_changes: 0 if they match else 4.
+# Why 4?
+
+# TODO We can reduce prompt calls here
 
 # TODO Remove score in prompt, because in output JSON from this prompt - we are not using it
+
+
+# ── Rule-based fast-path ───────────────────────────────────────────────────
+
+
 def judge_summary_metric(human, model):
+
+    # ── Fast-path: rule-based for DIRECT-mode special cases ──────────────────
+    fbeta, reasoning, matched = _try_rule_based_match(human, model)
+    if matched:
+        return fbeta
+    # ── Fallback: LLM judge for BREAKDOWN-mode (meaningful differences) ───────
 
     prompt = f"""
 You are a judge evaluating model-generated summaries of changes between two document images.
@@ -113,7 +208,7 @@ STEP 1 — Determine evaluation mode:
   → The model is expected to produce a summary that conveys the same category/conclusion as the human.
   → Treat the human's conclusion as a single "change" item and the model's conclusion as a single "change" item.
   → human_changes: [human conclusion], model_changes: [model conclusion]
-  → correct_matches: 1 if they match else 0, missed_changes: 0 if they match else 1, hallucinated_changes: 0 if they match else 4.
+  → correct_matches: 1 if they match else 0, missed_changes: 0 if they match else 1, hallucinated_changes: 0 if they match else 1.
 
 
 STEP 2 — Return JSON:
@@ -125,15 +220,16 @@ STEP 2 — Return JSON:
   "correct_matches": 0,
   "missed_changes": 0,
   "hallucinated_changes": 0,
-  "reasoning": "If there are missed_changes or hallucinated_changes, mention briefly the difference between human/ ground-truth and LLM model summary, and your reasoning for deciding the missed changes and hallucinated changes. Else mention human/ ground-truth and LLM model summaries are fully in agreement."
-}}
+  }}
 
 """
-    # TODO add response format
-    response = client.chat.completions.create(
+    # TODO add response format and add temperature
+    # TODO Implement intelligent caching
+    response = _get_client().chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
-        response_format="json"
+        response_format={"type": "json_object"},
+        temperature=0.1,
     )
 
     text = response.choices[0].message.content
@@ -146,7 +242,6 @@ STEP 2 — Return JSON:
     correct = parsed.get("correct_matches", 0)
     missed = parsed.get("missed_changes", 0)
     hallucinated = parsed.get("hallucinated_changes", 0)
-    reasoning = parsed.get("reasoning", "")
     human_total = correct + missed
     model_total = correct + hallucinated
 
@@ -159,7 +254,7 @@ STEP 2 — Return JSON:
              if precision is not None and recall is not None and (precision + recall) > 0
              else (0 if precision is not None and recall is not None else None))
 
-    return fbeta, reasoning
+    return fbeta
 
 
 # TODO Jahnavi to look into this
@@ -201,38 +296,33 @@ def dca_comparison_metric_with_feedback(example, prediction, trace=None, pred_na
     expected_bool = expected_discard_image in true_values
     predicted_bool = predicted_discard_image in true_values
     predicted_valid = predicted_discard_image in true_values or predicted_discard_image in false_values
-    # Use same field weights as dca_comparison_metric
-    field_weights = {
-        'discard_image': 0.6,
-        'changes': 0.4
-    }
     pair_name = getattr(example, "pair_name", "unknown")
-    
+
     if not predicted_valid:
         classification_score = 0.0
+        total_score = 0.0  # no change score available for invalid prediction
         invalid_feedback = (
             f"INVALID OUTPUT: Predicted_Discard_Image '{predicted_discard_image}' which is not a valid boolean. "
             f"The output for discard_image must be exactly 'true' or 'false'. "
         )
-    
         feedback = invalid_feedback + f"\nClassification score: {classification_score:.3f}"
     else:
-        classification_score = 1.0 if predicted_bool == expected_bool else 0.0
+        classification_score = compute_classification_score(expected_bool, predicted_bool)
 
         # Compute change description score via judge_summary_metric (robust to None)
-        change_score, reasoning = judge_summary_metric(expected_changes, predicted_changes)
+        change_score = judge_summary_metric(expected_changes, predicted_changes)
         if change_score is None:
             change_score = 0.0
 
         change_label = _change_score_label(change_score)
 
-        total_score = field_weights['discard_image'] * classification_score + field_weights['changes'] * change_score
+        total_score = compute_total_score(classification_score, change_score)
 
         if classification_score == 1.0:
             feedback = (
                 f"Feedback for Discard Image Classification: CORRECT: Predicted discard_image='{predicted_discard_image}' "
                 f"matches ground truth (expected='{expected_discard_image}'). "
-                f"Feedback for Changes [{change_label} | score={change_score:.3f}]: {reasoning}"
+                f"Feedback for Changes [{change_label} | score={change_score:.3f}]"
             )
 
         else:
@@ -240,13 +330,13 @@ def dca_comparison_metric_with_feedback(example, prediction, trace=None, pred_na
                 feedback = (
                     f"Feedback for Discard Image Classification: FALSE NEGATIVE (pair={pair_name}): "
                     f"Predicted discard_image='false' but the images should be discarded. "
-                    f"Feedback for Changes [{change_label} | score={change_score:.3f}]: {reasoning}"
+                    f"Feedback for Changes [{change_label} | score={change_score:.3f}]"
                 )
             else:
                 feedback = (
                     f"Feedback for Discard Image Classification: FALSE POSITIVE (pair={pair_name}): "
                     f"Predicted discard_image='true' but meaningful changes exist between the images. "
-                    f"Feedback for Changes [{change_label} | score={change_score:.3f}]: {reasoning}"
+                    f"Feedback for Changes [{change_label} | score={change_score:.3f}]"
                 )
 
         feedback += f"\nTotal score: {total_score:.3f}"

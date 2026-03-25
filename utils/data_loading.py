@@ -1,48 +1,54 @@
 import dspy
 from typing import Any, List
 import json
+import logging
 import os
-
 
 import pydantic
 
+logger = logging.getLogger("dca.data_loading")
 
-class AbsentImage(dspy.Image):
-    """Sentinel for a missing image in a one-sided DCA pair.
+# TODO Not Needed
+# class AbsentImage(dspy.Image):
+    # """Sentinel for a missing image in a one-sided DCA pair.
 
-    Instead of sending a real image to the LLM, format() returns a text
-    content block that tells the model this slot has no document.  This
-    lets the two-input DCAImageComparison signature run normally while
-    the model sees an explicit "[IMAGE ABSENT]" message and can apply
-    the correct one-sided branch (NoMatchFound / non-informational etc.).
-    """
+    # Instead of sending a real image to the LLM, format() returns a text
+    # content block that tells the model this slot has no document.  This
+    # lets the two-input DCAImageComparison signature run normally while
+    # the model sees an explicit "[IMAGE ABSENT]" message and can apply
+    # the correct one-sided branch (NoMatchFound / non-informational etc.).
+    # """
 
-    @pydantic.model_validator(mode="before")
-    @classmethod
-    def validate_input(cls, values):
-        """Accept the same inputs as Image, plus AbsentImage instances."""
-        if isinstance(values, AbsentImage):
-            return {"url": values.url}
-        # Fall back to parent behaviour for str / dict
-        return super().validate_input(values)
+    # @pydantic.model_validator(mode="before")
+    # @classmethod
+    # def validate_input(cls, values):
+    #     """Accept the same inputs as Image, plus AbsentImage instances."""
+    #     if isinstance(values, AbsentImage):
+    #         return {"url": values.url}
+    #     # Fall back to parent behaviour for str / dict
+    #     return super().validate_input(values)
 
-    def format(self) -> list[dict[str, Any]] | str:
-        return [
-            {
-                "type": "text",
-                "text": (
-                    ""
-                    "Treat this slot as missing/ as absent."
-                ),
-            }
-        ]
+    # def format(self) -> list[dict[str, Any]] | str:
+    #     logger.debug(
+    #         "AbsentImage.format() called — injecting [IMAGE ABSENT] text block "
+    #         "(no image bytes sent to API for this slot)"
+    #     )
+    #     return [
+    #         {
+    #             "type": "text",
+    #             "text": (
+    #                 ""
+    #                 "Treat this slot as missing/ as absent."
+    #             ),
+    #         }
+    #     ]
 
-    def __repr__(self):
-        return "AbsentImage()"
+    # def __repr__(self):
+    #     return "AbsentImage()"
 
-
+# TODO NOt needed
 # Singleton: reuse one instance everywhere (frozen & stateless)
-_ABSENT_IMAGE = AbsentImage(url="absent:no-image")
+# _ABSENT_IMAGE = AbsentImage(url="absent:no-image")
 
 
 def load_japanese_order_dataset(images_dir: str = None,
@@ -322,19 +328,23 @@ def load_dca_dataset(
         # (DSPy compares string outputs; the metric normalises both)
         expected_discard = "true" if human_classification else "false"
 
+        # TODO Changed, no need of absent image
         # Load images (use AbsentImage sentinel for missing side)
         try:
-            image_original = (
-                dspy.Image.from_file(original_path) if original_exists
-                else _ABSENT_IMAGE
-            )
-            image_reimage = (
-                dspy.Image.from_file(reimage_path) if reimage_exists
-                else _ABSENT_IMAGE
-            )
+            image_original = dspy.Image.from_file(original_path) if original_exists else None
+            image_reimage = dspy.Image.from_file(reimage_path) if reimage_exists else None
         except Exception as e:
             print(f"  Warning: Failed to load images for {pair_name}: {e}")
             continue
+
+        if not original_exists:
+            logger.info(
+                "Sending NONE"
+            )
+        elif not reimage_exists:
+            logger.info(
+                "Sending NONE"
+            )
 
         example = dspy.Example(
             image_original=image_original,

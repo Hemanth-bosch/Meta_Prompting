@@ -147,6 +147,7 @@ from evaluation.posthoc_analysis import analyze_dca_performance
 from datetime import datetime
 from typing import List, Dict, Any
 import json
+import logging
 import os
 import dotenv
 import argparse
@@ -199,6 +200,34 @@ parser.add_argument("--gepa-auto", type=str, default="light",
 
 args = parser.parse_args()
 
+# ── Logging Setup ────────────────────────────────────────────────
+# Writes structured logs to log/dca_run_<timestamp>.log (and echoes to console).
+# Key events captured:
+#   INFO  — dataset loading summary, AbsentImage one-sided pairs, optimizer phases
+#   DEBUG — AbsentImage.format() calls (every LLM invocation for absent slots)
+_log_run_time = datetime.now().strftime("%Y%m%d%H%M")
+_log_dir = "log"
+os.makedirs(_log_dir, exist_ok=True)
+_log_path = os.path.join(_log_dir, f"dca_run_{_log_run_time}.log")
+_log_fmt = logging.Formatter(
+    "%(asctime)s %(levelname)-8s %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+_file_handler = logging.FileHandler(_log_path, encoding="utf-8")
+_file_handler.setFormatter(_log_fmt)
+_console_handler = logging.StreamHandler()
+_console_handler.setFormatter(_log_fmt)
+
+# Root logger: WARNING only (suppresses LiteLLM / httpcore / httpx noise)
+logging.basicConfig(level=logging.WARNING, handlers=[_file_handler, _console_handler])
+
+# Our own namespaces: DEBUG (AbsentImage format() calls) and INFO
+for _ns in ("extract_dca", "dca.data_loading", "dca"):
+    logging.getLogger(_ns).setLevel(logging.DEBUG)
+
+_run_logger = logging.getLogger("extract_dca")
+_run_logger.info("DCA optimization run started — log file: %s", _log_path)
+
 
 # ── Model Configuration ──────────────────────────────────────────
 # Reconfigures DSPy's global LM only when the user explicitly provides
@@ -246,27 +275,13 @@ if len(dataset) == 0:
 
 split_seed = 42
 
-# TODO we already are using seed, why do we need to save and load test, val etc sets, We can just save val and test pair numbers in a json with seed?
-
-def _build_split_entries(examples: List[dspy.Example]) -> Dict[str, Any]:
-    pair_names = [
-        str(getattr(example, "pair_name"))
-        for example in examples
-        if getattr(example, "pair_name", None) is not None
+# TODO we are already using seed, we need not to save and load test val everytime
+def _pair_names(examples: List[dspy.Example]) -> list[str]:
+    return [
+        str(getattr(ex, "pair_name"))
+        for ex in examples
+        if getattr(ex, "pair_name", None) is not None
     ]
-
-    pair_numbers = []
-    for pair_name in pair_names:
-        try:
-            pair_numbers.append(int(pair_name.split("_")[-1]))
-        except (ValueError, IndexError):
-            continue
-
-    return {
-        "count": len(pair_names),
-        "pair_names": pair_names,
-        "pair_numbers": pair_numbers,
-    }
 
 
 split_dir = ".cache"
@@ -276,10 +291,9 @@ if not os.path.exists(split_dir):
 split_latest_path = os.path.join(split_dir, f"dca_split_seed{split_seed}.json")
 
 # ── Load or compute split ────────────────────────────────────────
-# The split manifest is written once and reused on every subsequent run so
-# that the test set is frozen.  New pairs added to the dataset are silently
-# assigned to train/val/test according to the saved pair_names lists; any pair
-# not covered by the manifest falls into the train set by default.
+# The manifest stores only val and test pair names (+ seed).
+# Train = all dataset pairs not in val or test — any new pairs added to the
+# dataset are automatically absorbed into train.
 # Delete .cache/dca_split_seed42.json to force a fresh stratified split.
 dataset_by_name = {str(getattr(ex, "pair_name", "")): ex for ex in dataset}
 
@@ -287,26 +301,26 @@ if os.path.exists(split_latest_path):
     with open(split_latest_path, "r", encoding="utf-8") as f:
         split_manifest = json.load(f)
 
-    saved_train = set(split_manifest["train"]["pair_names"])
-    saved_val   = set(split_manifest["val"]["pair_names"])
-    saved_test  = set(split_manifest["test"]["pair_names"])
+    saved_val  = set(split_manifest["val"]["pair_names"])
+    saved_test = set(split_manifest["test"]["pair_names"])
 
-    test_set  = [dataset_by_name[n] for n in saved_test  if n in dataset_by_name]
-    val_set   = [dataset_by_name[n] for n in saved_val   if n in dataset_by_name]
-    # New pairs not in any saved split go to train
-    all_saved = saved_train | saved_val | saved_test
-    train_set = (
-        [dataset_by_name[n] for n in saved_train if n in dataset_by_name]
-        + [ex for ex in dataset if str(getattr(ex, "pair_name", "")) not in all_saved]
-    )
+    val_set  = [dataset_by_name[n] for n in saved_val  if n in dataset_by_name]
+    test_set = [dataset_by_name[n] for n in saved_test if n in dataset_by_name]
+    # Train = everything not in val or test (new pairs included automatically)
+    held_out = saved_val | saved_test
+    train_set = [ex for ex in dataset if str(getattr(ex, "pair_name", "")) not in held_out]
 
     print(f"📂 Loaded existing split manifest: {split_latest_path}")
     print(f"   Test set locked to {len(saved_test)} pairs (found {len(test_set)} in current dataset)")
 else:
+    # TODO Make a dca config -> move dca related configs such as stratify to a new dca config file and import here
     train_set, val_set, test_set = stratified_split_yanase_dataset(
         dataset, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2,
         random_seed=split_seed, stratify_by=["expected_discard_image","expected_human_label_category","doubt"], verbose=True
     )
+
+    val_names  = _pair_names(val_set)
+    test_names = _pair_names(test_set)
 
     split_ts = datetime.now().strftime("%Y%m%d%H%M%S")
     split_versioned_path = os.path.join(split_dir, f"dca_split_seed{split_seed}_{split_ts}.json")
@@ -317,11 +331,8 @@ else:
         "stratify_by": ["expected_discard_image","expected_human_label_category","doubt"],
         "ratios": {"train": 0.6, "val": 0.2, "test": 0.2},
         "total_examples": len(dataset),
-        "train": _build_split_entries(train_set),
-        "val": _build_split_entries(val_set),
-        "test": _build_split_entries(test_set),
-        "val_pair_numbers": _build_split_entries(val_set)["pair_numbers"],
-        "test_pair_numbers": _build_split_entries(test_set)["pair_numbers"],
+        "val":  {"count": len(val_names),  "pair_names": val_names},
+        "test": {"count": len(test_names), "pair_names": test_names},
     }
 
     for split_path in [split_latest_path, split_versioned_path]:
@@ -330,8 +341,8 @@ else:
 
     print(f"🧩 Saved deterministic split manifest: {split_latest_path}")
     print(f"🧩 Saved timestamped split manifest:    {split_versioned_path}")
-    print(f"   Val pair count: {len(split_manifest['val_pair_numbers'])}")
-    print(f"   Test pair count: {len(split_manifest['test_pair_numbers'])}")
+    print(f"   Val pair count:  {len(val_names)}")
+    print(f"   Test pair count: {len(test_names)}")
 
 print(f"train set: {len(train_set)}")
 print(f"val set:   {len(val_set)}")
@@ -541,6 +552,8 @@ print(f"Best Strategy Val Score: {best_score:.1f}%")
 print(f"{'='*80}\n")
 
 
+# TODO Review, we should use same metrics as DCA metric - No extra fancy
+# TODO Not needed
 # ── Post-hoc Analysis ────────────────────────────────────────────
 # analyze_dca_performance() runs the optimized comparator on the specified
 # split and returns a detailed dict covering two evaluation dimensions:
@@ -559,33 +572,33 @@ print(f"{'='*80}\n")
 # and provides the per-class + per-dimension breakdown needed to diagnose
 # error patterns and guide further prompt optimization.
 # Results are printed to stdout and optionally serialized to JSON below.
-print(f"\n{'='*80}")
-print(f"📊 Performance Analysis")
-print(f"{'='*80}\n")
+# print(f"\n{'='*80}")
+# print(f"📊 Performance Analysis")
+# print(f"{'='*80}\n")
 
-all_results = {}
+# all_results = {}
 
-if args.analyze_sets in ["val", "both"]:
-    print(f"Analyzing validation set ({len(val_set)} examples)...")
-    val_results = analyze_dca_performance(optimized_comparator, val_set)
-    chq = val_results.get("change_quality", {})
-    print(f"\n✅ Validation — accuracy: {val_results['accuracy']:.3f} "
-          f"| avg change score: {val_results.get('avg_change_score') or 0:.3f} "
-          f"| change quality: Exact={chq.get('Exact match',0)}, "
-          f"Good={chq.get('Good',0)}, Partial={chq.get('Partial',0)}, "
-          f"No match={chq.get('No match',0)}\n")
-    all_results["val"] = val_results
+# if args.analyze_sets in ["val", "both"]:
+#     print(f"Analyzing validation set ({len(val_set)} examples)...")
+#     val_results = analyze_dca_performance(optimized_comparator, val_set)
+#     chq = val_results.get("change_quality", {})
+#     print(f"\n✅ Validation — accuracy: {val_results['accuracy']:.3f} "
+#           f"| avg change score: {val_results.get('avg_change_score') or 0:.3f} "
+#           f"| change quality: Exact={chq.get('Exact match',0)}, "
+#           f"Good={chq.get('Good',0)}, Partial={chq.get('Partial',0)}, "
+#           f"No match={chq.get('No match',0)}\n")
+#     all_results["val"] = val_results
 
-if args.analyze_sets in ["test", "both"]:
-    print(f"Analyzing test set ({len(test_set)} examples)...")
-    test_results = analyze_dca_performance(optimized_comparator, test_set)
-    chq = test_results.get("change_quality", {})
-    print(f"\n✅ Test — accuracy: {test_results['accuracy']:.3f} "
-          f"| avg change score: {test_results.get('avg_change_score') or 0:.3f} "
-          f"| change quality: Exact={chq.get('Exact match',0)}, "
-          f"Good={chq.get('Good',0)}, Partial={chq.get('Partial',0)}, "
-          f"No match={chq.get('No match',0)}\n")
-    all_results["test"] = test_results
+# if args.analyze_sets in ["test", "both"]:
+#     print(f"Analyzing test set ({len(test_set)} examples)...")
+#     test_results = analyze_dca_performance(optimized_comparator, test_set)
+#     chq = test_results.get("change_quality", {})
+#     print(f"\n✅ Test — accuracy: {test_results['accuracy']:.3f} "
+#           f"| avg change score: {test_results.get('avg_change_score') or 0:.3f} "
+#           f"| change quality: Exact={chq.get('Exact match',0)}, "
+#           f"Good={chq.get('Good',0)}, Partial={chq.get('Partial',0)}, "
+#           f"No match={chq.get('No match',0)}\n")
+#     all_results["test"] = test_results
 
 
 # ── Save Results ──────────────────────────────────────────────────
@@ -616,45 +629,46 @@ if args.save_model or args.save_results:
         optimized_comparator.save(model_path)
         print(f"\n💾 Saved optimized model to: {model_path}")
 
-    # Save performance results
-    if args.save_results:
-        results_path = os.path.join(
-            cache_dir,
-            f"{model_name}_{best_strategy_name}_dca_analysis_{current_time}.json",
-        )
-        serializable_results = {}
-        for split_name, result_dict in all_results.items():
-            serializable_results[split_name] = {
-                k: v for k, v in result_dict.items()
-                if k not in ("misclassified", "results")
-            }
-            serializable_results[split_name]["misclassified_count"] = len(
-                result_dict.get("misclassified", [])
-            )
-            serializable_results[split_name]["results_count"] = len(
-                result_dict.get("results", [])
-            )
+    # TODO upadte
+    # # Save performance results
+    # if args.save_results:
+    #     results_path = os.path.join(
+    #         cache_dir,
+    #         f"{model_name}_{best_strategy_name}_dca_analysis_{current_time}.json",
+    #     )
+    #     serializable_results = {}
+    #     for split_name, result_dict in all_results.items():
+    #         serializable_results[split_name] = {
+    #             k: v for k, v in result_dict.items()
+    #             if k not in ("misclassified", "results")
+    #         }
+    #         serializable_results[split_name]["misclassified_count"] = len(
+    #             result_dict.get("misclassified", [])
+    #         )
+    #         serializable_results[split_name]["results_count"] = len(
+    #             result_dict.get("results", [])
+    #         )
 
-        with open(results_path, "w") as f:
-            json.dump(
-                {
-                    "model": model_name,
-                    "best_strategy": best_strategy_name,
-                    "best_score": best_score,
-                    "optimizer": args.optimizer,
-                    "miprov2_auto": args.miprov2_auto,
-                    "gepa_auto": args.gepa_auto,
-                    "simba_max_steps": args.simba_max_steps,
-                    "analyze_sets": args.analyze_sets,
-                    "train_size": len(train_set),
-                    "val_size": len(val_set),
-                    "test_size": len(test_set),
-                    "results": serializable_results,
-                },
-                f,
-                indent=2,
-            )
-        print(f"💾 Saved performance results to: {results_path}")
+    #     with open(results_path, "w") as f:
+    #         json.dump(
+    #             {
+    #                 "model": model_name,
+    #                 "best_strategy": best_strategy_name,
+    #                 "best_score": best_score,
+    #                 "optimizer": args.optimizer,
+    #                 "miprov2_auto": args.miprov2_auto,
+    #                 "gepa_auto": args.gepa_auto,
+    #                 "simba_max_steps": args.simba_max_steps,
+    #                 "analyze_sets": args.analyze_sets,
+    #                 "train_size": len(train_set),
+    #                 "val_size": len(val_set),
+    #                 "test_size": len(test_set),
+    #                 "results": serializable_results,
+    #             },
+    #             f,
+    #             indent=2,
+    #         )
+    #     print(f"💾 Saved performance results to: {results_path}")
 
 print(f"\n{'='*80}")
 print(f"✅ DCA Pipeline complete!")
