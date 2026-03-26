@@ -297,52 +297,34 @@ split_latest_path = os.path.join(split_dir, f"dca_split_seed{split_seed}.json")
 # Delete .cache/dca_split_seed42.json to force a fresh stratified split.
 dataset_by_name = {str(getattr(ex, "pair_name", "")): ex for ex in dataset}
 
-if os.path.exists(split_latest_path):
-    with open(split_latest_path, "r", encoding="utf-8") as f:
-        split_manifest = json.load(f)
+# TODO Make a dca config -> move dca related configs such as stratify to a new dca config file and import here
+train_set, val_set, test_set = stratified_split_yanase_dataset(
+    dataset, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2,
+    random_seed=split_seed, stratify_by=["expected_discard_image","expected_human_label_category","doubt"], verbose=True
+)
 
-    saved_val  = set(split_manifest["val"]["pair_names"])
-    saved_test = set(split_manifest["test"]["pair_names"])
+val_names  = _pair_names(val_set)
+test_names = _pair_names(test_set)
 
-    val_set  = [dataset_by_name[n] for n in saved_val  if n in dataset_by_name]
-    test_set = [dataset_by_name[n] for n in saved_test if n in dataset_by_name]
-    # Train = everything not in val or test (new pairs included automatically)
-    held_out = saved_val | saved_test
-    train_set = [ex for ex in dataset if str(getattr(ex, "pair_name", "")) not in held_out]
+split_ts = datetime.now().strftime("%Y%m%d%H%M%S")
 
-    print(f"📂 Loaded existing split manifest: {split_latest_path}")
-    print(f"   Test set locked to {len(saved_test)} pairs (found {len(test_set)} in current dataset)")
-else:
-    # TODO Make a dca config -> move dca related configs such as stratify to a new dca config file and import here
-    train_set, val_set, test_set = stratified_split_yanase_dataset(
-        dataset, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2,
-        random_seed=split_seed, stratify_by=["expected_discard_image","expected_human_label_category","doubt"], verbose=True
-    )
+split_manifest = {
+    "created_at": datetime.now().isoformat(timespec="seconds"),
+    "seed": split_seed,
+    "stratify_by": ["expected_discard_image","expected_human_label_category","doubt"],
+    "ratios": {"train": 0.6, "val": 0.2, "test": 0.2},
+    "total_examples": len(dataset),
+    "val":  {"count": len(val_names),  "pair_names": val_names},
+    "test": {"count": len(test_names), "pair_names": test_names},
+}
 
-    val_names  = _pair_names(val_set)
-    test_names = _pair_names(test_set)
+for split_path in [split_latest_path]:
+    with open(split_path, "w", encoding="utf-8") as f:
+        json.dump(split_manifest, f, indent=2)
 
-    split_ts = datetime.now().strftime("%Y%m%d%H%M%S")
-    split_versioned_path = os.path.join(split_dir, f"dca_split_seed{split_seed}_{split_ts}.json")
-
-    split_manifest = {
-        "created_at": datetime.now().isoformat(timespec="seconds"),
-        "seed": split_seed,
-        "stratify_by": ["expected_discard_image","expected_human_label_category","doubt"],
-        "ratios": {"train": 0.6, "val": 0.2, "test": 0.2},
-        "total_examples": len(dataset),
-        "val":  {"count": len(val_names),  "pair_names": val_names},
-        "test": {"count": len(test_names), "pair_names": test_names},
-    }
-
-    for split_path in [split_latest_path, split_versioned_path]:
-        with open(split_path, "w", encoding="utf-8") as f:
-            json.dump(split_manifest, f, indent=2)
-
-    print(f"🧩 Saved deterministic split manifest: {split_latest_path}")
-    print(f"🧩 Saved timestamped split manifest:    {split_versioned_path}")
-    print(f"   Val pair count:  {len(val_names)}")
-    print(f"   Test pair count: {len(test_names)}")
+print(f"🧩 Saved deterministic split manifest: {split_latest_path}")
+print(f"   Val pair count:  {len(val_names)}")
+print(f"   Test pair count: {len(test_names)}")
 
 print(f"train set: {len(train_set)}")
 print(f"val set:   {len(val_set)}")

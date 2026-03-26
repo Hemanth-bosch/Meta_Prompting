@@ -1,0 +1,3387 @@
+{
+  "meta": {
+    "n_test_pairs": 82,
+    "split_file": "C:\\Users\\BHS1RNG\\OneDrive - Bosch Group\\AIQ-212\\Code\\meta-prompting\\.cache\\dca_split_seed42.json",
+    "json_dir": "C:\\Users\\BHS1RNG\\OneDrive - Bosch Group\\AIQ-212\\Code\\meta-prompting\\data\\dca_data\\image_pairs_llm_output_exp1",
+    "which_set": "val",
+    "skip_llm": false,
+    "runs": [
+      "v1_prompt_midas_gpt41_mini",
+      "v2_prompt_cr_gpt41_mini",
+      "v3_prompt_cr_gpt41_mini",
+      "v4_prompt_cr_gpt41_mini"
+    ],
+    "field_weight_cls": 0.6,
+    "field_weight_change": 0.4
+  },
+  "results": [
+    {
+      "run": "v1_prompt_midas_gpt41_mini",
+      "label": "v1/GPT-4.1-mini",
+      "n_test_pairs": 82,
+      "n_evaluated": 82,
+      "n_missing": 0,
+      "avg_cls_score": 0.5975609756097561,
+      "avg_change_score": 0.2900471656010949,
+      "avg_total_score": 0.47455545160629165,
+      "avg_total_tokens": 3046.048780487805,
+      "avg_response_time": 5.370121951219512,
+      "n_cls": 82,
+      "n_change": 82,
+      "n_total_score": 82,
+      "change_source_counts": {
+        "rule": 23,
+        "llm": 59,
+        "skipped": 0
+      },
+      "per_pair": [
+        {
+          "pair_name": "pair_249",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.8928571428571429,
+          "total_score": 0.9571428571428572,
+          "change_source": "llm",
+          "total_tokens": 4386,
+          "response_time": 9.987
+        },
+        {
+          "pair_name": "pair_423",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3677,
+          "response_time": 3.428
+        },
+        {
+          "pair_name": "pair_123",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2118,
+          "response_time": 4.741
+        },
+        {
+          "pair_name": "pair_354",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1407,
+          "response_time": 1.687
+        },
+        {
+          "pair_name": "pair_087",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2118,
+          "response_time": 2.084
+        },
+        {
+          "pair_name": "pair_119",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3480,
+          "response_time": 7.973
+        },
+        {
+          "pair_name": "pair_378",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 4883,
+          "response_time": 6.642
+        },
+        {
+          "pair_name": "pair_336",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2623,
+          "response_time": 3.743
+        },
+        {
+          "pair_name": "pair_055",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3636,
+          "response_time": 4.537
+        },
+        {
+          "pair_name": "pair_232",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1189,
+          "response_time": 1.351
+        },
+        {
+          "pair_name": "pair_428",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3927,
+          "response_time": 2.772
+        },
+        {
+          "pair_name": "pair_068",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2195,
+          "response_time": 2.36
+        },
+        {
+          "pair_name": "pair_012",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4451,
+          "response_time": 5.441
+        },
+        {
+          "pair_name": "pair_312",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2429,
+          "response_time": 2.883
+        },
+        {
+          "pair_name": "pair_346",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1407,
+          "response_time": 1.14
+        },
+        {
+          "pair_name": "pair_212",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1170,
+          "response_time": 1.185
+        },
+        {
+          "pair_name": "pair_049",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 3208,
+          "response_time": 3.689
+        },
+        {
+          "pair_name": "pair_006",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3946,
+          "response_time": 10.02
+        },
+        {
+          "pair_name": "pair_057",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 3092,
+          "response_time": 3.68
+        },
+        {
+          "pair_name": "pair_364",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1282,
+          "response_time": 1.656
+        },
+        {
+          "pair_name": "pair_324",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.625,
+          "total_score": 0.85,
+          "change_source": "llm",
+          "total_tokens": 5171,
+          "response_time": 7.09
+        },
+        {
+          "pair_name": "pair_242",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 3381,
+          "response_time": 5.743
+        },
+        {
+          "pair_name": "pair_290",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3653,
+          "response_time": 5.636
+        },
+        {
+          "pair_name": "pair_071",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 3092,
+          "response_time": 3.223
+        },
+        {
+          "pair_name": "pair_079",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4490,
+          "response_time": 4.461
+        },
+        {
+          "pair_name": "pair_309",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2312,
+          "response_time": 3.985
+        },
+        {
+          "pair_name": "pair_124",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4412,
+          "response_time": 5.995
+        },
+        {
+          "pair_name": "pair_082",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2118,
+          "response_time": 3.043
+        },
+        {
+          "pair_name": "pair_237",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2701,
+          "response_time": 3.543
+        },
+        {
+          "pair_name": "pair_308",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2584,
+          "response_time": 4.192
+        },
+        {
+          "pair_name": "pair_298",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2312,
+          "response_time": 3.279
+        },
+        {
+          "pair_name": "pair_017",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4258,
+          "response_time": 8.177
+        },
+        {
+          "pair_name": "pair_074",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4712,
+          "response_time": 3.314
+        },
+        {
+          "pair_name": "pair_109",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2234,
+          "response_time": 5.257
+        },
+        {
+          "pair_name": "pair_297",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3092,
+          "response_time": 7.209
+        },
+        {
+          "pair_name": "pair_224",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1170,
+          "response_time": 1.699
+        },
+        {
+          "pair_name": "pair_015",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3324,
+          "response_time": 12.222
+        },
+        {
+          "pair_name": "pair_065",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2360,
+          "response_time": 2.757
+        },
+        {
+          "pair_name": "pair_096",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4219,
+          "response_time": 3.937
+        },
+        {
+          "pair_name": "pair_023",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4880,
+          "response_time": 14.836
+        },
+        {
+          "pair_name": "pair_379",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2129,
+          "response_time": 3.912
+        },
+        {
+          "pair_name": "pair_397",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 5504,
+          "response_time": 8.246
+        },
+        {
+          "pair_name": "pair_133",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2118,
+          "response_time": 5.245
+        },
+        {
+          "pair_name": "pair_279",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3558,
+          "response_time": 5.799
+        },
+        {
+          "pair_name": "pair_374",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1376,
+          "response_time": 2.347
+        },
+        {
+          "pair_name": "pair_267",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3168,
+          "response_time": 5.201
+        },
+        {
+          "pair_name": "pair_019",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3897,
+          "response_time": 2.746
+        },
+        {
+          "pair_name": "pair_092",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2156,
+          "response_time": 4.455
+        },
+        {
+          "pair_name": "pair_066",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2118,
+          "response_time": 2.53
+        },
+        {
+          "pair_name": "pair_285",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2506,
+          "response_time": 5.75
+        },
+        {
+          "pair_name": "pair_406",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 4725,
+          "response_time": 16.182
+        },
+        {
+          "pair_name": "pair_149",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.3125,
+          "total_score": 0.725,
+          "change_source": "llm",
+          "total_tokens": 4791,
+          "response_time": 19.097
+        },
+        {
+          "pair_name": "pair_178",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3092,
+          "response_time": 7.731
+        },
+        {
+          "pair_name": "pair_130",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2429,
+          "response_time": 4.524
+        },
+        {
+          "pair_name": "pair_182",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3246,
+          "response_time": 14.099
+        },
+        {
+          "pair_name": "pair_243",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3285,
+          "response_time": 5.349
+        },
+        {
+          "pair_name": "pair_062",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2608,
+          "response_time": 2.07
+        },
+        {
+          "pair_name": "pair_203",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.14705882352941177,
+          "total_score": 0.6588235294117647,
+          "change_source": "llm",
+          "total_tokens": 3691,
+          "response_time": 21.558
+        },
+        {
+          "pair_name": "pair_208",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1243,
+          "response_time": 1.268
+        },
+        {
+          "pair_name": "pair_246",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.8064516129032258,
+          "total_score": 0.9225806451612903,
+          "change_source": "llm",
+          "total_tokens": 4460,
+          "response_time": 13.292
+        },
+        {
+          "pair_name": "pair_259",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2351,
+          "response_time": 5.187
+        },
+        {
+          "pair_name": "pair_215",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1186,
+          "response_time": 1.099
+        },
+        {
+          "pair_name": "pair_122",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3636,
+          "response_time": 8.643
+        },
+        {
+          "pair_name": "pair_080",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2080,
+          "response_time": 1.688
+        },
+        {
+          "pair_name": "pair_260",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2856,
+          "response_time": 6.475
+        },
+        {
+          "pair_name": "pair_163",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 4296,
+          "response_time": 5.978
+        },
+        {
+          "pair_name": "pair_115",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2118,
+          "response_time": 2.183
+        },
+        {
+          "pair_name": "pair_139",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2390,
+          "response_time": 4.616
+        },
+        {
+          "pair_name": "pair_366",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1282,
+          "response_time": 1.105
+        },
+        {
+          "pair_name": "pair_323",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3092,
+          "response_time": 2.951
+        },
+        {
+          "pair_name": "pair_150",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4685,
+          "response_time": 5.481
+        },
+        {
+          "pair_name": "pair_321",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2390,
+          "response_time": 3.521
+        },
+        {
+          "pair_name": "pair_165",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3489,
+          "response_time": 5.326
+        },
+        {
+          "pair_name": "pair_270",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2273,
+          "response_time": 4.764
+        },
+        {
+          "pair_name": "pair_037",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4724,
+          "response_time": 4.07
+        },
+        {
+          "pair_name": "pair_380",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 3989,
+          "response_time": 7.836
+        },
+        {
+          "pair_name": "pair_210",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3232,
+          "response_time": 7.609
+        },
+        {
+          "pair_name": "pair_090",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3311,
+          "response_time": 7.572
+        },
+        {
+          "pair_name": "pair_256",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2662,
+          "response_time": 4.505
+        },
+        {
+          "pair_name": "pair_411",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 4688,
+          "response_time": 3.913
+        },
+        {
+          "pair_name": "pair_353",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1407,
+          "response_time": 1.31
+        },
+        {
+          "pair_name": "pair_388",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2440,
+          "response_time": 2.52
+        }
+      ]
+    },
+    {
+      "run": "v2_prompt_cr_gpt41_mini",
+      "label": "v2/GPT-4.1-mini",
+      "n_test_pairs": 82,
+      "n_evaluated": 82,
+      "n_missing": 0,
+      "avg_cls_score": 0.8170731707317073,
+      "avg_change_score": 0.4711512065170601,
+      "avg_total_score": 0.6787043850458484,
+      "avg_total_tokens": 3382.8536585365855,
+      "avg_response_time": 6.348280487804877,
+      "n_cls": 82,
+      "n_change": 82,
+      "n_total_score": 82,
+      "change_source_counts": {
+        "rule": 23,
+        "llm": 59,
+        "skipped": 0
+      },
+      "per_pair": [
+        {
+          "pair_name": "pair_249",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.8333333333333334,
+          "total_score": 0.9333333333333333,
+          "change_source": "llm",
+          "total_tokens": 4500,
+          "response_time": 8.525
+        },
+        {
+          "pair_name": "pair_423",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 4130,
+          "response_time": 6.413
+        },
+        {
+          "pair_name": "pair_123",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2404,
+          "response_time": 2.452
+        },
+        {
+          "pair_name": "pair_354",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1693,
+          "response_time": 1.264
+        },
+        {
+          "pair_name": "pair_087",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2421,
+          "response_time": 3.991
+        },
+        {
+          "pair_name": "pair_119",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3759,
+          "response_time": 6.263
+        },
+        {
+          "pair_name": "pair_378",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 5322,
+          "response_time": 9.638
+        },
+        {
+          "pair_name": "pair_336",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 3218,
+          "response_time": 8.61
+        },
+        {
+          "pair_name": "pair_055",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.7142857142857143,
+          "total_score": 0.8857142857142857,
+          "change_source": "llm",
+          "total_tokens": 4140,
+          "response_time": 8.975
+        },
+        {
+          "pair_name": "pair_232",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1469,
+          "response_time": 1.122
+        },
+        {
+          "pair_name": "pair_428",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 4367,
+          "response_time": 6.88
+        },
+        {
+          "pair_name": "pair_068",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2498,
+          "response_time": 3.511
+        },
+        {
+          "pair_name": "pair_012",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4730,
+          "response_time": 5.533
+        },
+        {
+          "pair_name": "pair_312",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2702,
+          "response_time": 3.119
+        },
+        {
+          "pair_name": "pair_346",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1693,
+          "response_time": 1.2
+        },
+        {
+          "pair_name": "pair_212",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1456,
+          "response_time": 1.341
+        },
+        {
+          "pair_name": "pair_049",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3494,
+          "response_time": 3.619
+        },
+        {
+          "pair_name": "pair_006",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 4225,
+          "response_time": 9.58
+        },
+        {
+          "pair_name": "pair_057",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3372,
+          "response_time": 3.045
+        },
+        {
+          "pair_name": "pair_364",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1585,
+          "response_time": 1.848
+        },
+        {
+          "pair_name": "pair_324",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.45454545454545453,
+          "total_score": 0.7818181818181817,
+          "change_source": "llm",
+          "total_tokens": 5431,
+          "response_time": 6.327
+        },
+        {
+          "pair_name": "pair_242",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 3972,
+          "response_time": 9.126
+        },
+        {
+          "pair_name": "pair_290",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4391,
+          "response_time": 12.763
+        },
+        {
+          "pair_name": "pair_071",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3377,
+          "response_time": 3.488
+        },
+        {
+          "pair_name": "pair_079",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4769,
+          "response_time": 4.552
+        },
+        {
+          "pair_name": "pair_309",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2925,
+          "response_time": 9.808
+        },
+        {
+          "pair_name": "pair_124",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4691,
+          "response_time": 4.758
+        },
+        {
+          "pair_name": "pair_082",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2452,
+          "response_time": 3.688
+        },
+        {
+          "pair_name": "pair_237",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2980,
+          "response_time": 3.503
+        },
+        {
+          "pair_name": "pair_308",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2863,
+          "response_time": 5.259
+        },
+        {
+          "pair_name": "pair_298",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2591,
+          "response_time": 4.516
+        },
+        {
+          "pair_name": "pair_017",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4537,
+          "response_time": 8.205
+        },
+        {
+          "pair_name": "pair_074",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4985,
+          "response_time": 3.932
+        },
+        {
+          "pair_name": "pair_109",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2654,
+          "response_time": 6.633
+        },
+        {
+          "pair_name": "pair_297",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3371,
+          "response_time": 8.215
+        },
+        {
+          "pair_name": "pair_224",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1450,
+          "response_time": 1.074
+        },
+        {
+          "pair_name": "pair_015",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3603,
+          "response_time": 10.049
+        },
+        {
+          "pair_name": "pair_065",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2646,
+          "response_time": 2.82
+        },
+        {
+          "pair_name": "pair_096",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4498,
+          "response_time": 6.569
+        },
+        {
+          "pair_name": "pair_023",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5159,
+          "response_time": 14.844
+        },
+        {
+          "pair_name": "pair_379",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2670,
+          "response_time": 8.907
+        },
+        {
+          "pair_name": "pair_397",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 6081,
+          "response_time": 13.86
+        },
+        {
+          "pair_name": "pair_133",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2461,
+          "response_time": 4.113
+        },
+        {
+          "pair_name": "pair_279",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3837,
+          "response_time": 7.225
+        },
+        {
+          "pair_name": "pair_374",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1662,
+          "response_time": 1.706
+        },
+        {
+          "pair_name": "pair_267",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3441,
+          "response_time": 5.365
+        },
+        {
+          "pair_name": "pair_019",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4176,
+          "response_time": 3.243
+        },
+        {
+          "pair_name": "pair_092",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2442,
+          "response_time": 4.907
+        },
+        {
+          "pair_name": "pair_066",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2421,
+          "response_time": 2.343
+        },
+        {
+          "pair_name": "pair_285",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2785,
+          "response_time": 6.478
+        },
+        {
+          "pair_name": "pair_406",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 4893,
+          "response_time": 10.664
+        },
+        {
+          "pair_name": "pair_149",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.3846153846153846,
+          "total_score": 0.7538461538461538,
+          "change_source": "llm",
+          "total_tokens": 5049,
+          "response_time": 16.694
+        },
+        {
+          "pair_name": "pair_178",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3371,
+          "response_time": 8.843
+        },
+        {
+          "pair_name": "pair_130",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2708,
+          "response_time": 5.346
+        },
+        {
+          "pair_name": "pair_182",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3985,
+          "response_time": 23.687
+        },
+        {
+          "pair_name": "pair_243",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.3333333333333333,
+          "total_score": 0.7333333333333333,
+          "change_source": "llm",
+          "total_tokens": 3692,
+          "response_time": 7.4
+        },
+        {
+          "pair_name": "pair_062",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2966,
+          "response_time": 2.977
+        },
+        {
+          "pair_name": "pair_203",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.19999999999999998,
+          "total_score": 0.6799999999999999,
+          "change_source": "llm",
+          "total_tokens": 3753,
+          "response_time": 18.26
+        },
+        {
+          "pair_name": "pair_208",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1540,
+          "response_time": 1.163
+        },
+        {
+          "pair_name": "pair_246",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.7142857142857143,
+          "total_score": 0.8857142857142857,
+          "change_source": "llm",
+          "total_tokens": 4549,
+          "response_time": 9.99
+        },
+        {
+          "pair_name": "pair_259",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2630,
+          "response_time": 6.612
+        },
+        {
+          "pair_name": "pair_215",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1472,
+          "response_time": 1.202
+        },
+        {
+          "pair_name": "pair_122",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3915,
+          "response_time": 7.635
+        },
+        {
+          "pair_name": "pair_080",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 2425,
+          "response_time": 2.196
+        },
+        {
+          "pair_name": "pair_260",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 3135,
+          "response_time": 8.453
+        },
+        {
+          "pair_name": "pair_163",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 4789,
+          "response_time": 9.456
+        },
+        {
+          "pair_name": "pair_115",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2421,
+          "response_time": 3.008
+        },
+        {
+          "pair_name": "pair_139",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2936,
+          "response_time": 5.926
+        },
+        {
+          "pair_name": "pair_366",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1585,
+          "response_time": 2.184
+        },
+        {
+          "pair_name": "pair_323",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3371,
+          "response_time": 2.569
+        },
+        {
+          "pair_name": "pair_150",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4964,
+          "response_time": 5.032
+        },
+        {
+          "pair_name": "pair_321",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2836,
+          "response_time": 6.037
+        },
+        {
+          "pair_name": "pair_165",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3768,
+          "response_time": 5.018
+        },
+        {
+          "pair_name": "pair_270",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2871,
+          "response_time": 10.118
+        },
+        {
+          "pair_name": "pair_037",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 5210,
+          "response_time": 6.884
+        },
+        {
+          "pair_name": "pair_380",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 4298,
+          "response_time": 10.845
+        },
+        {
+          "pair_name": "pair_210",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3593,
+          "response_time": 9.382
+        },
+        {
+          "pair_name": "pair_090",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3513,
+          "response_time": 6.238
+        },
+        {
+          "pair_name": "pair_256",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2935,
+          "response_time": 6.391
+        },
+        {
+          "pair_name": "pair_411",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 4947,
+          "response_time": 5.086
+        },
+        {
+          "pair_name": "pair_353",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1693,
+          "response_time": 1.614
+        },
+        {
+          "pair_name": "pair_388",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 3082,
+          "response_time": 8.444
+        }
+      ]
+    },
+    {
+      "run": "v3_prompt_cr_gpt41_mini",
+      "label": "v3/GPT-4.1-mini",
+      "n_test_pairs": 82,
+      "n_evaluated": 82,
+      "n_missing": 0,
+      "avg_cls_score": 0.8414634146341463,
+      "avg_change_score": 0.694498486040579,
+      "avg_total_score": 0.7826774431967194,
+      "avg_total_tokens": 3644.439024390244,
+      "avg_response_time": 7.67609756097561,
+      "n_cls": 82,
+      "n_change": 82,
+      "n_total_score": 82,
+      "change_source_counts": {
+        "rule": 23,
+        "llm": 59,
+        "skipped": 0
+      },
+      "per_pair": [
+        {
+          "pair_name": "pair_249",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.8,
+          "total_score": 0.92,
+          "change_source": "llm",
+          "total_tokens": 4908,
+          "response_time": 14.092
+        },
+        {
+          "pair_name": "pair_423",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4292,
+          "response_time": 6.496
+        },
+        {
+          "pair_name": "pair_123",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2672,
+          "response_time": 4.138
+        },
+        {
+          "pair_name": "pair_354",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2001,
+          "response_time": 3.438
+        },
+        {
+          "pair_name": "pair_087",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2656,
+          "response_time": 3.359
+        },
+        {
+          "pair_name": "pair_119",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4044,
+          "response_time": 8.967
+        },
+        {
+          "pair_name": "pair_378",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 5625,
+          "response_time": 11.67
+        },
+        {
+          "pair_name": "pair_336",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3155,
+          "response_time": 4.774
+        },
+        {
+          "pair_name": "pair_055",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.8333333333333334,
+          "total_score": 0.9333333333333333,
+          "change_source": "llm",
+          "total_tokens": 4411,
+          "response_time": 11.111
+        },
+        {
+          "pair_name": "pair_232",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1767,
+          "response_time": 2.436
+        },
+        {
+          "pair_name": "pair_428",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 4658,
+          "response_time": 7.535
+        },
+        {
+          "pair_name": "pair_068",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2779,
+          "response_time": 5.361
+        },
+        {
+          "pair_name": "pair_012",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 5122,
+          "response_time": 8.467
+        },
+        {
+          "pair_name": "pair_312",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2995,
+          "response_time": 5.295
+        },
+        {
+          "pair_name": "pair_346",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1986,
+          "response_time": 3.433
+        },
+        {
+          "pair_name": "pair_212",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1728,
+          "response_time": 3.132
+        },
+        {
+          "pair_name": "pair_049",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3736,
+          "response_time": 5.559
+        },
+        {
+          "pair_name": "pair_006",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 4573,
+          "response_time": 11.024
+        },
+        {
+          "pair_name": "pair_057",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3645,
+          "response_time": 5.299
+        },
+        {
+          "pair_name": "pair_364",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1850,
+          "response_time": 2.957
+        },
+        {
+          "pair_name": "pair_324",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5768,
+          "response_time": 8.974
+        },
+        {
+          "pair_name": "pair_242",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3936,
+          "response_time": 4.917
+        },
+        {
+          "pair_name": "pair_290",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.9090909090909091,
+          "total_score": 0.9636363636363636,
+          "change_source": "llm",
+          "total_tokens": 4641,
+          "response_time": 14.591
+        },
+        {
+          "pair_name": "pair_071",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 3679,
+          "response_time": 5.075
+        },
+        {
+          "pair_name": "pair_079",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5099,
+          "response_time": 8.598
+        },
+        {
+          "pair_name": "pair_309",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 2907,
+          "response_time": 8.937
+        },
+        {
+          "pair_name": "pair_124",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5016,
+          "response_time": 8.778
+        },
+        {
+          "pair_name": "pair_082",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2655,
+          "response_time": 4.744
+        },
+        {
+          "pair_name": "pair_237",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3217,
+          "response_time": 4.551
+        },
+        {
+          "pair_name": "pair_308",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3117,
+          "response_time": 5.979
+        },
+        {
+          "pair_name": "pair_298",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2881,
+          "response_time": 6.222
+        },
+        {
+          "pair_name": "pair_017",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4848,
+          "response_time": 10.274
+        },
+        {
+          "pair_name": "pair_074",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5328,
+          "response_time": 5.296
+        },
+        {
+          "pair_name": "pair_109",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2773,
+          "response_time": 6.017
+        },
+        {
+          "pair_name": "pair_297",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3746,
+          "response_time": 11.557
+        },
+        {
+          "pair_name": "pair_224",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1728,
+          "response_time": 2.522
+        },
+        {
+          "pair_name": "pair_015",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3919,
+          "response_time": 13.576
+        },
+        {
+          "pair_name": "pair_065",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3270,
+          "response_time": 7.963
+        },
+        {
+          "pair_name": "pair_096",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4834,
+          "response_time": 7.436
+        },
+        {
+          "pair_name": "pair_023",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 5729,
+          "response_time": 19.317
+        },
+        {
+          "pair_name": "pair_379",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 2972,
+          "response_time": 9.426
+        },
+        {
+          "pair_name": "pair_397",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 6449,
+          "response_time": 16.233
+        },
+        {
+          "pair_name": "pair_133",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2692,
+          "response_time": 6.208
+        },
+        {
+          "pair_name": "pair_279",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4130,
+          "response_time": 8.973
+        },
+        {
+          "pair_name": "pair_374",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1948,
+          "response_time": 3.371
+        },
+        {
+          "pair_name": "pair_267",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3745,
+          "response_time": 7.449
+        },
+        {
+          "pair_name": "pair_019",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4517,
+          "response_time": 5.242
+        },
+        {
+          "pair_name": "pair_092",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 2689,
+          "response_time": 4.669
+        },
+        {
+          "pair_name": "pair_066",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2686,
+          "response_time": 4.5
+        },
+        {
+          "pair_name": "pair_285",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3040,
+          "response_time": 8.449
+        },
+        {
+          "pair_name": "pair_406",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 5290,
+          "response_time": 19.837
+        },
+        {
+          "pair_name": "pair_149",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.6,
+          "total_score": 0.84,
+          "change_source": "llm",
+          "total_tokens": 5619,
+          "response_time": 26.405
+        },
+        {
+          "pair_name": "pair_178",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3690,
+          "response_time": 9.736
+        },
+        {
+          "pair_name": "pair_130",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2979,
+          "response_time": 6.801
+        },
+        {
+          "pair_name": "pair_182",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3841,
+          "response_time": 16.565
+        },
+        {
+          "pair_name": "pair_243",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3872,
+          "response_time": 7.429
+        },
+        {
+          "pair_name": "pair_062",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3160,
+          "response_time": 3.545
+        },
+        {
+          "pair_name": "pair_203",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 3940,
+          "response_time": 17.829
+        },
+        {
+          "pair_name": "pair_208",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 1919,
+          "response_time": 3.625
+        },
+        {
+          "pair_name": "pair_246",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.8064516129032258,
+          "total_score": 0.9225806451612903,
+          "change_source": "llm",
+          "total_tokens": 5048,
+          "response_time": 13.95
+        },
+        {
+          "pair_name": "pair_259",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2888,
+          "response_time": 6.658
+        },
+        {
+          "pair_name": "pair_215",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 1804,
+          "response_time": 4.11
+        },
+        {
+          "pair_name": "pair_122",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4204,
+          "response_time": 8.184
+        },
+        {
+          "pair_name": "pair_080",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 2672,
+          "response_time": 2.87
+        },
+        {
+          "pair_name": "pair_260",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3368,
+          "response_time": 8.077
+        },
+        {
+          "pair_name": "pair_163",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 4906,
+          "response_time": 8.262
+        },
+        {
+          "pair_name": "pair_115",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2678,
+          "response_time": 4.258
+        },
+        {
+          "pair_name": "pair_139",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2908,
+          "response_time": 4.552
+        },
+        {
+          "pair_name": "pair_366",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1822,
+          "response_time": 2.07
+        },
+        {
+          "pair_name": "pair_323",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3734,
+          "response_time": 6.393
+        },
+        {
+          "pair_name": "pair_150",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5264,
+          "response_time": 6.918
+        },
+        {
+          "pair_name": "pair_321",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2942,
+          "response_time": 5.874
+        },
+        {
+          "pair_name": "pair_165",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4098,
+          "response_time": 7.237
+        },
+        {
+          "pair_name": "pair_270",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2793,
+          "response_time": 6.475
+        },
+        {
+          "pair_name": "pair_037",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5340,
+          "response_time": 6.381
+        },
+        {
+          "pair_name": "pair_380",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 4343,
+          "response_time": 7.151
+        },
+        {
+          "pair_name": "pair_210",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3849,
+          "response_time": 9.733
+        },
+        {
+          "pair_name": "pair_090",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 3873,
+          "response_time": 9.121
+        },
+        {
+          "pair_name": "pair_256",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3193,
+          "response_time": 5.824
+        },
+        {
+          "pair_name": "pair_411",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5227,
+          "response_time": 5.951
+        },
+        {
+          "pair_name": "pair_353",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2003,
+          "response_time": 4.229
+        },
+        {
+          "pair_name": "pair_388",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "rule",
+          "total_tokens": 3015,
+          "response_time": 5.003
+        }
+      ]
+    },
+    {
+      "run": "v4_prompt_cr_gpt41_mini",
+      "label": "v4/GPT-4.1-mini",
+      "n_test_pairs": 82,
+      "n_evaluated": 82,
+      "n_missing": 0,
+      "avg_cls_score": 0.8902439024390244,
+      "avg_change_score": 0.7818872727763823,
+      "avg_total_score": 0.8469012505739675,
+      "avg_total_tokens": 3636.170731707317,
+      "avg_response_time": 7.243414634146342,
+      "n_cls": 82,
+      "n_change": 82,
+      "n_total_score": 82,
+      "change_source_counts": {
+        "rule": 23,
+        "llm": 59,
+        "skipped": 0
+      },
+      "per_pair": [
+        {
+          "pair_name": "pair_249",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.8928571428571429,
+          "total_score": 0.9571428571428572,
+          "change_source": "llm",
+          "total_tokens": 6909,
+          "response_time": 14.15
+        },
+        {
+          "pair_name": "pair_423",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3009,
+          "response_time": 3.967
+        },
+        {
+          "pair_name": "pair_123",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1188,
+          "response_time": 2.113
+        },
+        {
+          "pair_name": "pair_354",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 684,
+          "response_time": 0.966
+        },
+        {
+          "pair_name": "pair_087",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1188,
+          "response_time": 2.43
+        },
+        {
+          "pair_name": "pair_119",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5513,
+          "response_time": 10.312
+        },
+        {
+          "pair_name": "pair_378",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 8592,
+          "response_time": 20.555
+        },
+        {
+          "pair_name": "pair_336",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1693,
+          "response_time": 3.425
+        },
+        {
+          "pair_name": "pair_055",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 1.0,
+          "total_score": 0.4,
+          "change_source": "llm",
+          "total_tokens": 5903,
+          "response_time": 8.843
+        },
+        {
+          "pair_name": "pair_232",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 259,
+          "response_time": 0.735
+        },
+        {
+          "pair_name": "pair_428",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 6622,
+          "response_time": 9.147
+        },
+        {
+          "pair_name": "pair_068",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1265,
+          "response_time": 1.816
+        },
+        {
+          "pair_name": "pair_012",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 7544,
+          "response_time": 10.964
+        },
+        {
+          "pair_name": "pair_312",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1499,
+          "response_time": 2.629
+        },
+        {
+          "pair_name": "pair_346",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 684,
+          "response_time": 1.092
+        },
+        {
+          "pair_name": "pair_212",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 240,
+          "response_time": 0.764
+        },
+        {
+          "pair_name": "pair_049",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2485,
+          "response_time": 2.576
+        },
+        {
+          "pair_name": "pair_006",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3230,
+          "response_time": 7.772
+        },
+        {
+          "pair_name": "pair_057",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2369,
+          "response_time": 2.567
+        },
+        {
+          "pair_name": "pair_364",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 352,
+          "response_time": 0.912
+        },
+        {
+          "pair_name": "pair_324",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.625,
+          "total_score": 0.85,
+          "change_source": "llm",
+          "total_tokens": 8756,
+          "response_time": 10.466
+        },
+        {
+          "pair_name": "pair_242",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 2451,
+          "response_time": 2.904
+        },
+        {
+          "pair_name": "pair_290",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 5859,
+          "response_time": 8.909
+        },
+        {
+          "pair_name": "pair_071",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2369,
+          "response_time": 2.889
+        },
+        {
+          "pair_name": "pair_079",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 7533,
+          "response_time": 7.327
+        },
+        {
+          "pair_name": "pair_309",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1382,
+          "response_time": 3.401
+        },
+        {
+          "pair_name": "pair_124",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 7377,
+          "response_time": 7.719
+        },
+        {
+          "pair_name": "pair_082",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1188,
+          "response_time": 3.016
+        },
+        {
+          "pair_name": "pair_237",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1771,
+          "response_time": 3.018
+        },
+        {
+          "pair_name": "pair_308",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1654,
+          "response_time": 3.446
+        },
+        {
+          "pair_name": "pair_298",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1382,
+          "response_time": 2.828
+        },
+        {
+          "pair_name": "pair_017",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 7069,
+          "response_time": 12.344
+        },
+        {
+          "pair_name": "pair_074",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 7977,
+          "response_time": 4.878
+        },
+        {
+          "pair_name": "pair_109",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1304,
+          "response_time": 3.751
+        },
+        {
+          "pair_name": "pair_297",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4737,
+          "response_time": 11.879
+        },
+        {
+          "pair_name": "pair_224",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 240,
+          "response_time": 1.14
+        },
+        {
+          "pair_name": "pair_015",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5201,
+          "response_time": 16.642
+        },
+        {
+          "pair_name": "pair_065",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1430,
+          "response_time": 2.15
+        },
+        {
+          "pair_name": "pair_096",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 7179,
+          "response_time": 9.602
+        },
+        {
+          "pair_name": "pair_023",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 8450,
+          "response_time": 23.477
+        },
+        {
+          "pair_name": "pair_379",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 3263,
+          "response_time": 16.652
+        },
+        {
+          "pair_name": "pair_397",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 9932,
+          "response_time": 23.776
+        },
+        {
+          "pair_name": "pair_133",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1188,
+          "response_time": 2.793
+        },
+        {
+          "pair_name": "pair_279",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5669,
+          "response_time": 9.478
+        },
+        {
+          "pair_name": "pair_374",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 653,
+          "response_time": 1.043
+        },
+        {
+          "pair_name": "pair_267",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4889,
+          "response_time": 9.058
+        },
+        {
+          "pair_name": "pair_019",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 6347,
+          "response_time": 5.245
+        },
+        {
+          "pair_name": "pair_092",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 1226,
+          "response_time": 3.097
+        },
+        {
+          "pair_name": "pair_066",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1188,
+          "response_time": 2.179
+        },
+        {
+          "pair_name": "pair_285",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1576,
+          "response_time": 4.186
+        },
+        {
+          "pair_name": "pair_406",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 7501,
+          "response_time": 20.606
+        },
+        {
+          "pair_name": "pair_149",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.3333333333333333,
+          "total_score": 0.7333333333333333,
+          "change_source": "llm",
+          "total_tokens": 7997,
+          "response_time": 26.359
+        },
+        {
+          "pair_name": "pair_178",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 4737,
+          "response_time": 12.039
+        },
+        {
+          "pair_name": "pair_130",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1499,
+          "response_time": 3.146
+        },
+        {
+          "pair_name": "pair_182",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 5461,
+          "response_time": 30.158
+        },
+        {
+          "pair_name": "pair_243",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.3333333333333333,
+          "total_score": 0.7333333333333333,
+          "change_source": "llm",
+          "total_tokens": 5423,
+          "response_time": 13.072
+        },
+        {
+          "pair_name": "pair_062",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1678,
+          "response_time": 3.224
+        },
+        {
+          "pair_name": "pair_203",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 5162,
+          "response_time": 24.74
+        },
+        {
+          "pair_name": "pair_208",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 313,
+          "response_time": 2.349
+        },
+        {
+          "pair_name": "pair_246",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.930232558139535,
+          "total_score": 0.972093023255814,
+          "change_source": "llm",
+          "total_tokens": 7184,
+          "response_time": 18.592
+        },
+        {
+          "pair_name": "pair_259",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1421,
+          "response_time": 4.079
+        },
+        {
+          "pair_name": "pair_215",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 463,
+          "response_time": 0.93
+        },
+        {
+          "pair_name": "pair_122",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5825,
+          "response_time": 9.896
+        },
+        {
+          "pair_name": "pair_080",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1357,
+          "response_time": 2.892
+        },
+        {
+          "pair_name": "pair_260",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1926,
+          "response_time": 5.299
+        },
+        {
+          "pair_name": "pair_163",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "llm",
+          "total_tokens": 7417,
+          "response_time": 12.797
+        },
+        {
+          "pair_name": "pair_115",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 1188,
+          "response_time": 2.15
+        },
+        {
+          "pair_name": "pair_139",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1460,
+          "response_time": 2.222
+        },
+        {
+          "pair_name": "pair_366",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 352,
+          "response_time": 0.796
+        },
+        {
+          "pair_name": "pair_323",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 4830,
+          "response_time": 6.529
+        },
+        {
+          "pair_name": "pair_150",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 7923,
+          "response_time": 8.393
+        },
+        {
+          "pair_name": "pair_321",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1460,
+          "response_time": 3.305
+        },
+        {
+          "pair_name": "pair_165",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 5531,
+          "response_time": 8.175
+        },
+        {
+          "pair_name": "pair_270",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1343,
+          "response_time": 4.22
+        },
+        {
+          "pair_name": "pair_037",
+          "missing": false,
+          "cls_score": 0.0,
+          "change_score": 0.0,
+          "total_score": 0.0,
+          "change_source": "llm",
+          "total_tokens": 8256,
+          "response_time": 9.667
+        },
+        {
+          "pair_name": "pair_380",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 3009,
+          "response_time": 3.581
+        },
+        {
+          "pair_name": "pair_210",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2549,
+          "response_time": 6.535
+        },
+        {
+          "pair_name": "pair_090",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 2369,
+          "response_time": 3.349
+        },
+        {
+          "pair_name": "pair_256",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "rule",
+          "total_tokens": 1732,
+          "response_time": 3.42
+        },
+        {
+          "pair_name": "pair_411",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 3969,
+          "response_time": 4.14
+        },
+        {
+          "pair_name": "pair_353",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 1.0,
+          "total_score": 1.0,
+          "change_source": "llm",
+          "total_tokens": 684,
+          "response_time": 1.507
+        },
+        {
+          "pair_name": "pair_388",
+          "missing": false,
+          "cls_score": 1.0,
+          "change_score": 0.0,
+          "total_score": 0.6,
+          "change_source": "rule",
+          "total_tokens": 3679,
+          "response_time": 8.765
+        }
+      ]
+    }
+  ]
+}

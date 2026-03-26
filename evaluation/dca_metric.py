@@ -41,21 +41,21 @@ FIELD_WEIGHT_CHANGE = 0.4   # change summary quality weight
 _SPECIAL_CASE_RULES = [
     {
         "label": "NoMatchFound",
-        "detect": lambda h: "nomatchfound" in h.replace(" ", "") or "no match found" in h,
-        "match":  lambda h, m: "nomatchfound" in m.replace(" ", "") or "no match found" in m,
+        "detect": lambda h: ("nomatchfound" in h.replace(" ", "") or "no match found" in h) and len(h) < 20,
+        "match":  lambda h, m: ("nomatchfound" in m.replace(" ", "") or "no match found" in m) and len(m) < 20,
     },
     {
         "label": "Could not infer",
-        "detect": lambda h: "could not infer" in h and len(h) < 30,
-        "match":  lambda h, m: "could not infer" in m and len(m) < 30,
+        "detect": lambda h: "could not infer" in h and len(h) < 25,
+        "match":  lambda h, m: "could not infer" in m and len(m) < 25,
     },
     {
         "label": "Image has been crossed out",
-        "detect": lambda h: "crossed out" in h.replace(" ", "") and len(h) < 30,
-        "match":  lambda h, m: "crossed out" in m.replace(" ", "") and len(m) < 30,
+        "detect": lambda h: "crossed out" in h.replace(" ", "") and len(h) < 40,
+        "match":  lambda h, m: "crossed out" in m.replace(" ", "") and len(m) < 40,
     },
     {
-        "label": "Images are identical - no changes",
+        "label": "Images are identical - no changes.",
         "detect": lambda h: "identical" in h.replace(" ", "") and "no change" in h.replace(" ", "") and  len(h) < 50,
         "match":  lambda h, m: "identical" in m.replace(" ", "") and "no change" in m.replace(" ", "") and len(m) < 50,
     },
@@ -197,19 +197,33 @@ Model summary:
 
 STEP 1 — Determine evaluation mode:
 
-**BREAKDOWN mode:** Use this only when the human summary describes actual meaningful differences between two images in detail
-  (i.e. both images are informational and different).
-  → Extract distinct changes from each summary (human and model), compare them, and calculate correct_matches, missed_changes, and hallucinated_changes based on the overlap of change details.
-  → For example, if human describes 3 distinct changes and model describes 2 of them correctly but misses 1 and adds 1 hallucinated change, then correct_matches=2, missed_changes=1, hallucinated_changes=1.
+**BREAKDOWN mode:** Use this ONLY when BOTH the human summary AND the model summary describe actual meaningful differences between two images in detail (i.e. both are informational and substantively different).
+  → Extract distinct changes from each summary, compare them, and calculate counts based on overlap.
+  → Example: human describes 3 changes, model correctly captures 2, misses 1, adds 1 hallucinated → correct_matches=2, missed_changes=1, hallucinated_changes=1.
 
-**DIRECT mode:** Use this when the human summary falls into any special case (and does not describe meaningful differences) such as:
-  "NoMatchFound", "Images are identical - no changes", one/both images non-informational,
-  image fully crossed out, could not infer, or only one image present.
-  → The model is expected to produce a summary that conveys the same category/conclusion as the human.
-  → Treat the human's conclusion as a single "change" item and the model's conclusion as a single "change" item.
-  → human_changes: [human conclusion], model_changes: [model conclusion]
-  → correct_matches: 1 if they match else 0, missed_changes: 0 if they match else 1, hallucinated_changes: 0 if they match else 1.
+**DIRECT mode:** Use this whenever the human summary OR the model summary falls into a special category that does not describe detailed meaningful differences. Special categories include:
+  - "NoMatchFound" (only one image and it is informational)
+  - "Only one image and it is non informational"
+  - "Both images are non informational"
+  - "One image is non informational" (one present, one not)
+  - "Images are identical - no changes" (trivial or no differences)
+  - "Image has been crossed out"
+  - "Could not infer"
+  - A detailed breakdown description when the other summary is one of the above special categories
 
+  In DIRECT mode, reduce each summary to its single conclusion/category label and compare:
+  → human_changes: [one-phrase label for the human conclusion]
+  → model_changes: [one-phrase label for the model conclusion]
+  → They MATCH only if both convey the same conclusion (e.g. both say "no meaningful changes" / "identical both", or both say "only one image present and it is non informational", etc.).
+  → They DO NOT MATCH if one says "meaningful differences exist" (breakdown) while the other says "identical" or vice versa.
+  → correct_matches: 1 if they match else 0
+  → missed_changes:  0 if they match else 1
+  → hallucinated_changes: 0 if they match else 1
+
+  Example (mixed case): human summary describes several meaningful differences (breakdown), model says "Images are identical - no changes".
+  → DIRECT mode, because model output is a special-category conclusion.
+  → human_changes: ["meaningful differences exist"], model_changes: ["images are identical - no changes"]
+  → They do NOT match → correct_matches=0, missed_changes=1, hallucinated_changes=1
 
 STEP 2 — Return JSON:
 
@@ -219,8 +233,8 @@ STEP 2 — Return JSON:
   "model_changes": [],
   "correct_matches": 0,
   "missed_changes": 0,
-  "hallucinated_changes": 0,
-  }}
+  "hallucinated_changes": 0
+}}
 
 """
     # TODO add response format and add temperature
@@ -245,14 +259,28 @@ STEP 2 — Return JSON:
     human_total = correct + missed
     model_total = correct + hallucinated
 
-    precision = correct / model_total if model_total > 0 else None
-    recall = correct / human_total if human_total > 0 else None
+    # TODO print to debug
+    # print(f"    [judge] mode={parsed.get('evaluation_mode','?')}  "
+    #       f"correct={correct}  missed={missed}  hallucinated={hallucinated}  "
+    #       f"human_total={human_total}  model_total={model_total}", flush=True)
 
+    # Degenerate cases where F-beta denominator is 0 — return 0.0 with a warning:
+    #   model_total=0, human_total>0  → model described nothing, missed all human changes
+    #   model_total>0, human_total=0  → model hallucinated changes when human had none
+    #   model_total=0, human_total=0  → judge returned all-zero counts (judge failure)
+    if model_total == 0 or human_total == 0:
+        if model_total == 0 and human_total == 0:
+            print(f"    [WARN judge] all-zero counts — treating as 0.0", flush=True)
+        return 0.0
+
+    precision = correct / model_total if model_total > 0 else 0.0
+    recall = correct / human_total if human_total > 0 else 0.0
+    
     # Weighted F-score: precision carries 60% weight, recall 40%
     # Equivalent to F_beta with beta^2 = 2/3  →  5*P*R / (2*P + 3*R)
     fbeta = (5 * precision * recall / (2 * precision + 3 * recall)
-             if precision is not None and recall is not None and (precision + recall) > 0
-             else (0 if precision is not None and recall is not None else None))
+             if (2 * precision + 3 * recall) > 0
+             else 0.0)
 
     return fbeta
 
