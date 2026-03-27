@@ -9,8 +9,11 @@ DS_Store
 *.pkl
 data/*                                                                                                                                                                                                  
 !data/.gitkeep
-!data/dca_data
 !data/README.md
+!data/dca_data/
+data/dca_data/*
+!data/dca_data/.gitkeep
+!data/dca_data/README.md
 
 # Log files
 log/
