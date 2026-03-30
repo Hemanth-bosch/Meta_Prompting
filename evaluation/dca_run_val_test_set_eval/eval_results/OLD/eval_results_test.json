@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "n_test_pairs": 93,
+    "split_file": "C:\\Users\\BHS1RNG\\OneDrive - Bosch Group\\AIQ-212\\Code\\meta-prompting\\.cache\\dca_split_seed42.json",
+    "json_dir": "C:\\Users\\BHS1RNG\\OneDrive - Bosch Group\\AIQ-212\\Code\\meta-prompting\\data\\dca_data\\image_pairs_llm_output_exp1",
+    "which_set": "test",
+    "skip_llm": false,
+    "runs": [
+      "v1_prompt_midas_gpt41",
+      "v2_prompt_cr_gpt41",
+      "v3_prompt_cr_gpt41",
+      "v4_prompt_cr_gpt41"
+    ],
+    "field_weight_cls": 0.6,
+    "field_weight_change": 0.4
+  },
+  "results": [
+    {
+      "run": "v1_prompt_midas_gpt41",
+      "label": "v1/GPT-4.1",
+      "n_test_pairs": 93,
+      "n_evaluated": 93,
+      "n_missing": 0,
+      "avg_cls_score": 0.7096774193548387,
+      "avg_change_score": 0.5661647471296286,
+      "avg_total_score": 0.6522723504647546,
+      "avg_total_tokens": 2540.7419354838707,
+      "avg_response_time": 5.368817204301076,
+      "n_cls": 93,
+      "n_change": 93,
+      "n_total_score": 93,
+      "change_source_counts": {
+        "rule": 26,
+        "llm": 67,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "v2_prompt_cr_gpt41",
+      "label": "v2/GPT-4.1",
+      "n_test_pairs": 93,
+      "n_evaluated": 93,
+      "n_missing": 0,
+      "avg_cls_score": 0.8602150537634409,
+      "avg_change_score": 0.7574370709382151,
+      "avg_total_score": 0.8191038606333506,
+      "avg_total_tokens": 2818.7634408602153,
+      "avg_response_time": 5.4748817204301075,
+      "n_cls": 93,
+      "n_change": 93,
+      "n_total_score": 93,
+      "change_source_counts": {
+        "rule": 26,
+        "llm": 67,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "v3_prompt_cr_gpt41",
+      "label": "v3/GPT-4.1",
+      "n_test_pairs": 93,
+      "n_evaluated": 93,
+      "n_missing": 0,
+      "avg_cls_score": 0.8494623655913979,
+      "avg_change_score": 0.7626568151552339,
+      "avg_total_score": 0.8147401454169324,
+      "avg_total_tokens": 3102.8817204301076,
+      "avg_response_time": 6.934139784946238,
+      "n_cls": 93,
+      "n_change": 93,
+      "n_total_score": 93,
+      "change_source_counts": {
+        "rule": 26,
+        "llm": 67,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "v4_prompt_cr_gpt41",
+      "label": "v4/GPT-4.1",
+      "n_test_pairs": 93,
+      "n_evaluated": 93,
+      "n_missing": 0,
+      "avg_cls_score": 0.8602150537634409,
+      "avg_change_score": 0.7782727771996762,
+      "avg_total_score": 0.8274381431379348,
+      "avg_total_tokens": 2657.1612903225805,
+      "avg_response_time": 5.91278494623656,
+      "n_cls": 93,
+      "n_change": 93,
+      "n_total_score": 93,
+      "change_source_counts": {
+        "rule": 26,
+        "llm": 67,
+        "skipped": 0
+      }
+    }
+  ]
+}

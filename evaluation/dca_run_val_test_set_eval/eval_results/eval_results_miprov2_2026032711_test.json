@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "split_file": "C:\\Users\\BHS1RNG\\OneDrive - Bosch Group\\AIQ-212\\Code\\meta-prompting\\.cache\\dca_split_seed42.json",
+    "which_set": "test",
+    "n_pairs": 93,
+    "skip_llm": false,
+    "field_weight_cls": 0.6,
+    "field_weight_change": 0.4,
+    "runs": [
+      "miprov2_light_gpt41_mini_2026032711"
+    ]
+  },
+  "results": [
+    {
+      "run": "miprov2_light_gpt41_mini_2026032711",
+      "label": "MIPROv2-Light/GPT-4.1-mini_2026032711",
+      "n_test_pairs": 93,
+      "n_evaluated": 93,
+      "n_missing": 0,
+      "avg_cls_score": 0.8924731182795699,
+      "avg_change_score": 0.802528811119274,
+      "avg_total_score": 0.8564953954154515,
+      "avg_total_tokens": 11867.10752688172,
+      "avg_input_tokens": 11753.655913978495,
+      "avg_output_tokens": 113.45161290322581,
+      "avg_reasoning_tokens": null,
+      "avg_response_time": 14.309372314842799,
+      "n_cls": 93,
+      "n_change": 93,
+      "n_total_score": 93,
+      "change_source_counts": {
+        "rule": 26,
+        "llm": 67,
+        "skipped": 0
+      },
+      "model_path": "C:\\Users\\BHS1RNG\\OneDrive - Bosch Group\\AIQ-212\\Code\\meta-prompting\\.cache\\gpt-4.1-mini_MIPROv2_DCA_Light_dca_optimized_2026032711.json",
+      "model_name": "gpt-4.1-mini",
+      "no_cot": false
+    }
+  ]
+}

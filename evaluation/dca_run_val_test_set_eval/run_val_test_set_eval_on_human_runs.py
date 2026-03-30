@@ -216,22 +216,30 @@ def parse_metadata(meta_str: Any) -> Optional[dict]:
     return None
 
 
-def extract_tokens_and_time(meta: dict) -> tuple[Optional[int], Optional[float]]:
-    """Extract (total_tokens, response_time_seconds) from parsed metadata dict.
+def extract_tokens_and_time(meta: dict) -> tuple[Optional[int], Optional[int], Optional[int], Optional[int], Optional[float]]:
+    """Extract (total, input, output, reasoning, response_time_seconds) from parsed metadata dict.
 
     Compatible with v1/v2/v3 (key: response.usage) and v4 (same top-level key).
+    reasoning_tokens comes from completion_tokens_details.reasoning_tokens (o-series models).
     """
     if not meta:
-        return None, None
+        return None, None, None, None, None
     usage = (meta.get("response") or {}).get("usage") or {}
-    total_tokens = usage.get("total_tokens")
-    response_time = (meta.get("timing") or {}).get("response_time_seconds")
+    details = usage.get("completion_tokens_details") or {}
+    total_tokens     = usage.get("total_tokens")
+    input_tokens     = usage.get("prompt_tokens")
+    output_tokens    = usage.get("completion_tokens")
+    reasoning_tokens = details.get("reasoning_tokens")
+    response_time    = (meta.get("timing") or {}).get("response_time_seconds")
     try:
-        total_tokens = int(total_tokens) if total_tokens is not None else None
-        response_time = float(response_time) if response_time is not None else None
+        total_tokens     = int(total_tokens)     if total_tokens     is not None else None
+        input_tokens     = int(input_tokens)     if input_tokens     is not None else None
+        output_tokens    = int(output_tokens)    if output_tokens    is not None else None
+        reasoning_tokens = int(reasoning_tokens) if reasoning_tokens is not None else None
+        response_time    = float(response_time)  if response_time    is not None else None
     except (TypeError, ValueError):
         pass
-    return total_tokens, response_time
+    return total_tokens, input_tokens, output_tokens, reasoning_tokens, response_time
 
 
 def compute_change_score(
@@ -329,7 +337,7 @@ def evaluate_run(
         # Metadata: tokens + timing
         meta_str = rec.get(meta_key)
         meta = parse_metadata(meta_str)
-        total_tokens, response_time = extract_tokens_and_time(meta or {})
+        total_tokens, input_tokens, output_tokens, reasoning_tokens, response_time = extract_tokens_and_time(meta or {})
 
         chg_str = f"{change_score:.3f}" if change_score is not None else "N/A "
         tot_str = f"{total_score:.3f}"  if total_score  is not None else "N/A "
@@ -338,14 +346,17 @@ def evaluate_run(
               flush=True)
 
         per_pair.append({
-            "pair_name":      pair_name,
-            "missing":        False,
-            "cls_score":      cls_score,
-            "change_score":   change_score,
-            "total_score":    total_score,
-            "change_source":  change_source,
-            "total_tokens":   total_tokens,
-            "response_time":  response_time
+            "pair_name":        pair_name,
+            "missing":          False,
+            "cls_score":        cls_score,
+            "change_score":     change_score,
+            "total_score":      total_score,
+            "change_source":    change_source,
+            "total_tokens":     total_tokens,
+            "input_tokens":     input_tokens,
+            "output_tokens":    output_tokens,
+            "reasoning_tokens": reasoning_tokens,
+            "response_time":    response_time,
         })
 
     # Aggregate
@@ -354,11 +365,14 @@ def evaluate_run(
     n_missing = sum(1 for p in per_pair if p.get("missing"))
     n_valid   = len(valid)
 
-    cls_scores    = [p["cls_score"]   for p in valid]
-    change_scores = [p["change_score"] for p in valid if p["change_score"] is not None]
-    total_scores  = [p["total_score"]  for p in valid if p["total_score"]  is not None]
-    tokens        = [p["total_tokens"] for p in valid if p["total_tokens"] is not None]
-    times         = [p["response_time"] for p in valid if p["response_time"] is not None]
+    cls_scores        = [p["cls_score"]        for p in valid]
+    change_scores     = [p["change_score"]     for p in valid if p["change_score"]     is not None]
+    total_scores      = [p["total_score"]      for p in valid if p["total_score"]      is not None]
+    tokens            = [p["total_tokens"]     for p in valid if p["total_tokens"]     is not None]
+    input_tok_list    = [p["input_tokens"]     for p in valid if p.get("input_tokens")     is not None]
+    output_tok_list   = [p["output_tokens"]    for p in valid if p.get("output_tokens")    is not None]
+    reasoning_tok_list= [p["reasoning_tokens"] for p in valid if p.get("reasoning_tokens") is not None]
+    times             = [p["response_time"]    for p in valid if p["response_time"]    is not None]
 
     source_counts = {"rule": 0, "llm": 0, "skipped": 0}
     for p in valid:
@@ -366,21 +380,24 @@ def evaluate_run(
         source_counts[src] = source_counts.get(src, 0) + 1
 
     return {
-        "run":                run,
-        "label":              RUN_LABELS.get(run, run),
-        "n_test_pairs":       n_total,
-        "n_evaluated":        n_valid,
-        "n_missing":          n_missing,
-        "avg_cls_score":      float(np.mean(cls_scores))    if cls_scores    else None,
-        "avg_change_score":   float(np.mean(change_scores)) if change_scores else None,
-        "avg_total_score":    float(np.mean(total_scores))  if total_scores  else None,
-        "avg_total_tokens":   float(np.mean(tokens))        if tokens        else None,
-        "avg_response_time":  float(np.mean(times))         if times         else None,
-        "n_cls":              len(cls_scores),
-        "n_change":           len(change_scores),
-        "n_total_score":      len(total_scores),
-        "change_source_counts": source_counts,
-        "per_pair":           per_pair,
+        "run":                    run,
+        "label":                  RUN_LABELS.get(run, run),
+        "n_test_pairs":           n_total,
+        "n_evaluated":            n_valid,
+        "n_missing":              n_missing,
+        "avg_cls_score":          float(np.mean(cls_scores))         if cls_scores         else None,
+        "avg_change_score":       float(np.mean(change_scores))      if change_scores      else None,
+        "avg_total_score":        float(np.mean(total_scores))       if total_scores       else None,
+        "avg_total_tokens":       float(np.mean(tokens))             if tokens             else None,
+        "avg_input_tokens":       float(np.mean(input_tok_list))     if input_tok_list     else None,
+        "avg_output_tokens":      float(np.mean(output_tok_list))    if output_tok_list    else None,
+        "avg_reasoning_tokens":   float(np.mean(reasoning_tok_list)) if reasoning_tok_list else None,
+        "avg_response_time":      float(np.mean(times))              if times              else None,
+        "n_cls":                  len(cls_scores),
+        "n_change":               len(change_scores),
+        "n_total_score":          len(total_scores),
+        "change_source_counts":   source_counts,
+        "per_pair":               per_pair,
     }
 
 
@@ -486,6 +503,10 @@ def plot_all(results: list[dict], output_dir: Path, n_test_pairs: int,
     output_dir.mkdir(parents=True, exist_ok=True)
     set_label = set_name.capitalize()
 
+    # Only include model groups that have at least one run present in the results
+    result_run_names = {r["run"] for r in results}
+    active_groups = [g for g in MODEL_GROUPS if any(run in result_run_names for run in g["runs"])]
+
     # ── Figure 1: Score metrics (3 grouped bar charts stacked vertically) ──
     fig1, axes1 = plt.subplots(3, 1, figsize=(14, 15))
     fig1.suptitle(
@@ -498,19 +519,19 @@ def plot_all(results: list[dict], output_dir: Path, n_test_pairs: int,
         axes1[0], "avg_total_score",
         "Total Score  (0.6 × Classification + 0.4 × Change)",
         "Avg Total Score",
-        results, MODEL_GROUPS,
+        results, active_groups,
     )
     _grouped_metric_bar(
         axes1[1], "avg_cls_score",
         "Classification Score  (discard_image correct?)",
         "Avg Classification Score",
-        results, MODEL_GROUPS,
+        results, active_groups,
     )
     _grouped_metric_bar(
         axes1[2], "avg_change_score",
         "Change Score  (judge_summary_metric, precision-60/recall-40 F-beta)",
         "Avg Change Score",
-        results, MODEL_GROUPS,
+        results, active_groups,
     )
 
     fig1.tight_layout(rect=[0, 0, 1, 0.96])
@@ -621,15 +642,21 @@ def main():
     args.output_dir.mkdir(parents=True, exist_ok=True)
     use_llm = not args.skip_llm
 
-    # ── Guard: abort if results already exist and --overwrite not set ─────────
+    # ── Guard: abort if any of the current RUNS already exist and --overwrite not set ───
     if not args.overwrite and not args.replot:
         _sets_to_check = ["val", "test"] if args.which_set == "both" else [args.which_set]
         for _sname in _sets_to_check:
             _out = args.output_dir / f"eval_results_{_sname}.json"
             if _out.exists():
-                print(f"[ERROR] Results already exist: {_out}")
-                print("  Use --overwrite to re-run and overwrite, or --replot to just regenerate plots.")
-                sys.exit(1)
+                _old = json.loads(_out.read_text(encoding="utf-8"))
+                _existing_runs = {r["run"] for r in _old.get("results", [])}
+                _conflicting = [r for r in RUNS if r in _existing_runs]
+                if _conflicting:
+                    print(f"[ERROR] The following runs already exist in {_out.name}:")
+                    for _r in _conflicting:
+                        print(f"  {_r}")
+                    print("  Use --overwrite to re-evaluate and replace these runs.")
+                    sys.exit(1)
 
     # ── Replot mode ──────────────────────────────────────────────────────────
     if args.replot:
@@ -706,7 +733,7 @@ def main():
         print(f"\nEvaluating {len(RUNS)} runs on {len(records)} {set_name} pairs …")
         print(f"  LLM judge: {'ENABLED' if use_llm else 'DISABLED (--skip-llm)'}\n")
 
-        results: list[dict] = []
+        new_results: list[dict] = []
         for i, run in enumerate(RUNS, 1):
             t0 = time.time()
             print(f"\n  [{i:02d}/{len(RUNS)}] {run}", flush=True)
@@ -721,57 +748,88 @@ def main():
                 f"src={res['change_source_counts']}  "
                 f"[{elapsed:.1f}s]"
             )
-            results.append(res)
+            new_results.append(res)
 
-        # Save summary JSON (no per-pair)
-        results_no_per_pair = []
-        for r in results:
-            r_clean = {k: v for k, v in r.items() if k != "per_pair"}
-            results_no_per_pair.append(r_clean)
-
+        # ── Load existing JSONs and merge by run name ─────────────────────────
         results_path = args.output_dir / f"eval_results_{set_name}.json"
-        saved_data = {
-            "meta": {
-                "n_test_pairs": len(records),
-                "split_file":    str(args.split_file),
-                "json_dir":      str(args.json_dir),
-                "which_set":     set_name,
-                "skip_llm":      not use_llm,
-                "runs":          RUNS,
-                "field_weight_cls":    FIELD_WEIGHT_CLS,
-                "field_weight_change": FIELD_WEIGHT_CHANGE,
-            },
-            "results": results_no_per_pair,
+        full_path    = args.output_dir / f"eval_results_full_{set_name}.json"
+
+        old_run_order:        list[str]       = []
+        existing_summary_map: dict[str, dict] = {}
+        existing_full_map:    dict[str, dict] = {}
+
+        if results_path.exists():
+            _old = json.loads(results_path.read_text(encoding="utf-8"))
+            for r in _old.get("results", []):
+                old_run_order.append(r["run"])
+                existing_summary_map[r["run"]] = r
+
+        if full_path.exists():
+            _old_full = json.loads(full_path.read_text(encoding="utf-8"))
+            for r in _old_full.get("results", []):
+                existing_full_map[r["run"]] = r
+
+        # New results override matching old entries; all others are preserved
+        for r in new_results:
+            r_clean = {k: v for k, v in r.items() if k != "per_pair"}
+            existing_summary_map[r["run"]] = r_clean
+            existing_full_map[r["run"]]    = r
+
+        # Preserve original order, then append any truly new runs at the end
+        merged_run_names: list[str] = list(old_run_order)
+        for run in RUNS:
+            if run not in merged_run_names:
+                merged_run_names.append(run)
+
+        merged_summary = [existing_summary_map[r] for r in merged_run_names if r in existing_summary_map]
+        merged_full    = [existing_full_map[r]    for r in merged_run_names if r in existing_full_map]
+
+        # ── Save summary JSON ────────────────────────────────────────────────
+        saved_meta = {
+            "n_test_pairs":        len(records),
+            "split_file":          str(args.split_file),
+            "json_dir":            str(args.json_dir),
+            "which_set":           set_name,
+            "skip_llm":            not use_llm,
+            "runs":                merged_run_names,
+            "field_weight_cls":    FIELD_WEIGHT_CLS,
+            "field_weight_change": FIELD_WEIGHT_CHANGE,
         }
-        results_path.write_text(json.dumps(saved_data, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"\nResults JSON -> {results_path}")
+        results_path.write_text(
+            json.dumps({"meta": saved_meta, "results": merged_summary}, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        print(f"\nResults JSON -> {results_path}  ({len(merged_summary)} runs total)")
 
-        # Full per-pair results
-        full_path = args.output_dir / f"eval_results_full_{set_name}.json"
-        full_data = saved_data.copy()
-        full_data["results"] = results
-        full_path.write_text(json.dumps(full_data, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"Full results -> {full_path}")
+        full_path.write_text(
+            json.dumps({"meta": saved_meta, "results": merged_full}, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        print(f"Full results -> {full_path}  ({len(merged_full)} runs total)")
 
-        # Summary table
+        # ── Summary table (all merged runs) ─────────────────────────────────
         print("\n" + "=" * 100)
         print(f"{'Run':<42} {'Cls':>6} {'Chg':>6} {'Tot':>6} {'Time(s)':>8} {'Tokens':>8} {'n_eval':>7}")
         print("-" * 100)
-        for r in results:
-            c  = f"{r['avg_cls_score']:.3f}"   if r['avg_cls_score']    is not None else "N/A"
+        for r in merged_summary:
+            c  = f"{r['avg_cls_score']:.3f}"    if r['avg_cls_score']    is not None else "N/A"
             ch = f"{r['avg_change_score']:.3f}" if r['avg_change_score'] is not None else "N/A"
             t  = f"{r['avg_total_score']:.3f}"  if r['avg_total_score']  is not None else "N/A"
             ti = f"{r['avg_response_time']:.1f}" if r['avg_response_time'] is not None else "N/A"
             tk = f"{r['avg_total_tokens']:.0f}"  if r['avg_total_tokens']  is not None else "N/A"
             print(f"  {r['label']:<40} {c:>6} {ch:>6} {t:>6} {ti:>8} {tk:>8} {r['n_evaluated']:>7}")
+            inp = f"{r['avg_input_tokens']:.0f}"     if r.get('avg_input_tokens')     is not None else "N/A"
+            out = f"{r['avg_output_tokens']:.0f}"    if r.get('avg_output_tokens')    is not None else "N/A"
+            rsn = f"{r['avg_reasoning_tokens']:.0f}" if r.get('avg_reasoning_tokens') is not None else "N/A"
+            print(f"    tok breakdown: input={inp}  output={out}  reasoning={rsn}")
         print("=" * 100)
 
-        # Plots in a subdirectory per set
+        # ── Plots from all merged results ────────────────────────────────────
         out_plot_dir = args.output_dir / set_name
         print("\nGenerating plots …")
-        plot_all(results, out_plot_dir, len(records), set_name=set_name)
+        plot_all(merged_summary, out_plot_dir, len(records), set_name=set_name)
 
-        return results
+        return merged_summary
 
     # Run requested sets
     if evaluate_test:
