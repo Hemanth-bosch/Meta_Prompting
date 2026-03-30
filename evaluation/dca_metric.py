@@ -1,4 +1,5 @@
 import dspy
+import hashlib
 import json
 import os
 
@@ -24,6 +25,33 @@ def _get_client():
 
 #  TODO Judge model — defined in config.DCA_JUDGE_MODEL_NAME
 MODEL = DCA_JUDGE_MODEL_NAME
+
+# ---------------------------------------------------------------------------
+# Judge cache — persistent file-based cache for judge_summary_metric results.
+# Keyed on SHA-256(human + "\0" + model) to keep file names short.
+# Loaded once on import; flushed to disk after every new LLM call.
+# ---------------------------------------------------------------------------
+_JUDGE_CACHE_PATH = os.path.join(".cache", "judge_summary_cache.json")
+_judge_cache: dict[str, float] = {}
+
+def _load_judge_cache() -> None:
+    global _judge_cache
+    if os.path.exists(_JUDGE_CACHE_PATH):
+        try:
+            with open(_JUDGE_CACHE_PATH, "r", encoding="utf-8") as f:
+                _judge_cache = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            _judge_cache = {}
+
+def _save_judge_cache() -> None:
+    os.makedirs(os.path.dirname(_JUDGE_CACHE_PATH), exist_ok=True)
+    with open(_JUDGE_CACHE_PATH, "w", encoding="utf-8") as f:
+        json.dump(_judge_cache, f, indent=2)
+
+def _judge_cache_key(human: str, model: str) -> str:
+    return hashlib.sha256(f"{human}\0{model}".encode()).hexdigest()
+
+_load_judge_cache()
 
 # ---------------------------------------------------------------------------
 # TODO Field weights
@@ -170,6 +198,12 @@ def judge_summary_metric(human, model):
     fbeta, reasoning, matched = _try_rule_based_match(human, model)
     if matched:
         return fbeta
+
+    # ── Cache lookup ──────────────────────────────────────────────────────────
+    cache_key = _judge_cache_key(human, model)
+    if cache_key in _judge_cache:
+        return _judge_cache[cache_key]
+
     # ── Fallback: LLM judge for BREAKDOWN-mode (meaningful differences) ───────
 
     prompt = f"""
@@ -238,7 +272,6 @@ STEP 2 — Return JSON:
 
 """
     # TODO add response format and add temperature
-    # TODO Implement intelligent caching
     response = _get_client().chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
@@ -271,7 +304,10 @@ STEP 2 — Return JSON:
     if model_total == 0 or human_total == 0:
         if model_total == 0 and human_total == 0:
             print(f"    [WARN judge] all-zero counts — treating as 0.0", flush=True)
-        return 0.0
+        result = 0.0
+        _judge_cache[cache_key] = result
+        _save_judge_cache()
+        return result
 
     precision = correct / model_total if model_total > 0 else 0.0
     recall = correct / human_total if human_total > 0 else 0.0
@@ -282,6 +318,8 @@ STEP 2 — Return JSON:
              if (2 * precision + 3 * recall) > 0
              else 0.0)
 
+    _judge_cache[cache_key] = fbeta
+    _save_judge_cache()
     return fbeta
 
 
@@ -298,11 +336,11 @@ def _change_score_label(score: float) -> str:
     if score >= 0.95:
         return "Exact match"
     elif score >= 0.70:
-        return "Good"
+        return "Good - needs improvement"
     elif score >= 0.35:
-        return "Partial"
+        return "Partial - needs major improvement"
     else:
-        return "No match"
+        return "No match - Unacceptable quality"
 
 # TODO Jahnavi to look into this
 def dca_comparison_metric_with_feedback(example, prediction, trace=None, pred_name=None, pred_trace=None):

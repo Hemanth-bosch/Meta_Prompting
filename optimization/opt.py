@@ -13,9 +13,10 @@ class OptimizationConfig:
     optimizer_type: Literal["bootstrap", "gepa", "miprov2", "simba"] = "bootstrap"
     
     # Common parameters - aligned with DSPy defaults where applicable
-    num_threads: int = None  # DSPy default: None (uses system default)
-    max_labeled_demos: int = None  # Will use DSPy defaults per optimizer
-    max_bootstrapped_demos: int = None  # Will use DSPy defaults per optimizer
+    #TODO: Made this optional
+    num_threads: Optional[int] = None  # DSPy default: None (uses system default)
+    max_labeled_demos: Optional[int] = None  # Will use DSPy defaults per optimizer
+    max_bootstrapped_demos: Optional[int] = None  # Will use DSPy defaults per optimizer
     
     # Flexible optimizer-specific parameters
     optimizer_params: Dict[str, Any] = field(default_factory=dict)
@@ -94,7 +95,7 @@ class OptimizationConfig:
 
 
 class OptimizationRunner:
-    """Configurable optimization runner for order extraction"""
+    """Configurable optimization runner supporting Bootstrap, MIPROv2, GEPA, and SimBA strategies"""
     
     def __init__(self, 
                  metric,
@@ -121,7 +122,7 @@ class OptimizationRunner:
         if strategies is None:
             strategies = self.default_strategies
         
-        print("🚀 Starting Configurable Order Extractor Optimization...")
+        print("🚀 Starting Optimization...")
         
         # Evaluate baseline
         baseline_score = self._evaluate_baseline()
@@ -218,19 +219,16 @@ class OptimizationRunner:
             raise ValueError(f"Unknown optimizer type: {config.optimizer_type}")
         
         print(f"🔧 Compiling {config.name}...")
-        optimized_extractor = optimizer.compile(
-            student=self.student_model,
-            trainset=self.train_set,
-            valset=self.val_set
-        )
-        
-        print(f"🔍 {config.optimizer_type.upper()} compilation result:")
-        print(f"   Type: {type(optimized_extractor)}")
-        print(f"   Is None: {optimized_extractor is None}")
-        if optimized_extractor is not None:
-            print(f"   Has forward method: {hasattr(optimized_extractor, 'forward')}")
-            print(f"   Has __call__ method: {hasattr(optimized_extractor, '__call__')}")
-        
+        compile_kwargs = {
+            "student": self.student_model,
+            "trainset": self.train_set,
+        }
+
+        #TODO: SIMBA doesnt accept valset so removed
+        if config.optimizer_type != "simba":
+            compile_kwargs["valset"] = self.val_set
+        optimized_extractor = optimizer.compile(**compile_kwargs)
+
         print(f"📈 Evaluating {config.name}...")
         result = self.evaluate_fn(optimized_extractor, devset=self.val_set)
         return optimized_extractor, result.score
@@ -432,6 +430,8 @@ if __name__ == "__main__":
     
     # Combine all strategies
     all_strategies = bootstrap_strategies + gepa_strategies + miprov2_strategies
+
+    #TODO: DCA STRATEGIES
     
     # Example: Use only GEPA strategies for Japanese order extraction
     japanese_order_gepa_strategies = gepa_strategies
