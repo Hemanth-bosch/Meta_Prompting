@@ -1,6 +1,0 @@
-synthetic:    true
-method:       B1_corruption (pixelate_100x100_nearest)
-source_pair:  pair_176
-corrupted:    reimage
-original:     pair_176/original.png (intact)
-reimage:      pair_176/reimage.png (corrupted with pixelate_100x100_nearest)
