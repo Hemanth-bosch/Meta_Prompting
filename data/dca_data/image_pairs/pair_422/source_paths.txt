@@ -1,5 +1,0 @@
-synthetic:    true
-method:       B4_recombination
-source_pairs: pair_057 (non-informational), pair_302 (informational)
-original:     non-informational (from pair_057/reimage.png)
-reimage:      informational (from pair_302/original.png)

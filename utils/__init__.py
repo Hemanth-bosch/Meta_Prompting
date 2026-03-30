@@ -6,6 +6,7 @@ from utils.data_loading import (
 from utils.splitting import (
     split_order_dataset,
     stratified_split_yanase_dataset,
+    stratified_split_dca_dataset,
 )
 from utils.pdf_processing import (
     process_pdf_into_image,

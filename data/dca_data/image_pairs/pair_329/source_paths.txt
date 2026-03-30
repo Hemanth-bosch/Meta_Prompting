@@ -1,3 +1,0 @@
-zip_file:     pdf_4.zip
-original:     C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting-midas-use-cases\data\dca_data\pdf_4\SFS-119-Rear_View_Camera_v0.4.4_8_21_2025 (1)\SFS-119-Rear_View_Camera_v0.4.4_8_21_2025 (1)_figures\Link_Aggregator_-_ACP3.1_4____VCU_High_connectivity.png
-reimage:      N/A (sentinel)

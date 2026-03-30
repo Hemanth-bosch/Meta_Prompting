@@ -10,6 +10,20 @@ each pair as:
                              content, diagram modifications, cross-out marks)
 
 Also, provides a change summary between the original and re-imaged versions in an image pair, based on the following rules:
+notes:
+
+1. If there's only one image and : it is informational: "NoMatchFound" - discard - false
+2. If there's only one image and : it is non informational: "Only one image present and it is non informational - watermark or logo" - discard - true
+
+3. If there are two images and they are both non informational: "Both images are non informational"
+4. They are visually identical/trivial changes: "Images are identical - no changes"
+In these cases - discard - true
+
+5. If there are meaningful differences, describe the specific changes - discard - false
+
+Other cases:
+1. When one of the images is completely crossed out - "Image 1/2 is crossed out"
+2. One of the images is tiny/corrupted/unreadable - "Could not infer"
 
 
 
@@ -131,7 +145,7 @@ Environment Variables (all optional — CLI flags take priority over env vars)
 
 import dspy
 from signatures.dca import DCAImageComparison
-from utils import load_dca_dataset, stratified_split_yanase_dataset
+from utils import load_dca_dataset, stratified_split_dca_dataset
 from config import *
 from config import reconfigure_lm
 from evaluation.dca_metric import dca_comparison_metric, dca_comparison_metric_with_feedback
@@ -298,16 +312,27 @@ split_latest_path = os.path.join(split_dir, f"dca_split_seed{split_seed}.json")
 dataset_by_name = {str(getattr(ex, "pair_name", "")): ex for ex in dataset}
 
 # TODO Make a dca config -> move dca related configs such as stratify to a new dca config file and import here
-train_set, val_set, test_set = stratified_split_yanase_dataset(
+train_set, val_set, test_set = stratified_split_dca_dataset(
     dataset, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2,
-    random_seed=split_seed, stratify_by=["expected_discard_image","expected_human_label_category","doubt"], verbose=True
+    random_seed=split_seed, verbose=True
 )
 
+val_names  = _pair_names(val_set)
+test_names = _pair_names(test_set)
 val_names  = _pair_names(val_set)
 test_names = _pair_names(test_set)
 
 split_ts = datetime.now().strftime("%Y%m%d%H%M%S")
 
+split_manifest = {
+    "created_at": datetime.now().isoformat(timespec="seconds"),
+    "seed": split_seed,
+    "stratify_by": ["expected_discard_image","expected_human_label_category","doubt"],
+    "ratios": {"train": 0.6, "val": 0.2, "test": 0.2},
+    "total_examples": len(dataset),
+    "val":  {"count": len(val_names),  "pair_names": val_names},
+    "test": {"count": len(test_names), "pair_names": test_names},
+}
 split_manifest = {
     "created_at": datetime.now().isoformat(timespec="seconds"),
     "seed": split_seed,
@@ -512,8 +537,8 @@ runner = OptimizationRunner(
     train_set=train_set,
     val_set=val_set,
     evaluate_fn=evaluate,
-    # metric_with_feedback=dca_comparison_metric_with_feedback,
-    # reflection_lm=reflectin_lm,
+    metric_with_feedback=dca_comparison_metric_with_feedback,
+    reflection_lm=reflectin_lm,
 )
 
 print(f"\n{'='*80}")

@@ -260,7 +260,7 @@ def load_dca_dataset(
 
     for pair_name in pair_dirs:
         pair_path = os.path.join(pairs_dir, pair_name)
-        original_path = os.path.join(pair_path, "original.png")
+        original_path = os.path.join(pair_path, "original.png") 
         reimage_path = os.path.join(pair_path, "reimage.png")
         gt_path = os.path.join(gt_dir, f"{pair_name}.json")
 
