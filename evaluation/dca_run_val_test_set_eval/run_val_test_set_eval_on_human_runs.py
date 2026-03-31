@@ -1,31 +1,36 @@
 #!/usr/bin/env python3
-"""Full DCA evaluation on the test split for all human-prompt runs.
+"""Evaluate all human-prompt DCA runs on val/test splits.
 
-Computes for each run × test-pair:
+Computes for each run × pair:
   - classification_score  (1.0 / 0.0)  — discard_image correct?
-  - change_score          (0.0–1.0)    — change-summary quality via judge_summary_metric
+  - change_score          (0.0–1.0)    — change-summary quality via LLM judge
   - total_score           (0.6 × cls + 0.4 × change)
   - response_time_seconds (from stored metadata)
   - total_tokens          (from stored metadata)
 
-Aggregates per run, saves JSON results, and produces grouped bar-chart plots.
+Output layout (under --output-dir = eval_results/human_runs/):
+  eval_results_{val|test}.json
+    ├── meta      — split info, weights, run list
+    ├── summary   — one entry per run, aggregated metrics only  (easy to scan)
+    └── details   — one entry per run, aggregated + per_pair    (full data)
 
 Usage
 -----
-# With LLM judge (requires Azure auth):
+    # Evaluate test set (default):
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_human_runs.py
 
-# Skip LLM judge (rule-based only; breakdown cases marked None):
+    # Evaluate val set:
+    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_human_runs.py --which-set val
+
+    # Evaluate both:
+    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_human_runs.py --which-set both
+
+    # Skip LLM judge (rule-based only; breakdown cases marked None):
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_human_runs.py --skip-llm
 
-# Overwrite existing results (otherwise aborts if results already exist):
+    # Overwrite existing run entries:
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_human_runs.py --overwrite
-
-# Re-use a previously saved result JSON (just re-plot):
-    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_human_runs.py --replot
 """
-
-# TODO Full file new
 
 from __future__ import annotations
 
@@ -61,21 +66,14 @@ from evaluation.dca_metric import (
     compute_total_score,
 )
 
-# ---------------------------------------------------------------------------
-# Matplotlib — non-interactive backend before any other mpl import
-# ---------------------------------------------------------------------------
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
-
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 DEFAULT_JSON_DIR   = REPO_ROOT / "data" / "dca_data" / "image_pairs_llm_output_exp1"
 DEFAULT_SPLIT_FILE = REPO_ROOT / ".cache" / "dca_split_seed42.json"
-OUTPUT_DIR         = SCRIPT_DIR / "eval_results"
+DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "eval_results" / "human_runs"
 
 
 # ---------------------------------------------------------------------------
@@ -126,64 +124,6 @@ RUN_LABELS: dict[str, str] = {
     "v4_prompt_cr_gpt52_reason_low":       "v4/GPT-5.2-RL",
     "v4_prompt_cr_gpt_5_mini_reason_low":  "v4/GPT-5-mini-RL",
 }
-
-# ---------------------------------------------------------------------------
-# Model groups — colour-coded families, shade per prompt version
-# ---------------------------------------------------------------------------
-MODEL_GROUPS: list[dict] = [
-    {
-        "name": "GPT-4.1-mini",
-        "runs": [
-            "v1_prompt_midas_gpt41_mini",
-            "v2_prompt_cr_gpt41_mini",
-            "v3_prompt_cr_gpt41_mini",
-            "v4_prompt_cr_gpt41_mini",
-        ],
-        "shades": ["#90CAF9", "#42A5F5", "#1565C0", "#0D2D6B"],
-    },
-    {
-        "name": "GPT-4.1",
-        "runs": [
-            "v1_prompt_midas_gpt41",
-            "v2_prompt_cr_gpt41",
-            "v3_prompt_cr_gpt41",
-            "v4_prompt_cr_gpt41",
-        ],
-        "shades": ["#A5D6A7", "#4CAF50", "#1B5E20", "#0A3D0A"],
-    },
-    {
-        "name": "GPT-5.2",
-        "runs": [
-            "v1_prompt_midas_gpt52",
-            "v2_prompt_cr_gpt52",
-            "v3_prompt_cr_gpt52",
-            "v4_prompt_cr_gpt52",
-        ],
-        "shades": ["#FFCC80", "#FF9800", "#E65100", "#7F2900"],
-    },
-    {
-        "name": "GPT-5.2\nReason-Low",
-        "runs": [
-            "v1_prompt_midas_gpt52_reason_low",
-            "v2_prompt_cr_gpt52_reason_low",
-            "v3_prompt_cr_gpt52_reason_low",
-            "v4_prompt_cr_gpt52_reason_low",
-        ],
-        "shades": ["#CE93D8", "#AB47BC", "#6A1B9A", "#2D004D"],
-    },
-    {
-        "name": "GPT-5-mini\nReason-Low",
-        "runs": [
-            "v1_prompt_midas_gpt_5_mini_reason_low",
-            "v2_prompt_cr_gpt_5_mini_reason_low",
-            "v3_prompt_cr_gpt_5_mini_reason_low",
-            "v4_prompt_cr_gpt_5_mini_reason_low",
-        ],
-        "shades": ["#EF9A9A", "#EF5350", "#B71C1C", "#600000"],
-    },
-]
-
-PROMPT_VERSION_LABELS = ["v1", "v2", "v3", "v4"]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -257,7 +197,7 @@ def compute_change_score(
     if matched:
         return score, "rule"
 
-    # 3) LLM judge
+    # 2) LLM judge
     if not use_llm:
         return None, "skipped"
 
@@ -402,254 +342,33 @@ def evaluate_run(
 
 
 # ---------------------------------------------------------------------------
-# Plotting
-# ---------------------------------------------------------------------------
-
-def _grouped_metric_bar(ax, metric_key, title, ylabel, results: list[dict], groups: list[dict]):
-    """Draw a grouped bar chart for a single metric across model groups."""
-    n_groups  = len(groups)
-    bar_width = 0.18
-
-    group_centers = np.arange(n_groups)
-    offsets = np.array([-1.5, -0.5, 0.5, 1.5]) * (bar_width + 0.01)
-
-    result_by_run = {r["run"]: r for r in results}
-
-    handles_for_legend = []
-    labels_for_legend  = []
-
-    for vi, version_label in enumerate(PROMPT_VERSION_LABELS):
-        bars_x = []
-        bars_h = []
-        bars_c = []
-        for gi, group in enumerate(groups):
-            run = group["runs"][vi] if vi < len(group["runs"]) else None
-            shade = group["shades"][vi] if vi < len(group["shades"]) else "#999999"
-            bars_c.append(shade)
-            if run and run in result_by_run:
-                val = result_by_run[run].get(metric_key)
-                bars_h.append(val if val is not None else 0.0)
-            else:
-                bars_h.append(0.0)
-            bars_x.append(group_centers[gi] + offsets[vi])
-
-        ax.bar(bars_x, bars_h, width=bar_width, color=bars_c, edgecolor="white", linewidth=0.5)
-
-        # One legend entry per version (colour from first group)
-        patch = plt.Rectangle((0, 0), 1, 1, fc=bars_c[0])
-        handles_for_legend.append(patch)
-        labels_for_legend.append(version_label)
-
-        # Value labels on bars
-        for bx, bh, bc in zip(bars_x, bars_h, bars_c):
-            if bh > 0:
-                ax.text(bx, bh + 0.005, f"{bh:.2f}", ha="center", va="bottom",
-                        fontsize=6, color="black")
-
-    ax.set_xticks(group_centers)
-    ax.set_xticklabels([g["name"] for g in groups], fontsize=9)
-    ax.set_ylabel(ylabel, fontsize=9)
-    ax.set_title(title, fontsize=10, fontweight="bold")
-    ax.set_ylim(0, 1.10)
-    ax.yaxis.grid(True, alpha=0.4, linestyle="--")
-    ax.set_axisbelow(True)
-    ax.legend(handles_for_legend, labels_for_legend,
-              title="Prompt Version", fontsize=7, title_fontsize=8,
-              loc="upper right", ncol=2)
-
-
-def _flat_metric_bar(ax, metric_key, title, ylabel, results: list[dict],
-                     unit_scale: float = 1.0, ymax: Optional[float] = None):
-    """Draw a flat (ungrouped) bar chart for token / time metrics, coloured by model group."""
-    run_keys = [r["run"] for r in results]
-    labels   = [RUN_LABELS.get(r, r).replace("/", "\n") for r in run_keys]
-    values   = [(res.get(metric_key) or 0.0) * unit_scale for res in results]
-
-    # Assign colour by model group membership
-    run_to_shade = {}
-    for group in MODEL_GROUPS:
-        for vi, run in enumerate(group["runs"]):
-            shade = group["shades"][vi] if vi < len(group["shades"]) else "#999999"
-            run_to_shade[run] = shade
-    colours = [run_to_shade.get(r, "#607D8B") for r in run_keys]
-
-    x = np.arange(len(run_keys))
-    ax.bar(x, values, color=colours, edgecolor="white", linewidth=0.5)
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=6.5, rotation=45, ha="right")
-    ax.set_ylabel(ylabel, fontsize=9)
-    ax.set_title(title, fontsize=10, fontweight="bold")
-    if ymax:
-        ax.set_ylim(0, ymax)
-    ax.yaxis.grid(True, alpha=0.4, linestyle="--")
-    ax.set_axisbelow(True)
-
-    for xi, v in zip(x, values):
-        if v > 0:
-            ax.text(xi, v + ax.get_ylim()[1] * 0.01, f"{v:.1f}", ha="center", va="bottom",
-                    fontsize=6, rotation=0)
-
-    # Group dividers (one per model change)
-    group_sizes = [len(g["runs"]) for g in MODEL_GROUPS]
-    boundary = 0
-    for gs in group_sizes[:-1]:
-        boundary += gs
-        ax.axvline(boundary - 0.5, color="gray", linestyle=":", linewidth=0.8, alpha=0.6)
-
-
-def plot_all(results: list[dict], output_dir: Path, n_test_pairs: int,
-             set_name: str = "test") -> None:
-    """Generate and save all plots."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-    set_label = set_name.capitalize()
-
-    # Only include model groups that have at least one run present in the results
-    result_run_names = {r["run"] for r in results}
-    active_groups = [g for g in MODEL_GROUPS if any(run in result_run_names for run in g["runs"])]
-
-    # ── Figure 1: Score metrics (3 grouped bar charts stacked vertically) ──
-    fig1, axes1 = plt.subplots(3, 1, figsize=(14, 15))
-    fig1.suptitle(
-        f"DCA Human-Prompt Baseline Evaluation — {set_label} Set (n={n_test_pairs})\n"
-        "Grouped by Model Family | Prompt Version v1→v4 (lighter→darker shade)",
-        fontsize=11, fontweight="bold", y=0.98,
-    )
-
-    _grouped_metric_bar(
-        axes1[0], "avg_total_score",
-        "Total Score  (0.6 × Classification + 0.4 × Change)",
-        "Avg Total Score",
-        results, active_groups,
-    )
-    _grouped_metric_bar(
-        axes1[1], "avg_cls_score",
-        "Classification Score  (discard_image correct?)",
-        "Avg Classification Score",
-        results, active_groups,
-    )
-    _grouped_metric_bar(
-        axes1[2], "avg_change_score",
-        "Change Score  (judge_summary_metric, precision-60/recall-40 F-beta)",
-        "Avg Change Score",
-        results, active_groups,
-    )
-
-    fig1.tight_layout(rect=[0, 0, 1, 0.96])
-    score_path = output_dir / "scores_grouped.png"
-    fig1.savefig(score_path, dpi=150, bbox_inches="tight")
-    plt.close(fig1)
-    print(f"  Saved: {score_path}")
-
-    # ── Figure 2: Efficiency metrics (tokens + time) ──
-    fig2, axes2 = plt.subplots(2, 1, figsize=(16, 10))
-    fig2.suptitle(
-        f"DCA Baseline — Response Time & Token Usage — {set_label} Set (n={n_test_pairs})",
-        fontsize=11, fontweight="bold",
-    )
-
-    _flat_metric_bar(
-        axes2[0], "avg_response_time",
-        "Avg Response Time per Pair  (seconds)",
-        "Seconds",
-        results,
-    )
-    _flat_metric_bar(
-        axes2[1], "avg_total_tokens",
-        "Avg Total Tokens per Pair  (prompt + completion)",
-        "Tokens",
-        results,
-    )
-
-    fig2.tight_layout()
-    eff_path = output_dir / "efficiency_metrics.png"
-    fig2.savefig(eff_path, dpi=150, bbox_inches="tight")
-    plt.close(fig2)
-    print(f"  Saved: {eff_path}")
-
-    # ── Figure 3: Summary heatmap (all metrics × all runs) ──
-    run_labels_short = [RUN_LABELS.get(r["run"], r["run"]) for r in results]
-    metric_names = ["Total Score", "Cls Score", "Change Score", "Avg Time (s)", "Avg Tokens (k)"]
-    data_matrix  = []
-    for r in results:
-        row = [
-            r.get("avg_total_score")    or 0.0,
-            r.get("avg_cls_score")      or 0.0,
-            r.get("avg_change_score")   or 0.0,
-            r.get("avg_response_time")  or 0.0,
-            (r.get("avg_total_tokens")  or 0.0) / 1000.0,
-        ]
-        data_matrix.append(row)
-
-    data_arr = np.array(data_matrix, dtype=float)  # shape: (n_runs, n_metrics)
-
-    fig3, ax3 = plt.subplots(figsize=(10, max(8, len(results) * 0.45)))
-    fig3.suptitle("DCA Baseline — Summary Heatmap (All Runs × Metrics)",
-                  fontsize=11, fontweight="bold")
-
-    # Normalise each column separately for colour scaling
-    normed = np.zeros_like(data_arr)
-    for c in range(data_arr.shape[1]):
-        col = data_arr[:, c]
-        col_min, col_max = col.min(), col.max()
-        span = col_max - col_min
-        normed[:, c] = (col - col_min) / span if span > 0 else np.zeros_like(col)
-
-    # Use viridis for scores (higher = better), reverse for time/tokens (lower = better)
-    ax3.imshow(normed, aspect="auto", cmap="RdYlGn", vmin=0, vmax=1)
-
-    ax3.set_xticks(range(len(metric_names)))
-    ax3.set_xticklabels(metric_names, fontsize=9)
-    ax3.set_yticks(range(len(run_labels_short)))
-    ax3.set_yticklabels(run_labels_short, fontsize=8)
-
-    # Annotate cells with actual values
-    for ri in range(len(results)):
-        for ci, col_vals in enumerate(data_arr[ri]):
-            txt = f"{col_vals:.2f}" if ci < 3 else (
-                f"{col_vals:.1f}s" if ci == 3 else f"{col_vals:.1f}k"
-            )
-            ax3.text(ci, ri, txt, ha="center", va="center", fontsize=7,
-                     color="black")
-
-    fig3.tight_layout()
-    heat_path = output_dir / "summary_heatmap.png"
-    fig3.savefig(heat_path, dpi=150, bbox_inches="tight")
-    plt.close(fig3)
-    print(f"  Saved: {heat_path}")
-
-
-# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description="Full DCA evaluation on test split.")
-    parser.add_argument("--json-dir",    type=Path, default=DEFAULT_JSON_DIR)
-    parser.add_argument("--split-file",  type=Path, default=DEFAULT_SPLIT_FILE)
-    parser.add_argument("--output-dir",  type=Path, default=OUTPUT_DIR)
-    parser.add_argument("--skip-llm",   action="store_true",
-                        help="Skip LLM judge calls; breakdown cases get change_score=None")
-    parser.add_argument("--overwrite",  action="store_true",
-                        help="Overwrite existing eval_results.json if it already exists")
-    parser.add_argument("--replot",     action="store_true",
-                        help="Load existing results JSON and re-generate plots only")
-    parser.add_argument("--results-json", type=Path, default=None,
-                        help="Path to existing results JSON for --replot")
-    parser.add_argument("--which-set", type=str, choices=["test", "val", "both"], default="test",
+    parser = argparse.ArgumentParser(description="Evaluate human-prompt DCA runs on val/test splits.")
+    parser.add_argument("--json-dir",   type=Path, default=DEFAULT_JSON_DIR)
+    parser.add_argument("--split-file", type=Path, default=DEFAULT_SPLIT_FILE)
+    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--which-set",  type=str, choices=["test", "val", "both"], default="test",
                         help="Which split to evaluate: test, val, or both (default: test)")
+    parser.add_argument("--skip-llm",  action="store_true",
+                        help="Skip LLM judge calls; breakdown cases get change_score=None")
+    parser.add_argument("--overwrite", action="store_true",
+                        help="Overwrite existing run entries if they already exist")
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     use_llm = not args.skip_llm
 
-    # ── Guard: abort if any of the current RUNS already exist and --overwrite not set ───
-    if not args.overwrite and not args.replot:
+    # ── Guard: abort if any of the current RUNS already exist and --overwrite not set ──
+    if not args.overwrite:
         _sets_to_check = ["val", "test"] if args.which_set == "both" else [args.which_set]
         for _sname in _sets_to_check:
             _out = args.output_dir / f"eval_results_{_sname}.json"
             if _out.exists():
                 _old = json.loads(_out.read_text(encoding="utf-8"))
-                _existing_runs = {r["run"] for r in _old.get("results", [])}
+                _existing_runs = {r["run"] for r in _old.get("summary", [])}
                 _conflicting = [r for r in RUNS if r in _existing_runs]
                 if _conflicting:
                     print(f"[ERROR] The following runs already exist in {_out.name}:")
@@ -658,35 +377,22 @@ def main():
                     print("  Use --overwrite to re-evaluate and replace these runs.")
                     sys.exit(1)
 
-    # ── Replot mode ──────────────────────────────────────────────────────────
-    if args.replot:
-        results_file = args.results_json or (args.output_dir / "eval_results.json")
-        if not results_file.exists():
-            print(f"[ERROR] --replot: results file not found: {results_file}")
-            sys.exit(1)
-        data = json.loads(results_file.read_text(encoding="utf-8"))
-        results  = data["results"]
-        n_test   = data["meta"]["n_test_pairs"]
-        set_name = data["meta"].get("which_set", "test")
-        print(f"Replotting {len(results)} runs from {results_file.name} …")
-        plot_all(results, args.output_dir / set_name, n_test, set_name=set_name)
-        return
-    
-    # ── Load split (support both old and new manifest formats) ────────────────
+    # ── Load split ────────────────────────────────────────────────────────────
     if not args.split_file.exists():
         print(f"[ERROR] Split file not found: {args.split_file}")
         sys.exit(1)
 
     split = json.loads(args.split_file.read_text(encoding="utf-8"))
-    # Manifest may be either: {"test": {"pair_names": [...]}, "val": {...}} or
-    # the older format that also contains a top-level "train" key. Be flexible.
     test_pair_names = split.get("test", {}).get("pair_names") or split.get("test_pair_numbers") or []
     if isinstance(test_pair_names, list) and test_pair_names and isinstance(test_pair_names[0], int):
-        # accidental numeric list stored; convert to strings with prefix if needed
         test_pair_names = [f"pair_{n:03d}" for n in test_pair_names]
     val_pair_names = split.get("val", {}).get("pair_names") or split.get("val_pair_numbers") or []
     if isinstance(val_pair_names, list) and val_pair_names and isinstance(val_pair_names[0], int):
         val_pair_names = [f"pair_{n:03d}" for n in val_pair_names]
+
+    if not args.json_dir.exists():
+        print(f"[ERROR] JSON dir not found: {args.json_dir}")
+        sys.exit(1)
 
     def _load_records(pair_names: list[str]) -> tuple[list[dict], int]:
         records: list[dict] = []
@@ -702,33 +408,29 @@ def main():
             records.append(rec)
         return records, missing
 
-    # Determine which sets to evaluate
     which = args.which_set
     evaluate_test = which in ("test", "both")
-    evaluate_val = which in ("val", "both")
+    evaluate_val  = which in ("val",  "both")
 
+    seed = split.get("seed", "?")
     if evaluate_test:
-        print(f"Test split: {len(test_pair_names)} pairs (seed={split.get('seed','?')})")
+        print(f"Test split: {len(test_pair_names)} pairs  (seed={seed})")
     if evaluate_val:
-        print(f"Validation split: {len(val_pair_names)} pairs (seed={split.get('seed','?')})")
-
-    if not args.json_dir.exists():
-        print(f"[ERROR] JSON dir not found: {args.json_dir}")
-        sys.exit(1)
+        print(f"Val  split: {len(val_pair_names)} pairs  (seed={seed})")
 
     test_records, test_missing = ([], 0)
-    val_records, val_missing = ([], 0)
+    val_records,  val_missing  = ([], 0)
     if evaluate_test:
         test_records, test_missing = _load_records(test_pair_names)
-        print(f"Loaded {len(test_records)} test pair JSONs ({test_missing} missing files)")
+        print(f"Loaded {len(test_records)} test pair JSONs  ({test_missing} missing)")
     if evaluate_val:
         val_records, val_missing = _load_records(val_pair_names)
-        print(f"Loaded {len(val_records)} val pair JSONs ({val_missing} missing files)")
+        print(f"Loaded {len(val_records)} val pair JSONs  ({val_missing} missing)")
 
-    def _evaluate_and_save(records: list[dict], set_name: str) -> list[dict]:
+    def _evaluate_and_save(records: list[dict], set_name: str) -> None:
         if not records:
             print(f"\nNo records for set: {set_name} — skipping.")
-            return []
+            return
 
         print(f"\nEvaluating {len(RUNS)} runs on {len(records)} {set_name} pairs …")
         print(f"  LLM judge: {'ENABLED' if use_llm else 'DISABLED (--skip-llm)'}\n")
@@ -743,78 +445,67 @@ def main():
             tot_str = f"{res['avg_total_score']:.3f}"  if res['avg_total_score']  is not None else "N/A"
             print(
                 f"  → avg: cls={res['avg_cls_score']:.3f}  "
-                f"chg={chg_str:>6}  "
-                f"tot={tot_str:>6}  "
-                f"src={res['change_source_counts']}  "
-                f"[{elapsed:.1f}s]"
+                f"chg={chg_str:>6}  tot={tot_str:>6}  "
+                f"src={res['change_source_counts']}  [{elapsed:.1f}s]"
             )
             new_results.append(res)
 
-        # ── Load existing JSONs and merge by run name ─────────────────────────
+        # ── Load existing file and merge by run name ──────────────────────────
         results_path = args.output_dir / f"eval_results_{set_name}.json"
-        full_path    = args.output_dir / f"eval_results_full_{set_name}.json"
 
-        old_run_order:        list[str]       = []
+        old_run_order:     list[str]       = []
         existing_summary_map: dict[str, dict] = {}
-        existing_full_map:    dict[str, dict] = {}
+        existing_details_map: dict[str, dict] = {}
 
         if results_path.exists():
             _old = json.loads(results_path.read_text(encoding="utf-8"))
-            for r in _old.get("results", []):
+            for r in _old.get("summary", []):
                 old_run_order.append(r["run"])
                 existing_summary_map[r["run"]] = r
-
-        if full_path.exists():
-            _old_full = json.loads(full_path.read_text(encoding="utf-8"))
-            for r in _old_full.get("results", []):
-                existing_full_map[r["run"]] = r
+            for r in _old.get("details", []):
+                existing_details_map[r["run"]] = r
 
         # New results override matching old entries; all others are preserved
         for r in new_results:
-            r_clean = {k: v for k, v in r.items() if k != "per_pair"}
-            existing_summary_map[r["run"]] = r_clean
-            existing_full_map[r["run"]]    = r
+            existing_summary_map[r["run"]] = {k: v for k, v in r.items() if k != "per_pair"}
+            existing_details_map[r["run"]] = r
 
-        # Preserve original order, then append any truly new runs at the end
+        # Preserve original order, append truly new runs at the end
         merged_run_names: list[str] = list(old_run_order)
         for run in RUNS:
             if run not in merged_run_names:
                 merged_run_names.append(run)
 
         merged_summary = [existing_summary_map[r] for r in merged_run_names if r in existing_summary_map]
-        merged_full    = [existing_full_map[r]    for r in merged_run_names if r in existing_full_map]
+        merged_details = [existing_details_map[r] for r in merged_run_names if r in existing_details_map]
 
-        # ── Save summary JSON ────────────────────────────────────────────────
         saved_meta = {
-            "n_test_pairs":        len(records),
+            "n_pairs":             len(records),
+            "which_set":           set_name,
             "split_file":          str(args.split_file),
             "json_dir":            str(args.json_dir),
-            "which_set":           set_name,
             "skip_llm":            not use_llm,
             "runs":                merged_run_names,
             "field_weight_cls":    FIELD_WEIGHT_CLS,
             "field_weight_change": FIELD_WEIGHT_CHANGE,
         }
         results_path.write_text(
-            json.dumps({"meta": saved_meta, "results": merged_summary}, indent=2, ensure_ascii=False),
+            json.dumps(
+                {"meta": saved_meta, "summary": merged_summary, "details": merged_details},
+                indent=2, ensure_ascii=False,
+            ),
             encoding="utf-8",
         )
         print(f"\nResults JSON -> {results_path}  ({len(merged_summary)} runs total)")
 
-        full_path.write_text(
-            json.dumps({"meta": saved_meta, "results": merged_full}, indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
-        print(f"Full results -> {full_path}  ({len(merged_full)} runs total)")
-
-        # ── Summary table (all merged runs) ─────────────────────────────────
+        # ── Summary table ────────────────────────────────────────────────────
         print("\n" + "=" * 100)
         print(f"{'Run':<42} {'Cls':>6} {'Chg':>6} {'Tot':>6} {'Time(s)':>8} {'Tokens':>8} {'n_eval':>7}")
         print("-" * 100)
         for r in merged_summary:
-            c  = f"{r['avg_cls_score']:.3f}"    if r['avg_cls_score']    is not None else "N/A"
-            ch = f"{r['avg_change_score']:.3f}" if r['avg_change_score'] is not None else "N/A"
-            t  = f"{r['avg_total_score']:.3f}"  if r['avg_total_score']  is not None else "N/A"
+            c  = f"{r['avg_cls_score']:.3f}"     if r['avg_cls_score']    is not None else "N/A"
+            ch = f"{r['avg_change_score']:.3f}"  if r['avg_change_score'] is not None else "N/A"
+            t  = f"{r['avg_total_score']:.3f}"   if r['avg_total_score']  is not None else "N/A"
             ti = f"{r['avg_response_time']:.1f}" if r['avg_response_time'] is not None else "N/A"
             tk = f"{r['avg_total_tokens']:.0f}"  if r['avg_total_tokens']  is not None else "N/A"
             print(f"  {r['label']:<40} {c:>6} {ch:>6} {t:>6} {ti:>8} {tk:>8} {r['n_evaluated']:>7}")
@@ -824,18 +515,10 @@ def main():
             print(f"    tok breakdown: input={inp}  output={out}  reasoning={rsn}")
         print("=" * 100)
 
-        # ── Plots from all merged results ────────────────────────────────────
-        out_plot_dir = args.output_dir / set_name
-        print("\nGenerating plots …")
-        plot_all(merged_summary, out_plot_dir, len(records), set_name=set_name)
-
-        return merged_summary
-
-    # Run requested sets
     if evaluate_test:
-        _ = _evaluate_and_save(test_records, "test")
+        _evaluate_and_save(test_records, "test")
     if evaluate_val:
-        _ = _evaluate_and_save(val_records, "val")
+        _evaluate_and_save(val_records, "val")
 
     print("\nDone.")
 

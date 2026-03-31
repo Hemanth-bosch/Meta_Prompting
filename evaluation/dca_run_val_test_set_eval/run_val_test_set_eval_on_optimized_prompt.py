@@ -11,26 +11,66 @@ Captures per-pair:
   - response_time_seconds    (inference only, not including judge calls)
   - total_tokens             (from DSPy LM history for the inference call)
 
-Output JSON is compatible with eval_results_full_<set>.json from
-run_val_test_set_eval_on_human_runs.py so results can be compared in the same table.
+Output JSON uses the same per-pair scoring fields as
+run_val_test_set_eval_on_human_runs.py so results can be compared side-by-side.
 
 Usage
 -----
-    # Evaluate on val set (default):
-    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py
+Required arguments (must always be specified):
+  --model-path   Path to the saved DSPy optimized model JSON
+  --model-name   LM to use for inference  (e.g. azure/gpt-4.1)
+  --split-file   Path to the train/val/test split JSON
+
+Optional arguments (sensible repo-relative defaults):
+  --temperature       Inference temperature (default: 0.1)
+  --reasoning-effort  Reasoning effort for reasoning models: low|medium|high (default: None)
+  --image-dir         Default: data/dca_data/image_pairs
+  --gt-dir       Default: data/dca_data/image_pairs_llm_output_exp1
+  --output-dir   Default: <this script's dir>/eval_results/optimized_prompt_runs
+
+RUN_KEY and RUN_LABEL are automatically derived from --model-path and
+--model-name, so you never need to edit them manually.
+
+Output layout (all under --output-dir):
+  eval_results/optimized_prompt_runs/
+  ├── eval_results_<run_key>_val.json   ← all runs merged, includes per_pair
+  └── eval_results_<run_key>_test.json
+
+Examples
+--------
+    # Evaluate on test set (default):
+    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
+        --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
+        --model-name azure/gpt-4.1 \\
+        --split-file .cache/dca_split_seed42.json
+
+    # Evaluate on val set:
+    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
+        --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
+        --model-name azure/gpt-4.1 \\
+        --split-file .cache/dca_split_seed42.json \\
+        --which-set val
 
     # Evaluate on both val and test:
-    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py --which-set both
-
-    # Use a specific saved model:
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
-        --model-path .cache/gpt-4.1-mini_MIPROv2_DCA_Light_dca_optimized_2026032517.json
+        --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
+        --model-name azure/gpt-4.1 \\
+        --split-file .cache/dca_split_seed42.json \\
+        --which-set both
 
-    # Skip LLM judge (rule-based change score only):
-    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py --skip-llm
+    # Use a different temperature:
+    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
+        --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
+        --model-name azure/gpt-4.1 \\
+        --split-file .cache/dca_split_seed42.json \\
+        --temperature 0.0
 
-    # Overwrite existing outputs:
-    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py --overwrite
+    # Overwrite an existing run:
+    python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
+        --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
+        --model-name azure/gpt-4.1 \\
+        --split-file .cache/dca_split_seed42.json \\
+        --overwrite
 """
 
 from __future__ import annotations
@@ -59,11 +99,7 @@ if str(REPO_ROOT) not in sys.path:
 import dspy
 import numpy as np
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
-from config import create_lm, DEFAULT_MODEL_NAME, AZURE_API_KEY
+from config import create_lm, AZURE_API_KEY
 from signatures.dca import DCAImageComparison
 from evaluation.dca_metric import (
     FIELD_WEIGHT_CLS,
@@ -75,32 +111,62 @@ from evaluation.dca_metric import (
 )
 
 # ---------------------------------------------------------------------------
-# Defaults
+# Defaults for paths that are fixed by repo layout (no need to pass every run)
 # ---------------------------------------------------------------------------
-DEFAULT_MODEL_PATH = REPO_ROOT / ".cache" / "gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json"
-DEFAULT_SPLIT_FILE = REPO_ROOT / ".cache" / "dca_split_seed42.json"
-DEFAULT_IMAGE_DIR  = REPO_ROOT / "data" / "dca_data" / "image_pairs"
-DEFAULT_GT_DIR     = REPO_ROOT / "data" / "dca_data" / "image_pairs_llm_output_exp1"
-OUTPUT_DIR         = SCRIPT_DIR / "eval_results"
-
-RUN_KEY   = "miprov2_light_gpt41_2026032716_run_using_gpt41"
-RUN_LABEL = "MIPROv2-Light/GPT-4.1_2026032716_run_using_gpt41"
-
+DEFAULT_IMAGE_DIR   = REPO_ROOT / "data" / "dca_data" / "image_pairs"
+DEFAULT_GT_DIR      = REPO_ROOT / "data" / "dca_data" / "image_pairs_llm_output_exp1"
+DEFAULT_OUTPUT_DIR  = SCRIPT_DIR / "eval_results" / "optimized_prompt_runs"
+DEFAULT_TEMPERATURE = 0.1
 
 # ---------------------------------------------------------------------------
-# Infer the inference model name from the optimized-model filename.
-# Convention: <model>_<Strategy>_dca_optimized_<timestamp>.json
-# e.g. gpt-4.1-mini_MIPROv2_DCA_Light_dca_optimized_2026032517.json → azure/gpt-4.1-mini
+# Derive RUN_KEY and RUN_LABEL from the model filename + inference model name.
+#
+# Filename convention:
+#   {train_model}_{Strategy}_dca_optimized_{timestamp}.json
+#   e.g. gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json
+#
+# Produces:
+#   run_key   → "miprov2_dca_light_gpt41_2026032716_run_gpt41"
+#   run_label → "MIPROv2-DCA-Light/gpt-4.1_2026032716_run_gpt-4.1"
 # ---------------------------------------------------------------------------
 
-def _infer_model_name_from_path(path: Path) -> Optional[str]:
-    """Return 'azure/<model>' extracted from the filename, or None if unparseable."""
-    stem = path.stem  # strip .json extension
+def _derive_run_ids(model_path: Path, inference_model_name: str) -> tuple[str, str]:
+    """Return (run_key, run_label) derived from the model filename and inference model."""
+    stem = model_path.stem  # e.g. gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716
+
+    train_model = strategy = timestamp = None
     for marker in ["_MIPROv2_", "_GEPA_", "_SimBA_", "_Bootstrap_"]:
         idx = stem.find(marker)
         if idx > 0:
-            return f"azure/{stem[:idx]}"
-    return None
+            train_model = stem[:idx]                                 # gpt-4.1
+            strategy_prefix = marker[1:-1]                           # MIPROv2
+            remainder = stem[idx + len(marker):]                     # DCA_Light_dca_optimized_2026032716
+            opt_marker = "_dca_optimized_"
+            opt_idx = remainder.find(opt_marker)
+            if opt_idx >= 0:
+                strategy_suffix = remainder[:opt_idx]                # DCA_Light
+                timestamp = remainder[opt_idx + len(opt_marker):]    # 2026032716
+                strategy = f"{strategy_prefix}_{strategy_suffix}"    # MIPROv2_DCA_Light
+            else:
+                strategy = strategy_prefix
+                timestamp = remainder
+            break
+
+    # Inference model display name — strip "azure/" prefix
+    inf_display = inference_model_name.split("/")[-1] if "/" in inference_model_name else inference_model_name
+
+    if train_model is None:
+        # Filename doesn't match convention — fall back to stem + model name
+        key = stem.lower().replace("-", "").replace(".", "") + f"_run_{inf_display.replace('-', '').replace('.', '')}"
+        label = f"{stem}_run_{inf_display}"
+        return key, label
+
+    def _slug(s: str) -> str:
+        return s.lower().replace("-", "").replace(".", "")
+
+    run_key   = f"{_slug(strategy)}_{_slug(train_model)}_{timestamp}_run_{_slug(inf_display)}"
+    run_label = f"{strategy.replace('_', '-')}/{train_model}_{timestamp}_run_{inf_display}"
+    return run_key, run_label
 
 
 # ---------------------------------------------------------------------------
@@ -309,8 +375,8 @@ def evaluate_predictions(
 
 def aggregate_results(
     per_pair: list[dict],
-    run_key: str = RUN_KEY,
-    run_label: str = RUN_LABEL,
+    run_key: str,
+    run_label: str,
 ) -> dict:
     """Aggregate per-pair scores into a run-level result dict (same format as evaluate_run)."""
     valid = [p for p in per_pair if not p.get("missing")]
@@ -349,112 +415,6 @@ def aggregate_results(
         "change_source_counts": source_counts,
         "per_pair":             per_pair,
     }
-
-
-# ---------------------------------------------------------------------------
-# Plotting
-# ---------------------------------------------------------------------------
-
-def plot_all(results: list[dict], output_dir: Path, n_pairs: int, set_name: str = "val") -> None:
-    """Generate and save score, efficiency, and heatmap plots for optimized-prompt runs."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-    set_label = set_name.capitalize()
-    run_labels = [r.get("label", r["run"]) for r in results]
-    x = np.arange(len(results))
-    bar_w = 0.5
-
-    # ── Figure 1: Score metrics (3 subplots) ─────────────────────────────────
-    fig1, axes1 = plt.subplots(3, 1, figsize=(max(8, len(results) * 2.5), 12))
-    fig1.suptitle(
-        f"DCA Optimized Prompt Evaluation — {set_label} Set (n={n_pairs})",
-        fontsize=11, fontweight="bold",
-    )
-    for ax, key, title, ylabel in [
-        (axes1[0], "avg_total_score",  "Total Score  (0.6 × Classification + 0.4 × Change)", "Avg Total Score"),
-        (axes1[1], "avg_cls_score",    "Classification Score  (discard_image correct?)",      "Avg Cls Score"),
-        (axes1[2], "avg_change_score", "Change Score  (judge F-beta, precision-60/recall-40)", "Avg Change Score"),
-    ]:
-        values = [(r.get(key) or 0.0) for r in results]
-        ax.bar(x, values, width=bar_w, color="#4CAF50", edgecolor="white", linewidth=0.5)
-        ax.set_xticks(x)
-        ax.set_xticklabels(run_labels, fontsize=8, rotation=20, ha="right")
-        ax.set_ylabel(ylabel, fontsize=9)
-        ax.set_title(title, fontsize=10, fontweight="bold")
-        ax.set_ylim(0, 1.10)
-        ax.yaxis.grid(True, alpha=0.4, linestyle="--")
-        ax.set_axisbelow(True)
-        for xi, v in zip(x, values):
-            if v > 0:
-                ax.text(xi, v + 0.01, f"{v:.3f}", ha="center", va="bottom", fontsize=8)
-    fig1.tight_layout()
-    p = output_dir / "scores.png"
-    fig1.savefig(p, dpi=150, bbox_inches="tight")
-    plt.close(fig1)
-    print(f"  Saved: {p}")
-
-    # ── Figure 2: Efficiency metrics ─────────────────────────────────────────
-    fig2, axes2 = plt.subplots(2, 1, figsize=(max(8, len(results) * 2.5), 8))
-    fig2.suptitle(
-        f"DCA Optimized — Response Time & Token Usage — {set_label} Set (n={n_pairs})",
-        fontsize=11, fontweight="bold",
-    )
-    for ax, key, title, ylabel in [
-        (axes2[0], "avg_response_time", "Avg Response Time per Pair  (seconds)", "Seconds"),
-        (axes2[1], "avg_total_tokens",  "Avg Total Tokens per Pair  (prompt + completion)", "Tokens"),
-    ]:
-        values = [(r.get(key) or 0.0) for r in results]
-        ax.bar(x, values, width=bar_w, color="#42A5F5", edgecolor="white", linewidth=0.5)
-        ax.set_xticks(x)
-        ax.set_xticklabels(run_labels, fontsize=8, rotation=20, ha="right")
-        ax.set_ylabel(ylabel, fontsize=9)
-        ax.set_title(title, fontsize=10, fontweight="bold")
-        ax.yaxis.grid(True, alpha=0.4, linestyle="--")
-        ax.set_axisbelow(True)
-        for xi, v in zip(x, values):
-            if v > 0:
-                ax.text(xi, v + ax.get_ylim()[1] * 0.01, f"{v:.1f}", ha="center", va="bottom", fontsize=8)
-    fig2.tight_layout()
-    p = output_dir / "efficiency_metrics.png"
-    fig2.savefig(p, dpi=150, bbox_inches="tight")
-    plt.close(fig2)
-    print(f"  Saved: {p}")
-
-    # ── Figure 3: Summary heatmap ─────────────────────────────────────────────
-    metric_names = ["Total Score", "Cls Score", "Change Score", "Avg Time (s)", "Avg Tokens (k)"]
-    data_matrix = []
-    for r in results:
-        data_matrix.append([
-            r.get("avg_total_score")   or 0.0,
-            r.get("avg_cls_score")     or 0.0,
-            r.get("avg_change_score")  or 0.0,
-            r.get("avg_response_time") or 0.0,
-            (r.get("avg_total_tokens") or 0.0) / 1000.0,
-        ])
-    data_arr = np.array(data_matrix, dtype=float)
-
-    normed = np.zeros_like(data_arr)
-    for c in range(data_arr.shape[1]):
-        col = data_arr[:, c]
-        span = col.max() - col.min()
-        normed[:, c] = (col - col.min()) / span if span > 0 else np.zeros_like(col)
-
-    fig3, ax3 = plt.subplots(figsize=(10, max(4, len(results) * 0.6)))
-    fig3.suptitle("DCA Optimized — Summary Heatmap (All Runs × Metrics)",
-                  fontsize=11, fontweight="bold")
-    ax3.imshow(normed, aspect="auto", cmap="RdYlGn", vmin=0, vmax=1)
-    ax3.set_xticks(range(len(metric_names)))
-    ax3.set_xticklabels(metric_names, fontsize=9)
-    ax3.set_yticks(range(len(results)))
-    ax3.set_yticklabels(run_labels, fontsize=8)
-    for ri, row in enumerate(data_matrix):
-        for ci, v in enumerate(row):
-            txt = f"{v:.3f}" if ci < 3 else (f"{v:.1f}" if ci == 3 else f"{v:.2f}k")
-            ax3.text(ci, ri, txt, ha="center", va="center", fontsize=7, color="black")
-    fig3.tight_layout()
-    p = output_dir / "summary_heatmap.png"
-    fig3.savefig(p, dpi=150, bbox_inches="tight")
-    plt.close(fig3)
-    print(f"  Saved: {p}")
 
 
 # ---------------------------------------------------------------------------
@@ -502,58 +462,57 @@ def main():
     parser = argparse.ArgumentParser(
         description="Evaluate MIPROv2-optimized DCA model on val/test splits."
     )
-    parser.add_argument("--model-path",  type=Path, default=DEFAULT_MODEL_PATH,
-                        help="Path to saved DSPy optimized model JSON")
-    parser.add_argument("--model-name",  type=str, default=None,
-                        help="Override LM name for inference (default: MODEL_NAME from .env)")
-    parser.add_argument("--split-file",  type=Path, default=DEFAULT_SPLIT_FILE)
+    parser.add_argument("--model-path",  type=Path, required=True,
+                        help="Path to saved DSPy optimized model JSON  (e.g. .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json)")
+    parser.add_argument("--model-name",  type=str, required=True,
+                        help="LM to use for inference  (e.g. azure/gpt-4.1)")
+    parser.add_argument("--split-file",  type=Path, required=True,
+                        help="Path to train/val/test split JSON  (e.g. .cache/dca_split_seed42.json)")
+    parser.add_argument("--temperature",  type=float, default=DEFAULT_TEMPERATURE,
+                        help=f"Inference temperature (default: {DEFAULT_TEMPERATURE})")
     parser.add_argument("--image-dir",   type=Path, default=DEFAULT_IMAGE_DIR)
     parser.add_argument("--gt-dir",      type=Path, default=DEFAULT_GT_DIR)
-    parser.add_argument("--output-dir",  type=Path, default=OUTPUT_DIR)
-    parser.add_argument("--which-set",   type=str, choices=["val", "test", "both"], default="val",
-                        help="Which split to evaluate (default: val)")
+    parser.add_argument("--output-dir",  type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--which-set",   type=str, choices=["val", "test", "both"], default="test",
+                        help="Which split to evaluate (default: test)")
     parser.add_argument("--skip-llm",    action="store_true",
                         help="Skip LLM judge; breakdown cases get change_score=None")
     parser.add_argument("--overwrite",   action="store_true",
                         help="Overwrite the current run's entry if it already exists in the results file")
-    parser.add_argument("--replot",      action="store_true",
-                        help="Load existing results JSON and re-generate plots only (no inference)")
-    parser.add_argument("--results-json", type=Path, default=None,
-                        help="Path to existing results JSON for --replot")
     parser.add_argument("--no-cot",      action="store_true",
                         help="Use dspy.Predict instead of dspy.ChainOfThought "
                              "(keeps few-shot demos + optimized instruction, removes reasoning step)")
+    parser.add_argument("--reasoning-effort", type=str, default=None,
+                        choices=["low", "medium", "high"],
+                        help="Reasoning effort for o-series / reasoning models (e.g. gpt-5). "
+                             "Passed to create_lm as reasoning_effort kwarg.")
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     use_llm = not args.skip_llm
     no_cot  = args.no_cot
 
+    # Derive run_key and run_label from the model path and inference model name.
+    run_key, run_label = _derive_run_ids(args.model_path, args.model_name)
+    model_name = args.model_name
+
+    # Append reasoning effort suffix so different efforts don't collide
+    if args.reasoning_effort:
+        re_suffix_key   = f"_re{args.reasoning_effort}"       # e.g. _relow
+        re_suffix_label = f" (RE={args.reasoning_effort})"    # e.g. (RE=low)
+        run_key   += re_suffix_key
+        run_label += re_suffix_label
+
     if no_cot:
-        active_run_key   = RUN_KEY + "_nocot"
-        active_run_label = RUN_LABEL + " (no CoT)"
-        file_prefix      = "eval_results" + "_no_CoT_" + RUN_KEY
+        active_run_key   = run_key + "_nocot"
+        active_run_label = run_label + " (no CoT)"
+        file_prefix      = "eval_results_no_CoT_" + run_key
     else:
-        active_run_key   = RUN_KEY
-        active_run_label = RUN_LABEL
-        file_prefix      = "eval_results" + RUN_KEY
+        active_run_key   = run_key
+        active_run_label = run_label
+        file_prefix      = "eval_results_" + run_key
 
     sets_to_run = ["val", "test"] if args.which_set == "both" else [args.which_set]
-
-    # ── Replot mode ───────────────────────────────────────────────────────────
-    if args.replot:
-        for set_name in sets_to_run:
-            results_file = args.results_json or (args.output_dir / f"{file_prefix}_{set_name}.json")
-            if not results_file.exists():
-                print(f"[ERROR] --replot: results file not found: {results_file}")
-                sys.exit(1)
-            data = json.loads(results_file.read_text(encoding="utf-8"))
-            n_pairs  = data["meta"].get("n_pairs", 0)
-            set_lbl  = data["meta"].get("which_set", set_name)
-            results  = data["results"]
-            print(f"Replotting {len(results)} run(s) from {results_file.name} …")
-            plot_all(results, args.output_dir / f"opt_{set_lbl}", n_pairs, set_name=set_lbl)
-        return
 
     # ── Guard: abort if the current run_key already exists and --overwrite not set ──
     if not args.overwrite:
@@ -572,23 +531,14 @@ def main():
         print(f"[ERROR] Model file not found: {args.model_path}")
         sys.exit(1)
 
-    # Determine which model to use for inference.
-    # Priority: 1) --model-name arg  2) model name inferred from filename  3) MODEL_NAME from .env
-    if args.model_name:
-        model_name = args.model_name
-        model_source = "--model-name arg"
-    else:
-        inferred = _infer_model_name_from_path(args.model_path)
-        if inferred:
-            model_name = inferred
-            model_source = f"inferred from filename ({args.model_path.name})"
-        else:
-            model_name = DEFAULT_MODEL_NAME
-            model_source = f"MODEL_NAME from .env  [WARNING: could not infer from filename — verify this matches the model used during optimization]"
+    lm_kwargs = {}
+    if args.reasoning_effort is not None:
+        lm_kwargs["reasoning_effort"] = args.reasoning_effort
 
-    print(f"Inference LM : {model_name}  ({model_source})")
-    print(f"              cache=False, temperature=0.1")
-    lm = create_lm(model_name, cache=False, temperature=0.1)
+    print(f"Inference LM : {model_name}  (--model-name)")
+    print(f"              cache=False, temperature={args.temperature}"
+          + (f", reasoning_effort={args.reasoning_effort}" if args.reasoning_effort else ""))
+    lm = create_lm(model_name, cache=False, temperature=args.temperature, **lm_kwargs)
     dspy.configure(lm=lm)
 
     mode_label = "Predict (no CoT — few-shots only)" if no_cot else "ChainOfThought (few-shots + reasoning)"
@@ -648,41 +598,33 @@ def main():
         result = aggregate_results(per_pair_eval, run_key=active_run_key, run_label=active_run_label)
 
         # Attach per-run model provenance directly to the result entry
-        result["model_path"] = str(args.model_path)
-        result["model_name"] = model_name
-        result["no_cot"]     = no_cot
+        result["model_path"]        = str(args.model_path)
+        result["model_name"]        = model_name
+        result["temperature"]       = args.temperature
+        result["reasoning_effort"]  = args.reasoning_effort
+        result["no_cot"]            = no_cot
 
-        # ── Load existing JSONs and merge by run key ──────────────────────────
-        summary_path = args.output_dir / f"{file_prefix}_{set_name}.json"
-        full_path    = args.output_dir / f"{file_prefix}_full_{set_name}.json"
+        # ── Load existing JSON and merge by run key ───────────────────────────
+        results_path = args.output_dir / f"{file_prefix}_{set_name}.json"
 
-        old_run_order:        list[str]       = []
-        existing_summary_map: dict[str, dict] = {}
-        existing_full_map:    dict[str, dict] = {}
+        old_run_order:     list[str]       = []
+        existing_runs_map: dict[str, dict] = {}
 
-        if summary_path.exists():
-            _old = json.loads(summary_path.read_text(encoding="utf-8"))
+        if results_path.exists():
+            _old = json.loads(results_path.read_text(encoding="utf-8"))
             for r in _old.get("results", []):
                 old_run_order.append(r["run"])
-                existing_summary_map[r["run"]] = r
-
-        if full_path.exists():
-            _old_full = json.loads(full_path.read_text(encoding="utf-8"))
-            for r in _old_full.get("results", []):
-                existing_full_map[r["run"]] = r
+                existing_runs_map[r["run"]] = r
 
         # New result overrides matching old entry; all others are preserved
-        r_clean = {k: v for k, v in result.items() if k != "per_pair"}
-        existing_summary_map[active_run_key] = r_clean
-        existing_full_map[active_run_key]    = result
+        existing_runs_map[active_run_key] = result
 
         # Preserve original order, append truly new run at the end
         merged_run_names: list[str] = list(old_run_order)
         if active_run_key not in merged_run_names:
             merged_run_names.append(active_run_key)
 
-        merged_summary = [existing_summary_map[r] for r in merged_run_names if r in existing_summary_map]
-        merged_full    = [existing_full_map[r]    for r in merged_run_names if r in existing_full_map]
+        merged_results = [existing_runs_map[r] for r in merged_run_names if r in existing_runs_map]
 
         # ── File-level meta (not run-specific) ───────────────────────────────
         saved_meta = {
@@ -695,23 +637,17 @@ def main():
             "runs":                merged_run_names,
         }
 
-        summary_path.write_text(
-            json.dumps({"meta": saved_meta, "results": merged_summary}, indent=2, ensure_ascii=False),
+        results_path.write_text(
+            json.dumps({"meta": saved_meta, "results": merged_results}, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
-        print(f"\nResults JSON  -> {summary_path}  ({len(merged_summary)} run(s) total)")
-
-        full_path.write_text(
-            json.dumps({"meta": saved_meta, "results": merged_full}, indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
-        print(f"Full results  -> {full_path}  ({len(merged_full)} run(s) total)")
+        print(f"\nResults JSON  -> {results_path}  ({len(merged_results)} run(s) total)")
 
         # ── Summary table (all merged runs) ──────────────────────────────────
         print(f"\n{'='*100}")
         print(f"{'Run':<42} {'Cls':>6} {'Chg':>6} {'Tot':>6} {'Time(s)':>8} {'Tokens':>8} {'n_eval':>7}")
         print(f"{'-'*100}")
-        for r in merged_summary:
+        for r in merged_results:
             c  = f"{r['avg_cls_score']:.3f}"    if r.get('avg_cls_score')    is not None else "N/A"
             ch = f"{r['avg_change_score']:.3f}" if r.get('avg_change_score') is not None else "N/A"
             t  = f"{r['avg_total_score']:.3f}"  if r.get('avg_total_score')  is not None else "N/A"
@@ -724,11 +660,6 @@ def main():
             rsn = f"{r['avg_reasoning_tokens']:.0f}" if r.get('avg_reasoning_tokens') is not None else "N/A"
             print(f"    tok breakdown: input={inp}  output={out}  reasoning={rsn}")
         print(f"{'='*100}")
-
-        # ── Plots from all merged runs ────────────────────────────────────────
-        out_plot_dir = args.output_dir / f"opt_{set_name}"
-        print("\nGenerating plots …")
-        plot_all(merged_summary, out_plot_dir, len(pair_names), set_name=set_name)
 
     for set_name in sets_to_run:
         _run_set(set_name)

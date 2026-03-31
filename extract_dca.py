@@ -319,20 +319,9 @@ train_set, val_set, test_set = stratified_split_dca_dataset(
 
 val_names  = _pair_names(val_set)
 test_names = _pair_names(test_set)
-val_names  = _pair_names(val_set)
-test_names = _pair_names(test_set)
 
 split_ts = datetime.now().strftime("%Y%m%d%H%M%S")
 
-split_manifest = {
-    "created_at": datetime.now().isoformat(timespec="seconds"),
-    "seed": split_seed,
-    "stratify_by": ["expected_discard_image","expected_human_label_category","doubt"],
-    "ratios": {"train": 0.6, "val": 0.2, "test": 0.2},
-    "total_examples": len(dataset),
-    "val":  {"count": len(val_names),  "pair_names": val_names},
-    "test": {"count": len(test_names), "pair_names": test_names},
-}
 split_manifest = {
     "created_at": datetime.now().isoformat(timespec="seconds"),
     "seed": split_seed,
