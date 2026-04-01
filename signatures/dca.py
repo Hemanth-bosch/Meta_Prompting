@@ -61,5 +61,4 @@ class DCAImageComparison(dspy.Signature):
             "Return 'One image informational and other non-informational: <description of informational content>' if one image is informational and the other is non-informational. For example, 'Image 1 contains a table with 3 rows and 2 columns with headers X and Y, while Image 2 contains only a logo'. "
             "Return 'Images are identical - no changes' if both images are informational but only trivial differences exist (layout/resize/resolution/quality/watermark/punctuation-only/no content impact). "
             "Return 'OVERVIEW: <brief summary of what changed between Image 1 and Image 2> | DETAILS (Each Change): 1) <location/area/section>: <what changed, quoting original and updated content>; 2) <location>: <what changed>; ...' if both images are informational and meaningful differences exist, describe all observable changes using the format."
-            #TODO: Fixed typos and added prompt for when both images are informational and meaningful differences exist
     )

@@ -116,7 +116,6 @@ def stratified_split_yanase_dataset(dataset: List[dspy.Example],
     # Apply downsampling if max_examples_per_seller is specified
     original_total = sum(len(examples) for examples in groups.values())
 
-    #TODO: CREATE SEPERATE STRATIFY FOR DCA 
     if max_examples_per_seller is not None:
         balanced_groups = {}
         downsampled_groups = []

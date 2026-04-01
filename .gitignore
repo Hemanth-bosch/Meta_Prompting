@@ -10,10 +10,7 @@ DS_Store
 data/*                                                                                                                                                                                                  
 !data/.gitkeep
 !data/README.md
-!data/dca_data/
 data/dca_data/*
-!data/dca_data/.gitkeep
-!data/dca_data/README.md
 
 # Log files
 log/

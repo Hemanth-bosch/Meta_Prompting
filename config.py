@@ -34,7 +34,6 @@ REQUESTS_CA_BUNDLE = dotenv.get_key(_dotenv_file, "REQUESTS_CA_BUNDLE") or os.ge
 DEFAULT_MODEL_NAME = dotenv.get_key(_dotenv_file, "MODEL_NAME")
 REFLECTION_MODEL_NAME = dotenv.get_key(_dotenv_file, "REFLECTION_LM_NAME")
 
-# TODO 
 DCA_JUDGE_MODEL_NAME = "gpt-4.1"  # LLM judge used in dca_metric.judge_summary_metric
 
 
