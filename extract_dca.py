@@ -333,19 +333,21 @@ if args.optimizer in ("bootstrap", "all"):
     custom_strategies.extend([
         create_bootstrap_strategy(
             name="Balanced_DCA_Bootstrap",
-            description="Balanced approach with equal labeled and bootstrapped demos",
-            max_labeled_demos=4,
-            max_bootstrapped_demos=4,
-            num_candidate_programs=16,
-            num_threads=4,
-            max_rounds=2,
+            description="Balanced approach with equal labeled and bootstrapped demos for DCA classification",
+            max_labeled_demos=4,        # Image context overhead; each demo adds tokens
+            max_bootstrapped_demos=4,   # Teacher-generated demos drawn from correct train predictions
+            num_candidate_programs=32,  # Random candidates to evaluate; more = better coverage
+            num_candidate_traces=(2,5), # Generate 2-5 candidate traces per example for bootstrapping
+            num_threads=4,              # Parallel LLM calls during candidate evaluation
+            max_rounds=2,               # Second round refines demo quality; >2 risks overfitting
         ),
         create_bootstrap_strategy(
             name="Label_Heavy_DCA_Bootstrap",
-            description="Label-heavy approach focusing on ground truth examples",
-            max_labeled_demos=6,
-            max_bootstrapped_demos=4,
-            num_candidate_programs=16,
+            description="Label-heavy approach focusing on ground truth examples for DCA classification",
+            max_labeled_demos=6,        # One extra human-verified example vs balanced variant
+            max_bootstrapped_demos=4,   # Fewer teacher demos to reduce noise risk
+            num_candidate_programs=32,  # Slightly more candidates for broader coverage
+            num_candidate_traces=(2,5), # Generate 2-5 candidate traces per example for bootstrapping
             num_threads=4,
             max_rounds=2,
         ),

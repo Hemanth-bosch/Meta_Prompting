@@ -264,11 +264,18 @@ def create_gepa_strategy(name: str, description: str, auto=None,
 
 
 def create_bootstrap_strategy(name: str, description: str, max_labeled_demos=None,
-                               max_bootstrapped_demos=None, num_threads=None,
-                               **bootstrap_params) -> OptimizationConfig:
-    """Helper function to create Bootstrap optimization strategies."""
+                            max_bootstrapped_demos=None, num_threads=None, num_candidate_traces=None,
+                            **bootstrap_params) -> OptimizationConfig:
+    """
+    Helper function to create Bootstrap optimization strategies with flexible interface.
+    """
+    # Add any additional Bootstrap-specific parameters
     optimizer_params = {}
     optimizer_params.update(bootstrap_params)
+
+    if num_candidate_traces is not None:
+        optimizer_params["num_candidate_traces"] = num_candidate_traces
+    
     return OptimizationConfig(
         name=name,
         description=description,
