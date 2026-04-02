@@ -146,35 +146,54 @@ else:  # "all"
 _log_prefix = f"{_model_display}_{_strategy_display}_{_cot_tag}{_re_tag}"
 
 # ── TeeLogger ────────────────────────────────────────────────────
-# Captures all stdout (including DSPy's print output) to a log file
-# while still printing to the terminal.
+# Captures all stdout AND stderr (including DSPy's logging output and tqdm
+# progress bars) to a log file while still printing to the terminal.
 _log_dir = "log"
 os.makedirs(_log_dir, exist_ok=True)
 _stdout_log_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}.log")
 
 
 class _TeeLogger:
-    """Redirect sys.stdout to both the terminal and a file simultaneously."""
+    """Redirect a stream (stdout or stderr) to both the terminal and a shared
+    log file simultaneously.
 
-    def __init__(self, filepath: str):
-        self._file = open(filepath, "a", encoding="utf-8")
-        self._stdout = sys.stdout
+    Parameters
+    ----------
+    original_stream:
+        The original stream object (``sys.stdout`` or ``sys.stderr``) to
+        forward writes to in addition to the file.
+    log_file:
+        An already-opened, writable text file object shared by both the
+        stdout- and stderr-tee instances (avoids opening the same path twice).
+    """
+
+    def __init__(self, original_stream, log_file):
+        self._original = original_stream
+        self._file = log_file
 
     def write(self, msg: str):
         self._file.write(msg)
-        self._stdout.write(msg)
+        self._file.flush()
+        self._original.write(msg)
 
     def flush(self):
         self._file.flush()
-        self._stdout.flush()
+        self._original.flush()
 
-    def close(self):
-        sys.stdout = self._stdout
-        self._file.close()
+    # Some libraries (e.g. subprocess, tqdm) check for ``fileno``.
+    def fileno(self):
+        return self._original.fileno()
+
+    def isatty(self):
+        return self._original.isatty()
 
 
-_tee = _TeeLogger(_stdout_log_path)
-sys.stdout = _tee
+# Open the log file once; share the handle between both tee instances.
+_log_file = open(_stdout_log_path, "a", encoding="utf-8")
+_tee_stdout = _TeeLogger(sys.stdout, _log_file)
+_tee_stderr = _TeeLogger(sys.stderr, _log_file)
+sys.stdout = _tee_stdout
+sys.stderr = _tee_stderr
 
 # ── Logging Setup ────────────────────────────────────────────────
 _log_fmt = logging.Formatter(
@@ -183,7 +202,10 @@ _log_fmt = logging.Formatter(
 )
 _file_handler = logging.FileHandler(_stdout_log_path, encoding="utf-8")
 _file_handler.setFormatter(_log_fmt)
-_console_handler = logging.StreamHandler()
+# Use the original stderr (before the tee replaced it) so log records go to
+# the terminal only via the console handler.  The file handler handles writing
+# to the log file directly, avoiding double-writes.
+_console_handler = logging.StreamHandler(_tee_stderr._original)
 _console_handler.setFormatter(_log_fmt)
 
 # Root logger: WARNING only (suppresses LiteLLM / httpcore / httpx noise)
@@ -192,6 +214,11 @@ logging.basicConfig(level=logging.WARNING, handlers=[_file_handler, _console_han
 # Project namespaces: DEBUG + INFO
 for _ns in ("extract_dca", "dca.data_loading", "dca"):
     logging.getLogger(_ns).setLevel(logging.DEBUG)
+
+# DSPy creates its StreamHandler lazily (on first optimizer call), at which
+# point sys.stderr is already our tee — so DSPy's own handler already writes
+# to the log file via the tee.  Do NOT add _file_handler to the dspy logger;
+# doing so would cause every DSPy log record to appear twice in the file.
 
 _run_logger = logging.getLogger("extract_dca")
 _run_logger.info("DCA optimization run started -- log file: %s", _stdout_log_path)
@@ -244,7 +271,9 @@ print(f"{'='*80}\n")
 dataset = load_dca_dataset(pairs_dir, gt_dir)
 if len(dataset) == 0:
     print("ERROR: No valid DCA image pairs found. Check your data paths.")
-    _tee.close()
+    sys.stdout = _tee_stdout._original
+    sys.stderr = _tee_stderr._original
+    _log_file.close()
     exit(1)
 
 split_seed = 42
@@ -359,8 +388,8 @@ if args.optimizer in ("miprov2", "all"):
             name=f"MIPROv2_DCA_{args.miprov2_auto.capitalize()}",
             description=f"MIPROv2 ({args.miprov2_auto}) -- Bayesian instruction + demo search",
             auto=args.miprov2_auto,
-            max_labeled_demos=3,
-            max_bootstrapped_demos=3,
+            max_labeled_demos=6,
+            max_bootstrapped_demos=6,
             num_threads=4,
         ),
     )
@@ -434,7 +463,7 @@ if args.save_model:
     os.makedirs(cache_dir, exist_ok=True)
     model_path = os.path.join(
         cache_dir,
-        f"{model_name}_{best_strategy_name}_{cot_tag}{re_tag}_dca_optimized_{current_time}.json",
+        f"{model_name}_{best_strategy_name}_{cot_tag}{re_tag}_dca_optimized_max_labelled_6_bootstrapped_6_{current_time}.json",
     )
     optimized_comparator.save(model_path)
     print(f"\nSaved optimized model to: {model_path}")
@@ -447,7 +476,9 @@ print(f"{'='*80}\n")
 # ── Close TeeLogger and rename log to match saved model ──────────
 # For runs where a model was saved, rename the log file to share the same
 # base name as the model JSON (easy to find the log for a given model file).
-_tee.close()
+sys.stdout = _tee_stdout._original
+sys.stderr = _tee_stderr._original
+_log_file.close()
 if model_path is not None:
     model_stem = os.path.splitext(os.path.basename(model_path))[0]
     final_log_path = os.path.join(_log_dir, f"{model_stem}.log")

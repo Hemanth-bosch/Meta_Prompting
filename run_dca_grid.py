@@ -39,12 +39,13 @@ from itertools import product
 MODELS = [
     # (model_name,            reasoning_effort)
     # ("azure/gpt-4.1",         None),
-    # ("azure/gpt-4.1-mini",    None),
-    ("azure/gpt-5-mini",      "low"),   # reasoning model → pass reasoning_effort
+    ("azure/gpt-4.1-mini",    None),
+    # ("azure/gpt-5-mini",      "low"),   # reasoning model → pass reasoning_effort
 ]
 
-INTENSITIES = ["heavy", 
-            #    "medium"
+INTENSITIES = [
+                # "heavy", 
+               "light"
                ]   # MIPROv2 --miprov2-auto
 
 COT_MODES = [
