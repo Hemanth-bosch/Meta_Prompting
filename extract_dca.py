@@ -220,6 +220,38 @@ for _ns in ("extract_dca", "dca.data_loading", "dca"):
 # to the log file via the tee.  Do NOT add _file_handler to the dspy logger;
 # doing so would cause every DSPy log record to appear twice in the file.
 
+# ── Truncation Inspector ─────────────────────────────────────────
+# Whenever DSPy emits a "LM response was truncated" WARNING, immediately
+# dump the last LM interaction (prompt + full truncated response) to the log
+# so we can see exactly what the model was generating and why it hit the limit.
+
+class _TruncationInspectorHandler(logging.Handler):
+    """On every truncation WARNING from dspy.clients.lm, log the LM history."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        if record.levelno != logging.WARNING:
+            return
+        if "LM response was truncated" not in record.getMessage():
+            return
+        try:
+            history_text = dspy.inspect_history(n=1)
+        except Exception as exc:
+            history_text = f"<could not retrieve history: {exc}>"
+
+        _log_file.write(
+            "\n" + "=" * 80 + "\n"
+            "[TRUNCATION INSPECTOR] Last LM interaction that hit max_tokens:\n"
+            + "=" * 80 + "\n"
+            + (history_text or "<empty history>")
+            + "\n" + "=" * 80 + "\n\n"
+        )
+        _log_file.flush()
+
+
+_trunc_inspector = _TruncationInspectorHandler()
+_trunc_inspector.setLevel(logging.WARNING)
+logging.getLogger("dspy.clients.lm").addHandler(_trunc_inspector)
+
 _run_logger = logging.getLogger("extract_dca")
 _run_logger.info("DCA optimization run started -- log file: %s", _stdout_log_path)
 
