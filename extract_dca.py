@@ -118,12 +118,31 @@ parser.add_argument("--reasoning-effort", type=str, default=None,
                          "Passed to the LM as reasoning_effort kwarg. (default: None)")
 parser.add_argument("--no-cot", action="store_true", default=False,
                     help="Use dspy.Predict instead of dspy.ChainOfThought (no reasoning scratchpad)")
+parser.add_argument("--max-labeled-demos", type=int, default=6,
+                    help="Max labeled (human) demos passed to MIPROv2 (default: 6)")
+parser.add_argument("--max-bootstrapped-demos", type=int, default=6,
+                    help="Max bootstrapped demos passed to MIPROv2 (default: 6)")
+parser.add_argument("--initial-instruction-file", type=str, default=None,
+                    help="Path to a .md/.txt file whose content replaces the default signature "
+                         "instruction before optimization starts (e.g. human_prompts/v1_prompt_midas.md)")
+parser.add_argument("--clear-field-descs", action="store_true", default=False,
+                    help="Clear all field desc strings before optimization so MIPROv2 "
+                         "sees only the instruction block (works with or without --initial-instruction-file)")
+parser.add_argument("--run-timestamp", type=str, default=None,
+                    help="Pre-generated timestamp (YYYYmmddHHMMSS) supplied by the grid runner to "
+                         "guarantee uniqueness across parallel runs. Falls back to datetime.now() "
+                         "when running extract_dca.py directly.")
 
 args = parser.parse_args()
 
+# Central flag — purely driven by the explicit switch
+_should_clear_descs: bool = args.clear_field_descs
+
 # ── Timestamp ────────────────────────────────────────────────────
 # Set once here so the log file and saved model share the same timestamp.
-current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+# When launched from run_dca_grid.py each run receives a pre-generated unique
+# timestamp via --run-timestamp so parallel runs don't collide.
+current_time = args.run_timestamp if args.run_timestamp else datetime.now().strftime("%Y%m%d%H%M%S")
 
 # ── Log filename prefix ───────────────────────────────────────────
 # Compute the same prefix that the saved model will use, so the log file
@@ -143,7 +162,11 @@ elif args.optimizer == "simba":
     _strategy_display = f"SimBA_DCA_Steps{args.simba_max_steps}"
 else:  # "all"
     _strategy_display = "All"
-_log_prefix = f"{_model_display}_{_strategy_display}_{_cot_tag}{_re_tag}"
+_demo_tag   = f"_d{args.max_labeled_demos}b{args.max_bootstrapped_demos}"
+_instr_tag  = ("_" + os.path.splitext(os.path.basename(args.initial_instruction_file))[0]
+               if args.initial_instruction_file else "")
+_cfd_tag    = "_cfd" if args.clear_field_descs else ""
+_log_prefix = f"{_model_display}_{_strategy_display}_{_cot_tag}{_re_tag}{_demo_tag}{_instr_tag}{_cfd_tag}"
 
 # ── TeeLogger ────────────────────────────────────────────────────
 # Captures all stdout AND stderr (including DSPy's logging output and tqdm
@@ -293,6 +316,9 @@ _opt_detail = {
 print(f"  Optimizer: {args.optimizer} ({_opt_detail})")
 print(f"  Load extractor: {args.load_extractor if not args.skip_load else 'No'}")
 print(f"  Save model: {args.save_model}")
+print(f"  Initial instruction: {args.initial_instruction_file or '(signature docstring)'}")
+print(f"  Clear field descs: {args.clear_field_descs}")
+print(f"  Max labeled demos: {args.max_labeled_demos}  |  Max bootstrapped demos: {args.max_bootstrapped_demos}")
 print(f"\n Data Paths:")
 print(f"  Image pairs: {pairs_dir}")
 print(f"  Ground truth: {gt_dir}")
@@ -371,6 +397,55 @@ if not args.skip_load:
 else:
     print("Skipping extractor loading (--skip-load)\n")
 
+# ── Inject initial instruction from file (e.g. human-written prompt) ─────────
+# Replaces the default signature docstring instruction so MIPROv2 optimizes
+# starting from this human prompt instead of the auto-generated one.
+if args.initial_instruction_file:
+    _instr_path = os.path.abspath(args.initial_instruction_file)
+    if not os.path.isfile(_instr_path):
+        print(f"[ERROR] --initial-instruction-file not found: {_instr_path}")
+        sys.exit(1)
+    with open(_instr_path, encoding="utf-8") as _fh:
+        _initial_instruction = _fh.read().strip()
+    comparator.signature = comparator.signature.with_instructions(_initial_instruction)
+    print(f"Initial instruction loaded from: {_instr_path}\n")
+
+if _should_clear_descs:
+    for _fname in list(comparator.signature.fields):
+        comparator.signature = comparator.signature.with_updated_fields(_fname, desc="")
+    print("Field descriptions cleared (--clear-field-descs).\n")
+
+# ── Verify seed instruction on the live signature object ─────────────────
+# Reads back from comparator.signature.instructions so we prove the object
+# MIPROv2 will receive already contains the human prompt, not the class docstring.
+# Also prints field descriptions — those are fixed (MIPROv2 doesn't touch them)
+# but are always part of every LLM call.
+_live_instruction = comparator.signature.instructions
+print(f"\n{'='*80}")
+print("[SEED INSTRUCTION VERIFICATION] — full text read back from comparator.signature:")
+print(f"{'='*80}")
+print(_live_instruction)
+print(f"\n--- Field descriptions (cleared={_should_clear_descs}) ---")
+for fname, finfo in comparator.signature.fields.items():
+    _desc = getattr(finfo, "json_schema_extra", {}) or {}
+    _desc_str = _desc.get("desc", "") if isinstance(_desc, dict) else ""
+    _desc_display = _desc_str[:200] if _desc_str else "(empty)"
+    print(f"  [{fname}]  {_desc_display}")
+print(f"{'='*80}\n")
+if args.initial_instruction_file:
+    # Hard check: the live instruction must exactly match what we loaded from file
+    if _live_instruction.strip() != _initial_instruction.strip():
+        print("[ERROR] Seed instruction mismatch — live signature does not match the file content!")
+        sys.exit(1)
+    else:
+        print("[OK] Seed instruction verified: live signature matches the instruction file exactly.\n")
+
+# ── Save seed state (DSPy's own dump_state — same format as .save()) ─────────
+_seed_prompt_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}_seed_state.json")
+with open(_seed_prompt_path, "w", encoding="utf-8") as _fp:
+    json.dump(comparator.dump_state(), _fp, indent=2, ensure_ascii=False)
+print(f"Seed state saved   -> {_seed_prompt_path}\n")
+
 
 # ── Evaluation Setup ─────────────────────────────────────────────
 # dca_comparison_metric returns a weighted float 0-1:
@@ -420,8 +495,8 @@ if args.optimizer in ("miprov2", "all"):
             name=f"MIPROv2_DCA_{args.miprov2_auto.capitalize()}",
             description=f"MIPROv2 ({args.miprov2_auto}) -- Bayesian instruction + demo search",
             auto=args.miprov2_auto,
-            max_labeled_demos=6,
-            max_bootstrapped_demos=6,
+            max_labeled_demos=args.max_labeled_demos,
+            max_bootstrapped_demos=args.max_bootstrapped_demos,
             num_threads=4,
         ),
     )
@@ -480,6 +555,22 @@ print(f"{'='*80}")
 print(f"Best Strategy Val Score: {best_score:.1f}%")
 print(f"{'='*80}\n")
 
+# ── Print final optimized instruction so you can compare with the seed ─────
+_opt_instruction = getattr(optimized_comparator, "signature", None)
+if _opt_instruction is not None:
+    _opt_instruction = _opt_instruction.instructions
+print(f"{'='*80}")
+print("[OPTIMIZED INSTRUCTION] — final instruction produced by the optimizer:")
+print(f"{'='*80}")
+print(_opt_instruction or "<could not retrieve>")
+print(f"{'='*80}\n")
+
+# ── Save optimized state (DSPy's own dump_state — same format as .save()) ────
+_opt_prompt_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}_optimized_state.json")
+with open(_opt_prompt_path, "w", encoding="utf-8") as _fp:
+    json.dump(optimized_comparator.dump_state(), _fp, indent=2, ensure_ascii=False)
+print(f"Optimized state saved -> {_opt_prompt_path}\n")
+
 
 # ── Save Model ───────────────────────────────────────────────────
 # File naming: {model}_{strategy}_{cot}[_RE{effort}]_dca_optimized_{YYYYMMDDHHmmss}.json
@@ -493,9 +584,13 @@ re_tag  = f"_RE{args.reasoning_effort}" if args.reasoning_effort else ""
 model_path = None
 if args.save_model:
     os.makedirs(cache_dir, exist_ok=True)
+    demo_tag  = f"max_{args.max_labeled_demos}_{args.max_bootstrapped_demos}"
+    instr_tag = ("_" + os.path.splitext(os.path.basename(args.initial_instruction_file))[0]
+                 if args.initial_instruction_file else "")
+    cfd_tag   = "_cfd" if args.clear_field_descs else ""
     model_path = os.path.join(
         cache_dir,
-        f"{model_name}_{best_strategy_name}_{cot_tag}{re_tag}_dca_optimized_max_labelled_6_bootstrapped_6_{current_time}.json",
+        f"{model_name}_{best_strategy_name}_{cot_tag}{re_tag}_dca_optimized_{demo_tag}{instr_tag}{cfd_tag}_{current_time}.json",
     )
     optimized_comparator.save(model_path)
     print(f"\nSaved optimized model to: {model_path}")

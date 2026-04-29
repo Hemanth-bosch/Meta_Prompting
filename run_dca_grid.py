@@ -2,65 +2,76 @@
 DCA Optimization Grid Runner
 =============================
 
-Launches extract_dca.py sequentially for all 12 strategy combinations:
+Launches extract_dca.py with up to --parallel workers running simultaneously:
 
-  MIPROv2 intensity  : light, medium                   (2)
-  CoT mode           : CoT, NoCot                       (2)
-  Model              : gpt-4.1, gpt-4.1-mini, gpt-5-mini  (3)
+  MIPROv2 intensity  : light, medium                    (2)  [heavy excluded by default]
+  Demo config        : (max_labeled=6, max_bootstrapped=6)
+                       (max_labeled=3, max_bootstrapped=3) (2)
+  Model              : gpt-4.1, gpt-4.1-mini             (2)
+  CoT mode           : NoCot only                         (1)
   ──────────────────────────────────────────────────────────
-  Total              : 2 × 2 × 3 = 12 runs
+  Total              : 2 × 2 × 2 × 1 = 8 runs  (default)
 
-Each run saves its own optimized model and log file.
-Failed runs are skipped and reported at the end — the grid continues.
+Starting instruction: human prompt from
+  evaluation/dca_baseline_runs/human_prompts/v1_prompt_midas.md
 
 Usage:
-    uv run python run_dca_grid.py
-
-    # Dry-run: print commands without executing
-    uv run python run_dca_grid.py --dry-run
-
-    # Run only a subset (e.g. light intensity only)
-    uv run python run_dca_grid.py --miprov2-auto light
-
-    # Skip CoT or NoCot runs
-    uv run python run_dca_grid.py --cot-only
-    uv run python run_dca_grid.py --nocot-only
+    uv run python run_dca_grid.py                     # 8 runs, 4 parallel
+    uv run python run_dca_grid.py --parallel 2        # 2 at a time (rate-limit friendly)
+    uv run python run_dca_grid.py --parallel 1        # fully sequential
+    uv run python run_dca_grid.py --dry-run           # print plan only
+    uv run python run_dca_grid.py --miprov2-auto light  # filter intensity
+    uv run python run_dca_grid.py --include-heavy     # add heavy runs (12 total)
 """
 
 import argparse
 import subprocess
 import sys
 import time
-from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta
 from itertools import product
 
 # ── Grid definition ──────────────────────────────────────────────
 
 MODELS = [
     # (model_name,            reasoning_effort)
-    # ("azure/gpt-4.1",         None),
     ("azure/gpt-4.1-mini",    None),
-    # ("azure/gpt-5-mini",      "low"),   # reasoning model → pass reasoning_effort
+    ("azure/gpt-4.1",         None),
+    
+    
 ]
 
 INTENSITIES = [
-                # "heavy", 
-               "light"
-               ]   # MIPROv2 --miprov2-auto
+    # "light", 
+               "medium"
+               ]   # MIPROv2 --miprov2-auto  (heavy excluded by default)
 
 COT_MODES = [
     # (label,    no_cot_flag)
-    # ("CoT",    False),
     ("NoCot",  True),
 ]
+
+DEMO_CONFIGS = [
+    # (max_labeled_demos, max_bootstrapped_demos)
+    (6, 6),
+    (3, 3),
+]
+
+# Human prompt used as the initial instruction for all runs
+INITIAL_INSTRUCTION_FILE = "evaluation/dca_baseline_runs/human_prompts/v2_prompt_cr.md"
 
 # ── CLI for the grid runner itself ───────────────────────────────
 parser = argparse.ArgumentParser(description="Run DCA optimization grid (12 runs)")
 parser.add_argument("--dry-run", action="store_true",
                     help="Print commands without executing them")
+parser.add_argument("--parallel", type=int, default=4,
+                    help="Max number of runs to execute in parallel (default: 4)")
 parser.add_argument("--miprov2-auto", type=str, default=None,
-                    choices=["light", "medium"],
-                    help="Run only this intensity (default: both)")
+                    choices=["light", "medium", "heavy"],
+                    help="Run only this intensity (default: light + medium)")
+parser.add_argument("--include-heavy", action="store_true",
+                    help="Include heavy intensity runs (excluded by default)")
 parser.add_argument("--cot-only", action="store_true",
                     help="Run only CoT variants")
 parser.add_argument("--nocot-only", action="store_true",
@@ -68,31 +79,47 @@ parser.add_argument("--nocot-only", action="store_true",
 args = parser.parse_args()
 
 # Apply filters
-intensities = [args.miprov2_auto] if args.miprov2_auto else INTENSITIES
+if args.miprov2_auto:
+    intensities = [args.miprov2_auto]
+elif args.include_heavy:
+    intensities = INTENSITIES + ["heavy"]
+else:
+    intensities = INTENSITIES
 cot_modes   = COT_MODES
 if args.cot_only:
-    cot_modes = [m for m in COT_MODES if not m[1]]   # keep only CoT
+    cot_modes = [m for m in COT_MODES if not m[1]]
 if args.nocot_only:
-    cot_modes = [m for m in COT_MODES if m[1]]        # keep only NoCot
+    cot_modes = [m for m in COT_MODES if m[1]]
 
 # ── Build run list ───────────────────────────────────────────────
+# Pre-generate a unique timestamp for every run so that parallel workers
+# never collide on log / saved-model filenames.  Each run gets base_time
+# offset by its sequential index (1 s apart) which keeps the YYYYmmddHHMMSS
+# format intact and is immediately human-readable.
+_grid_base_time = datetime.now()
 
 runs = []
-for intensity, (cot_label, no_cot), (model_name, reasoning_effort) in product(
-    intensities, cot_modes, MODELS
+for _run_idx, (intensity, (cot_label, no_cot), (model_name, reasoning_effort), (max_lab, max_boot)) in enumerate(
+    product(intensities, cot_modes, MODELS, DEMO_CONFIGS)
 ):
-    model_label = model_name.split("/")[-1]
-    re_label    = f" RE={reasoning_effort}" if reasoning_effort else ""
-    label       = f"MIPROv2-{intensity} | {cot_label} | {model_label}{re_label}"
+    model_label    = model_name.split("/")[-1]
+    re_label       = f" RE={reasoning_effort}" if reasoning_effort else ""
+    label          = f"MIPROv2-{intensity} | {cot_label} | {model_label}{re_label} | d{max_lab}b{max_boot}"
+    run_timestamp  = (_grid_base_time + timedelta(seconds=_run_idx)).strftime("%Y%m%d%H%M%S")
 
     cmd = [
         "extract_dca.py",
         "--model-name", model_name,
-        "--no-cache",               # always: optimizer needs fresh evaluations
-        "--save-model",             # save each optimized prompt
+        "--no-cache",
+        "--save-model",
         "--optimizer", "miprov2",
         "--miprov2-auto", intensity,
-        "--skip-load",              # start fresh each run, don't load previous extractor
+        "--skip-load",
+        "--max-labeled-demos",      str(max_lab),
+        "--max-bootstrapped-demos", str(max_boot),
+        "--initial-instruction-file", INITIAL_INSTRUCTION_FILE,
+        "--clear-field-descs",   # seed from instruction file only; no fixed field desc boilerplate
+        "--run-timestamp", run_timestamp,  # unique id so parallel runs never share filenames
     ]
     if no_cot:
         cmd.append("--no-cot")
@@ -117,49 +144,52 @@ if args.dry_run:
     print()
     sys.exit(0)
 
-# ── Execute sequentially ─────────────────────────────────────────
+# ── Execute with bounded parallelism ─────────────────────────────
 
-results = []
 grid_start = time.time()
 
-for i, run in enumerate(runs, 1):
+def _run_one(idx: int, run: dict) -> dict:
     label = run["label"]
-    print(f"\n{'='*80}")
-    print(f" Run {i}/{len(runs)}: {label}")
-    print(f" Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"{'='*80}\n")
-
-    # Use sys.executable (current interpreter) — already in the right venv,
-    # no need to invoke uv which may not be on subprocess PATH on Windows.
+    started = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"\n[START {idx:2d}/{len(runs)}] {label}  ({started})")
     actual_cmd = [sys.executable] + run["cmd"]
-
-    run_start = time.time()
+    t0 = time.time()
     try:
         proc = subprocess.run(actual_cmd, check=False)
-        elapsed = time.time() - run_start
+        elapsed = time.time() - t0
         success = proc.returncode == 0
-        status  = "OK" if success else f"FAILED (exit code {proc.returncode})"
+        status  = "OK" if success else f"FAILED (exit {proc.returncode})"
     except Exception as e:
-        elapsed = time.time() - run_start
+        elapsed = time.time() - t0
         success = False
         status  = f"ERROR: {e}"
+    print(f"[DONE  {idx:2d}/{len(runs)}] {label}  [{status}]  {elapsed/60:.1f} min")
+    return {"label": label, "success": success, "status": status, "elapsed": elapsed}
 
-    results.append({"label": label, "success": success, "status": status, "elapsed": elapsed})
-    print(f"\n  [{status}]  elapsed: {elapsed/60:.1f} min")
+print(f"Executing {len(runs)} runs with max {args.parallel} in parallel …\n")
+with ThreadPoolExecutor(max_workers=args.parallel) as pool:
+    futures = {pool.submit(_run_one, i, run): i for i, run in enumerate(runs, 1)}
+    results_list = []
+    for fut in as_completed(futures):
+        results_list.append(fut.result())
+
+# Restore original order for the summary
+results_list.sort(key=lambda r: next(i for i, run in enumerate(runs, 1) if run["label"] == r["label"]))
 
 # ── Summary ──────────────────────────────────────────────────────
 
 total_elapsed = time.time() - grid_start
-n_ok   = sum(1 for r in results if r["success"])
-n_fail = len(results) - n_ok
+n_ok   = sum(1 for r in results_list if r["success"])
+n_fail = len(results_list) - n_ok
 
 print(f"\n{'='*80}")
-print(f" Grid complete — {n_ok}/{len(runs)} succeeded  |  total: {total_elapsed/60:.1f} min")
+print(f" Grid complete — {n_ok}/{len(runs)} succeeded  |  total wall-clock: {total_elapsed/60:.1f} min")
 print(f"{'='*80}")
-for r in results:
+for r in results_list:
     icon = "OK  " if r["success"] else "FAIL"
     print(f"  {icon}  {r['elapsed']/60:5.1f} min  {r['label']}  [{r['status']}]")
 print(f"{'='*80}\n")
 
 if n_fail > 0:
+    sys.exit(1)
     sys.exit(1)

@@ -2,6 +2,7 @@ import dspy
 import hashlib
 import json
 import os
+import threading
 
 from config import _build_ca_bundle, _get_azure_client, DCA_JUDGE_MODEL_NAME
 
@@ -12,13 +13,18 @@ os.environ.setdefault("SSL_CERT_FILE", _ca)
 
 # Azure client is lazily initialised on the first judge call so that
 # importing this module does not spin up a connection.
+# Thread-safe via double-checked locking — multiple eval threads may
+# call _get_client() concurrently when max_parallel > 1.
 _client = None
+_client_lock = threading.Lock()
 
 
 def _get_client():
     global _client
     if _client is None:
-        _client = _get_azure_client()
+        with _client_lock:
+            if _client is None:
+                _client = _get_azure_client()
     return _client
 
 
@@ -373,3 +379,113 @@ def dca_comparison_metric_with_feedback(example, prediction, trace=None, pred_na
         return total_score
 
     return dspy.Prediction(score=total_score, feedback=feedback)
+
+
+# ── Hybrid metric (score + prompt-token efficiency penalty) ─────────────────
+
+def _prompt_tokens_from_lm_history(trace) -> int:
+    """Read prompt (input) token count for the most recent LM call(s).
+
+    Uses ``dspy.settings.lm.history`` — the live API-reported token counts
+    from the LM response JSON.  This is accurate for multimodal prompts
+    (base64 images included) because the LM itself counts the tokens.
+
+    ``n_calls`` is estimated as max(1, len(trace)) so multi-module programs
+    (e.g. chain-of-thought + classifier) sum all their input tokens.
+
+    Returns 0 when trace is None (pure evaluation mode, no penalty applied)
+    or when lm.history is unavailable.
+    """
+    if not trace:
+        return 0  # pure eval mode — no penalty
+    try:
+        import dspy as _dspy
+        lm = _dspy.settings.lm
+        if not hasattr(lm, "history") or not lm.history:
+            return 0
+        n_calls = max(1, len(trace))
+        recent = lm.history[-n_calls:]
+        total_prompt = 0
+        for entry in recent:
+            usage = entry.get("usage") or {}
+            if hasattr(usage, "get"):
+                pt = (usage.get("prompt_tokens")
+                      or usage.get("input_tokens")
+                      or 0)
+            else:
+                pt = getattr(usage, "prompt_tokens", 0) or getattr(usage, "input_tokens", 0) or 0
+            total_prompt += int(pt or 0)
+        return total_prompt
+    except Exception:
+        return 0
+
+
+def make_hybrid_metric(
+    base_metric,
+    base_metric_with_feedback,
+    score_weight: float = 0.5,
+    length_weight: float = 0.5,
+    max_prompt_tokens: int = 4000,
+):
+    """Wrap base metrics with a prompt-token efficiency penalty.
+
+    hybrid_score = score_weight * dca_score
+                 + length_weight * max(0, 1 - prompt_tokens / max_prompt_tokens)
+
+    Prompt token count is read from ``dspy.settings.lm.history`` after each
+    forward pass — these are the real API-reported input tokens, so multimodal
+    prompts (images, long contexts) are counted correctly.
+
+    During plain evaluation (trace=None) the wrapper returns the raw DCA score
+    unchanged so leaderboard final evals are always on the true metric.
+
+    Parameters
+    ----------
+    base_metric : callable
+        The plain per-example metric, e.g. dca_comparison_metric.
+    base_metric_with_feedback : callable
+        The feedback-aware metric, e.g. dca_comparison_metric_with_feedback.
+    score_weight : float
+        Weight applied to the DCA accuracy score (default 0.5).
+    length_weight : float
+        Weight applied to the token-efficiency term (default 0.5).
+    max_prompt_tokens : int
+        Input token count at which length_score reaches 0 (default 4000).
+
+    Returns
+    -------
+    (hybrid_metric, hybrid_metric_with_feedback) — two callables with the
+    same signatures as the base functions.
+    """
+
+    def hybrid_metric(example, prediction, trace=None):
+        raw_score = base_metric(example, prediction, trace=trace)
+        tokens = _prompt_tokens_from_lm_history(trace)
+        if tokens > 0:
+            length_score = max(0.0, 1.0 - tokens / max_prompt_tokens)
+            return score_weight * raw_score + length_weight * length_score
+        # trace=None → pure eval mode; return unblended score for true leaderboard evals
+        return raw_score
+
+    def hybrid_metric_with_feedback(
+        example, prediction, trace=None, pred_name=None, pred_trace=None
+    ):
+        result = base_metric_with_feedback(
+            example, prediction,
+            trace=trace, pred_name=pred_name, pred_trace=pred_trace,
+        )
+        tokens = _prompt_tokens_from_lm_history(trace)
+        if tokens == 0:
+            return result  # no trace → return as-is
+
+        length_score = max(0.0, 1.0 - tokens / max_prompt_tokens)
+
+        if pred_name is None:
+            # scalar return path
+            return score_weight * result + length_weight * length_score
+
+        # dspy.Prediction return path
+        adjusted = score_weight * result.score + length_weight * length_score
+        return dspy.Prediction(score=adjusted, feedback=result.feedback)
+
+    return hybrid_metric, hybrid_metric_with_feedback

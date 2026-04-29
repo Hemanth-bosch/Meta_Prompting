@@ -4,6 +4,7 @@ notebooks
 .DS_Store
 __pycache__
 .cache
+.claude
 .venv
 DS_Store
 *.pkl
@@ -14,6 +15,9 @@ data/dca_data/*
 
 # Log files
 log/
+.cache/
+evaluation/dca_run_val_test_set_eval/eval_results
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

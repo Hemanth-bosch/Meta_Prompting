@@ -1,0 +1,970 @@
+"""Tournament utilities — logging, evaluation, save/load, category sampling.
+
+Shared helpers used by every stage of the cascaded optimization pipeline.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import random
+import sys
+import time
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
+from pathlib import Path
+from threading import Lock
+from typing import Optional
+
+import dspy
+
+from config import create_lm
+from signatures.dca import DCAImageComparison
+from evaluation.dca_metric import (
+    dca_comparison_metric,
+    compute_classification_score,
+)
+from dca_tournaments.leaderboard import CandidateEntry, OptimizationLeaderboard
+
+
+logger = logging.getLogger("dca_tournaments.utils")
+
+# ── Categories ──────────────────────────────────────────────────
+DCA_CATEGORIES = ["A1", "A2", "B1", "B2", "B3", "B4", "B5a", "B5b"]
+
+
+def _ts() -> str:
+    """Return a short timestamp for log lines."""
+    return datetime.now().strftime("%H:%M:%S")
+
+
+# ═══════════════════════════════════════════════════════════════════
+# TeeLogger — duplicates stdout + stderr to a log file
+# ═══════════════════════════════════════════════════════════════════
+
+class _TeeStream:
+    """Redirect a stream to both the terminal and a shared log file."""
+
+    def __init__(self, original_stream, log_file):
+        self._original = original_stream
+        self._file = log_file
+
+    def write(self, msg: str):
+        self._file.write(msg)
+        self._file.flush()
+        self._original.write(msg)
+
+    def flush(self):
+        self._file.flush()
+        self._original.flush()
+
+    def fileno(self):
+        return self._original.fileno()
+
+    def isatty(self):
+        return self._original.isatty()
+
+
+class TeeLogger:
+    """Context-manager that tees stdout + stderr to a log file.
+
+    Usage::
+
+        with TeeLogger(log_dir, "stage_1_bootstrap") as tee:
+            print("this goes to both terminal and log file")
+        # streams restored automatically
+    """
+
+    def __init__(self, log_dir: str | Path, name: str):
+        self.log_dir = Path(log_dir)
+        self.name = name
+        self.log_path = self.log_dir / f"{name}.log"
+        self._file = None
+        self._tee_stdout = None
+        self._tee_stderr = None
+        self._orig_stdout = None
+        self._orig_stderr = None
+
+    def __enter__(self) -> "TeeLogger":
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        self._file = open(self.log_path, "a", encoding="utf-8")
+        self._orig_stdout = sys.stdout
+        self._orig_stderr = sys.stderr
+        self._tee_stdout = _TeeStream(self._orig_stdout, self._file)
+        self._tee_stderr = _TeeStream(self._orig_stderr, self._file)
+        sys.stdout = self._tee_stdout
+        sys.stderr = self._tee_stderr
+        return self
+
+    def __exit__(self, *exc):
+        sys.stdout = self._orig_stdout
+        sys.stderr = self._orig_stderr
+        if self._file:
+            self._file.close()
+            self._file = None
+
+    def teardown(self):
+        """Manual teardown (for cases where context manager is inconvenient)."""
+        if self._orig_stdout:
+            sys.stdout = self._orig_stdout
+        if self._orig_stderr:
+            sys.stderr = self._orig_stderr
+        if self._file:
+            self._file.close()
+            self._file = None
+
+
+def setup_tournament_logging(log_dir: str | Path, name: str) -> tuple[TeeLogger, Path]:
+    """Create and enter a `TeeLogger`, returning it and the resolved log path."""
+    tee = TeeLogger(log_dir, name)
+    tee.__enter__()
+    return tee, tee.log_path
+
+
+def teardown_logging(tee: TeeLogger | None):
+    """Restore stdout/stderr and close a previously created tee logger."""
+    if tee is not None:
+        tee.teardown()
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Evaluation helpers
+# ═══════════════════════════════════════════════════════════════════
+
+def _extract_token_stats_from_history(lm, history_before: int, n_samples: int) -> dict:
+    """Extract per-sample average token stats from new LM history entries.
+
+    Returns dict with avg_total_tokens, avg_input_tokens, avg_output_tokens,
+    avg_reasoning_tokens (all float or None).
+    """
+    def _get(obj, key):
+        if obj is None:
+            return None
+        return obj.get(key) if isinstance(obj, dict) else getattr(obj, key, None)
+
+    try:
+        if not hasattr(lm, "history") or n_samples <= 0:
+            return {}
+        new_entries = lm.history[history_before:]
+        if not new_entries:
+            return {}
+        total_t = input_t = output_t = reasoning_t = 0
+        for entry in new_entries:
+            usage = entry.get("usage") or _get(entry.get("response"), "usage")
+            pt = int(_get(usage, "prompt_tokens") or _get(usage, "input_tokens") or 0)
+            ct = int(_get(usage, "completion_tokens") or _get(usage, "output_tokens") or 0)
+            tt = _get(usage, "total_tokens")
+            details = _get(usage, "completion_tokens_details")
+            rt = int(_get(details, "reasoning_tokens") or 0)
+            input_t     += pt
+            output_t    += ct
+            reasoning_t += rt
+            total_t     += int(tt) if tt is not None else (pt + ct)
+        n = n_samples
+        return {
+            "avg_total_tokens":     total_t     / n if total_t     > 0 else None,
+            "avg_input_tokens":     input_t     / n if input_t     > 0 else None,
+            "avg_output_tokens":    output_t    / n if output_t    > 0 else None,
+            "avg_reasoning_tokens": reasoning_t / n if reasoning_t > 0 else None,
+        }
+    except Exception:
+        return {}
+
+
+def evaluate_candidate(
+    program,
+    val_set: list,
+    metric=None,
+    num_threads: int = 4,
+    lm=None,
+) -> dict:
+    """Evaluate a program on val_set and return aggregate + per-category scores.
+
+    Parameters
+    ----------
+    lm : optional
+        Explicit LM instance to use for inference **and** token tracking.
+        When provided, every worker thread is wrapped with
+        ``dspy.settings.context(lm=lm)`` so that Python's ContextVar
+        propagation (or lack thereof in ThreadPoolExecutor < 3.12) never
+        causes history to be recorded on the wrong LM object.
+
+    Returns dict with keys:
+        total_score, cls_score, change_score, per_category_scores, n_evaluated,
+        eval_time_seconds, avg_total_tokens, avg_input_tokens, avg_output_tokens,
+        avg_reasoning_tokens
+    """
+    if metric is None:
+        metric = dca_comparison_metric
+
+    n_total = len(val_set)
+    t0 = time.time()
+
+    # Snapshot LM history length for per-sample token tracking.
+    # If caller supplied an explicit ``lm``, use it; otherwise fall back to
+    # whatever ``dspy.settings.lm`` resolves to in the calling thread.
+    _lm = lm or dspy.settings.lm
+    _history_before = len(_lm.history) if hasattr(_lm, "history") else 0
+
+    print(f"  [{_ts()}] Evaluating {n_total} examples ({num_threads} threads)...")
+
+    # Single-pass evaluation with per-category breakdown.
+    cat_scores: dict[str, list[float]] = defaultdict(list)
+    cat_cls: dict[str, list[float]] = defaultdict(list)
+    progress_lock = Lock()
+    done_count = [0]
+    errors_count = [0]
+
+    def _eval_one(idx_example):
+        idx, example = idx_example
+        # Explicitly set the LM context in every worker thread so that
+        # (a) the program uses ``_lm`` for inference and
+        # (b) ``_lm.history`` grows — making token extraction correct
+        # even when ThreadPoolExecutor doesn't propagate ContextVars.
+        with dspy.settings.context(lm=_lm):
+            try:
+                pred = program(
+                    image_original=getattr(example, "image_original", None),
+                    image_reimage=getattr(example, "image_reimage", None),
+                )
+                score = metric(example, pred)
+                cat = str(getattr(example, "expected_human_label_category", "Unknown"))
+
+                exp_discard = str(getattr(example, "expected_discard_image", "")).strip().lower()
+                pred_discard = str(getattr(pred, "discard_image", "")).strip().lower()
+                true_vals = {"true", "yes", "1"}
+                cls = compute_classification_score(
+                    exp_discard in true_vals, pred_discard in true_vals
+                )
+            except Exception as exc:
+                cat = str(getattr(example, "expected_human_label_category", "Unknown"))
+                score = 0.0
+                cls = 0.0
+                logger.debug("Eval error on example %d: %s", idx, exc)
+                with progress_lock:
+                    errors_count[0] += 1
+
+        with progress_lock:
+            done_count[0] += 1
+            if done_count[0] % 20 == 0 or done_count[0] == n_total:
+                elapsed = time.time() - t0
+                rate = done_count[0] / elapsed if elapsed > 0 else 0
+                eta = (n_total - done_count[0]) / rate if rate > 0 else 0
+                print(f"\r  [{_ts()}] Eval: {done_count[0]}/{n_total}  "
+                      f"({rate:.1f}/s, ETA {eta:.0f}s, {errors_count[0]} errors)",
+                      end="", flush=True)
+
+        return cat, score, cls
+
+    if num_threads <= 1:
+        results = [_eval_one((i, ex)) for i, ex in enumerate(val_set)]
+    else:
+        with ThreadPoolExecutor(max_workers=num_threads) as pool:
+            results = list(pool.map(_eval_one, enumerate(val_set)))
+
+    for cat, score, cls in results:
+        cat_scores[cat].append(score)
+        cat_cls[cat].append(cls)
+
+    elapsed = time.time() - t0
+    print(f"\n  [{_ts()}] Evaluation done in {elapsed:.1f}s ({errors_count[0]} errors)")
+
+    per_category = {}
+    for cat in DCA_CATEGORIES:
+        if cat in cat_scores and cat_scores[cat]:
+            per_category[cat] = sum(cat_scores[cat]) / len(cat_scores[cat])
+
+    # Compute overall cls and change from per-example scores
+    all_total = []
+    all_cls = []
+    for cat in cat_scores:
+        all_total.extend(cat_scores[cat])
+        all_cls.extend(cat_cls[cat])
+
+    avg_cls = sum(all_cls) / len(all_cls) if all_cls else 0.0
+    avg_total = sum(all_total) / len(all_total) if all_total else 0.0
+    # Derive change score from: total = 0.6*cls + 0.4*chg  →  chg = (total - 0.6*cls) / 0.4
+    avg_change = (avg_total - 0.6 * avg_cls) / 0.4 if avg_total > 0 else 0.0
+    avg_change = max(0.0, min(1.0, avg_change))
+
+    token_stats = _extract_token_stats_from_history(_lm, _history_before, n_total)
+
+    result = {
+        "total_score": avg_total,
+        "cls_score": avg_cls,
+        "change_score": avg_change,
+        "per_category_scores": per_category,
+        "n_evaluated": len(val_set),
+        "eval_time_seconds": elapsed,
+        **token_stats,
+    }
+
+    # Log per-category breakdown
+    cat_parts = [f"{c}={per_category[c]:.3f}" for c in DCA_CATEGORIES if c in per_category]
+    print(f"  Per-category: {' | '.join(cat_parts)}")
+
+    # Log token stats if available
+    if token_stats.get("avg_total_tokens") is not None:
+        inp = f"{token_stats['avg_input_tokens']:.0f}"     if token_stats.get("avg_input_tokens")     is not None else "N/A"
+        out = f"{token_stats['avg_output_tokens']:.0f}"    if token_stats.get("avg_output_tokens")    is not None else "N/A"
+        rsn = f"{token_stats['avg_reasoning_tokens']:.0f}" if token_stats.get("avg_reasoning_tokens") is not None else "N/A"
+        tot = f"{token_stats['avg_total_tokens']:.0f}"
+        print(f"  Avg tokens/sample: total={tot}  input={inp}  output={out}  reasoning={rsn}")
+
+    return result
+
+
+def evaluate_candidate_at_temperature(
+    program_path: str,
+    val_set: list,
+    metric,
+    temperature: float,
+    model_name: str,
+    use_cot: bool = False,
+    num_threads: int = 4,
+) -> dict:
+    """Re-evaluate a saved program at a specific temperature.
+
+    Creates a fresh LM, loads the program, evaluates, and restores original LM.
+    """
+    original_lm = dspy.settings.lm
+    print(f"  [{_ts()}] Re-eval at temp={temperature} with {model_name}")
+    print(f"           Program: {Path(program_path).name}")
+
+    try:
+        eval_lm = create_lm(model_name, temperature=temperature, cache=False)
+        dspy.configure(lm=eval_lm)
+        program = load_candidate(program_path, use_cot=use_cot)
+        program.lm = eval_lm
+        result = evaluate_candidate(program, val_set, metric, num_threads, lm=eval_lm)
+    finally:
+        dspy.configure(lm=original_lm)
+
+    return result
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Save / Load candidates
+# ═══════════════════════════════════════════════════════════════════
+
+def save_candidate(
+    program,
+    path: str | Path,
+    metadata: dict | None = None,
+) -> Path:
+    """Save a DSPy program and its metadata sidecar."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Save DSPy state
+    program.save(str(path))
+
+    # Save metadata sidecar for every candidate
+    meta = dict(metadata or {})
+    meta.setdefault("saved_at", datetime.now().isoformat(timespec="seconds"))
+    meta_path = path.with_suffix(".meta.json")
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
+
+    return path
+
+
+def load_candidate(path: str | Path, use_cot: bool = False):
+    """Load a saved DSPy program (Predict or ChainOfThought)."""
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"Program file not found: {path}")
+
+    if use_cot:
+        program = dspy.ChainOfThought(DCAImageComparison)
+    else:
+        program = dspy.Predict(DCAImageComparison)
+
+    program.load(str(path))
+    return program
+
+
+def get_program_info(program) -> dict:
+    """Extract metadata from a loaded program (demo count, instruction length)."""
+    n_demos = len(getattr(program, "demos", []))
+    instruction = ""
+    sig = getattr(program, "signature", None)
+    if sig:
+        instruction = getattr(sig, "instructions", "") or ""
+    return {
+        "n_demos": n_demos,
+        "instruction_length": len(instruction),
+        "instruction_preview": instruction[:200] if instruction else "",
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Category-balanced sampling
+# ═══════════════════════════════════════════════════════════════════
+
+def category_balanced_sample(
+    dataset: list,
+    max_per_category: int = 1,
+    seed: int = 42,
+) -> list:
+    """Select up to ``max_per_category`` examples per human_label_category.
+
+    Returns a flat list (up to 8 × max_per_category examples for DCA).
+    """
+    import random
+    rng = random.Random(seed)
+
+    groups: dict[str, list] = defaultdict(list)
+    for ex in dataset:
+        cat = str(getattr(ex, "expected_human_label_category", "Unknown"))
+        groups[cat].append(ex)
+
+    selected = []
+    for cat in DCA_CATEGORIES:
+        pool = groups.get(cat, [])
+        if pool:
+            n = min(max_per_category, len(pool))
+            selected.extend(rng.sample(pool, n))
+
+    return selected
+
+
+def create_mini_dataset(
+    dataset: list,
+    target_size: int | None,
+    seed: int = 42,
+    stratify_by: list[str] | None = None,
+) -> list:
+    """Create a stratified mini-dataset using ``stratified_split_dca_dataset``.
+
+    Delegates to the *same* stratified splitting function used for the main
+    train/val/test split, so the mini set preserves the exact same
+    distribution characteristics (binary classification balance, category
+    proportions, doubt distribution).
+
+    Parameters
+    ----------
+    dataset : list
+        Full DSPy dataset (list of dspy.Example).
+    target_size : int or None
+        Desired number of examples.  None means use full dataset.
+    seed : int
+        RNG seed for reproducibility.
+    stratify_by : list[str] or None
+        Field name(s) to stratify by.  Passed through to
+        ``stratified_split_dca_dataset``.  Uses its default (3-field
+        composite key) when None.
+    """
+    if target_size is None or target_size >= len(dataset):
+        return dataset
+
+    from utils import stratified_split_dca_dataset
+
+    mini_ratio = target_size / len(dataset)
+    kwargs: dict = {
+        "train_ratio": mini_ratio,
+        "val_ratio": 1.0 - mini_ratio,
+        "test_ratio": 0.0,
+        "random_seed": seed,
+        "verbose": False,
+    }
+    if stratify_by is not None:
+        kwargs["stratify_by"] = stratify_by
+
+    # Take the "train" portion — that's our mini subset
+    mini, _, _ = stratified_split_dca_dataset(dataset, **kwargs)
+
+    # Log per-category breakdown for readability
+    from collections import Counter as _Counter
+    cat_counts = _Counter(
+        str(getattr(ex, "expected_human_label_category", "?")) for ex in mini
+    )
+    cat_str = ", ".join(
+        f"{c}={cat_counts.get(c, 0)}" for c in DCA_CATEGORIES if c in cat_counts
+    )
+    print(f"  [{_ts()}] Mini dataset: {len(mini)}/{len(dataset)} examples [{cat_str}]")
+    return mini
+
+
+def find_worst_performing_examples(
+    program,
+    dataset: list,
+    metric,
+    n: int,
+    per_category_limit: int = 2,
+    num_threads: int = 4,
+    return_eval_result: bool = False,
+    select_best: bool = False,
+) -> "list[dict] | tuple[list[dict], dict]":
+    """Run inference on dataset and return the ``n`` worst- (or best-) scoring examples.
+
+    Balances across categories (max ``per_category_limit`` per category).
+    Each returned item is a dict with: example, prediction, score, category.
+
+    Args:
+        return_eval_result: If True, also return an aggregate eval-result dict
+            (same format as ``evaluate_candidate``) computed from the **same**
+            single inference pass — eliminating a redundant second evaluation.
+            In that case the function returns ``(worst_examples, eval_result)``.
+        select_best: If True, return the *best*-scoring examples instead of
+            the worst.  Useful for providing gold-standard demonstrations to
+            the seed LLM rather than failure examples.
+    """
+    n_total = len(dataset)
+    t0 = time.time()
+    print(f"  [{_ts()}] Scoring {n_total} examples ({num_threads} threads)...")
+    progress_lock = Lock()
+    done_count = [0]
+    errors_count = [0]
+
+    def _score_one(example):
+        try:
+            pred = program(
+                image_original=getattr(example, "image_original", None),
+                image_reimage=getattr(example, "image_reimage", None),
+            )
+            score = metric(example, pred)
+            # Compute binary classification score for optional eval_result
+            exp_discard = str(getattr(example, "expected_discard_image", "")).strip().lower()
+            pred_discard = str(getattr(pred, "discard_image", "")).strip().lower()
+            true_vals = {"true", "yes", "1"}
+            cls = compute_classification_score(
+                exp_discard in true_vals, pred_discard in true_vals
+            )
+        except Exception as exc:
+            pred = None
+            score = 0.0
+            cls = 0.0
+            logger.debug("Score error: %s", exc)
+            with progress_lock:
+                errors_count[0] += 1
+
+        cat = str(getattr(example, "expected_human_label_category", "Unknown"))
+
+        with progress_lock:
+            done_count[0] += 1
+            if done_count[0] % 20 == 0 or done_count[0] == n_total:
+                elapsed = time.time() - t0
+                rate = done_count[0] / elapsed if elapsed > 0 else 0
+                eta = (n_total - done_count[0]) / rate if rate > 0 else 0
+                print(f"\r  [{_ts()}] Scoring: {done_count[0]}/{n_total}  "
+                      f"({rate:.1f}/s, ETA {eta:.0f}s, {errors_count[0]} errors)",
+                      end="", flush=True)
+
+        return {
+            "example": example,
+            "prediction": pred,
+            "score": score,
+            "cls": cls,
+            "category": cat,
+        }
+
+    if num_threads <= 1:
+        scored = [_score_one(ex) for ex in dataset]
+    else:
+        with ThreadPoolExecutor(max_workers=num_threads) as pool:
+            scored = list(pool.map(_score_one, dataset))
+
+    elapsed = time.time() - t0
+    print(f"\n  [{_ts()}] Scoring done in {elapsed:.1f}s ({errors_count[0]} errors)")
+
+    # Sort: ascending = worst first; descending = best first
+    scored.sort(key=lambda x: x["score"], reverse=select_best)
+
+    # Pick worst/best N, balanced across categories
+    selected = []
+    cat_counts: dict[str, int] = defaultdict(int)
+    for item in scored:
+        if len(selected) >= n:
+            break
+        cat = item["category"]
+        if cat_counts[cat] < per_category_limit:
+            selected.append(item)
+            cat_counts[cat] += 1
+
+    if not return_eval_result:
+        return selected
+
+    # ── Build aggregate eval_result from the same inference pass ──────
+    cat_scores_agg: dict[str, list[float]] = defaultdict(list)
+    cat_cls_agg: dict[str, list[float]] = defaultdict(list)
+    for item in scored:
+        cat_scores_agg[item["category"]].append(item["score"])
+        cat_cls_agg[item["category"]].append(item["cls"])
+
+    per_category: dict[str, float] = {}
+    for cat in DCA_CATEGORIES:
+        if cat in cat_scores_agg and cat_scores_agg[cat]:
+            per_category[cat] = sum(cat_scores_agg[cat]) / len(cat_scores_agg[cat])
+
+    all_total = [s for vals in cat_scores_agg.values() for s in vals]
+    all_cls   = [s for vals in cat_cls_agg.values() for s in vals]
+    avg_cls    = sum(all_cls)   / len(all_cls)   if all_cls   else 0.0
+    avg_total  = sum(all_total) / len(all_total) if all_total else 0.0
+    avg_change = (avg_total - 0.6 * avg_cls) / 0.4 if avg_total > 0 else 0.0
+    avg_change = max(0.0, min(1.0, avg_change))
+
+    eval_result = {
+        "total_score":         avg_total,
+        "cls_score":           avg_cls,
+        "change_score":        avg_change,
+        "per_category_scores": per_category,
+        "n_evaluated":         len(scored),
+    }
+
+    cat_parts = [f"{c}={per_category[c]:.3f}" for c in DCA_CATEGORIES if c in per_category]
+    print(f"  Per-category: {' | '.join(cat_parts)}")
+
+    return selected, eval_result
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Summary generation
+# ═══════════════════════════════════════════════════════════════════
+
+def generate_summary(
+    config,
+    leaderboard: OptimizationLeaderboard,
+    stages_run: list[str],
+    total_time_seconds: float,
+    test_eval_result: dict | None = None,
+    started_at: str = "",
+    stage_top_k_history: dict | None = None,
+    stage_pre_best: dict | None = None,
+) -> dict:
+    """Build a complete end-of-run summary dict.
+
+    Parameters
+    ----------
+    stage_top_k_history : dict[str, list[CandidateEntry]], optional
+        Maps stage name → the top-K entries that were passed to the next
+        stage.  Recorded in run_tournament.py after each stage's selection.
+    stage_pre_best : dict[str, float], optional
+        Maps stage name → the global best val_total_score immediately before
+        that stage ran.  Used to compute true cross-stage improvement.
+    """
+    summary = {
+        "tournament_id": f"tournament_{config.timestamp}",
+        "started_at": started_at,
+        "completed_at": datetime.now().isoformat(timespec="seconds"),
+        "total_duration_seconds": round(total_time_seconds, 1),
+        "config": config.to_dict(),
+        "stages_run": stages_run,        # stages freshly executed this session
+        "per_stage": {},
+    }
+
+    # Include ALL stages present in the leaderboard (not just freshly-run
+    # ones) so that resumed stages also appear in the final summary.
+    # "seed_baseline" is diagnostic (scored on train, not val) so exclude it.
+    all_stages = [s for s in leaderboard.get_stages() if s != "seed_baseline"]
+    summary["stages_all"] = all_stages
+
+    for stage in all_stages:
+        stage_sum = leaderboard.get_stage_summary(stage)
+
+        # Override improvement with "vs global best before this stage ran"
+        # if we have that info (more accurate than vs-previous-stage-best).
+        if stage_pre_best and stage in stage_pre_best:
+            stage_sum["pre_stage_best"] = stage_pre_best[stage]
+            stage_sum["improvement_over_alltime_prev"] = round(
+                stage_sum["best_score"] - stage_pre_best[stage], 4
+            )
+
+        # Record which top-K entries were passed to the next stage.
+        if stage_top_k_history and stage in stage_top_k_history:
+            tk = stage_top_k_history[stage]
+            stage_sum["top_k_passed_to_next"] = len(tk)
+            stage_sum["top_k_entries"] = [
+                {
+                    "stage": e.stage,
+                    "config": e.config_name,
+                    "score": round(e.val_total_score, 4),
+                    "program_path": e.program_path,
+                }
+                for e in tk
+            ]
+
+        summary["per_stage"][stage] = stage_sum
+
+    # Global best
+    full = leaderboard.get_full_summary()
+    summary["global_best"] = full.get("global_best")
+    summary["n_total_candidates"] = full["n_total_candidates"]
+
+    # Final tournament / test eval
+    if test_eval_result:
+        summary["test_eval"] = test_eval_result
+
+    # Ranked list (compact)
+    summary["all_candidates_ranked"] = [
+        {
+            "rank": i + 1,
+            "stage": e.stage,
+            "config": e.config_name,
+            "val_total": round(e.val_total_score, 4),
+            "val_cls": round(e.val_cls_score, 4),
+            "val_change": round(e.val_change_score, 4),
+            "val_avg_total_tokens": e.val_avg_total_tokens,
+            "val_avg_input_tokens": e.val_avg_input_tokens,
+            "val_avg_output_tokens": e.val_avg_output_tokens,
+            "val_avg_reasoning_tokens": e.val_avg_reasoning_tokens,
+            "opt_prompt_tokens": e.prompt_tokens,
+            "opt_completion_tokens": e.completion_tokens,
+            "parent": Path(e.parent_path).stem if e.parent_path else None,
+            "program_path": e.program_path,
+        }
+        for i, e in enumerate(leaderboard.entries)
+    ]
+
+    return summary
+
+
+def save_summary(summary: dict, *paths: str | Path):
+    """Save summary JSON to one or more locations."""
+    for p in paths:
+        p = Path(p)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(summary, f, indent=2, ensure_ascii=False)
+        print(f"  Summary saved → {p}")
+
+
+def print_final_summary(summary: dict):
+    """Print the end-of-tournament summary with a full cascade table."""
+    W = 82
+    print(f"\n{'#'*W}")
+    print(f" TOURNAMENT COMPLETE — {summary['tournament_id']}")
+    print(f"{'#'*W}")
+    print(f"  Duration   : {summary['total_duration_seconds']:.0f}s")
+
+    # Use stages_all (includes resumed stages) if present, else fall back
+    stages_all = summary.get("stages_all", summary.get("stages_run", []))
+    stages_run = summary.get("stages_run", [])
+    print(f"  Stages     : {' → '.join(stages_all)}")
+    if stages_run != stages_all:
+        print(f"  Run this session: {' → '.join(stages_run) or '(none — all resumed)'}")
+    print(f"  Candidates : {summary['n_total_candidates']}")
+
+    # ── Cascade table ────────────────────────────────────────────────────────
+    per_stage = summary.get("per_stage", {})
+    if stages_all and per_stage:
+        print(f"\n{'─'*W}")
+        print(f"  STAGE CASCADE  (cross-stage top-K selection: best-so-far flows forward)")
+        print(f"{'─'*W}")
+        # Header
+        print(f"  {'Stage':<12} {'#Cands':>7} {'BestScore':>10} {'Δ vs prev':>11}"
+              f"  {'Best config':<32} {'→ Next stage'}")
+        print(f"  {'─'*12} {'─'*7} {'─'*10} {'─'*11}"
+              f"  {'─'*32} {'─'*16}")
+
+        n_stages = len(stages_all)
+        for i, stage in enumerate(stages_all):
+            ps = per_stage.get(stage, {})
+            n = ps.get("n_candidates", 0)
+            best = ps.get("best_score", 0.0)
+            # Prefer the more accurate "improvement_over_alltime_prev" if available
+            imp = ps.get("improvement_over_alltime_prev", ps.get("improvement_over_prev"))
+            imp_str = f"{imp:+.4f}" if imp is not None else "—"
+            bname = (ps.get("best_candidate") or "—")[:32]
+
+            topk = ps.get("top_k_passed_to_next")
+            if topk is not None and i < n_stages - 1:
+                next_stage = stages_all[i + 1]
+                next_str = f"{topk} → {next_stage}"
+            elif i == n_stages - 1:
+                next_str = "(final stage)"
+            else:
+                next_str = "?"
+
+            resumed = "" if stage in stages_run else " [resumed]"
+            print(f"  {stage:<12} {n:>7} {best:>10.4f} {imp_str:>11}"
+                  f"  {bname:<32} {next_str}{resumed}")
+
+        print(f"  {'─'*12} {'─'*7} {'─'*10} {'─'*11}"
+              f"  {'─'*32} {'─'*16}")
+
+    # ── Top-K entries passed to each next stage ──────────────────────────────
+    any_topk = any(
+        per_stage.get(s, {}).get("top_k_entries")
+        for s in stages_all[:-1]  # last stage has nothing after it
+    )
+    if any_topk:
+        print(f"\n  TOP-K FLOW (candidates that seeded each subsequent stage):")
+        for i, stage in enumerate(stages_all[:-1]):
+            ps = per_stage.get(stage, {})
+            tk_entries = ps.get("top_k_entries")
+            if tk_entries:
+                next_stage = stages_all[i + 1]
+                print(f"\n    [{stage}] → [{next_stage}]  ({len(tk_entries)} candidates):")
+                for j, te in enumerate(tk_entries, 1):
+                    src = te.get("stage", stage)
+                    # Show source stage if it differs (cross-stage selection)
+                    src_tag = f"[{src}] " if src != stage else ""
+                    print(f"      {j}. {src_tag}{te['config']}  score={te['score']:.4f}")
+
+    # ── Winner ───────────────────────────────────────────────────────────────
+    gb = summary.get("global_best")
+    if gb:
+        print(f"\n{'─'*W}")
+        print(f"  WINNER: [{gb['stage']}] {gb['config_name']}")
+        print(f"{'─'*W}")
+        print(f"    Val total  = {gb['val_total_score']:.4f}")
+        print(f"    Val cls    = {gb['val_cls_score']:.4f}")
+        print(f"    Val change = {gb['val_change_score']:.4f}")
+        if gb.get("val_avg_total_tokens") is not None:
+            print(f"    Avg tok/smp = {gb['val_avg_total_tokens']:.0f}"
+                  f"  (in={gb.get('val_avg_input_tokens') or 0:.0f}"
+                  f" out={gb.get('val_avg_output_tokens') or 0:.0f})")
+        if gb.get("per_category_scores"):
+            cats = sorted(gb["per_category_scores"].keys())
+            cat_str = "  ".join(
+                f"{c}={gb['per_category_scores'][c]:.3f}" for c in cats
+            )
+            print(f"    Per-cat    : {cat_str}")
+
+    # ── Test set evaluation ───────────────────────────────────────────────────
+    te = summary.get("test_eval")
+    if te:
+        print(f"\n{'─'*W}")
+        print(f"  TEST SET EVALUATION (winner on held-out test set):")
+        print(f"{'─'*W}")
+        print(f"    Total  = {te.get('avg_total_score', te.get('total_score', 'N/A'))}")
+        print(f"    Cls    = {te.get('avg_cls_score', te.get('cls_score', 'N/A'))}")
+        print(f"    Change = {te.get('avg_change_score', te.get('change_score', 'N/A'))}")
+        if te.get("n_evaluated"):
+            print(f"    N eval = {te['n_evaluated']}")
+
+    print(f"{'#'*W}\n")
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Token-usage helpers
+# ═══════════════════════════════════════════════════════════════════
+
+def token_usage_from_tracker(tracker) -> dict:
+    """Extract aggregate token counts from a ``dspy.track_usage()`` tracker.
+
+    Parameters
+    ----------
+    tracker : object
+        The object returned by ``dspy.track_usage().__enter__()``.
+        Expected to have ``get_total_tokens()`` → dict[model_name → {prompt_tokens, completion_tokens}].
+
+    Returns
+    -------
+    dict with keys prompt_tokens, completion_tokens, total_tokens (all int, summed across models).
+    """
+    prompt = 0
+    completion = 0
+    try:
+        totals = tracker.get_total_tokens()
+        if isinstance(totals, dict):
+            for model_name, usage in totals.items():
+                if isinstance(usage, dict):
+                    prompt += usage.get("prompt_tokens", 0) or 0
+                    completion += usage.get("completion_tokens", 0) or 0
+    except Exception:
+        pass
+    return {
+        "prompt_tokens": prompt,
+        "completion_tokens": completion,
+        "total_tokens": prompt + completion,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Pareto scatter plot
+# ═══════════════════════════════════════════════════════════════════
+
+def plot_pareto_candidates(
+    leaderboard: OptimizationLeaderboard,
+    output_path: str | Path,
+    title: str = "Tournament Candidates — Score vs Avg Tokens/Sample",
+):
+    """Generate a 2D scatter plot: val_total_score (X, %) vs val_avg_total_tokens (Y)."""
+    try:
+        import matplotlib
+        matplotlib.use("Agg")  # non-interactive backend
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print(f"  [WARN] matplotlib not available — skipping scatter plot")
+        return
+
+    entries = leaderboard.entries
+    if not entries:
+        print(f"  [WARN] No entries in leaderboard — skipping scatter plot")
+        return
+
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    valid_token_entries = [e for e in entries if e.val_avg_total_tokens is not None and e.val_avg_total_tokens > 0]
+    if not valid_token_entries:
+        print("  [WARN] No val_avg_total_tokens available — skipping Pareto plot")
+        return
+
+    stage_colours = {
+        "seed": "#2196F3",
+        "seed_baseline": "#90CAF9",
+        "bootstrap": "#4CAF50",
+        "miprov2": "#FF9800",
+        "gepa": "#9C27B0",
+        "external": "#607D8B",
+    }
+    top_markers = ["o", "s", "^", "D"]
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    ax.scatter(
+        [e.val_total_score * 100.0 for e in valid_token_entries],
+        [e.val_avg_total_tokens for e in valid_token_entries],
+        c="#BDBDBD",
+        label="All candidates",
+        alpha=0.75,
+        s=45,
+        edgecolors="white",
+        linewidths=0.4,
+        zorder=1,
+    )
+
+    pareto_entries = leaderboard.pareto_front(valid_token_entries)
+    if pareto_entries:
+        pareto_sorted = sorted(pareto_entries, key=lambda e: (e.val_total_score, e.val_avg_total_tokens))
+        px = [e.val_total_score * 100.0 for e in pareto_sorted]
+        py = [e.val_avg_total_tokens for e in pareto_sorted]
+        ax.step(px, py, where="post", color="#D32F2F", linewidth=2.0, label="Pareto front", zorder=3)
+        ax.scatter(px, py, c="#D32F2F", marker="D", s=42, zorder=4)
+
+    top_labeled = sorted(valid_token_entries, key=lambda e: e.val_total_score, reverse=True)[:4]
+    for rank, e in enumerate(top_labeled, 1):
+        x = e.val_total_score * 100.0
+        y = e.val_avg_total_tokens
+        ax.scatter(
+            [x], [y],
+            c=stage_colours.get(e.stage, "#455A64"),
+            marker=top_markers[(rank - 1) % len(top_markers)],
+            s=95,
+            edgecolors="black",
+            linewidths=0.7,
+            zorder=5,
+        )
+        label = f"#{rank} {e.config_name}\n({e.stage})"
+        ax.annotate(
+            label, (x, y),
+            textcoords="offset points", xytext=(8, 6),
+            fontsize=7, fontweight="bold",
+            arrowprops=dict(arrowstyle="->", color="grey", lw=0.8),
+            bbox=dict(boxstyle="round,pad=0.2", fc="lightyellow", ec="grey", alpha=0.8),
+        )
+
+    ax.set_xlabel("Val Total Score (%)", fontsize=12)
+    ax.set_ylabel("Avg Tokens / Sample (val set)", fontsize=12)
+    ax.set_title(title, fontsize=14)
+    ax.legend(loc="lower right", fontsize=10)
+    ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    fig.savefig(str(output_path), dpi=150)
+    plt.close(fig)
+    print(f"  [{_ts()}] Scatter plot saved → {output_path}")

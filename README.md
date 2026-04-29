@@ -2,93 +2,104 @@
 
 A meta-prompting system for extracting structured information from images using multimodal language models with automated prompt optimization.
 
-## Use Case
-- Information Extraction from Images:
-    - Japanese Order (JO)
-    - YANASE
-- Image comparision: Classification, and Change summary for DCA:
-    - DCA: Document Comparison Assist is a document image-pair comparison, classification, and change summary tool. It outputs a json with classification labels (whether to discard image pairs) and change summary for each image pair. The current baseline workflow is human-prompt based, and we are using it as a basis for testing the effectiveness of meta-prompt optimization in improving LLM performance on this task.
+## Use Cases
 
+- **Information Extraction from Images**:
+  - Japanese Order (JO) — structured field extraction from Japanese business order documents
+  - YANASE — structured field extraction from YANASE automotive parts order documents
+- **Image Comparison: Classification and Change Summary for DCA**:
+  - DCA (Document Comparison Assist) — image-pair comparison that outputs a classification label (whether to discard the pair) and a change summary. The current baseline workflow is human-prompt based; this repository tests and improves it using DSPy meta-prompt optimization.
 
-### Key Features
+---
 
-- **Meta-Prompt Optimization**: Automated prompt engineering for information extraction tasks, including optimizers: 
-   - Fewshot learning optimization: boostrap examples with random search
-   - Instruction optimization: MIPROv2, SIMBA
-- **DCA Human-Run Baselines**: Human Prompt-based image-pair comparison workflow with classification and change-summary generation.
-- **Comprehensive Evaluation**: Field-specific scoring with text normalization and extact/fuzzy matching
+## Key Features
 
-## 📋 Project Structure
+- **Multi-Stage Tournament Optimization**: Cascaded pipeline (Seed → Bootstrap → MIPROv2 → GEPA) that progressively refines prompts using DSPy optimizers.
+- **Single-Optimizer Runs**: Standalone `extract_dca.py` for quick MIPROv2, Bootstrap, SIMBA, or GEPA experiments.
+- **Grid Runner**: `run_dca_grid.py` for parallel combinatorial experiments across models and hyperparameters.
+- **DCA Human-Run Baselines**: Human-authored prompt experiments with full evaluation pipeline.
+- **Comprehensive Evaluation**: Composite metric (0.6 × classification + 0.4 × LLM-judge change summary), per-category breakdown, Pareto analysis of score vs token cost.
+- **Pareto Selection**: Optional token-efficiency-aware candidate selection during optimization.
+- **Multi-Provider LLM Support**: Azure OpenAI, Vertex AI, OpenAI, Anthropic via LiteLLM routing.
+
+---
+
+## Project Structure
 
 ```
 meta-prompting/
-├── extract_dca.py             # DCA extraction/experimentation entrypoint
-├── extract_jo.py              # Japanese order extraction pipeline
-├── extract_yanase.py          # YANASE order extraction pipeline
-├── config.py                  # Model configuration and DSPy setup (multi-provider)
+├── extract_dca.py              # DCA single-optimizer CLI entrypoint
+├── run_dca_grid.py             # Grid runner for parallel DCA optimization experiments
+├── extract_jo.py               # Japanese Order extraction pipeline
+├── extract_yanase.py           # YANASE order extraction pipeline
+├── config.py                   # Model configuration and DSPy setup (multi-provider)
 │
-├── signatures/                # DSPy Signature definitions
-│   ├── dca.py                 #   DCA fields
-│   ├── jo.py                  #   JO extraction fields
-│   └── yanase.py              #   YANASE extraction fields
+├── signatures/                 # DSPy Signature definitions
+│   ├── README.md               #   Signature guide and DCA task specification
+│   ├── dca.py                  #   DCA image-pair comparison signature
+│   ├── jo.py                   #   JO extraction fields
+│   └── yanase.py               #   YANASE extraction fields
 │
-├── evaluation/                # Evaluation metrics and analysis
-│   ├── common.py              #   Shared helpers (normalization, similarity)
-│   ├── dca_metric.py          #   DCA weighted metric (0.6 classification + 0.4 change summary)
-│   ├── jo_metric.py           #   JO-specific metrics
-│   ├── yanase_metric.py       #   YANASE-specific metrics
-│   ├── posthoc_analysis.py    #   Performance analysis and reporting
-│   └── dca_baseline_runs/     #   DCA human-prompt baseline experiments
-│       ├── eval/              #     All evaluation outputs
-│       │   ├── discard_image_classification_eval/
-│       │   │   ├── run_eval/
-│       │   │   │   └── eval_human_runs.py          # Classification metrics, plots, confusion matrices, CSV
-│       │   │   └── eval_results/                   # Generated outputs
-│       │   └── change_summary_eval/                # Change-summary quality evaluation
-│       │       ├── run_eval/
-│       │       │   ├── midas_summary_eval.py        # LLM judge + semantic sim over all model versions
-│       │       │   ├── visualize_all_metrics.py     # Heatmap + bar charts from summary_eval_results.json
-│       │       │   └── fbeta_quartile_analysis.py   # Precision-60/Recall-40 F-beta quartile breakdown
-│       │       └── eval_results/                   # Generated outputs 
-│       ├── human_prompts/     #     Prompt markdown files (v0–v4)
-│       └── run_human_prompts/ #     Runners: single, batch, v4 triage, categorization
+├── dca_tournaments/            # Multi-stage tournament optimization pipeline
+│   ├── README.md               #   Full pipeline guide
+│   ├── run_tournament.py       #   CLI entrypoint — orchestrates all stages
+│   ├── tour_config.py          #   TournamentConfig dataclass — all hyperparameters
+│   ├── leaderboard.py          #   Candidate tracking, Pareto selection, persistence
+│   ├── tour_utils.py           #   Shared helpers: evaluate_candidate, logging, sampling
+│   ├── seed_prompt_generator.py #  Stage 0: LLM-written seed prompt generation
+│   ├── stage_runner.py         #   Stages 1-3: subprocess-isolated compile() + eval
+│   ├── optimizer_subprocess.py #   Isolated compile() worker
+│   └── gepa_utils.py           #   GEPA image-aware reflection utilities
 │
-├── utils/                     # Data utilities
-│   ├── data_loading.py        #   Dataset loading functions
-│   ├── splitting.py           #   Train/val/test splitting
-│   ├── pdf_processing.py      #   PDF-to-image conversion
-│   └── dca_data_generation/   #   DCA dataset generation tools
+├── evaluation/                 # Evaluation metrics, analysis, and baseline runners
+│   ├── README.md               #   DCA metric guide
+│   ├── dca_metric.py           #   DCA composite metric (0.6×cls + 0.4×change summary)
+│   ├── jo_metric.py            #   JO extraction metric
+│   ├── yanase_metric.py        #   YANASE extraction metric
+│   ├── common.py               #   Shared helpers (normalization, fuzzy matching)
+│   ├── posthoc_analysis.py     #   Performance analysis and reporting
+│   ├── dca_baseline_runs/      #   Human-prompt baseline experiments
+│   │   ├── README.md           #     Usage guide
+│   │   ├── human_prompts/      #     Prompt markdown files (v0–v5)
+│   │   ├── run_human_prompts/  #     Inference scripts
+│   │   └── eval/               #     Classification and change-summary eval scripts
+│   └── dca_run_val_test_set_eval/  # Val/test evaluation for human + optimized runs
+│       ├── README.md           #     Usage guide
+│       ├── run_val_test_set_eval_on_human_runs.py
+│       └── run_val_test_set_eval_on_optimized_prompt.py
+│
+├── optimization/               # Single-optimizer strategy builders
+│   └── opt.py                  #   OptimizationRunner, strategy factories
+│
+├── utils/                      # Data utilities
+│   ├── data_loading.py         #   load_dca_dataset()
+│   ├── splitting.py            #   stratified_split_dca_dataset()
+│   ├── pdf_processing.py       #   PDF-to-image conversion
+│   └── dca_data_generation/    #   DCA dataset creation and augmentation
+│       ├── ReadMe.md           #     Data generation guide
 │       ├── generate_from_zips.py  # Generate image pairs from PDF zips
 │       └── augment_rare_categories.py  # Synthetic data for B1/B2/B4 categories
 │
-├── optimization/              # Optimization strategies
-│   └── opt.py                 #   OptimizationRunner and strategy builders
+├── data/                       # Dataset directory
+│   ├── dca_data/               #   DCA image pairs and annotation JSONs
+│   ├── json/                   #   JO ground truth (50 files)
+│   ├── png/                    #   JO order images (50 files)
+│   ├── YANASE_ground_truth/    #   YANASE ground truth JSON annotations
+│   └── YANASE_images/          #   YANASE processed PNG images
 │
-├── tests/                     # Test and example scripts
-│   ├── test_model_comparison.py
-│   ├── test_vertex_gemini.py
-│   └── ...
-│
-├── data/                      # Dataset directory
-│   ├── dca_data/              #   DCA pairs and experiment JSON outputs (temporary for experimentation)
-│   ├── json/                  #   JO ground truth JSON (50 files)
-│   ├── png/                   #   JO order images (50 files)
-│   ├── YANASE_ground_truth/   #   YANASE ground truth JSON annotations
-│   ├── YANASE_images/         #   YANASE processed PNG images
-│   └── YANASE/                #   YANASE original PDF documents
-│
-├── .cache/                    # Cached optimized extractors
-└── .env                       # Environment configuration
+├── .cache/                     # Cached optimized programs and split manifests
+└── .env                        # Environment configuration (see env.template)
 ```
 
-## 🚀 Quick Start
+---
+
+## Setup
 
 ### Prerequisites
 
 - Python 3.12+
+- [uv](https://docs.astral.sh/uv/) package manager
 - LLM API access (Azure OpenAI, Vertex AI, OpenAI, or Anthropic)
-- DSPy framework
-- uv package manager
 
 ### Installation
 
@@ -98,165 +109,185 @@ git clone https://github.boschdevcloud.com/WAX3SYV/meta-prompting.git
 cd meta-prompting
 ```
 
-2. Install dependencies with [`uv`](https://docs.astral.sh/uv/) package and activate the virtual environment:
+2. Install dependencies and activate the virtual environment:
 ```bash
 uv sync
-# activate the virtual env:
-source .venv/bin/activate # Windows: .venv\Scripts\activate
+source .venv/bin/activate     # Windows: .venv\Scripts\activate
 ```
 
-3. Configure environment variables by creating a `.env` file in the repo root. All variables with defaults are optional:
+3. Configure environment variables by creating a `.env` file in the repo root:
 ```bash
-# ── Model configuration (prefix determines provider) ────────────────────────
-MODEL_NAME=azure/gpt-4.1-mini        # Azure OpenAI (default)
-# MODEL_NAME=vertex_ai/gemini-2.0-flash
-# MODEL_NAME=openai/gpt-4o
-# MODEL_NAME=anthropic/claude-sonnet-4-20250514
-REFLECTION_LM_NAME=azure/gpt-5       # Used by GEPA optimizer
+# Model configuration (prefix determines provider)
+MODEL_NAME=azure/gpt-4.1-mini
 
-# ── Azure OpenAI ─────────────────────────────────────────────────────────────
-# Leave AZURE_OPENAI_API_KEY empty to use `az login` (Azure CLI) auth instead
+# Azure OpenAI (leave API key empty to use az login)
 AZURE_OPENAI_API_KEY=
 AZURE_OPENAI_ENDPOINT=https://your-endpoint.openai.azure.com
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
-# ── Corporate TLS (Bosch / proxy environments) ───────────────────────────────
-# Path to CA bundle PEM for SSL verification. If unset, the code merges
-# certifi with any PEMs found in %TEMP%\bosch-ca\ automatically.
+# Corporate TLS (Bosch / proxy environments)
 REQUESTS_CA_BUNDLE=
 
-# ── Vertex AI (for vertex_ai/ models) ────────────────────────────────────────
-# VERTEX_PROJECT=your-gcp-project-id
-# VERTEX_LOCATION=us-central1
-
-# ── OpenAI / Anthropic direct ────────────────────────────────────────────────
-# OPENAI_API_KEY=sk-...
-# ANTHROPIC_API_KEY=sk-ant-...
-
-# ── Cache and data paths (defaults shown) ────────────────────────────────────
+# Cache and data paths (defaults shown)
 CACHED_EXTRACTOR_PATH=.cache/
-CACHED_EXTRACTOR_DIR=.cache/
-YANASE_IMAGES_DIR=data/YANASE_images
-YANASE_GT_DIR=data/YANASE_ground_truth
-JAPANESE_ORDER_IMAGES_DIR=./data/png
-JAPANESE_ORDER_GT_DIR=./data/json
 DCA_IMAGE_PAIRS_DIR=data/dca_data/image_pairs
 DCA_GT_DIR=data/dca_data/image_pairs_llm_output_exp1
 ```
 
-4. Prepare data within the `data` folder:
+See `env.template` for the full list of supported variables.
 
->Please email data owners of the JO and YANASE data (Matthew Deng (Matthew.DENG@cn.bosch.com) and Vinayak Kumar (Vinayak.Kumar2@sg.bosch.com)) and send their confirmation email proofs to xingbo.wang@us.bosch.com
+4. Prepare data (see [Data Setup](#data-setup) section below).
 
-**4.1 Japanese Order (JO) Dataset**
+---
 
-Download from: [JO data - OneDrive link (access granted on demand)](https://bosch-my.sharepoint.com/:u:/r/personal/wax3syv_bosch_com/Documents/aim205/meta-agents/JO-data.zip?csf=1&web=1&e=liwUyV) 
+## Data Setup
 
-Extract to create the following structure:
+### DCA Dataset
+
+The DCA dataset (429 image pairs) is stored under `data/dca_data/`. It is not included in the repository — contact the data owner for access.
+
+After placing the data, the frozen train/val/test split is created automatically on first run and saved to `.cache/dca_split_seed42.json`. Stratification is by `expected_discard_image`, `human_label_category`, and `doubt`. The split is fixed — do not delete this file.
+
+For dataset details and synthetic augmentation, see [utils/dca_data_generation/ReadMe.md](utils/dca_data_generation/ReadMe.md).
+
+### Japanese Order (JO) Dataset
+
+Download from the OneDrive link (access granted on demand) and extract to:
 ```
 data/
-├── json/               # Ground truth JSON annotations (50 files)
-└── png/                # Order document images (50 files)
+├── json/   # Ground truth JSON annotations (50 files)
+└── png/    # Order document images (50 files)
 ```
 
-**4.2 YANASE Order Dataset**
+### YANASE Dataset
 
-Download from: [YANASE data - OneDrive link (access granted on demand)](https://bosch-my.sharepoint.com/:u:/r/personal/wax3syv_bosch_com/Documents/aim205/meta-agents/yanase_data-20251112.zip?csf=1&web=1&e=HVqYqe)
-
-Extract to create the following structure:
+Download from the OneDrive link and extract to:
 ```
 data/
-├── YANASE_ground_truth/  # Ground truth JSON annotations
-├── YANASE_images/        # Processed PNG images from YANASE PDFs
-└── YANASE/               # Original source PDF documents (optional)
+├── YANASE_ground_truth/   # Ground truth JSON annotations
+├── YANASE_images/         # Processed PNG images
+└── YANASE/                # Original PDFs (optional)
 ```
 
+---
 
-    
-## Running the Pipeline
+## Running the DCA Pipeline
 
-### PDF Preprocessing (Optional)
+### Option 1: Multi-Stage Tournament (Recommended)
 
-If your source data is in PDF format, you can convert it to images with automatic rotation correction:
+The tournament pipeline runs up to four sequential optimization stages and selects the best candidate by val-set score (and optionally inference token cost).
 
-**Prerequisites:**
-- Install Tesseract OCR for rotation detection:
-  ```bash
-  # macOS
-  brew install tesseract
-
-  # Ubuntu/Debian
-  sudo apt-get install tesseract-ocr
-
-  # Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki
-  ```
-
-    **Usage:**
-    ```python
-    from utils import process_pdf_files_into_images_with_rotation
-
-    # Convert PDFs to rotation-corrected images
-    pdf_dir = "data/YANASE"              # Directory containing PDF files
-    output_dir = "data/YANASE_images"     # Output directory for PNG images
-
-    process_pdf_files_into_images_with_rotation(pdf_dir, output_dir)
-    ```
-
-
-### Japanese Order Extraction with Prompt Optimization (extract_jo.py)
-Execute the Japanese order extraction pipeline:
 ```bash
-# Basic usage (uses defaults from .env)
-python extract_jo.py
+# Default: seed → bootstrap → miprov2
+uv run python -m dca_tournaments.run_tournament
 
-# With custom configuration
-python extract_jo.py \
-    --images-dir ./data/png \
-    --gt-dir ./data/json \
-    --model-name azure/gpt-4o-mini \
-    --analyze-sets both \
-    --save-model \
-    --save-results
+# Dry run — print config and estimated runs, then exit
+uv run python -m dca_tournaments.run_tournament --dry-run
 
-# Other available options:
-# --no-cache              Disable LLM response caching
-# --load-extractor PATH   Load previously saved extractor
-# --skip-load             Skip loading cached extractor
-# --analyze-sets [val|test|both]  Which dataset to analyze (default: test)
+# Full pipeline including GEPA
+uv run python -m dca_tournaments.run_tournament --stages seed,bootstrap,miprov2,gepa
+
+# Parallel: 4 concurrent optimizer subprocesses + 4 concurrent seed evaluations
+uv run python -m dca_tournaments.run_tournament \
+    --max-parallel 4 \
+    --seed-parallel-evaluations 4
+
+# Pareto selection (score + token efficiency)
+uv run python -m dca_tournaments.run_tournament \
+    --selection-criteria pareto
+
+# Resume an interrupted run
+uv run python -m dca_tournaments.run_tournament \
+    --resume .cache/tournament/tournament_20260428234355
 ```
 
-### YANASE Order Extraction with Prompt Optimization (extract_yanase.py)
-Execute the YANASE order extraction pipeline:
+See [dca_tournaments/README.md](dca_tournaments/README.md) for the full argument reference and architecture details.
+
+### Option 2: Single-Optimizer Run
+
 ```bash
-# Basic usage (uses defaults from .env)
-python extract_yanase.py
+# MIPROv2 optimization
+uv run python extract_dca.py --optimizer miprov2 --miprov2-auto medium
 
-# With custom configuration
-python extract_yanase.py \
-    --images-dir data/YANASE_images \
-    --ground-truth-dir data/YANASE_ground_truth \
-    --model-name azure/gpt-4o-mini \
-    --analyze-sets both \
-    --save-model \
-    --save-results
+# Bootstrap
+uv run python extract_dca.py --optimizer bootstrap
 
-# Same options as extract_jo.py available
+# GEPA
+uv run python extract_dca.py --optimizer gepa --gepa-auto medium
+
+# SIMBA
+uv run python extract_dca.py --optimizer simba --simba-max-steps 8
+
+# Run all optimizers
+uv run python extract_dca.py --optimizer all
 ```
 
-### DCA Human-Run Baseline Pipeline (Brief)
+### Option 3: Grid Runner
 
-The DCA workflow currently runs from `evaluation/dca_baseline_runs/` and focuses on image-pair triage/change assessment using human-authored prompts.
+Run combinatorial experiments across models and hyperparameters in parallel:
 
-- Single run: `evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py`
-- Multi-step v4 pipeline: `evaluation/dca_baseline_runs/run_human_prompts/run_v4_human_prompt.py`
-- Batch orchestration: `evaluation/dca_baseline_runs/run_human_prompts/run_all_experiments.py`
-- Metrics and reports: `evaluation/dca_baseline_runs/eval/discard_image_classification_eval/run_eval/eval_human_runs.py`
+```bash
+# Default grid (models × intensities × demo configs)
+uv run python run_dca_grid.py --parallel 4
 
-For detailed usage and prompt/model combinations, see `evaluation/dca_baseline_runs/README.md`.
+# Dry run
+uv run python run_dca_grid.py --dry-run
+```
 
-### DCA Data Augmentation
+### Evaluate a Saved Model
 
-The original DCA dataset had severe class imbalance (B1=0, B2=2, B4=5 samples). Synthetic pairs were generated to bring each underrepresented category to ≥20 samples:
+```bash
+# Evaluate an optimized model on the val set
+uv run python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \
+    --model-path .cache/my_model.json \
+    --model-name azure/gpt-4.1-mini \
+    --split-file .cache/dca_split_seed42.json \
+    --which-set val
+
+# Evaluate human-prompt runs on val/test
+uv run python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_human_runs.py --which-set both
+```
+
+See [evaluation/dca_run_val_test_set_eval/README.md](evaluation/dca_run_val_test_set_eval/README.md) for details.
+
+---
+
+## Running the JO and YANASE Pipelines
+
+```bash
+# Japanese Order extraction with prompt optimization
+python extract_jo.py --model-name azure/gpt-4o-mini --analyze-sets both --save-model
+
+# YANASE order extraction with prompt optimization
+python extract_yanase.py --model-name azure/gpt-4o-mini --analyze-sets both --save-model
+```
+
+---
+
+## DCA Human Prompt Baselines
+
+Run LLM inference using hand-authored prompts and evaluate the results:
+
+```bash
+# Single run: v2 prompt with gpt-4.1-mini
+python evaluation/dca_baseline_runs/run_human_prompts/run_with_human_prompts.py \
+    --key-prefix v2_prompt_cr_gpt41mini \
+    --prompt v2_prompt_cr.md \
+    --deployment gpt-4.1-mini \
+    --no-thinking-area \
+    --verbose
+
+# Batch run (configured via RUNS list inside the script)
+python evaluation/dca_baseline_runs/run_human_prompts/run_all_experiments.py
+```
+
+See [evaluation/dca_baseline_runs/README.md](evaluation/dca_baseline_runs/README.md) for the full guide.
+
+---
+
+## DCA Data Augmentation
+
+The original dataset had severe class imbalance (B1=0, B2=2, B4=5 samples). Synthetic pairs were generated to bring each underrepresented category to at least 20 samples:
 
 ```bash
 # Preview what would be generated
@@ -266,74 +297,70 @@ python utils/dca_data_generation/augment_rare_categories.py --dry-run --verbose
 python utils/dca_data_generation/augment_rare_categories.py --verbose
 ```
 
-| Category | Method | Count |
-|----------|--------|-------|
-| B1 (corrupted/unreadable) | Gaussian blur, pixelation, resize-to-tiny | 20 |
-| B2 (crossed-out) | Semi-transparent diagonal X overlay (1px, alpha 45–100) | 18 |
+| Category | Method | Pairs added |
+|----------|--------|------------|
+| B1 (corrupted/unreadable) | Gaussian blur, pixelation, resize-to-40px | 20 |
+| B2 (crossed-out) | Semi-transparent diagonal X overlay | 18 |
 | B4 (one info + one non-info) | Recombination from A1/B3 + B5a/B5b pools | 15 |
 
-All synthetic pairs include `is_synthetic: true`, `source_pairs`, and `data_augmentation_explain_in_detail` for traceability. Total dataset: 429 pairs (376 original + 53 synthetic).
-
-### DCA Prompt Optimization Pipeline
-
-The `extract_dca.py` script runs DSPy-based prompt optimization on the DCA dataset:
-
-```bash
-# MIPROv2 optimization (default)
-uv run python extract_dca.py --optimizer miprov2 --miprov2-auto medium
-
-# SIMBA optimization
-uv run python extract_dca.py --optimizer simba --simba-max-steps 8
-
-# Run all optimizers
-uv run python extract_dca.py --optimizer all --analyze-sets both --save-model --save-results
-```
-
-The pipeline uses a frozen train/val/test split (saved in `.cache/dca_split_seed42.json`) stratified by `expected_discard_image`, `expected_human_label_category`, and `doubt`. New pairs added to the dataset are automatically assigned to the train set.
-
-Evaluation covers two dimensions:
-- **Classification** (discard_image): accuracy, precision, recall, F1, confusion matrix
-- **Change summary** (changes): weighted F-beta via GPT-5.2 judge (precision 60% / recall 40%)
-
-
-### Performance
-
-#### Japanese Order (JO) Dataset
-Extraction accuracy on Japanese business order documents with 13 fields:
-
-| Model       | Human-crafted Prompts | Meta-Prompting | Improvement |
-|-------------|--------------------| ---------------|-------------|
-| gpt-4o-mini | 73.68%             | 84.29%         | +10.62%     |
-| gpt-4o      | 49.81%             | 91.85%         | +42.04%     |
-| gpt-5       | 86.98%             | **98.26%**     | +11.28%     |
-
-
-<!-- 
-**Extracted Fields:**
-- Seller information: company name (2 lines), postal code, address, telephone, fax
-- Order details: order date, comments
-- Shipping information: postal code, telephone, address, company name
-- Product details: PO numbers, product codes and quantities 
--->
-
-
-#### YANASE Order Dataset
-Extraction accuracy on YANASE automotive parts order documents with 16 fields:
-
-| Model       | Human-crafted Prompts | Meta-Prompting | Improvement |
-|-------------|-----------------------| ---------------|-------------|
-| gpt-4o-mini | 71.3%                 | 79.8%          | +8.5%       |
-| gpt-4o      | 73.9%                 | 83.8%          | +9.9%       |
-| gpt-4.1     | 68.9%                 | **88.1%**      | +19.2%      |
-| gpt-5       | 71.1%                 | 79.0%          | +7.9%       |
-
-<!-- 
-**Extracted Fields:**
-- Seller information: company name (primary and secondary names), telephone, fax
-- Receiver information: company name, shipping postal code, address, telephone, fax
-- Product orders (list): receiver code, order code, product code, Bosch code, quantity, unit price, PCD price 
--->
+Total: 376 original + 53 synthetic = 429 pairs. See [utils/dca_data_generation/ReadMe.md](utils/dca_data_generation/ReadMe.md) for details.
 
 ---
 
-**Note**: This project supports multiple LLM providers (Azure OpenAI, Vertex AI, OpenAI, Anthropic) via LiteLLM routing. Set the `MODEL_NAME` prefix to select a provider. Ensure proper API quotas and rate limiting when running optimization experiments.
+## Performance
+
+### Japanese Order (JO)
+
+Extraction accuracy on Japanese business order documents (13 fields):
+
+| Model | Human-crafted Prompts | Meta-Prompting | Improvement |
+|-------|-----------------------|----------------|-------------|
+| gpt-4o-mini | 73.68% | 84.29% | +10.62% |
+| gpt-4o | 49.81% | 91.85% | +42.04% |
+| gpt-5 | 86.98% | 98.26% | +11.28% |
+
+### YANASE Order
+
+Extraction accuracy on YANASE automotive parts order documents (16 fields):
+
+| Model | Human-crafted Prompts | Meta-Prompting | Improvement |
+|-------|-----------------------|----------------|-------------|
+| gpt-4o-mini | 71.3% | 79.8% | +8.5% |
+| gpt-4o | 73.9% | 83.8% | +9.9% |
+| gpt-4.1 | 68.9% | 88.1% | +19.2% |
+| gpt-5 | 71.1% | 79.0% | +7.9% |
+
+---
+
+## PDF Preprocessing (Optional)
+
+To convert source PDFs to rotation-corrected images, install Tesseract OCR:
+
+```bash
+# macOS
+brew install tesseract
+
+# Ubuntu/Debian
+sudo apt-get install tesseract-ocr
+
+# Windows: download from https://github.com/UB-Mannheim/tesseract/wiki
+```
+
+Then:
+```python
+from utils import process_pdf_files_into_images_with_rotation
+process_pdf_files_into_images_with_rotation("data/YANASE", "data/YANASE_images")
+```
+
+---
+
+## Provider Configuration
+
+This project supports multiple LLM providers via LiteLLM routing. Set the `MODEL_NAME` prefix to select a provider:
+
+| Prefix | Provider | Example |
+|--------|----------|---------|
+| `azure/` | Azure OpenAI | `azure/gpt-4.1-mini` |
+| `vertex_ai/` | Google Vertex AI | `vertex_ai/gemini-2.0-flash` |
+| `openai/` | OpenAI | `openai/gpt-4o` |
+| `anthropic/` | Anthropic | `anthropic/claude-sonnet-4-20250514` |

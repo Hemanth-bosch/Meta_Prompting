@@ -77,8 +77,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Optional
 
@@ -483,10 +485,114 @@ def main():
                         help="Use dspy.Predict instead of dspy.ChainOfThought "
                              "(keeps few-shot demos + optimized instruction, removes reasoning step)")
     parser.add_argument("--reasoning-effort", type=str, default=None,
-                        choices=["low", "medium", "high"],
+                        choices=["None", "low", "medium", "high"],
                         help="Reasoning effort for o-series / reasoning models (e.g. gpt-5). "
                              "Passed to create_lm as reasoning_effort kwarg.")
+    parser.add_argument("--run-id", type=str, default=None,
+                        help="Optional suffix appended to run_key and output filename "
+                             "(e.g. 'rep01'). Used automatically by --n-repeats.")
+    parser.add_argument("--n-repeats", type=int, default=None,
+                        help="Launch N independent parallel repeats (each gets --run-id repNN). "
+                             "Results are written to separate files for easy comparison.")
     args = parser.parse_args()
+
+    # ── n-repeats: spawn N subprocesses, each with a unique --run-id ─────────
+    if args.n_repeats is not None:
+        if args.n_repeats < 1:
+            print("[ERROR] --n-repeats must be >= 1")
+            sys.exit(1)
+        base_argv = [a for a in sys.argv[1:]
+                     if not a.startswith("--n-repeats") and a != str(args.n_repeats)]
+        # Remove any existing --run-id passed alongside --n-repeats
+        filtered: list[str] = []
+        skip_next = False
+        for tok in base_argv:
+            if skip_next:
+                skip_next = False
+                continue
+            if tok == "--run-id":
+                skip_next = True
+                continue
+            if tok.startswith("--run-id="):
+                continue
+            filtered.append(tok)
+        base_argv = filtered
+
+        pad = len(str(args.n_repeats))
+        cmds = [
+            [sys.executable, __file__] + base_argv + ["--run-id", f"rep{i:0{pad}d}"]
+            for i in range(1, args.n_repeats + 1)
+        ]
+
+        # Build a unique log-tag from the run identity so different experiments
+        # never share the same log filenames.
+        _rk, _ = _derive_run_ids(args.model_path, args.model_name)
+        if args.reasoning_effort:
+            _rk += f"_re{args.reasoning_effort}"
+        if args.no_cot:
+            _rk += "_nocot"
+        if args.run_id:          # shouldn't be set together with --n-repeats, but guard anyway
+            _rk += f"_{args.run_id}"
+        log_tag = _rk            # e.g. miprov2_dca_light_gpt41mini_20260402145119_run_gpt41mini_nocot
+        
+        log_tag += f"_temp{args.temperature}" if args.temperature != DEFAULT_TEMPERATURE else str(args.temperature)
+        # Log files go to <output-dir>/repeat_logs/<log_tag>/repN.log
+        logs_dir = args.output_dir / "repeat_logs" / log_tag
+        logs_dir.mkdir(parents=True, exist_ok=True)
+        log_paths = {
+            i: logs_dir / f"rep{i:0{pad}d}.log"
+            for i in range(1, args.n_repeats + 1)
+        }
+
+        print(f"Launching {args.n_repeats} parallel repeats …")
+        print(f"Logs directory: {logs_dir}")
+        for i, cmd in enumerate(cmds, 1):
+            print(f"  rep {i:0{pad}d}: {' '.join(cmd[-6:])} …  -> {log_paths[i].name}")
+
+        def _run_one(cmd: list[str], rep_idx: int) -> tuple[int, str, str, str]:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            # Write full output to log immediately
+            log_path = log_paths[rep_idx]
+            with log_path.open("w", encoding="utf-8") as fh:
+                fh.write(f"=== rep {rep_idx:0{pad}d} — exit_code={result.returncode} ===\n\n")
+                fh.write("--- STDOUT ---\n")
+                fh.write(result.stdout or "(empty)\n")
+                if result.stderr.strip():
+                    fh.write("\n--- STDERR ---\n")
+                    fh.write(result.stderr)
+            return rep_idx, result.returncode, result.stdout, result.stderr
+
+        results_list: list[tuple[int, int, str, str]] = []
+        with ThreadPoolExecutor(max_workers=args.n_repeats) as pool:
+            futures = {pool.submit(_run_one, cmd, i): i for i, cmd in enumerate(cmds, 1)}
+            for fut in as_completed(futures):
+                rep_idx, rc, stdout, stderr = fut.result()
+                results_list.append((rep_idx, rc, stdout, stderr))
+                tag = f"[rep {rep_idx:0{pad}d}]"
+                status = "OK" if rc == 0 else f"FAILED (exit {rc})"
+                print(f"  {tag} finished — {status}  log -> {log_paths[rep_idx]}")
+
+        # Print full output of every repeat once all are done
+        results_list.sort(key=lambda x: x[0])
+        print(f"\n{'#'*80}")
+        print("FULL OUTPUT OF ALL REPEATS")
+        print(f"{'#'*80}")
+        for rep_idx, rc, stdout, stderr in results_list:
+            tag = f"rep {rep_idx:0{pad}d}"
+            print(f"\n{'='*80}")
+            print(f"  {tag}  exit_code={rc}  (log: {log_paths[rep_idx]})")
+            print(f"{'='*80}")
+            print(stdout or "(no stdout)")
+            if stderr.strip():
+                print(f"--- STDERR ---\n{stderr.strip()}")
+
+        print(f"\n{'#'*80}")
+        n_ok   = sum(1 for _, rc, _, _ in results_list if rc == 0)
+        n_fail = len(results_list) - n_ok
+        print(f"All {args.n_repeats} repeats finished — {n_ok} OK, {n_fail} FAILED")
+        print(f"Logs saved to: {logs_dir}")
+        print(f"{'#'*80}")
+        sys.exit(0 if n_fail == 0 else 1)
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     use_llm = not args.skip_llm
@@ -511,6 +617,19 @@ def main():
         active_run_key   = run_key
         active_run_label = run_label
         file_prefix      = "eval_results_" + run_key
+
+    # Append --run-id suffix so parallel repeats write to separate files
+    if args.run_id:
+        rid = args.run_id
+        active_run_key   = active_run_key   + f"_{rid}"
+        active_run_label = active_run_label + f" [{rid}]"
+        file_prefix      = file_prefix      + f"_{rid}"
+
+    # Append temperature — same pattern as log_tag: "0.1" for default, "_temp0.7" for others
+    # This ensures different temperatures produce separate JSON files (mirrors log folder naming)
+    _temp_suffix   = f"_temp{args.temperature}" if args.temperature != DEFAULT_TEMPERATURE else str(args.temperature)
+    active_run_key += _temp_suffix
+    file_prefix    += _temp_suffix
 
     sets_to_run = ["val", "test"] if args.which_set == "both" else [args.which_set]
 
