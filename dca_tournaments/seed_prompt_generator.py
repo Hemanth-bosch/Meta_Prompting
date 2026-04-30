@@ -39,14 +39,14 @@ _CATEGORY_REFERENCE = """
 Category definitions for DCA (Document Change Analysis):
 
 Case A — Single image present:
-  A1: Single NON-INFORMATIONAL image (blank/logo/watermark/divider) → discard=true
+    A1: Single NON-INFORMATIONAL image (blank/logo/watermark/divider) → discard=true,  changes="Only one image and it is non informational"
   A2: Single INFORMATIONAL image (meaningful text/tables/diagrams)  → discard=false, changes="NoMatchFound"
 
 Case B — Two images present:
   B1: Either image is CORRUPTED / UNREADABLE / TOO TINY              → discard=false, changes="Could not infer"
-  B2: Either image has a FULL STRIKETHROUGH / CROSS-OUT               → discard=false, changes="Image crossed out"
-  B3: BOTH images are NON-INFORMATIONAL                               → discard=true,  changes="Both non informational"
-  B4: ONE informational + ONE non-informational                        → discard=false, describe the informational image
+ B2: Either image has a FULL STRIKETHROUGH / CROSS-OUT               → discard=false, changes="Image has been crossed out"
+    B3: BOTH images are NON-INFORMATIONAL                               → discard=true,  changes="Both images are non informational and contain only logo/watermark etc. no meaningful content"
+    B4: ONE informational + ONE non-informational                       → discard=false, changes="One image informational and other non-informational: <describe informational image>"
   B5a: Both informational, TRIVIAL differences only                    → discard=true,  changes="Images are identical - no changes"
   B5b: Both informational, MEANINGFUL differences exist                → discard=false, detailed change description
 """.strip()

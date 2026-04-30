@@ -72,8 +72,8 @@ FIELD_WEIGHT_CHANGE = 0.4   # change summary quality weight
 _SPECIAL_CASE_RULES = [
     {
         "label": "NoMatchFound",
-        "detect": lambda h: ("nomatchfound" in h.replace(" ", "") or "no match found" in h) and len(h) < 20,
-        "match":  lambda h, m: ("nomatchfound" in m.replace(" ", "") or "no match found" in m) and len(m) < 20,
+        "detect": lambda h: ("nomatchfound" in h or "no match found" in h) and len(h) < 20,
+        "match":  lambda h, m: ("nomatchfound" in m or "no match found" in m) and len(m) < 20,
     },
     {
         "label": "Could not infer",
@@ -82,13 +82,13 @@ _SPECIAL_CASE_RULES = [
     },
     {
         "label": "Image has been crossed out",
-        "detect": lambda h: "crossed out" in h.replace(" ", "") and len(h) < 40,
-        "match":  lambda h, m: "crossed out" in m.replace(" ", "") and len(m) < 40,
+        "detect": lambda h: ("crossed out" in h or "crossedout" in h) and len(h) < 40,
+        "match":  lambda h, m: ("crossed out" in m or "crossedout" in m) and len(m) < 40,
     },
     {
         "label": "Images are identical - no changes",
-        "detect": lambda h: "identical" in h.replace(" ", "") and "no change" in h.replace(" ", "") and len(h) < 50,
-        "match":  lambda h, m: "identical" in m.replace(" ", "") and "no change" in m.replace(" ", "") and len(m) < 50,
+        "detect": lambda h: "identical" in h and ("no change" in h or "nochanges" in h) and len(h) < 50,
+        "match":  lambda h, m: "identical" in m and ("no change" in m or "nochanges" in m) and len(m) < 50,
     },
 ]
 

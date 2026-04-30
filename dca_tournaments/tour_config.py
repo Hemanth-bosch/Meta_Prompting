@@ -25,13 +25,13 @@ _DEFAULT_BOOTSTRAP_CONFIGS: list[dict] = [
     # {"name": "n16_d5b3", "n": 16, "max_rounds": 2, "max_labeled_demos": 5, "max_bootstrapped_demos": 3},
     # {"name": "n32_d3b3", "n": 32, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 3},
     # {"name": "n32_d5b3", "n": 32, "max_rounds": 2, "max_labeled_demos": 5, "max_bootstrapped_demos": 3},
-    # {"name": "n16_d3b5", "n": 16, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 5},
-    {"name": "n32_d3b5", "n": 4, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 5},
+    {"name": "n8_d3b5", "n": 8, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 5},
+    {"name": "n16_d3b3", "n": 16, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 3},
 ]
 
 # ── Default GEPA configurations (Stage 3) ───────────────────────
 _DEFAULT_GEPA_CONFIGS: list[dict] = [
-    # {"name": "gepa_medium", "auto": "medium", "use_merge": True, "track_stats": True},
+    {"name": "gepa_medium", "auto": "medium", "use_merge": True, "track_stats": True},
     {"name": "gepa_light", "auto": "light", "use_merge": True, "track_stats": True},
 ]
 
@@ -69,7 +69,7 @@ class TournamentConfig:
     # ── Mini dataset sizes ─────────────────────────────────────────
     # Set to None to use full datasets.
     mini_train_size: Optional[int] = 120
-    mini_val_size: Optional[int] = 60
+    mini_val_size: Optional[int] = 41
 
     # ── Instructions vs field descriptions ─────────────────────────
     instructions_only: bool = True
@@ -91,13 +91,13 @@ class TournamentConfig:
 
     # ── Stage 2: MIPROv2 ──────────────────────────────────────────
     miprov2_intensities: List[str] = field(default_factory=lambda: ["light", 
-                                                                    # "medium"
+                                                                    "medium"
                                                                     ]
                                                                     )
     miprov2_models: List[str] = field(default_factory=lambda: ["azure/gpt-4.1-mini"])
     miprov2_demo_configs: List[dict] = field(default_factory=lambda: [
-        {"max_labeled_demos": 3, "max_bootstrapped_demos": 3},
-        # {"max_labeled_demos": 6, "max_bootstrapped_demos": 6},
+        # {"max_labeled_demos": 3, "max_bootstrapped_demos": 3},
+        {"max_labeled_demos": 6, "max_bootstrapped_demos": 6},
         # {"max_labeled_demos": 3, "max_bootstrapped_demos": 5},
         # {"max_labeled_demos": 5, "max_bootstrapped_demos": 3},
     ])
