@@ -8,22 +8,22 @@ This repository provides a framework for automatically optimizing LLM prompts us
 
 ## Table of Contents
 
-1. [Getting Started in 5 Minutes](#getting-started-in-5-minutes)
+1. [(DCA) Getting Started in 5 Minutes](#dca-getting-started-in-5-minutes)
 2. [Use Cases](#use-cases-in-this-repository)
 3. [Project Structure](#project-structure)
 4. [Setup](#setup)
 5. [Data Setup](#data-setup)
-6. [Running the DCA Pipeline](#running-the-dca-pipeline)
+6. [(DCA) Running the DCA Pipeline](#dca-running-the-dca-pipeline)
 7. [Running JO and YANASE Pipelines](#running-the-jo-and-yanase-pipelines)
-8. [Human Prompt Baselines](#dca-human-prompt-baseline-pipeline)
+8. [(DCA) Human Prompt Baselines](#dca-human-prompt-baseline-pipeline)
 9. [Performance Results](#performance-results)
 10. [LLM Provider Configuration](#llm-provider-configuration)
 11. [Adding a New Use Case](#adding-a-new-use-case)
-12. [Runtime Expectations](#runtime-expectations)
-13. [Cost Estimates](#cost-estimates)
-14. [Example Output Files](#example-output-files)
-15. [Resuming an Interrupted Run](#resuming-an-interrupted-run)
-16. [Test Set Evaluation](#test-set-evaluation)
+12. [(DCA) Runtime Expectations](#dca-runtime-expectations)
+13. [(DCA) Cost Estimates](#dca-cost-estimates)
+14. [(DCA) Example Output Files](#dca-example-output-files)
+15. [(DCA) Resuming an Interrupted Run](#dca-resuming-an-interrupted-run)
+16. [(DCA) Test Set Evaluation](#dca-test-set-evaluation)
 17. [FAQ](#faq)
 18. [Troubleshooting](#troubleshooting)
 
@@ -121,7 +121,7 @@ meta-prompting/
 
 ---
 
-## Getting Started in 5 Minutes
+## (DCA) Getting Started in 5 Minutes
 
 > **Fastest path to running a DCA tournament on your machine.**
 
@@ -241,11 +241,11 @@ data/
 
 ---
 
-## Running the DCA Pipeline
+## (DCA) Running the DCA Pipeline
 
 The DCA pipeline has three modes depending on how much you want to run:
 
-### Mode 1 — Multi-Stage Tournament (Recommended for best results)
+### (DCA) Mode 1 — Multi-Stage Tournament (Recommended for best results)
 
 Runs four sequential optimization stages (Seed → Bootstrap → MIPROv2 → GEPA). Each stage uses the best candidates from the previous stage as its starting point. Produces a leaderboard plus final score and Pareto summaries for manual or criteria-based selection.
 
@@ -274,7 +274,7 @@ uv run python -m dca_tournaments.run_tournament \
 
 See [dca_tournaments/README.md](dca_tournaments/README.md) for the full argument reference, stage details, and output artifacts.
 
-### Mode 2 — Single-Optimizer Run
+### (DCA) Mode 2 — Single-Optimizer Run
 
 Run one optimizer in isolation for quick experiments:
 
@@ -297,7 +297,7 @@ uv run python extract_dca.py --optimizer all --load-extractor log\..._seed_state
 
 Single-optimizer runs are now fail-fast: if Bootstrap, MIPROv2, GEPA, or SIMBA hits an unrecoverable optimizer error, the script stops immediately, writes an error summary JSON, preserves the seed state JSON, and prints a rerun command that resumes from that saved seed state instead of silently continuing with a degraded result.
 
-### Mode 3 — Grid Runner
+### (DCA) Mode 3 — Grid Runner
 
 Run combinatorial experiments across models and hyperparameters in parallel:
 
@@ -309,7 +309,7 @@ uv run python run_dca_grid.py --parallel 4
 uv run python run_dca_grid.py --dry-run
 ```
 
-### Evaluating a Saved DCA Model
+### (DCA) Evaluating a Saved DCA Model
 
 After optimization, evaluate the saved model on the frozen val or test split:
 
@@ -473,7 +473,7 @@ See also [ReadMe-Understand-Optimizers/](ReadMe-Understand-Optimizers/) for guid
 
 ---
 
-## Runtime Expectations
+## (DCA) Runtime Expectations
 
 Optimizer runtime depends on the **student model**, **dataset size**, and **Azure API throughput** at the time of the run. Numbers below are measured from completed DCA tournaments with the default configuration (`mini_train=120`, `mini_val=45`, `top_k=2`, `n_threads=4`).
 
@@ -501,7 +501,7 @@ Optimizer runtime depends on the **student model**, **dataset size**, and **Azur
 
 ---
 
-## Cost Estimates
+## (DCA) Cost Estimates
 
 Costs depend on Azure pricing tier, model versions, and API load. The estimates below are rough ballparks for the DCA use case (image-pair inputs — **images are the dominant cost factor**).
 
@@ -533,7 +533,7 @@ Costs depend on Azure pricing tier, model versions, and API load. The estimates 
 
 ---
 
-## Resuming an Interrupted Run
+## (DCA) Resuming an Interrupted Run
 
 If a tournament is interrupted (network timeout, crash, manual stop), resume it from where it stopped:
 
@@ -552,7 +552,7 @@ If an optimizer subprocess fails, the error summary and seed state are preserved
 
 ---
 
-## Test Set Evaluation
+## (DCA) Test Set Evaluation
 
 By default the tournament does **not** evaluate on the hold-out test set. Test evaluation should happen once, on a final selected candidate, to avoid repeated measurement leakage.
 
@@ -566,7 +566,7 @@ The test score appears in `tournament_summary.json` under `test_evaluation` and 
 
 ---
 
-## Example Output Files
+## (DCA) Example Output Files
 
 After a completed tournament, `.cache/tournament/<tournament_id>/` contains:
 
