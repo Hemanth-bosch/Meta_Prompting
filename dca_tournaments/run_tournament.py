@@ -1,43 +1,96 @@
 #!/usr/bin/env python3
-"""run_tournament.py — CLI entrypoint for the Sequential Cascaded DCA Optimization.
+"""run_tournament.py \u2014 CLI entrypoint for the Sequential Cascaded DCA Optimization.
 
-Flow
-----
-1. Parse args → build TournamentConfig
-2. Setup logging (TeeLogger for the entire run)
-3. Load DCA dataset & stratified split
-4. Initialize leaderboard
-5. Stage 0: Seed prompt generation (or load seed from file)
-6. Stages 1-3: Run each stage via StageRunner, seeding from top-K of
-   the previous stage
-7. Final tournament re-evaluation at eval_temperature
-8. Optional test set evaluation via subprocess
-9. Generate & save summary to output_dir AND log_dir
+WHAT THIS SCRIPT DOES
+---------------------
+This is the main entry point for the multi-stage tournament optimization pipeline.
+It chains four optimizers in sequence, where each stage seeds the next with its
+best-performing prompt candidates.
 
-Usage examples
+PIPELINE STAGES (in order)
+---------------------------
+  Stage 0  seed       \u2014 A strong LLM (seed_model) writes N candidate instructions.
+                        Each is evaluated bare + optionally with demos added.
+                        Best top-K flow into stage 1.
+
+  Stage 1  bootstrap  \u2014 BootstrapFewShotWithRandomSearch.
+                        Searches for good few-shot demo configurations around
+                        each incoming seed. Spawned as a subprocess per config
+                        to avoid nested ThreadPoolExecutor issues on Windows.
+
+  Stage 2  miprov2    \u2014 MIPROv2 (Bayesian instruction + demo search).
+                        Proposes new instruction variants using a prompt_model,
+                        evaluates them in a Bayesian loop. Also subprocessed.
+
+  Stage 3  gepa       \u2014 GEPA (reflection-LM guided prompt improvement).
+                        Runs the student on mini-train, sends failures to a
+                        reflection LM which rewrites the instruction, then
+                        evaluates the improved version. Also subprocessed.
+
+STAGE FLOW DIAGRAM
+------------------
+  seed_candidates ─top-K─\u25ba bootstrap ─top-K─\u25ba miprov2 ─top-K─\u25ba gepa
+                                \u2193                    \u2193               \u2193
+                         leaderboard ────────────────────────────\u25ba leaderboard
+                                                                       \u2193
+                                               final re-eval on full val set
+                                                                       \u2193
+                                               summary.json + leaderboard.xlsx
+
+KEY DESIGN DECISIONS
+--------------------
+  - Each optimizer runs in an isolated subprocess (optimizer_subprocess.py).
+    This avoids ContextVar / nested thread-pool bugs on Windows with Azure.
+  - All stages share a single OptimizationLeaderboard that auto-saves after
+    every new entry so progress is never lost on crash.
+  - ``--cross-stage-selection`` (default on) selects top-K from ALL stages
+    combined for the next stage seed, not just the current stage's best.
+  - Final re-evaluation uses the full val set at eval_temperature so all
+    candidates are compared on the same data (optimization used mini_val).
+  - Resuming is safe: ``--resume-from <dir>`` reloads the leaderboard and
+    stage completion markers, skipping completed stages.
+
+RESUME / CRASH RECOVERY
+-----------------------
+  If a run crashes or is interrupted (Ctrl+C), re-run with:
+      python -m dca_tournaments.run_tournament --resume-from \".cache/tournament/<name>\"
+  Completed stages (marked by stage_completed.json) are skipped automatically.
+
+USAGE EXAMPLES
 --------------
-    # Default: seed → bootstrap → miprov2
-    uv run python -m dca_tournaments.run_tournament
+    # Full pipeline with default settings
+    python -m dca_tournaments.run_tournament
 
-    # Quick smoke test (Stage 0 only, 1 candidate)
-    uv run python -m dca_tournaments.run_tournament --stages seed --n-seed-candidates 1
+    # Quick smoke test (seed stage only, 1 candidate)
+    python -m dca_tournaments.run_tournament --stages seed --n-seed-candidates 1
 
-    # Full pipeline with GEPA
-    uv run python -m dca_tournaments.run_tournament --stages seed,bootstrap,miprov2,gepa
+    # Exponential hybrid metric to penalise long prompts during optimization
+    python -m dca_tournaments.run_tournament \\
+        --hybrid-metric --hybrid-penalty-mode exponential \\
+        --hybrid-target-tokens 2500 --hybrid-penalty-steepness 2.0
 
-    # Skip Stage 0 — use a saved program as the sole seed
-    uv run python -m dca_tournaments.run_tournament --seed-from-file .cache/my_best.json --stages bootstrap,miprov2
+    # Resume after crash
+    python -m dca_tournaments.run_tournament --resume-from \".cache/tournament/tournament_20260505135453\"
 
-    # Dry run — print config and estimated runs, then exit
-    uv run python -m dca_tournaments.run_tournament --dry-run
+    # Skip Stage 0 \u2014 use a saved program as the sole seed
+    python -m dca_tournaments.run_tournament \\
+        --seed-from-file .cache/my_best.json --stages bootstrap,miprov2
 
-    # Change models
-    uv run python -m dca_tournaments.run_tournament --student-model azure/gpt-4.1 --seed-model azure/gpt-4.1
+OUTPUT FILES (in .cache/tournament/<name>/ and log/tournament/<name>/)
+-----------------------------------------------------------------------
+  leaderboard.json         \u2014 all candidates, auto-updated after each eval
+  leaderboard.xlsx         \u2014 Excel export of leaderboard for offline analysis
+  summary.json             \u2014 final run summary (timing, best score, stage history)
+  pareto_plot.png          \u2014 score vs avg_tokens scatter + Pareto front
+  config.json              \u2014 TournamentConfig snapshot (reproducibility)
+  stage_{N}_{name}/        \u2014 compiled .json programs from each stage
+  split_manifest.json      \u2014 dataset split used (val/test pair names)
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
 import os
@@ -72,10 +125,147 @@ from dca_tournaments.tour_utils import (
 
 
 def _stage_dir_name(stage: str) -> str:
+    """Return the filesystem folder name for a given stage, e.g. 'stage_1_bootstrap'."""
     return StageRunner.get_stage_dir_name(stage)
 
+
+def _stage_completion_marker(output_dir: str | Path, stage: str) -> Path:
+    """Path to the sentinel file that marks a stage as fully completed.
+
+    If this file exists when resuming, the stage is skipped entirely.
+    Written by _write_stage_completion_marker() after every successful stage.
+    """
+    return Path(output_dir) / _stage_dir_name(stage) / "stage_completed.json"
+
+
+def _stage_is_completed(output_dir: str | Path, stage: str) -> bool:
+    """Return True if the stage has a completion marker on disk."""
+    return _stage_completion_marker(output_dir, stage).exists()
+
+
+def _write_stage_completion_marker(output_dir: str | Path, stage: str, execution: dict) -> None:
+    marker_path = _stage_completion_marker(output_dir, stage)
+    marker_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(marker_path, "w", encoding="utf-8") as f:
+        json.dump({"stage": stage, "execution": execution}, f, indent=2, ensure_ascii=False)
+
 def _ts() -> str:
+    """Return a short HH:MM:SS timestamp for console log lines."""
     return datetime.now().strftime("%H:%M:%S")
+
+
+def _slug_token(value: str | None, default: str = "na") -> str:
+    """Convert any string to a safe filesystem token by replacing non-alphanumeric chars.
+
+    Example: _slug_token("azure/gpt-4.1") -> "azure_gpt_4_1"
+    """
+    text = str(value or "").strip().lower()
+    cleaned = [ch if ch.isalnum() else "_" for ch in text]
+    slug = "".join(cleaned).strip("_")
+    while "__" in slug:
+        slug = slug.replace("__", "_")
+    return slug or default
+
+
+def _short_hash(*parts: object, length: int = 10) -> str:
+    """Return a short deterministic hex hash of the given parts (JSON-serialised).
+
+    Used to fingerprint dataset+split configs so the same settings always
+    resolve to the same cached split manifest file.
+    """
+    payload = json.dumps(parts, ensure_ascii=False, sort_keys=True, default=str)
+    return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:length]
+
+
+def _build_split_cache_path(config: TournamentConfig) -> Path:
+    pairs_tag = _slug_token(Path(os.path.abspath(config.pairs_dir)).name)[:24]
+    gt_tag = _slug_token(Path(os.path.abspath(config.gt_dir)).name)[:24]
+    ratios_tag = (
+        f"tr{int(config.train_ratio * 100)}"
+        f"va{int(config.val_ratio * 100)}"
+        f"te{int(config.test_ratio * 100)}"
+    )
+    split_fingerprint = _short_hash(
+        os.path.abspath(config.pairs_dir),
+        os.path.abspath(config.gt_dir),
+        config.split_seed,
+        {"train": config.train_ratio, "val": config.val_ratio, "test": config.test_ratio},
+        ["expected_discard_image", "expected_human_label_category", "doubt"],
+    )
+    return Path(".cache") / "splits" / (
+        f"dca_split_seed{config.split_seed}_{pairs_tag}_{gt_tag}_{ratios_tag}_{split_fingerprint}.json"
+    )
+
+
+def _entry_snapshot(e, rank: int | None = None) -> dict:
+    """Serialise a CandidateEntry to a plain dict suitable for JSON snapshots.
+
+    Used by _save_stage_snapshot, _save_full_val_reeval_audit, and the
+    stage_top_k_history recorded in summary.json.
+    Rank is 1-based if provided.
+    """
+    metadata = dict(e.metadata or {})
+    d: dict = {}
+    if rank is not None:
+        d["rank"] = rank
+    d.update({
+        "stage": e.stage,
+        "config_name": e.config_name,
+        "val_total_score": round(e.val_total_score, 4),
+        "val_cls_score": round(e.val_cls_score, 4),
+        "val_change_score": round(e.val_change_score, 4),
+        "n_demos": e.n_demos,
+        "instruction_length": e.instruction_length,
+        "val_avg_total_tokens": e.val_avg_total_tokens,
+        "val_avg_input_tokens": e.val_avg_input_tokens,
+        "val_avg_output_tokens": e.val_avg_output_tokens,
+        "val_avg_reasoning_tokens": e.val_avg_reasoning_tokens,
+        "per_category_scores": dict(e.per_category_scores or {}),
+        "parent_path": e.parent_path,
+        "program_path": e.program_path,
+        "timestamp": e.timestamp,
+        "optimization_started_at": metadata.get("optimization_started_at"),
+        "optimization_completed_at": metadata.get("optimization_completed_at"),
+        "optimization_duration_seconds": metadata.get("optimization_duration_seconds"),
+        "compile_duration_seconds": metadata.get("compile_duration_seconds"),
+        "evaluation_duration_seconds": metadata.get("evaluation_duration_seconds", e.val_eval_time_seconds),
+    })
+    return d
+
+
+def _freeze_selected_entries(entries: list) -> list[dict]:
+    """Snapshot a list of CandidateEntry objects as rank-ordered plain dicts.
+
+    Called after each stage to record which candidates flow to the next stage.
+    Used in the cascade table in the final summary.json.
+    """
+    return [_entry_snapshot(e, i + 1) for i, e in enumerate(entries)]
+
+
+def _save_full_val_reeval_audit(config: TournamentConfig, phase: str, entries: list) -> None:
+    """Save a snapshot of the full leaderboard before/after the final val re-eval.
+
+    Writes two files to log_dir:
+      leaderboard_pre_full_val_reeval.json   — scores from mini_val (during optimisation)
+      leaderboard_post_full_val_reeval.json  — scores from full val set (after re-eval)
+
+    This lets you compare optimisation-time scores against final evaluation scores.
+    """
+    path = Path(config.log_dir) / f"leaderboard_{phase}_full_val_reeval.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "phase": phase,
+                "n_candidates": len(entries),
+                "entries": [_entry_snapshot(e, i + 1) for i, e in enumerate(entries)],
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+            default=str,
+        )
+    print(f"  [{_ts()}] Full-val re-eval snapshot saved → {path}")
 
 
 def _save_stage_snapshot(
@@ -93,29 +283,6 @@ def _save_stage_snapshot(
     log_dir = Path(config.log_dir)
     log_dir.mkdir(parents=True, exist_ok=True)
 
-    def _entry_to_dict(e, rank: int | None = None) -> dict:
-        d: dict = {}
-        if rank is not None:
-            d["rank"] = rank
-        d.update({
-            "stage": e.stage,
-            "config_name": e.config_name,
-            "val_total_score": round(e.val_total_score, 4),
-            "val_cls_score": round(e.val_cls_score, 4),
-            "val_change_score": round(e.val_change_score, 4),
-            "n_demos": e.n_demos,
-            "instruction_length": e.instruction_length,
-            "val_avg_total_tokens": e.val_avg_total_tokens,
-            "val_avg_input_tokens": e.val_avg_input_tokens,
-            "val_avg_output_tokens": e.val_avg_output_tokens,
-            "val_avg_reasoning_tokens": e.val_avg_reasoning_tokens,
-            "per_category_scores": e.per_category_scores,
-            "parent_path": e.parent_path,
-            "program_path": e.program_path,
-            "timestamp": e.timestamp,
-        })
-        return d
-
     try:
         all_path = log_dir / f"stage_{stage_name}_all_candidates.json"
         with open(all_path, "w", encoding="utf-8") as f:
@@ -124,7 +291,7 @@ def _save_stage_snapshot(
                 "n_candidates": len(all_candidates),
                 "selection_criteria": config.selection_criteria,
                 "cross_stage_selection": config.cross_stage_selection,
-                "candidates": [_entry_to_dict(e, i + 1) for i, e in enumerate(all_candidates)],
+                "candidates": [_entry_snapshot(e, i + 1) for i, e in enumerate(all_candidates)],
             }, f, indent=2, ensure_ascii=False, default=str)
         print(f"  [{_ts()}] All candidates saved → {all_path}")
 
@@ -135,11 +302,16 @@ def _save_stage_snapshot(
                 "top_k": config.top_k,
                 "n_selected": len(top_k_selected),
                 "selection_criteria": config.selection_criteria,
-                "selected": [_entry_to_dict(e, i + 1) for i, e in enumerate(top_k_selected)],
+                "selected": [_entry_snapshot(e, i + 1) for i, e in enumerate(top_k_selected)],
             }, f, indent=2, ensure_ascii=False, default=str)
         print(f"  [{_ts()}] Top-K selected saved → {top_path}")
     except Exception as exc:
         print(f"  [WARN] Failed to save stage snapshot for '{stage_name}': {exc}")
+
+
+# Stages whose scores are NOT comparable to optimisation stages
+# (seed_baseline is evaluated on train_set, not val_set).
+_FINAL_SELECTION_EXCLUDE_STAGES = ["seed_baseline"]
 
 dotenv.load_dotenv(override=True)
 
@@ -158,13 +330,17 @@ def build_parser() -> argparse.ArgumentParser:
     g = p.add_argument_group("Stage control")
     g.add_argument("--stages", type=str, default=None,
                    help=f"Comma-separated list of stages to run. "
-                        f"Valid: {','.join(VALID_STAGES)}  (default: seed,bootstrap,miprov2)")
+                        f"Valid: {','.join(VALID_STAGES)}  (default: seed,bootstrap,miprov2,gepa)")
     g.add_argument("--top-k", type=int, default=None,
                    help="Number of top candidates to propagate between stages (default: 2)")
     g.add_argument("--skip-final-tournament", action="store_true",
                    help="Skip the final re-evaluation at eval_temperature")
-    g.add_argument("--skip-test-eval", action="store_true",
-                   help="Skip test set evaluation at the end")
+    g.add_argument("--test-eval", action="store_true",
+                   help="Run test set evaluation at the end (default: off)")
+    g.add_argument("--test-eval-criteria", type=str, default=None,
+                   choices=["best_score"],
+                   help="How to choose the candidate for test evaluation (default: best_score)")
+    g.add_argument("--skip-test-eval", action="store_true", help=argparse.SUPPRESS)
     g.add_argument("--dry-run", action="store_true",
                    help="Print config and estimated runs, then exit")
 
@@ -206,7 +382,7 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--mini-train-size", type=int, default=None,
                    help="Mini train dataset size (0=full, default: 120)")
     g.add_argument("--mini-val-size", type=int, default=None,
-                   help="Mini val dataset size (0=full, default: 40)")
+                   help="Mini val dataset size (0=full, default: 41)")
 
     # Instructions mode
     g = p.add_argument_group("Instructions mode")
@@ -330,15 +506,24 @@ def build_parser() -> argparse.ArgumentParser:
     # Hybrid metric
     g = p.add_argument_group("Hybrid metric")
     g.add_argument("--hybrid-metric", action="store_true", default=False,
-                   help="Use hybrid metric: score * weight + length_penalty * weight "
-                        "(penalises long prompts during optimisation; "
-                        "plain eval always uses true DCA score)")
+                   help="Use hybrid metric to penalise long prompts during optimisation "
+                        "(plain eval always uses true DCA score). "
+                        "Modes: 'linear' (score*w + efficiency*w) or "
+                        "'exponential' (score * exp(-k * max(0, t/T - 1)))")
     g.add_argument("--hybrid-score-weight", type=float, default=None,
-                   help="Weight for DCA score in hybrid metric (default: 0.5)")
+                   help="Weight for DCA score in hybrid metric (linear mode, default: 0.5)")
     g.add_argument("--hybrid-length-weight", type=float, default=None,
-                   help="Weight for prompt-length efficiency term (default: 0.5)")
+                   help="Weight for prompt-length efficiency term (linear mode, default: 0.5)")
     g.add_argument("--hybrid-max-prompt-tokens", type=int, default=None,
-                   help="Input token count at which length_score reaches 0 (default: 4000)")
+                   help="Input token count at which length_score reaches 0 (linear mode, default: 8000)")
+    g.add_argument("--hybrid-penalty-mode", type=str, default=None,
+                   choices=["linear", "exponential"],
+                   help="Penalty shape: 'linear' (default) or 'exponential' "
+                        "(zero penalty below --hybrid-target-tokens, then exp(-k*(t/T-1)))")
+    g.add_argument("--hybrid-target-tokens", type=int, default=None,
+                   help="Token budget for exponential penalty — below this, penalty=0 (default: 2500)")
+    g.add_argument("--hybrid-penalty-steepness", type=float, default=None,
+                   help="Steepness k — k=1 gentle, k=2 standard, k=3 aggressive (default: 2.0)")
 
     # Paths & data
     g = p.add_argument_group("Paths & data")
@@ -376,6 +561,24 @@ def build_parser() -> argparse.ArgumentParser:
 # ═══════════════════════════════════════════════════════════════════
 
 def main():
+    """Run the full tournament pipeline.
+
+    Execution order (all controlled by TournamentConfig):
+      1. Parse CLI args \u2192 TournamentConfig
+      2. Create output + log directories, save config.json
+      3. Start TeeLogger (all output \u2192 terminal + log file)
+      4. Load dataset, stratified split, mini datasets
+      5. Load or create leaderboard (resume-safe)
+      6. Optionally build hybrid metric (prompt-length penalty)
+      7. Stage 0 \u2014 Seed: generate N candidate instructions via seed LLM
+      8. Stages 1-3 \u2014 Bootstrap / MIPROv2 / GEPA in order
+         - Each stage spawns subprocesses (one per seed \xd7 config pair)
+         - Results added to shared leaderboard after each subprocess
+         - Stage completion marker written to disk for resume safety
+      9. Final re-evaluation: all candidates \u2192 full val set at eval_temperature
+      10. Pareto front analysis (score vs avg tokens/sample)
+      11. Summary JSON + leaderboard.xlsx + pareto_plot.png saved
+    """
     parser = build_parser()
     args = parser.parse_args()
 
@@ -383,8 +586,8 @@ def main():
     config = TournamentConfig.from_cli_args(args)
 
     # ── Dry-run mode ─────────────────────────────────────────────
+    config.print_summary()
     if args.dry_run:
-        config.print_summary()
         print("Dry run — exiting.\n")
         return
 
@@ -405,14 +608,17 @@ def main():
     stages_run: list[str] = []
     # Maps stage → top-K CandidateEntry objects passed to the next stage.
     # Used for the cascade table in the final summary.
-    stage_top_k_history: dict[str, list] = {}
+    stage_top_k_history: dict[str, list[dict]] = {}
+    stage_execution_history: dict[str, dict] = {}
+    current_stage_name = None
+    current_stage_started_at = None
+    current_stage_t0 = None
     # Maps stage → global best val_total_score immediately before that stage ran.
     # Gives the true cross-stage improvement delta.
     stage_pre_best: dict[str, float] = {}
 
     try:
         config.print_summary()
-
         # ── Configure LM ────────────────────────────────────────
         print(f"[{_ts()}] Configuring student LM...")
         student_lm_kwargs = {}
@@ -452,8 +658,12 @@ def main():
         test_names = [str(getattr(ex, "pair_name", "")) for ex in test_set]
         split_manifest = {
             "created_at": datetime.now().isoformat(timespec="seconds"),
+            "cache_path": str(_build_split_cache_path(config)),
             "seed": config.split_seed,
+            "stratify_by": ["expected_discard_image", "expected_human_label_category", "doubt"],
             "ratios": {"train": config.train_ratio, "val": config.val_ratio, "test": config.test_ratio},
+            "pairs_dir": os.path.abspath(config.pairs_dir),
+            "gt_dir": os.path.abspath(config.gt_dir),
             "total_examples": len(dataset),
             "val": {"count": len(val_names), "pair_names": val_names},
             "test": {"count": len(test_names), "pair_names": test_names},
@@ -461,10 +671,13 @@ def main():
         split_path = Path(config.output_dir) / "split_manifest.json"
         with open(split_path, "w", encoding="utf-8") as f:
             json.dump(split_manifest, f, indent=2)
-        # Also save to standard cache location for test eval script
-        cache_split_path = Path(".cache") / f"dca_split_seed{config.split_seed}.json"
-        cache_split_path.parent.mkdir(exist_ok=True)
+        cache_split_path = _build_split_cache_path(config)
+        cache_split_path.parent.mkdir(parents=True, exist_ok=True)
         with open(cache_split_path, "w", encoding="utf-8") as f:
+            json.dump(split_manifest, f, indent=2)
+        # Keep the legacy cache filename as a compatibility alias for older tooling.
+        legacy_cache_split_path = Path(".cache") / f"dca_split_seed{config.split_seed}.json"
+        with open(legacy_cache_split_path, "w", encoding="utf-8") as f:
             json.dump(split_manifest, f, indent=2)
 
         print(f"\n  train: {len(train_set)}  |  val: {len(val_set)}  |  test: {len(test_set)}")
@@ -509,23 +722,39 @@ def main():
                 score_weight=config.hybrid_score_weight,
                 length_weight=config.hybrid_length_weight,
                 max_prompt_tokens=config.hybrid_max_prompt_tokens,
+                penalty_mode=config.hybrid_penalty_mode,
+                target_tokens=config.hybrid_target_tokens,
+                penalty_steepness=config.hybrid_penalty_steepness,
             )
-            print(
-                f"\n  Hybrid metric enabled: "
-                f"score*{config.hybrid_score_weight} + "
-                f"length_efficiency*{config.hybrid_length_weight} "
-                f"(max_prompt_tokens={config.hybrid_max_prompt_tokens})"
-            )
+            if config.hybrid_penalty_mode == "exponential":
+                print(
+                    f"\n  Hybrid metric enabled: exponential penalty  "
+                    f"target={config.hybrid_target_tokens} tok  k={config.hybrid_penalty_steepness}  "
+                    f"(raw DCA score at eval)"
+                )
+            else:
+                print(
+                    f"\n  Hybrid metric enabled: "
+                    f"score*{config.hybrid_score_weight} + "
+                    f"length_efficiency*{config.hybrid_length_weight} "
+                    f"(max_prompt_tokens={config.hybrid_max_prompt_tokens}; raw DCA score at eval)"
+                )
 
         # ── Stage 0: Seed generation ────────────────────────────
         seed_entries = []
 
         if "seed" in config.stages:
-            if is_resume_mode and leaderboard.stage_entries("seed") and not config.seed_from_file:
+            if is_resume_mode and _stage_is_completed(config.output_dir, "seed") and leaderboard.stage_entries("seed") and not config.seed_from_file:
                 print("\nSkipping Stage 0 (seed): already completed in resumed leaderboard.")
                 seed_entries = leaderboard.top_k(config.top_k, stage="seed")
+                stage_execution_history["seed"] = {"status": "resumed"}
             else:
                 stages_run.append("seed")
+                seed_stage_started_at = datetime.now().isoformat(timespec="seconds")
+                seed_stage_t0 = time.time()
+                current_stage_name = "seed"
+                current_stage_started_at = seed_stage_started_at
+                current_stage_t0 = seed_stage_t0
 
                 if config.seed_from_file:
                     # Load external seed instead of generating
@@ -534,9 +763,13 @@ def main():
                     info = get_program_info(program)
 
                     from dca_tournaments.tour_utils import evaluate_candidate
+                    seed_from_file_started_at = datetime.now().isoformat(timespec="seconds")
+                    seed_from_file_t0 = time.time()
                     eval_result = evaluate_candidate(
                         program, mini_val, metric, config.eval_num_threads,
                     )
+                    seed_from_file_completed_at = datetime.now().isoformat(timespec="seconds")
+                    seed_from_file_duration_seconds = round(time.time() - seed_from_file_t0, 1)
 
                     # Save a copy into our tournament dir
                     seed_dir = Path(config.output_dir) / _stage_dir_name("seed")
@@ -548,6 +781,10 @@ def main():
                         "model": config.student_model_name,
                         "student_model": config.student_model_name,
                         "original_path": config.seed_from_file,
+                        "optimization_started_at": seed_from_file_started_at,
+                        "optimization_completed_at": seed_from_file_completed_at,
+                        "optimization_duration_seconds": seed_from_file_duration_seconds,
+                        "evaluation_duration_seconds": eval_result.get("eval_time_seconds"),
                         "eval_result": eval_result,
                     })
 
@@ -575,6 +812,10 @@ def main():
                             "model": config.student_model_name,
                             "student_model": config.student_model_name,
                             "original_path": config.seed_from_file,
+                            "optimization_started_at": seed_from_file_started_at,
+                            "optimization_completed_at": seed_from_file_completed_at,
+                            "optimization_duration_seconds": seed_from_file_duration_seconds,
+                            "evaluation_duration_seconds": eval_result.get("eval_time_seconds"),
                             "eval_result": eval_result,
                         },
                     )
@@ -616,6 +857,17 @@ def main():
                     # Restore student LM after seed generation (it may have changed)
                     dspy.configure(lm=student_lm)
 
+                stage_execution_history["seed"] = {
+                    "status": "completed",
+                    "started_at": seed_stage_started_at,
+                    "completed_at": datetime.now().isoformat(timespec="seconds"),
+                    "duration_seconds": round(time.time() - seed_stage_t0, 1),
+                }
+                _write_stage_completion_marker(config.output_dir, "seed", stage_execution_history["seed"])
+                current_stage_name = None
+                current_stage_started_at = None
+                current_stage_t0 = None
+
         if not seed_entries and is_resume_mode:
             for fallback_stage in ("gepa", "miprov2", "bootstrap", "seed"):
                 existing = leaderboard.top_k(config.top_k, stage=fallback_stage)
@@ -630,9 +882,13 @@ def main():
                 program = load_candidate(config.seed_from_file, use_cot=config.use_cot)
                 info = get_program_info(program)
                 from dca_tournaments.tour_utils import evaluate_candidate
+                external_seed_started_at = datetime.now().isoformat(timespec="seconds")
+                external_seed_t0 = time.time()
                 eval_result = evaluate_candidate(
                     program, mini_val, metric, config.eval_num_threads,
                 )
+                external_seed_completed_at = datetime.now().isoformat(timespec="seconds")
+                external_seed_duration_seconds = round(time.time() - external_seed_t0, 1)
                 seed_dir = Path(config.output_dir) / "external_seed"
                 seed_dir.mkdir(parents=True, exist_ok=True)
                 seed_path = seed_dir / "external_seed.json"
@@ -642,6 +898,10 @@ def main():
                     "model": config.student_model_name,
                     "student_model": config.student_model_name,
                     "original_path": config.seed_from_file,
+                    "optimization_started_at": external_seed_started_at,
+                    "optimization_completed_at": external_seed_completed_at,
+                    "optimization_duration_seconds": external_seed_duration_seconds,
+                    "evaluation_duration_seconds": eval_result.get("eval_time_seconds"),
                     "eval_result": eval_result,
                 })
 
@@ -669,6 +929,10 @@ def main():
                         "model": config.student_model_name,
                         "student_model": config.student_model_name,
                         "original_path": config.seed_from_file,
+                        "optimization_started_at": external_seed_started_at,
+                        "optimization_completed_at": external_seed_completed_at,
+                        "optimization_duration_seconds": external_seed_duration_seconds,
+                        "evaluation_duration_seconds": eval_result.get("eval_time_seconds"),
                         "eval_result": eval_result,
                     },
                 )
@@ -735,7 +999,7 @@ def main():
             current_top = seed_entries
 
         # Record which seed candidates flow to the first optimization stage.
-        stage_top_k_history["seed"] = list(current_top)
+        stage_top_k_history["seed"] = _freeze_selected_entries(current_top)
 
         # Save seed stage output to log dir — include all seed + seed_baseline entries
         _all_seed_candidates = (
@@ -753,8 +1017,9 @@ def main():
             if stage == "seed":
                 continue  # already handled above
 
-            if is_resume_mode and leaderboard.stage_entries(stage):
+            if is_resume_mode and _stage_is_completed(config.output_dir, stage) and leaderboard.stage_entries(stage):
                 print(f"\nSkipping stage '{stage}': already completed in resumed leaderboard.")
+                stage_execution_history[stage] = {"status": "resumed"}
                 # Record stage-specific best score (always stage-scoped)
                 _stage_entries = leaderboard.stage_entries(stage)
                 stage_best_scores[stage] = max(
@@ -772,10 +1037,17 @@ def main():
                         config.top_k, stage=stage,
                         criteria=config.selection_criteria,
                     )
-                stage_top_k_history[stage] = list(current_top)
+                stage_top_k_history[stage] = _freeze_selected_entries(current_top)
                 continue
+            if is_resume_mode and leaderboard.stage_entries(stage) and not _stage_is_completed(config.output_dir, stage):
+                print(f"\nResuming partially completed stage '{stage}' from existing leaderboard entries.")
 
             stages_run.append(stage)
+            stage_started_at = datetime.now().isoformat(timespec="seconds")
+            stage_t0 = time.time()
+            current_stage_name = stage
+            current_stage_started_at = stage_started_at
+            current_stage_t0 = stage_t0
 
             print(f"\n  Seeding stage '{stage}' with {len(current_top)} candidates:")
             for i, e in enumerate(current_top):
@@ -798,6 +1070,16 @@ def main():
             stage_pre_best[stage] = pre_stage_best_score
 
             new_entries = runner.run_stage(stage, current_top)
+            stage_execution_history[stage] = {
+                "status": "completed",
+                "started_at": stage_started_at,
+                "completed_at": datetime.now().isoformat(timespec="seconds"),
+                "duration_seconds": round(time.time() - stage_t0, 1),
+            }
+            _write_stage_completion_marker(config.output_dir, stage, stage_execution_history[stage])
+            current_stage_name = None
+            current_stage_started_at = None
+            current_stage_t0 = None
 
             # ── Cross-stage improvement check ───────────────────
             # Use ALL entries from this stage (not just the selection-
@@ -872,7 +1154,7 @@ def main():
                 current_top = new_entries
 
             # Record which candidates flow to the next stage.
-            stage_top_k_history[stage] = list(current_top)
+            stage_top_k_history[stage] = _freeze_selected_entries(current_top)
 
             # Save stage output snapshot to log dir — use ALL entries
             # from this stage (not just top-K returned by run_stage)
@@ -897,6 +1179,7 @@ def main():
             # comparison.  During optimization stages scores came from mini_val;
             # this pass makes every entry comparable on the same data.
             all_entries = list(leaderboard.entries)
+            _save_full_val_reeval_audit(config, "pre", all_entries)
             print(f"  Re-evaluating {len(all_entries)} candidates on full val set "
                   f"({len(val_set)} examples)...")
 
@@ -909,7 +1192,7 @@ def main():
                         val_set=val_set,
                         metric=metric,
                         temperature=config.eval_temperature,
-                        model_name=entry.metadata.get("model", config.student_model_name) if entry.metadata else config.student_model_name,
+                        model_name=config.student_model_name,
                         use_cot=config.use_cot,
                         num_threads=config.eval_num_threads,
                     )
@@ -917,6 +1200,18 @@ def main():
                           f"total={result['total_score']:.4f}  "
                           f"cls={result['cls_score']:.4f}  "
                           f"chg={result['change_score']:.4f}")
+
+                    pre_eval_snapshot = {
+                        "val_total_score": entry.val_total_score,
+                        "val_cls_score": entry.val_cls_score,
+                        "val_change_score": entry.val_change_score,
+                        "per_category_scores": dict(entry.per_category_scores or {}),
+                        "val_avg_total_tokens": entry.val_avg_total_tokens,
+                        "val_avg_input_tokens": entry.val_avg_input_tokens,
+                        "val_avg_output_tokens": entry.val_avg_output_tokens,
+                        "val_avg_reasoning_tokens": entry.val_avg_reasoning_tokens,
+                        "val_eval_time_seconds": entry.val_eval_time_seconds,
+                    }
 
                     # Update entry scores with eval-temperature results
                     entry.val_total_score = result["total_score"]
@@ -930,8 +1225,10 @@ def main():
                     entry.val_eval_time_seconds    = result.get("eval_time_seconds")
                     if entry.metadata is None:
                         entry.metadata = {}
+                    entry.metadata["pre_full_val_eval"] = pre_eval_snapshot
                     entry.metadata["final_eval_temperature"] = config.eval_temperature
                     entry.metadata["final_eval_dataset"] = "full_val"
+                    entry.metadata["final_eval_model"] = config.student_model_name
 
                 except Exception as exc:
                     print(f"    [ERROR] Re-evaluation failed: {exc}")
@@ -941,13 +1238,17 @@ def main():
                 key=lambda e: e.val_total_score, reverse=True,
             )
             leaderboard.save()
+            _save_full_val_reeval_audit(config, "post", leaderboard.entries)
 
             # ── Present final Pareto front ──────────────────────
             print(f"\n[{_ts()}] {'='*70}")
             print(f" Final Pareto Front (score vs avg tokens/sample)")
             print(f"{'='*70}")
             try:
-                pareto_front = leaderboard.pareto_front()
+                pareto_front = leaderboard.pareto_front([
+                    e for e in leaderboard.entries
+                    if e.stage not in _FINAL_SELECTION_EXCLUDE_STAGES
+                ])
                 print(f"  Pareto-optimal candidates ({len(pareto_front)}):")
                 for i, pe in enumerate(pareto_front, 1):
                     tok_str = (f"avg_tok/smp={pe.val_avg_total_tokens:.0f}"
@@ -958,23 +1259,43 @@ def main():
                 print(f"  [INFO] Pareto front skipped: {pex}")
 
             # Overall best by score
-            overall_best = leaderboard.best()
+            overall_best = leaderboard.best(
+                criteria="score_only",
+                exclude_stages=_FINAL_SELECTION_EXCLUDE_STAGES,
+            )
             if overall_best:
                 print(f"\n  Overall best by SCORE: [{overall_best.stage}] {overall_best.config_name}  "
                       f"total={overall_best.val_total_score:.4f}")
 
             # Overall cheapest by avg tokens/sample (inference cost)
-            valid_token_entries = [e for e in leaderboard.entries
-                                  if e.val_avg_total_tokens is not None and e.val_avg_total_tokens > 0]
+            valid_token_entries = [
+                e for e in leaderboard.entries
+                if e.stage not in _FINAL_SELECTION_EXCLUDE_STAGES
+                and e.val_avg_total_tokens is not None
+                and e.val_avg_total_tokens > 0
+            ]
             if valid_token_entries:
                 cheapest = min(valid_token_entries, key=lambda e: e.val_avg_total_tokens)
                 print(f"  Overall CHEAPEST inference: [{cheapest.stage}] {cheapest.config_name}  "
                       f"avg_tok/smp={cheapest.val_avg_total_tokens:.0f}  total={cheapest.val_total_score:.4f}")
+            if config.selection_criteria == "pareto":
+                print("  Final selection mode: manual from Pareto front / saved plot")
+            elif config.selection_criteria != "score_only":
+                selection_leader = leaderboard.best(
+                    criteria=config.selection_criteria,
+                    exclude_stages=_FINAL_SELECTION_EXCLUDE_STAGES,
+                )
+                if selection_leader:
+                    print(f"  Selection leader ({config.selection_criteria}): [{selection_leader.stage}] "
+                          f"{selection_leader.config_name}  total={selection_leader.val_total_score:.4f}")
             print(f"{'='*70}")
 
         # ── Test set evaluation ─────────────────────────────────
-        if config.run_test_eval:
-            winner = leaderboard.best()
+        if config.run_test_eval and config.test_eval_criteria == "best_score":
+            winner = leaderboard.best(
+                criteria="score_only",
+                exclude_stages=_FINAL_SELECTION_EXCLUDE_STAGES,
+            )
             if winner:
                 print(f"\n[{_ts()}] {'='*70}")
                 print(f" Test Set Evaluation")
@@ -1002,6 +1323,7 @@ def main():
             started_at=started_at,
             stage_top_k_history=stage_top_k_history,
             stage_pre_best=stage_pre_best,
+            stage_execution_history=stage_execution_history,
         )
 
         save_summary(
@@ -1018,7 +1340,7 @@ def main():
         # Export leaderboard to Excel for offline analysis
         try:
             excel_path = Path(config.output_dir) / "leaderboard.xlsx"
-            leaderboard.export_to_excel(excel_path)
+            leaderboard.export_to_excel(excel_path, stage_execution_history=stage_execution_history)
         except Exception as _xl_exc:
             print(f"  [WARN] Excel export failed: {_xl_exc}")
 
@@ -1036,6 +1358,8 @@ def main():
         try:
             for _stage_name in leaderboard.get_stages():
                 _stage_sum = leaderboard.get_stage_summary(_stage_name)
+                if _stage_name in stage_execution_history:
+                    _stage_sum["execution"] = dict(stage_execution_history[_stage_name])
                 _stage_sum_path = Path(config.log_dir) / f"stage_{_stage_name}_summary.json"
                 with open(_stage_sum_path, "w", encoding="utf-8") as _f:
                     json.dump(_stage_sum, _f, indent=2, ensure_ascii=False, default=str)
@@ -1045,7 +1369,11 @@ def main():
         # Generate Pareto scatter plot (accuracy vs tokens) — always
         if len(leaderboard.entries) > 0:
             plot_path = Path(config.output_dir) / "pareto_plot.png"
-            plot_pareto_candidates(leaderboard, plot_path)
+            plot_pareto_candidates(
+                leaderboard,
+                plot_path,
+                exclude_stages=_FINAL_SELECTION_EXCLUDE_STAGES,
+            )
             # Also save to log dir
             try:
                 import shutil
@@ -1065,6 +1393,7 @@ def main():
             started_at=started_at,
             stage_top_k_history=stage_top_k_history,
             stage_pre_best=stage_pre_best,
+            stage_execution_history=stage_execution_history,
         )
         save_summary(
             summary,
@@ -1074,7 +1403,22 @@ def main():
         print("Partial summary saved.")
 
     except Exception as exc:
+        if current_stage_name:
+            stage_execution_history[current_stage_name] = {
+                "status": "failed",
+                "started_at": current_stage_started_at,
+                "failed_at": datetime.now().isoformat(timespec="seconds"),
+                "duration_seconds": round(time.time() - current_stage_t0, 1) if current_stage_t0 else None,
+                "error": str(exc),
+            }
         print(f"\n\nFATAL ERROR: {exc}")
+        if config.output_dir:
+            resume_cmd = (
+                "uv run python -m dca_tournaments.run_tournament "
+                f"--resume-from \"{config.output_dir}\""
+            )
+            print("Resume from the saved partial tournament with:")
+            print(f"  {resume_cmd}")
         logging.getLogger("tournament").exception("Tournament failed")
         # Save whatever we have
         try:
@@ -1087,8 +1431,10 @@ def main():
                 started_at=started_at,
                 stage_top_k_history=stage_top_k_history,
                 stage_pre_best=stage_pre_best,
+                stage_execution_history=stage_execution_history,
             )
             summary["error"] = str(exc)
+            summary["resume_from"] = config.output_dir
             save_summary(
                 summary,
                 Path(config.output_dir) / "summary_error.json",
@@ -1124,10 +1470,17 @@ def _run_test_eval(
     output_dir = Path(config.output_dir) / "test_eval"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    winner_metadata = winner.metadata or {}
+    test_eval_model = (
+        winner_metadata.get("final_eval_model")
+        or winner_metadata.get("stage_eval_model")
+        or config.student_model_name
+    )
+
     cmd = [
         sys.executable, str(eval_script),
         "--model-path", winner.program_path,
-        "--model-name", winner.metadata.get("model", config.student_model_name) if winner.metadata else config.student_model_name,
+        "--model-name", test_eval_model,
         "--split-file", split_path,
         "--temperature", str(config.eval_temperature),
         "--which-set", "test",

@@ -1,61 +1,54 @@
 """Isolated compile() worker for the tournament pipeline.
 
-Invoked as a subprocess by ``stage_runner._spawn_optimizer()``.
-Runs in a fresh Python interpreter with no inherited DSPy ContextVar state,
-no nested thread pools from the parent, and no Azure client race conditions.
+ROLE IN THE PIPELINE
+--------------------
+This script is spawned as a subprocess by ``stage_runner._spawn_optimizer()``.
+It performs exactly ONE optimizer.compile() call, saves the result to disk,
+and exits.  The parent process (stage_runner) then evaluates the saved program
+in-process and adds it to the leaderboard.
 
-Exit codes:
-    0 — compiled program saved to ``output_path`` successfully
-    1 — any failure (traceback printed to stderr)
+WHY ISOLATED SUBPROCESS?
+-------------------------
+DSPy optimizers (Bootstrap, MIPROv2, GEPA) use ThreadPoolExecutors internally.
+When the parent run_tournament.py also has thread pools active, nesting them
+on Windows with the Azure OpenAI client causes race conditions that produce
+near-zero metric scores (\u201c0-score bug\u201d).  Running each optimizer in a fresh
+Python interpreter with no inherited state eliminates this completely.
 
-Config JSON (written by stage_runner, path passed via --config):
-    stage                  : "bootstrap" | "miprov2" | "gepa"
-    seed_path              : str  — path to saved seed .json program
-    output_path            : str  — where to save the compiled program
-    use_cot                : bool
-    instructions_only      : bool
+HOW IT WORKS
+------------
+  1. stage_runner writes a JSON config file for this work item to disk.
+  2. stage_runner calls: python optimizer_subprocess.py --config <path>
+  3. This script reads the config, reconstructs the dataset split, loads
+     the seed program, runs optimizer.compile(), saves the result to
+     config[\"output_path\"], then exits 0 on success or 1 on failure.
+  4. stage_runner reads the saved program from output_path and evaluates it.
 
-    # Data (must match parent's split exactly)
-    pairs_dir              : str
-    gt_dir                 : str
-    split_seed             : int
-    train_ratio            : float
-    val_ratio              : float
-    test_ratio             : float
-    mini_train_size        : int | null
-    mini_val_size          : int | null
+EXIT CODES
+----------
+  0 \u2014 compiled program saved to output_path successfully
+  1 \u2014 any failure (full traceback printed to stderr)
 
-    # LM
-    student_model_name     : str
-    optimization_temperature: float | null
-
-    # Stage-specific blocks (only the one matching ``stage`` is used)
-    bootstrap_cfg          : dict | null
-        n, max_rounds, max_labeled_demos, max_bootstrapped_demos
-    bootstrap_teacher_model: str | null
-    bootstrap_stop_at_score: float | null
-    bootstrap_num_threads  : int
-
-    miprov2_cfg            : dict | null
-        auto, model_name, max_labeled_demos, max_bootstrapped_demos, clear_field_descs
-    miprov2_prompt_model   : str | null
-    miprov2_prompt_model_reasoning_effort: str | null
-    miprov2_minibatch_size : int | null
-    miprov2_metric_threshold: float | null
-    miprov2_teacher_model  : str | null
-    miprov2_num_threads    : int
-
-    gepa_cfg               : dict | null
-        auto, use_merge, track_stats, reflection_minibatch_size, train_size, val_size
-    gepa_reflection_model  : str | null
-    gepa_reflection_images : bool
-    gepa_reflection_image_detail: str
-    gepa_reflection_max_images: int
-    gepa_add_format_failure_as_feedback: bool
-    gepa_perfect_score     : float | null
-    gepa_lowest_score      : float | null
-    gepa_candidate_selection_strategy: str | null
-    gepa_num_threads       : int
+CONFIG JSON FIELDS (written by stage_runner, passed via --config)
+------------------------------------------------------------------
+  stage                   \"bootstrap\" | \"miprov2\" | \"gepa\"
+  seed_path               Path to the seed program .json to start from
+  output_path             Where to save the compiled program .json
+  use_cot                 bool \u2014 ChainOfThought vs Predict
+  instructions_only       bool \u2014 suppress field descriptions
+  pairs_dir / gt_dir      Dataset paths (must match parent\u2019s split exactly)
+  split_seed              Random seed for the train/val/test split
+  mini_train_size         Training subset size passed to optimizer.compile()
+  mini_val_size           Validation subset size for optimizer internal eval
+  student_model_name      LM used as the student during optimization
+  bootstrap_cfg           BootstrapFewShotWithRandomSearch hyperparams
+  miprov2_cfg             MIPROv2 hyperparams (auto intensity, demo counts)
+  gepa_cfg                GEPA hyperparams (auto intensity, minibatch size)
+  gepa_reflection_model   Reflection LM for GEPA (e.g. azure/gpt-5.2)
+  use_hybrid_metric       bool \u2014 whether to apply the hybrid penalty metric
+  hybrid_penalty_mode     \"linear\" | \"exponential\"
+  hybrid_target_tokens    Token budget for exponential mode
+  hybrid_penalty_steepness  k value for exponential penalty
 """
 
 from __future__ import annotations
@@ -66,6 +59,7 @@ import json
 import logging
 import sys
 import time
+from contextlib import nullcontext
 from datetime import datetime
 from pathlib import Path
 
@@ -78,7 +72,12 @@ import dspy
 from config import create_lm
 from utils import load_dca_dataset, stratified_split_dca_dataset
 from evaluation.dca_metric import dca_comparison_metric, dca_comparison_metric_with_feedback
-from dca_tournaments.tour_utils import create_mini_dataset, save_candidate, load_candidate
+from dca_tournaments.tour_utils import (
+    create_mini_dataset,
+    save_candidate,
+    load_candidate,
+    token_usage_from_tracker,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -86,13 +85,30 @@ logger = logging.getLogger(__name__)
 # ── Timestamp helper ──────────────────────────────────────────────
 
 def _ts() -> str:
+    """Short HH:MM:SS timestamp for log lines."""
     return datetime.now().strftime("%H:%M:%S")
 
 
 # ── P1 enforcement (mirrors stage_runner._load_student) ──────────
 
 def _load_student(seed_path: str, use_cot: bool, instructions_only: bool):
-    """Load + deep-copy seed program, enforcing P1 if instructions_only."""
+    """Load the seed program from disk and prepare it for optimization.
+
+    Performs a deep-copy so the loaded object is independent of any cache.
+
+    instructions_only=True (P1 enforcement):
+      Merges all field descriptions into the signature’s instruction text
+      then clears them from individual fields.  This ensures MIPROv2/GEPA
+      optimize ONLY the instruction block and don’t touch field descriptions,
+      which keeps the prompt structure clean and reproducible.
+
+    Example
+    -------
+    Before: sig.instructions = "Classify the images."
+            sig.fields["discard_image"].desc = "true if images are identical"
+    After:  sig.instructions = "Classify the images.\nField guidance:\n- discard_image: true if images are identical"
+            sig.fields["discard_image"].desc = ""  # cleared
+    """
     program = load_candidate(seed_path, use_cot=use_cot)
     student = copy.deepcopy(program)
 
@@ -121,9 +137,27 @@ def _load_student(seed_path: str, use_cot: bool, instructions_only: bool):
     return student
 
 
+def _pin_predictor_lm(program, lm) -> int:
+    """Bind each predictor on ``program`` to a specific LM instance.
+
+    This prevents stale serialized predictor.lm references from bypassing
+    the subprocess-configured student LM.
+    """
+    pinned = 0
+    for predictor in program.predictors():
+        predictor.lm = lm
+        pinned += 1
+    return pinned
+
+
 # ── Field desc snapshot / normalize (mirrors stage_runner) ────────
 
 def _snapshot_field_descs(program) -> list[dict[str, str]]:
+    """Capture field description strings from all predictors before compilation.
+
+    Used to detect if the optimizer added new field descs during compile()
+    so _normalize_compiled_field_descs can absorb them into the instructions.
+    """
     def _descs(sig):
         return {
             fname: ((finfo.json_schema_extra or {}).get("desc", ""))
@@ -262,6 +296,13 @@ def _run_gepa(student, train_set, val_set, cfg: dict) -> object:
     num_threads = cfg.get("gepa_num_threads", 4)
     gepa_reflection_images = cfg.get("gepa_reflection_images", True)
 
+    # GEPA trajectory capture must run against the subprocess-configured
+    # student LM, not any stale LM object stored in the loaded candidate.
+    student_lm = getattr(dspy.settings, "lm", None)
+    if student_lm is not None:
+        n_pinned = _pin_predictor_lm(student, student_lm)
+        print(f"  [{_ts()}] GEPA pinned {n_pinned} predictor LM(s) to student LM")
+
     # Apply the reflective-dataset patch
     patch_gepa_reflective_dataset(send_images=gepa_reflection_images)
 
@@ -381,26 +422,84 @@ def main() -> int:
     original_field_descs = _snapshot_field_descs(student)
     print(f"  [{_ts()}] Seed loaded: {Path(seed_path).name}")
 
+    optimization_token_usage = {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+    }
+
     # ── Run compile() ─────────────────────────────────────────────
     try:
-        if stage == "bootstrap":
-            compiled = _run_bootstrap(student, mini_train, mini_val, cfg)
-        elif stage == "miprov2":
-            # MIPROv2 may use a different model per combo
-            mc = cfg.get("miprov2_cfg", {})
-            model_name = mc.get("model_name") or cfg["student_model_name"]
-            if model_name != cfg["student_model_name"]:
-                combo_lm_kwargs: dict = {"cache": False}
-                if cfg.get("optimization_temperature") is not None:
-                    combo_lm_kwargs["temperature"] = cfg["optimization_temperature"]
-                dspy.configure(lm=create_lm(model_name, **combo_lm_kwargs))
-                print(f"  [{_ts()}] MIPROv2 reconfigured to {model_name}")
-            compiled = _run_miprov2(student, mini_train, mini_val, cfg)
-        elif stage == "gepa":
-            compiled = _run_gepa(student, mini_train, mini_val, cfg)
-        else:
-            print(f"[ERROR] Unknown stage: {stage}", file=sys.stderr)
-            return 1
+        # dspy.track_usage() MUST be disabled for all optimizer stages.
+        #
+        # Root cause (confirmed via DSPy source):
+        #   dspy.track_usage() calls settings.context(usage_tracker=tracker), which sets
+        #   'usage_tracker' into the ContextVar thread_local_overrides.  DSPy's
+        #   ParallelExecutor.worker() then checks parent_overrides.get("usage_tracker")
+        #   and tries to execute:
+        #       thread_local_overrides.overrides["usage_tracker"] = copy.deepcopy(...)
+        #   But thread_local_overrides is a contextvars.ContextVar, NOT a dict — it has no
+        #   .overrides attribute.  This raises AttributeError, which is silently swallowed
+        #   by the future exception handler (except Exception: pass), making every parallel
+        #   worker return None (failure_score=0.0).
+        #
+        #   Effect: ALL internal optimizer evaluations score 0.0 for every example:
+        #     - Bootstrap: every candidate set scores 0.0 → can't rank → returns original seed
+        #     - MIPROv2: every trial scores 0.0 → Bayesian optimizer picks default → no instruction change
+        #
+        #   The fix was originally applied for stage=="gepa" only.  It must apply to ALL stages.
+        #   Token tracking during compile() is sacrificed; optimization token counts are
+        #   therefore reported as 0 in the leaderboard for bootstrap/miprov2.
+        should_track_usage = False
+        if cfg.get("track_tokens", False):
+            print(f"  [{_ts()}] track_tokens requested but disabled for all optimizer stages "
+                  f"(dspy.track_usage() breaks ParallelExecutor — all scores become 0.0)")
+
+        # Snapshot LM history length before compile so we can sum tokens from new history entries.
+        _lm_for_history = getattr(dspy.settings, "lm", None)
+        _lm_history_before = len(_lm_for_history.history) if _lm_for_history is not None and hasattr(_lm_for_history, "history") else 0
+
+        tracker_cm = nullcontext()
+        with tracker_cm as tracker:
+            if stage == "bootstrap":
+                compiled = _run_bootstrap(student, mini_train, mini_val, cfg)
+            elif stage == "miprov2":
+                # MIPROv2 may use a different model per combo
+                mc = cfg.get("miprov2_cfg", {})
+                model_name = mc.get("model_name") or cfg["student_model_name"]
+                if model_name != cfg["student_model_name"]:
+                    combo_lm_kwargs: dict = {"cache": False}
+                    if cfg.get("optimization_temperature") is not None:
+                        combo_lm_kwargs["temperature"] = cfg["optimization_temperature"]
+                    dspy.configure(lm=create_lm(model_name, **combo_lm_kwargs))
+                    print(f"  [{_ts()}] MIPROv2 reconfigured to {model_name}")
+                compiled = _run_miprov2(student, mini_train, mini_val, cfg)
+            elif stage == "gepa":
+                compiled = _run_gepa(student, mini_train, mini_val, cfg)
+            else:
+                print(f"[ERROR] Unknown stage: {stage}", file=sys.stderr)
+                return 1
+            # track_usage is disabled — collect token usage from LM history instead.
+            # Snapshot taken BEFORE compile; we sum history entries added during compile.
+            _lm_after = getattr(dspy.settings, "lm", None)
+            if _lm_after is not None and hasattr(_lm_after, "history"):
+                _new_entries = _lm_after.history[_lm_history_before:]
+                _prompt = sum(
+                    (e.get("usage", {}) or {}).get("prompt_tokens", 0) or 0
+                    for e in _new_entries
+                )
+                _completion = sum(
+                    (e.get("usage", {}) or {}).get("completion_tokens", 0) or 0
+                    for e in _new_entries
+                )
+                if _prompt or _completion:
+                    optimization_token_usage = {
+                        "prompt_tokens": _prompt,
+                        "completion_tokens": _completion,
+                        "total_tokens": _prompt + _completion,
+                    }
+                    print(f"  [{_ts()}] Optimization token usage (from LM history): "
+                          f"prompt={_prompt}, completion={_completion}, total={_prompt + _completion}")
     except Exception as exc:
         import traceback
         print(f"\n[ERROR] compile() failed: {exc}", file=sys.stderr)
@@ -414,10 +513,26 @@ def main() -> int:
     _normalize_compiled_field_descs(compiled, original_field_descs, stage, instructions_only)
 
     # ── Save compiled program ─────────────────────────────────────
+    # GEPA pins the student LM onto each predictor (for trajectory capture).
+    # The student LM may hold non-JSON-serializable objects in its kwargs
+    # (e.g. `azure_ad_token_provider` function for CLI-auth flows).
+    # Clear pinned LMs before saving so that dump_state() writes {"lm": null};
+    # at inference time the predictor falls back to dspy.settings.lm.
+    if stage == "gepa":
+        for _pred in compiled.predictors():
+            _pred.lm = None
     out_path = Path(output_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     compiled.save(str(out_path))
     print(f"  [{_ts()}] Saved compiled program → {out_path}")
+
+    token_usage_path = cfg.get("token_usage_path")
+    if token_usage_path:
+        token_path = Path(token_usage_path)
+        token_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(token_path, "w", encoding="utf-8") as f:
+            json.dump(optimization_token_usage, f, indent=2, ensure_ascii=False)
+        print(f"  [{_ts()}] Saved optimization token usage → {token_path}")
 
     total = time.time() - t0
     print(f"  [{_ts()}] Subprocess done in {total:.1f}s")

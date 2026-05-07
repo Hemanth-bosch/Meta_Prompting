@@ -65,6 +65,7 @@ from evaluation.dca_metric import (
     compute_classification_score,
     compute_total_score,
 )
+from evaluation.dca_run_val_test_set_eval.split_utils import resolve_default_split_file
 
 import numpy as np
 
@@ -72,7 +73,7 @@ import numpy as np
 # Paths
 # ---------------------------------------------------------------------------
 DEFAULT_JSON_DIR   = REPO_ROOT / "data" / "dca_data" / "image_pairs_llm_output_exp1"
-DEFAULT_SPLIT_FILE = REPO_ROOT / ".cache" / "dca_split_seed42.json"
+DEFAULT_SPLIT_FILE = resolve_default_split_file(REPO_ROOT)
 DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "eval_results" / "human_runs"
 
 

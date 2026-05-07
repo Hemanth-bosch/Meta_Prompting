@@ -1,7 +1,22 @@
 from dataclasses import dataclass, field
+from datetime import datetime
+import inspect
+import time
 from typing import List, Optional, Literal, Dict, Any
 from dspy.teleprompt import BootstrapFewShotWithRandomSearch, MIPROv2, SIMBA
 from dspy import GEPA
+
+
+class StrategyExecutionError(RuntimeError):
+    """Optimization strategy failed after the underlying optimizer exhausted its retries."""
+
+    def __init__(self, strategy_name: str, optimizer_type: str, cause: Exception):
+        self.strategy_name = strategy_name
+        self.optimizer_type = optimizer_type
+        self.cause = cause
+        super().__init__(
+            f"Strategy '{strategy_name}' ({optimizer_type}) failed: {cause}"
+        )
 
 
 @dataclass
@@ -96,6 +111,7 @@ class OptimizationRunner:
         self.reflection_lm = reflection_lm
 
         self.default_strategies = []
+        self.run_summary = {}
 
     def run_optimization(self, strategies: Optional[List[OptimizationConfig]] = None) -> tuple:
         """Run optimization with configurable strategies"""
@@ -104,17 +120,66 @@ class OptimizationRunner:
 
         print("Starting Optimization...")
 
+        run_started_at = datetime.now().isoformat(timespec="seconds")
+        run_t0 = time.time()
+
+        baseline_started_at = datetime.now().isoformat(timespec="seconds")
+        baseline_t0 = time.time()
         baseline_score = self._evaluate_baseline()
+        baseline_completed_at = datetime.now().isoformat(timespec="seconds")
+        baseline_duration_seconds = round(time.time() - baseline_t0, 1)
 
         best_extractor = None
         best_score = baseline_score
         best_strategy_name = "Baseline"
+        strategy_summaries = []
 
         for i, config in enumerate(strategies, 1):
             print(f"\nStrategy {i}: {config.name}...")
             print(f"   {config.description}")
 
-            extractor, score = self._run_strategy(config)
+            strategy_started_at = datetime.now().isoformat(timespec="seconds")
+            strategy_t0 = time.time()
+            try:
+                extractor, score = self._run_strategy(config)
+            except Exception as exc:
+                strategy_completed_at = datetime.now().isoformat(timespec="seconds")
+                strategy_duration_seconds = round(time.time() - strategy_t0, 1)
+                failed_summary = {
+                    "index": i,
+                    "name": config.name,
+                    "optimizer_type": config.optimizer_type,
+                    "description": config.description,
+                    "started_at": strategy_started_at,
+                    "completed_at": strategy_completed_at,
+                    "duration_seconds": strategy_duration_seconds,
+                    "status": "failed",
+                    "error": str(exc),
+                    "num_threads": config.num_threads,
+                    "max_labeled_demos": config.max_labeled_demos,
+                    "max_bootstrapped_demos": config.max_bootstrapped_demos,
+                    "optimizer_params": dict(config.optimizer_params or {}),
+                }
+                strategy_summaries.append(failed_summary)
+                self.run_summary = {
+                    "started_at": run_started_at,
+                    "completed_at": strategy_completed_at,
+                    "total_duration_seconds": round(time.time() - run_t0, 1),
+                    "baseline": {
+                        "started_at": baseline_started_at,
+                        "completed_at": baseline_completed_at,
+                        "duration_seconds": baseline_duration_seconds,
+                        "score": baseline_score,
+                    },
+                    "best_strategy_name": best_strategy_name,
+                    "best_score": best_score,
+                    "failed_strategy": failed_summary,
+                    "strategies": strategy_summaries,
+                    "status": "failed",
+                }
+                raise StrategyExecutionError(config.name, config.optimizer_type, exc) from exc
+            strategy_completed_at = datetime.now().isoformat(timespec="seconds")
+            strategy_duration_seconds = round(time.time() - strategy_t0, 1)
             improvement = score - baseline_score
 
             print(f"Strategy {i} Results:")
@@ -129,8 +194,44 @@ class OptimizationRunner:
             else:
                 print(f"  Score not better than current best ({best_score:.1f}%)")
 
+            strategy_summaries.append({
+                "index": i,
+                "name": config.name,
+                "optimizer_type": config.optimizer_type,
+                "description": config.description,
+                "started_at": strategy_started_at,
+                "completed_at": strategy_completed_at,
+                "duration_seconds": strategy_duration_seconds,
+                "status": "completed",
+                "score": score,
+                "improvement_over_baseline": round(improvement, 4),
+                "num_threads": config.num_threads,
+                "max_labeled_demos": config.max_labeled_demos,
+                "max_bootstrapped_demos": config.max_bootstrapped_demos,
+                "optimizer_params": dict(config.optimizer_params or {}),
+            })
+
         self._print_final_results(best_strategy_name, baseline_score, best_score)
         self.best_strategy_name = best_strategy_name
+        run_completed_at = datetime.now().isoformat(timespec="seconds")
+        total_duration_seconds = round(time.time() - run_t0, 1)
+        for strategy_summary in strategy_summaries:
+            strategy_summary["is_best"] = strategy_summary["name"] == best_strategy_name
+        self.run_summary = {
+            "started_at": run_started_at,
+            "completed_at": run_completed_at,
+            "total_duration_seconds": total_duration_seconds,
+            "status": "completed",
+            "baseline": {
+                "started_at": baseline_started_at,
+                "completed_at": baseline_completed_at,
+                "duration_seconds": baseline_duration_seconds,
+                "score": baseline_score,
+            },
+            "best_strategy_name": best_strategy_name,
+            "best_score": best_score,
+            "strategies": strategy_summaries,
+        }
         return best_extractor, best_score
 
     def _evaluate_baseline(self) -> float:
@@ -154,6 +255,14 @@ class OptimizationRunner:
             }
             if config.num_threads is not None:
                 bootstrap_kwargs["num_threads"] = config.num_threads
+            for param_name, param_value in config.optimizer_params.items():
+                if param_name not in bootstrap_kwargs and param_value is not None:
+                    bootstrap_kwargs[param_name] = param_value
+            bootstrap_kwargs = self._filter_supported_kwargs(
+                BootstrapFewShotWithRandomSearch,
+                bootstrap_kwargs,
+                optimizer_name=config.name,
+            )
             optimizer = BootstrapFewShotWithRandomSearch(**bootstrap_kwargs)
 
         elif config.optimizer_type == "gepa":
@@ -204,6 +313,19 @@ class OptimizationRunner:
         print(f"Evaluating {config.name}...")
         result = self.evaluate_fn(optimized_extractor, devset=self.val_set)
         return optimized_extractor, result.score
+
+    @staticmethod
+    def _filter_supported_kwargs(optimizer_cls, kwargs: Dict[str, Any], optimizer_name: str) -> Dict[str, Any]:
+        """Drop legacy optimizer kwargs that the installed DSPy version no longer accepts."""
+        allowed = set(inspect.signature(optimizer_cls.__init__).parameters)
+        filtered = {key: value for key, value in kwargs.items() if key in allowed}
+        dropped = sorted(key for key in kwargs if key not in filtered)
+        if dropped:
+            print(
+                f"Skipping unsupported {optimizer_cls.__name__} kwargs for {optimizer_name}: "
+                f"{', '.join(dropped)}"
+            )
+        return filtered
 
     def _create_miprov2_optimizer(self, config: OptimizationConfig):
         """Create MIPROv2 optimizer with DSPy-aligned parameter handling"""
@@ -274,6 +396,8 @@ def create_bootstrap_strategy(name: str, description: str, max_labeled_demos=Non
     optimizer_params.update(bootstrap_params)
 
     if num_candidate_traces is not None:
+        # Legacy compatibility only. Older repo configs still pass this,
+        # but current DSPy BootstrapFewShotWithRandomSearch no longer accepts it.
         optimizer_params["num_candidate_traces"] = num_candidate_traces
     
     return OptimizationConfig(

@@ -283,7 +283,7 @@ def verify_az_login() -> None:
 
 def build_openai_client() -> Tuple[AzureOpenAI, str, str, str]:
     """Returns (client, deployment, api_version, endpoint)."""
-    endpoint    = os.getenv("AZURE_OPENAI_ENDPOINT",    "https://aiq212-openai.openai.azure.com/")
+    endpoint    = os.getenv("AZURE_OPENAI_ENDPOINT")
     api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview")
     deployment  = os.getenv("MODEL_NAME",  "gpt-4.1")
 

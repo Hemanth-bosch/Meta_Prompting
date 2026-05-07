@@ -1,8 +1,39 @@
-"""TournamentConfig — central configuration for the cascaded optimization pipeline.
+"""TournamentConfig \u2014 central configuration for the cascaded optimization pipeline.
 
-Every hyperparameter is collected here so that ``run_tournament.py`` has a
-single source of truth.  Factory class-methods provide convenient presets,
-and ``from_cli_args()`` bridges the argparse namespace.
+ROLE IN THE PIPELINE
+--------------------
+TournamentConfig is the single source of truth for every hyperparameter used
+by run_tournament.py, StageRunner, SeedPromptGenerator, and the subprocess
+optimizer.  It is:
+  - Built from CLI args via ``TournamentConfig.from_cli_args(args)``
+  - Saved to output_dir/config.json immediately on startup (crash-safe)
+  - Reloaded from config.json when resuming an interrupted run
+
+KEY SECTIONS
+------------
+  Stage control    \u2014 which stages to run, top_k, test eval flags
+  Models           \u2014 student/seed/reflection LM names + per-stage overrides
+  Temperature      \u2014 optimization vs eval temperatures
+  Mini datasets    \u2014 sizes for mini_train / mini_val (full dataset is only
+                       used during the final re-evaluation step)
+  Stage 0 seed     \u2014 seed LLM settings, demo variants, context examples
+  Stage 1 bootstrap\u2014 BootstrapFewShotWithRandomSearch grid configs
+  Stage 2 miprov2  \u2014 intensity levels, demo configs, prompt model
+  Stage 3 gepa     \u2014 reflection LM, minibatch size, candidate selection
+  Hybrid metric    \u2014 optional prompt-token efficiency penalty during optimization
+  Paths            \u2014 output/log/data directories, split seed
+
+FACTORY PRESETS (quick-start)
+------------------------------
+  TournamentConfig.quick_test()      \u2014 seed only, 1 candidate
+  TournamentConfig.bootstrap_only()  \u2014 skip seed, bootstrap only
+  TournamentConfig.full_pipeline()   \u2014 all 4 stages
+
+EXAMPLE (from CLI)
+------------------
+  # In run_tournament.py:
+  config = TournamentConfig.from_cli_args(args)
+  config.save()  # writes output_dir/config.json
 """
 
 from __future__ import annotations
@@ -25,14 +56,14 @@ _DEFAULT_BOOTSTRAP_CONFIGS: list[dict] = [
     # {"name": "n16_d5b3", "n": 16, "max_rounds": 2, "max_labeled_demos": 5, "max_bootstrapped_demos": 3},
     # {"name": "n32_d3b3", "n": 32, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 3},
     # {"name": "n32_d5b3", "n": 32, "max_rounds": 2, "max_labeled_demos": 5, "max_bootstrapped_demos": 3},
-    {"name": "n8_d3b5", "n": 8, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 5},
-    {"name": "n16_d3b3", "n": 16, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 3},
+    # {"name": "n8_d3b5", "n": 1, "max_rounds": 1, "max_labeled_demos": 3, "max_bootstrapped_demos": 5},
+    {"name": "n16_d3b3", "n": 16, "max_rounds": 2, "max_labeled_demos": 3, "max_bootstrapped_demos": 5},
 ]
 
 # ── Default GEPA configurations (Stage 3) ───────────────────────
 _DEFAULT_GEPA_CONFIGS: list[dict] = [
     {"name": "gepa_medium", "auto": "medium", "use_merge": True, "track_stats": True},
-    {"name": "gepa_light", "auto": "light", "use_merge": True, "track_stats": True},
+    # {"name": "gepa_light", "auto": "light", "use_merge": True, "track_stats": True},
 ]
 
 # ── Valid stage names (in canonical execution order) ─────────────
@@ -41,13 +72,21 @@ VALID_STAGES = ("seed", "bootstrap", "miprov2", "gepa")
 
 @dataclass
 class TournamentConfig:
-    """All hyperparameters for the sequential cascaded DCA optimization."""
+    """All hyperparameters for the sequential cascaded DCA optimization.
+
+    Instantiated once per run via ``from_cli_args(args)`` and passed to every
+    component.  Changes here affect the entire pipeline without touching the
+    individual stage implementations.
+
+    Most fields have sensible defaults; only override what you need.
+    """
 
     # ── Stage control ──────────────────────────────────────────────
     stages: List[str] = field(default_factory=lambda: ["seed", "bootstrap", "miprov2", "gepa"])
     top_k: int = 2
     skip_final_tournament: bool = False
-    run_test_eval: bool = True
+    run_test_eval: bool = False
+    test_eval_criteria: str = "best_score"
 
     # ── Model configuration ────────────────────────────────────────
     student_model_name: str = "azure/gpt-4.1-mini"
@@ -81,7 +120,7 @@ class TournamentConfig:
     seed_from_file: Optional[str] = None  # skip Stage 0 — use this saved program
     seed_reasoning_effort: Optional[str] = "low"  # passed to seed LLM create_lm()
     seed_add_demos_variant: bool = True  # eval each candidate bare + with demos
-    seed_parallel_evaluations: int = 4  # max concurrent Stage-0 seed eval variants
+    seed_parallel_evaluations: int = 2 # max concurrent Stage-0 seed eval variants
 
     # ── Stage 1: Bootstrap ─────────────────────────────────────────
     bootstrap_configs: List[dict] = field(default_factory=lambda: list(_DEFAULT_BOOTSTRAP_CONFIGS))
@@ -90,14 +129,15 @@ class TournamentConfig:
     bootstrap_teacher_model: Optional[str] = "azure/gpt-5.2"  # teacher_settings lm for Bootstrap
 
     # ── Stage 2: MIPROv2 ──────────────────────────────────────────
-    miprov2_intensities: List[str] = field(default_factory=lambda: ["light", 
+    miprov2_intensities: List[str] = field(default_factory=lambda: [
+                                                                    # "light", 
                                                                     "medium"
                                                                     ]
                                                                     )
-    miprov2_models: List[str] = field(default_factory=lambda: ["azure/gpt-4.1-mini"])
+    miprov2_models: List[str] = field(default_factory=list)
     miprov2_demo_configs: List[dict] = field(default_factory=lambda: [
         # {"max_labeled_demos": 3, "max_bootstrapped_demos": 3},
-        {"max_labeled_demos": 6, "max_bootstrapped_demos": 6},
+        {"max_labeled_demos": 3, "max_bootstrapped_demos": 5},
         # {"max_labeled_demos": 3, "max_bootstrapped_demos": 5},
         # {"max_labeled_demos": 5, "max_bootstrapped_demos": 3},
     ])
@@ -147,7 +187,10 @@ class TournamentConfig:
     use_hybrid_metric: bool = False
     hybrid_score_weight: float = 0.5
     hybrid_length_weight: float = 0.5
-    hybrid_max_prompt_tokens: int = 4000  # input tokens at which length_score → 0
+    hybrid_max_prompt_tokens: int = 8000  # input tokens at which length_score → 0
+    hybrid_penalty_mode: str = "linear"       # "linear" | "exponential"
+    hybrid_target_tokens: int = 2500          # exponential mode: zero-penalty budget
+    hybrid_penalty_steepness: float = 2.0     # exponential mode: k (1=gentle, 2=std, 3=aggressive)
 
     # ── Dataset split ratios ────────────────────────────────────────
     train_ratio: float = 0.6
@@ -170,9 +213,14 @@ class TournamentConfig:
     eval_num_threads: int = 4
 
     # ── Parallelism ────────────────────────────────────────────────
-    max_parallel_optimizations: int = 1
+    max_parallel_optimizations: int = 2
 
     def __post_init__(self):
+        """Validate config and auto-fill timestamp + output/log dirs if not set.
+
+        Called automatically by the @dataclass machinery after __init__.
+        Raises ValueError for invalid stage names or seed_context_mode.
+        """
         for s in self.stages:
             if s not in VALID_STAGES:
                 raise ValueError(f"Invalid stage '{s}'. Must be one of {VALID_STAGES}")
@@ -199,6 +247,23 @@ class TournamentConfig:
         }
         return overrides.get(stage) or self.student_model_name
 
+    def get_miprov2_models(self) -> List[str]:
+        """Return the MIPROv2 optimization model list.
+
+        Priority order:
+          1. Per-stage override ``miprov2_model_name`` (single model)
+          2. Explicit model grid ``miprov2_models`` (list)
+          3. Fall back to ``student_model_name`` (same model as evaluation)
+
+        Example: if student_model_name='azure/gpt-4.1-mini' and no
+        override is set, MIPROv2 also runs on gpt-4.1-mini.
+        """
+        if self.miprov2_model_name:
+            return [self.miprov2_model_name]
+        if self.miprov2_models:
+            return list(self.miprov2_models)
+        return [self.student_model_name]
+
     # ── Serialization ──────────────────────────────────────────────
 
     def to_dict(self) -> dict:
@@ -224,7 +289,7 @@ class TournamentConfig:
 
     @classmethod
     def default(cls, **overrides) -> "TournamentConfig":
-        """Full default: seed → bootstrap → miprov2."""
+        """Full default: seed → bootstrap → miprov2 → gepa."""
         return cls(**overrides)
 
     @classmethod
@@ -258,6 +323,12 @@ class TournamentConfig:
         """Build a TournamentConfig from an argparse Namespace."""
         kwargs: dict = {}
 
+        resume_from = getattr(args, "resume_from", None)
+        if resume_from:
+            resume_config_path = Path(resume_from) / "config.json"
+            if resume_config_path.exists():
+                kwargs = cls.load(resume_config_path).to_dict()
+
         # Stage control
         if args.stages:
             kwargs["stages"] = [s.strip() for s in args.stages.split(",")]
@@ -265,6 +336,10 @@ class TournamentConfig:
             kwargs["top_k"] = args.top_k
         if getattr(args, "skip_final_tournament", False):
             kwargs["skip_final_tournament"] = True
+        if getattr(args, "test_eval", False):
+            kwargs["run_test_eval"] = True
+        if getattr(args, "test_eval_criteria", None):
+            kwargs["test_eval_criteria"] = args.test_eval_criteria
         if getattr(args, "skip_test_eval", False):
             kwargs["run_test_eval"] = False
 
@@ -419,6 +494,12 @@ class TournamentConfig:
             kwargs["hybrid_length_weight"] = args.hybrid_length_weight
         if getattr(args, "hybrid_max_prompt_tokens", None) is not None:
             kwargs["hybrid_max_prompt_tokens"] = args.hybrid_max_prompt_tokens
+        if getattr(args, "hybrid_penalty_mode", None) is not None:
+            kwargs["hybrid_penalty_mode"] = args.hybrid_penalty_mode
+        if getattr(args, "hybrid_target_tokens", None) is not None:
+            kwargs["hybrid_target_tokens"] = args.hybrid_target_tokens
+        if getattr(args, "hybrid_penalty_steepness", None) is not None:
+            kwargs["hybrid_penalty_steepness"] = args.hybrid_penalty_steepness
 
         # Seed generation temperature
         if getattr(args, "seed_generation_temperature", None) is not None:
@@ -447,9 +528,9 @@ class TournamentConfig:
             kwargs["eval_num_threads"] = args.eval_num_threads
         if getattr(args, "max_parallel", None) is not None:
             kwargs["max_parallel_optimizations"] = args.max_parallel
-        if getattr(args, "resume_from", None):
-            kwargs["output_dir"] = args.resume_from
-            dirname = Path(args.resume_from).name
+        if resume_from:
+            kwargs["output_dir"] = resume_from
+            dirname = Path(resume_from).name
             if dirname.startswith("tournament_"):
                 kwargs["timestamp"] = dirname.replace("tournament_", "")
 
@@ -477,14 +558,20 @@ class TournamentConfig:
         print(f"  Instructions only: {'Yes' if self.instructions_only else 'No (+ field descs)'}")
         print(f"  Track tokens     : {'Yes' if self.track_tokens else 'No'}")
         if self.use_hybrid_metric:
-            print(f"  Hybrid metric    : score*{self.hybrid_score_weight} + length*{self.hybrid_length_weight} "
-                  f"(max_tokens={self.hybrid_max_prompt_tokens})")
+            if self.hybrid_penalty_mode == "exponential":
+                print(f"  Hybrid metric    : exponential penalty  "
+                      f"target={self.hybrid_target_tokens} tok  k={self.hybrid_penalty_steepness}  "
+                      f"(score × exp(-k × max(0, t/T - 1)); raw DCA at eval)")
+            else:
+                print(f"  Hybrid metric    : score*{self.hybrid_score_weight} + length*{self.hybrid_length_weight} "
+                      f"(max_tokens={self.hybrid_max_prompt_tokens}; raw DCA at eval)")
         print(f"  Parallelism      : {self.max_parallel_optimizations} concurrent per stage")
         print(f"  Eval threads     : {self.eval_num_threads}")
         print(f"  Split ratios     : train={self.train_ratio}, val={self.val_ratio}, test={self.test_ratio}")
         print(f"  Split seed       : {self.split_seed}")
         print(f"  Final re-eval    : {'Skip' if self.skip_final_tournament else 'Yes'}")
-        print(f"  Test eval        : {'Yes' if self.run_test_eval else 'No'}")
+        test_eval_label = f"Yes ({self.test_eval_criteria})" if self.run_test_eval else "No"
+        print(f"  Test eval        : {test_eval_label}")
 
         # Mini dataset
         mt = self.mini_train_size or "full"
@@ -528,7 +615,7 @@ class TournamentConfig:
         if "miprov2" in self.stages:
             print(f"\n  Stage 2 — MIPROv2:")
             print(f"    Intensities : {', '.join(self.miprov2_intensities)}")
-            effective_models = [self.miprov2_model_name] if self.miprov2_model_name else self.miprov2_models
+            effective_models = self.get_miprov2_models()
             print(f"    Models      : {', '.join(effective_models)}")
             for dc in self.miprov2_demo_configs:
                 print(f"    Demo config : labeled={dc['max_labeled_demos']}, bootstrapped={dc['max_bootstrapped_demos']}")
@@ -586,7 +673,7 @@ class TournamentConfig:
                 stage_runs[stage] = r
                 prev_k = min(self.top_k, r) if r > 0 else prev_k
             elif stage == "miprov2":
-                eff_models = [self.miprov2_model_name] if self.miprov2_model_name else self.miprov2_models
+                eff_models = self.get_miprov2_models()
                 n_configs = len(self.miprov2_intensities) * len(eff_models) * len(self.miprov2_demo_configs)
                 r = prev_k * n_configs
                 stage_runs[stage] = r

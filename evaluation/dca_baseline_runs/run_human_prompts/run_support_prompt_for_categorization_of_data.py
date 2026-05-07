@@ -285,7 +285,7 @@ def main() -> None:
     parser.add_argument("--deployment", default=os.getenv("MODEL_NAME", "gpt-4.1"))
     parser.add_argument("--model-name", default=None, help="Alias for deployment; overrides --deployment if provided")
     parser.add_argument("--prompt", default=DEFAULT_PROMPT_FILE, help="Prompt markdown file in human_prompts directory")
-    parser.add_argument("--endpoint", default=os.getenv("AZURE_OPENAI_ENDPOINT", "https://aiq212-openai.openai.azure.com/"))
+    parser.add_argument("--endpoint", default=os.getenv("AZURE_OPENAI_ENDPOINT"))
     parser.add_argument("--api-version", default=os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview"))
     parser.add_argument("--start", type=int, default=None)
     parser.add_argument("--end", type=int, default=None)

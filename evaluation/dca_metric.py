@@ -1,6 +1,77 @@
+"""DCA evaluation metric \u2014 classification score, judge-based change score, hybrid penalty.
+
+WHAT IS THE DCA METRIC?
+-----------------------
+DCA (Document Change Analysis) measures how well the model describes
+meaningful differences between two document images.
+
+The final score for one example is:
+
+    total_score = FIELD_WEIGHT_CLS \xd7 cls_score + FIELD_WEIGHT_CHANGE \xd7 change_score
+                = 0.6 \xd7 cls_score + 0.4 \xd7 change_score
+
+  cls_score    (classification):   1.0 if model correctly flags the change
+               category; 0.0 otherwise.  Rule-based, instant, no LLM needed.
+
+  change_score (summary quality):  How well the model\u2019s change description
+               matches the human ground truth.  Measured by a judge LLM that
+               returns precision/recall of content items, combined via F-beta
+               with \u03b2\u00b2 = FIELD_WEIGHT_CHANGE/FIELD_WEIGHT_CLS = 2/3.
+
+JUDGE PIPELINE
+--------------
+  1. \u201cFast-path\u201d rules in _SPECIAL_CASE_RULES handle NoMatchFound,
+     Could not infer, Images are identical, crossed out, etc. \u2014 no LLM call.
+  2. Persistent on-disk cache at JUDGE_CACHE_FILE avoids re-judging the
+     same (human, model) pair across runs.  Cache key = sha256(human+model).
+  3. For genuine change descriptions, an Azure OpenAI judge call is made.
+     The judge returns JSON with precision (0\u20131) and recall (0\u20131).
+  4. F-beta combines them: score = (1+\u03b2\u00b2)\xd7P\xd7R / (\u03b2\u00b2\xd7P + R)
+
+HYBRID METRIC (optional)
+------------------------
+make_hybrid_metric() wraps any base metric with a token-efficiency penalty:
+
+  Exponential: score \xd7 exp(-k \xd7 max(0, tokens/T - 1))
+               Full score up to T tokens, then decays smoothly.
+               Default: T=2500, k=2.0
+
+  Linear:      score \xd7 max(0, 1 - (tokens - T) / T)
+               Full score up to T tokens, linear decrease to 0 at 2\xd7T.
+
+  Both modes only apply during optimization (trace is not None).
+  During pure evaluation (trace=None), the raw metric score is returned
+  unchanged so leaderboard scores stay comparable across candidates.
+
+MODULE EXPORTS
+--------------
+  dca_comparison_metric(example, prediction, trace) \u2192 float [0,1]
+      Primary metric for DSPy optimizers.  Returns total_score.
+
+  dca_comparison_metric_with_feedback(example, prediction, trace)
+      \u2192 dspy.Prediction(score, feedback)
+      Used by GEPA optimizer which needs textual feedback per example.
+
+  judge_summary_metric(human, model) \u2192 float [0,1]
+      Judge the summary quality of one example.  Exported for testing.
+
+  make_hybrid_metric(base_metric, \u2026) \u2192 callable
+      Factory returning a new metric with token penalty applied.
+
+  compute_classification_score(example, prediction) \u2192 float
+      Classification component only (no LLM).  Used for fast pre-screening.
+
+CONSTANTS
+---------
+  FIELD_WEIGHT_CLS    = 0.6   (classification weight)
+  FIELD_WEIGHT_CHANGE = 0.4   (change summary weight)
+  JUDGE_CACHE_FILE    = \".cache/judge_summary_cache.json\"
+"""
+
 import dspy
 import hashlib
 import json
+import math
 import os
 import threading
 
@@ -30,6 +101,71 @@ def _get_client():
 
 MODEL = DCA_JUDGE_MODEL_NAME
 
+_JUDGE_PROMPT_TEMPLATE = """
+You are a judge evaluating model-generated summaries of changes between two document images.
+
+The human (ground truth) summary was produced using these rules:
+- Only one image present AND it is informational -> "NoMatchFound"
+- Only one image present AND it is non-informational -> "Only one image and it is non informational"
+- Both images present AND both non-informational -> "Both images are non informational and contain only logo/watermark etc. no meaningful content"
+- Both images present AND both informational AND fully identical or just trivial differences (minor such as layout shift, spelling errors, etc.) -> "Images are identical - no changes"
+- Both images present AND one is non-informational -> describe the informational image and note that the other is non-informational
+- Image is crossed out -> "Image has been crossed out"
+- Image is tiny/corrupted -> "Could not infer"
+- Both images present AND both informational AND meaningfully different -> describe the meaningful visual/content differences (ignoring trivial differences like formatting)
+
+---
+
+Human summary:
+__HUMAN_SUMMARY__
+
+Model summary:
+__MODEL_SUMMARY__
+
+---
+
+STEP 1 -- Determine evaluation mode:
+
+**BREAKDOWN mode:** Use this ONLY when BOTH the human summary AND the model summary describe actual meaningful differences between two images in detail (i.e. both are informational and substantively different).
+    -> Extract distinct changes from each summary, compare them, and calculate counts based on overlap.
+    -> Example: human describes 3 changes, model correctly captures 2, misses 1, adds 1 hallucinated -> correct_matches=2, missed_changes=1, hallucinated_changes=1.
+
+**DIRECT mode:** Use this whenever the human summary OR the model summary falls into a special category that does not describe detailed meaningful differences. Special categories include:
+    - "NoMatchFound" (only one image and it is informational)
+    - "Only one image and it is non informational"
+    - "Both images are non informational"
+    - "One image is non informational" (one present, one not)
+    - "Images are identical - no changes" (trivial or no differences)
+    - "Image has been crossed out"
+    - "Could not infer"
+    - A detailed breakdown description when the other summary is one of the above special categories
+
+    In DIRECT mode, reduce each summary to its single conclusion/category label and compare:
+    -> human_changes: [one-phrase label for the human conclusion]
+    -> model_changes: [one-phrase label for the model conclusion]
+    -> They MATCH only if both convey the same conclusion (e.g. both say "no meaningful changes" / "identical both", or both say "only one image present and it is non informational", etc.).
+    -> They DO NOT MATCH if one says "meaningful differences exist" (breakdown) while the other says "identical" or vice versa.
+    -> correct_matches: 1 if they match else 0
+    -> missed_changes:  0 if they match else 1
+    -> hallucinated_changes: 0 if they match else 1
+
+    Example (mixed case): human summary describes several meaningful differences (breakdown), model says "Images are identical - no changes".
+    -> DIRECT mode, because model output is a special-category conclusion.
+    -> human_changes: ["meaningful differences exist"], model_changes: ["images are identical - no changes"]
+    -> They do NOT match -> correct_matches=0, missed_changes=1, hallucinated_changes=1
+
+STEP 2 -- Return JSON:
+
+{
+    "evaluation_mode": "direct" or "breakdown",
+    "human_changes": [],
+    "model_changes": [],
+    "correct_matches": 0,
+    "missed_changes": 0,
+    "hallucinated_changes": 0
+}
+""".strip()
+
 # ---------------------------------------------------------------------------
 # Judge cache -- persistent file-based cache for judge_summary_metric results.
 # Keyed on SHA-256(human + "\0" + model).
@@ -53,7 +189,34 @@ def _save_judge_cache() -> None:
         json.dump(_judge_cache, f, indent=2)
 
 def _judge_cache_key(human: str, model: str) -> str:
-    return hashlib.sha256(f"{human}\0{model}".encode()).hexdigest()
+    namespace = {
+        "judge_model": MODEL,
+        "prompt_template": _JUDGE_PROMPT_TEMPLATE,
+        "special_case_rules": [
+            {
+                "label": rule["label"],
+                "detect_code": rule["detect"].__code__.co_code.hex(),
+                "detect_consts": repr(rule["detect"].__code__.co_consts),
+                "match_code": rule["match"].__code__.co_code.hex(),
+                "match_consts": repr(rule["match"].__code__.co_consts),
+            }
+            for rule in _SPECIAL_CASE_RULES
+        ],
+    }
+    payload = json.dumps(
+        {
+            "namespace": namespace,
+            "human": human,
+            "model": model,
+        },
+        sort_keys=True,
+        ensure_ascii=False,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _normalize_summary_text(text: str) -> str:
+    return " ".join(str(text).strip().lower().split())
 
 _load_judge_cache()
 
@@ -173,6 +336,9 @@ def judge_summary_metric(human, model):
     Uses rule-based fast-path for special cases, persistent cache, and
     falls back to LLM judge for breakdown-mode comparisons.
     """
+    if _normalize_summary_text(human) == _normalize_summary_text(model):
+        return 1.0
+
     # Fast-path: rule-based for DIRECT-mode special cases
     fbeta, reasoning, matched = _try_rule_based_match(human, model)
     if matched:
@@ -184,71 +350,11 @@ def judge_summary_metric(human, model):
         return _judge_cache[cache_key]
 
     # LLM judge for BREAKDOWN-mode (meaningful differences)
-    prompt = f"""
-You are a judge evaluating model-generated summaries of changes between two document images.
-
-The human (ground truth) summary was produced using these rules:
-- Only one image present AND it is informational -> "NoMatchFound"
-- Only one image present AND it is non-informational -> "Only one image and it is non informational"
-- Both images present AND both non-informational -> "Both images are non informational and contain only logo/watermark etc. no meaningful content"
-- Both images present AND both informational AND fully identical or just trivial differences (minor such as layout shift, spelling errors, etc.) -> "Images are identical - no changes"
-- Both images present AND one is non-informational -> describe the informational image and note that the other is non-informational
-- Image is crossed out -> "Image has been crossed out"
-- Image is tiny/corrupted -> "Could not infer"
-- Both images present AND both informational AND meaningfully different -> describe the meaningful visual/content differences (ignoring trivial differences like formatting)
-
----
-
-Human summary:
-{human}
-
-Model summary:
-{model}
-
----
-
-STEP 1 -- Determine evaluation mode:
-
-**BREAKDOWN mode:** Use this ONLY when BOTH the human summary AND the model summary describe actual meaningful differences between two images in detail (i.e. both are informational and substantively different).
-  -> Extract distinct changes from each summary, compare them, and calculate counts based on overlap.
-  -> Example: human describes 3 changes, model correctly captures 2, misses 1, adds 1 hallucinated -> correct_matches=2, missed_changes=1, hallucinated_changes=1.
-
-**DIRECT mode:** Use this whenever the human summary OR the model summary falls into a special category that does not describe detailed meaningful differences. Special categories include:
-  - "NoMatchFound" (only one image and it is informational)
-  - "Only one image and it is non informational"
-  - "Both images are non informational"
-  - "One image is non informational" (one present, one not)
-  - "Images are identical - no changes" (trivial or no differences)
-  - "Image has been crossed out"
-  - "Could not infer"
-  - A detailed breakdown description when the other summary is one of the above special categories
-
-  In DIRECT mode, reduce each summary to its single conclusion/category label and compare:
-  -> human_changes: [one-phrase label for the human conclusion]
-  -> model_changes: [one-phrase label for the model conclusion]
-  -> They MATCH only if both convey the same conclusion (e.g. both say "no meaningful changes" / "identical both", or both say "only one image present and it is non informational", etc.).
-  -> They DO NOT MATCH if one says "meaningful differences exist" (breakdown) while the other says "identical" or vice versa.
-  -> correct_matches: 1 if they match else 0
-  -> missed_changes:  0 if they match else 1
-  -> hallucinated_changes: 0 if they match else 1
-
-  Example (mixed case): human summary describes several meaningful differences (breakdown), model says "Images are identical - no changes".
-  -> DIRECT mode, because model output is a special-category conclusion.
-  -> human_changes: ["meaningful differences exist"], model_changes: ["images are identical - no changes"]
-  -> They do NOT match -> correct_matches=0, missed_changes=1, hallucinated_changes=1
-
-STEP 2 -- Return JSON:
-
-{{
-  "evaluation_mode": "direct" or "breakdown",
-  "human_changes": [],
-  "model_changes": [],
-  "correct_matches": 0,
-  "missed_changes": 0,
-  "hallucinated_changes": 0
-}}
-
-"""
+    prompt = (
+        _JUDGE_PROMPT_TEMPLATE
+        .replace("__HUMAN_SUMMARY__", str(human))
+        .replace("__MODEL_SUMMARY__", str(model))
+    )
     response = _get_client().chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
@@ -426,11 +532,24 @@ def make_hybrid_metric(
     score_weight: float = 0.5,
     length_weight: float = 0.5,
     max_prompt_tokens: int = 4000,
+    penalty_mode: str = "linear",
+    target_tokens: int = 2500,
+    penalty_steepness: float = 2.0,
 ):
     """Wrap base metrics with a prompt-token efficiency penalty.
 
-    hybrid_score = score_weight * dca_score
-                 + length_weight * max(0, 1 - prompt_tokens / max_prompt_tokens)
+    Two penalty modes are supported:
+
+    ``'linear'`` (default, backwards-compatible):
+        hybrid_score = score_weight * dca_score
+                     + length_weight * max(0, 1 - prompt_tokens / max_prompt_tokens)
+
+    ``'exponential'`` (recommended):
+        hybrid_score = dca_score * exp(-k * max(0, t/T - 1))
+
+        Zero penalty below *target_tokens* T; exponential cliff above it.
+        ``penalty_steepness`` k controls severity (k=1 gentle, k=2 standard,
+        k=3 aggressive).
 
     Prompt token count is read from ``dspy.settings.lm.history`` after each
     forward pass — these are the real API-reported input tokens, so multimodal
@@ -446,11 +565,17 @@ def make_hybrid_metric(
     base_metric_with_feedback : callable
         The feedback-aware metric, e.g. dca_comparison_metric_with_feedback.
     score_weight : float
-        Weight applied to the DCA accuracy score (default 0.5).
+        Weight applied to the DCA accuracy score (linear mode, default 0.5).
     length_weight : float
-        Weight applied to the token-efficiency term (default 0.5).
+        Weight applied to the token-efficiency term (linear mode, default 0.5).
     max_prompt_tokens : int
-        Input token count at which length_score reaches 0 (default 4000).
+        Input token count at which length_score reaches 0 (linear mode, default 4000).
+    penalty_mode : str
+        ``'linear'`` or ``'exponential'`` (default ``'linear'``).
+    target_tokens : int
+        Token budget for exponential mode — no penalty below this (default 2500).
+    penalty_steepness : float
+        Exponential steepness k (default 2.0).
 
     Returns
     -------
@@ -462,9 +587,13 @@ def make_hybrid_metric(
         raw_score = base_metric(example, prediction, trace=trace)
         tokens = _prompt_tokens_from_lm_history(trace)
         if tokens > 0:
-            length_score = max(0.0, 1.0 - tokens / max_prompt_tokens)
-            return score_weight * raw_score + length_weight * length_score
-        # trace=None → pure eval mode; return unblended score for true leaderboard evals
+            if penalty_mode == "exponential":
+                factor = math.exp(-penalty_steepness * max(0.0, tokens / target_tokens - 1.0))
+                return raw_score * factor
+            else:  # "linear"
+                length_score = max(0.0, 1.0 - tokens / max_prompt_tokens)
+                return score_weight * raw_score + length_weight * length_score
+        # trace=None or no LM history → pure eval mode; return unblended score for true leaderboard evals
         return raw_score
 
     def hybrid_metric_with_feedback(
@@ -478,14 +607,21 @@ def make_hybrid_metric(
         if tokens == 0:
             return result  # no trace → return as-is
 
-        length_score = max(0.0, 1.0 - tokens / max_prompt_tokens)
-
-        if pred_name is None:
-            # scalar return path
-            return score_weight * result + length_weight * length_score
-
-        # dspy.Prediction return path
-        adjusted = score_weight * result.score + length_weight * length_score
-        return dspy.Prediction(score=adjusted, feedback=result.feedback)
+        if penalty_mode == "exponential":
+            factor = math.exp(-penalty_steepness * max(0.0, tokens / target_tokens - 1.0))
+            if pred_name is None:
+                # scalar return path
+                return result * factor
+            # dspy.Prediction return path
+            adjusted = result.score * factor
+            return dspy.Prediction(score=adjusted, feedback=result.feedback)
+        else:  # "linear"
+            length_score = max(0.0, 1.0 - tokens / max_prompt_tokens)
+            if pred_name is None:
+                # scalar return path
+                return score_weight * result + length_weight * length_score
+            # dspy.Prediction return path
+            adjusted = score_weight * result.score + length_weight * length_score
+            return dspy.Prediction(score=adjusted, feedback=result.feedback)
 
     return hybrid_metric, hybrid_metric_with_feedback

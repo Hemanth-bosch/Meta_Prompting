@@ -1,6 +1,51 @@
-"""Tournament utilities — logging, evaluation, save/load, category sampling.
+"""Tournament utilities \u2014 logging, evaluation, save/load, category sampling.
 
 Shared helpers used by every stage of the cascaded optimization pipeline.
+
+MODULE CONTENTS
+---------------
+TeeLogger
+    Context manager that duplicates stdout+stderr to a log file.  Every
+    print() and logger call is captured without touching the calling code.
+
+    Example::
+
+        with TeeLogger(\"my_run.log\"):
+            run_all_stages()   # stdout + stderr also written to my_run.log
+
+evaluate_candidate(program, val_set, metric, \u2026)
+    Run \`program\` on each example in \`val_set\` and collect per-sample token
+    usage from \`lm.history\` (the LM\u2019s own API-reported token counts).
+    Returns avg_total_score, per_sample_token_stats dict, and timing info.
+    Token stats power the Pareto front analysis and hybrid metric penalty.
+
+evaluate_candidate_at_temperature(program, \u2026, temperature)
+    Same as evaluate_candidate but temporarily overrides the student LM
+    temperature, used by seed_prompt_generator for diverse score sampling.
+
+save_candidate(program, path) / load_candidate(path, \u2026)
+    Thin wrappers around DSPy\u2019s save()/load() that also store/restore the
+    custom instruction text injected into the signature.
+
+get_program_info(program)
+    Extract the instruction text and number of demos from a compiled program.
+    Used to populate CandidateEntry.metadata.
+
+create_mini_dataset(full_set, n, stratify_by, \u2026)
+    Stratified random subsample of the dataset.  Preserves the category
+    distribution of the full set so mini metrics stay meaningful.
+
+    Example::
+
+        mini_train = create_mini_dataset(train_set, n=32, stratify_by=\"category\")
+
+generate_summary(leaderboard, config, \u2026)
+    Build the final summary dict (best score, Pareto front, per-stage stats)
+    written to \`tournament_summary.json\` and printed to console.
+
+plot_pareto_candidates(entries, output_path, \u2026)
+    Draw a scatter plot of score vs avg_tokens with the Pareto front
+    highlighted.  Saved as \`pareto_plot.png\` in the tournament directory.
 """
 
 from __future__ import annotations
@@ -632,18 +677,22 @@ def generate_summary(
     started_at: str = "",
     stage_top_k_history: dict | None = None,
     stage_pre_best: dict | None = None,
+    stage_execution_history: dict | None = None,
 ) -> dict:
     """Build a complete end-of-run summary dict.
 
     Parameters
     ----------
-    stage_top_k_history : dict[str, list[CandidateEntry]], optional
-        Maps stage name → the top-K entries that were passed to the next
-        stage.  Recorded in run_tournament.py after each stage's selection.
+    stage_top_k_history : dict[str, list[dict]], optional
+        Maps stage name → frozen snapshots of the top-K entries that were
+        passed to the next stage. Recorded in run_tournament.py at selection
+        time so the audit trail is not mutated by later full-val re-evaluation.
     stage_pre_best : dict[str, float], optional
         Maps stage name → the global best val_total_score immediately before
         that stage ran.  Used to compute true cross-stage improvement.
     """
+    final_selection_exclude_stages = ["seed_baseline"]
+
     summary = {
         "tournament_id": f"tournament_{config.timestamp}",
         "started_at": started_at,
@@ -654,10 +703,26 @@ def generate_summary(
         "per_stage": {},
     }
 
-    # Include ALL stages present in the leaderboard (not just freshly-run
-    # ones) so that resumed stages also appear in the final summary.
+    # Include any stage that materially participated in the run, even if it
+    # failed before producing leaderboard entries. This keeps summary_error.json
+    # honest for zero-candidate failures such as a bootstrap subprocess crash.
     # "seed_baseline" is diagnostic (scored on train, not val) so exclude it.
-    all_stages = [s for s in leaderboard.get_stages() if s != "seed_baseline"]
+    leaderboard_stages = [s for s in leaderboard.get_stages() if s != "seed_baseline"]
+    execution_stages = [
+        s for s in (stage_execution_history or {}).keys()
+        if s != "seed_baseline"
+    ]
+    participated_stages = set(leaderboard_stages) | set(execution_stages) | {
+        s for s in stages_run if s != "seed_baseline"
+    }
+
+    all_stages = [
+        stage for stage in config.stages
+        if stage in participated_stages
+    ]
+    for stage in leaderboard_stages + execution_stages + stages_run:
+        if stage != "seed_baseline" and stage in participated_stages and stage not in all_stages:
+            all_stages.append(stage)
     summary["stages_all"] = all_stages
 
     for stage in all_stages:
@@ -677,19 +742,49 @@ def generate_summary(
             stage_sum["top_k_passed_to_next"] = len(tk)
             stage_sum["top_k_entries"] = [
                 {
-                    "stage": e.stage,
-                    "config": e.config_name,
-                    "score": round(e.val_total_score, 4),
-                    "program_path": e.program_path,
+                    "stage": e["stage"],
+                    "config": e["config_name"],
+                    "score": round(e["val_total_score"], 4),
+                    "program_path": e["program_path"],
+                    "optimization_started_at": e.get("optimization_started_at"),
+                    "optimization_completed_at": e.get("optimization_completed_at"),
+                    "optimization_duration_seconds": e.get("optimization_duration_seconds"),
                 }
                 for e in tk
             ]
 
+        if stage_execution_history and stage in stage_execution_history:
+            stage_sum["execution"] = dict(stage_execution_history[stage])
+
         summary["per_stage"][stage] = stage_sum
 
-    # Global best
-    full = leaderboard.get_full_summary()
-    summary["global_best"] = full.get("global_best")
+    # Final leaders / selection guidance
+    full = leaderboard.get_full_summary(
+        selection_criteria=config.selection_criteria,
+        exclude_stages=final_selection_exclude_stages,
+    )
+    summary["selection_criteria"] = config.selection_criteria
+    summary["score_leader"] = full.get("score_leader")
+    if config.selection_criteria == "pareto":
+        summary["final_selection_mode"] = "manual_pareto_choice"
+        try:
+            summary["pareto_front"] = [
+                {
+                    "stage": e.stage,
+                    "config_name": e.config_name,
+                    "val_total_score": round(e.val_total_score, 4),
+                    "val_avg_total_tokens": e.val_avg_total_tokens,
+                    "program_path": e.program_path,
+                }
+                for e in leaderboard.pareto_front([
+                    e for e in leaderboard.entries
+                    if e.stage not in final_selection_exclude_stages
+                ])
+            ]
+        except Exception:
+            summary["pareto_front"] = []
+    else:
+        summary["selection_leader"] = full.get("selection_leader")
     summary["n_total_candidates"] = full["n_total_candidates"]
 
     # Final tournament / test eval
@@ -711,10 +806,20 @@ def generate_summary(
             "val_avg_reasoning_tokens": e.val_avg_reasoning_tokens,
             "opt_prompt_tokens": e.prompt_tokens,
             "opt_completion_tokens": e.completion_tokens,
+            "optimization_started_at": (e.metadata or {}).get("optimization_started_at"),
+            "optimization_completed_at": (e.metadata or {}).get("optimization_completed_at"),
+            "optimization_duration_seconds": (e.metadata or {}).get("optimization_duration_seconds"),
+            "compile_duration_seconds": (e.metadata or {}).get("compile_duration_seconds"),
+            "evaluation_duration_seconds": (e.metadata or {}).get("evaluation_duration_seconds", e.val_eval_time_seconds),
             "parent": Path(e.parent_path).stem if e.parent_path else None,
             "program_path": e.program_path,
         }
-        for i, e in enumerate(leaderboard.entries)
+        for i, e in enumerate(
+            [
+                entry for entry in leaderboard.entries
+                if entry.stage not in final_selection_exclude_stages
+            ]
+        )
     ]
 
     return summary
@@ -803,25 +908,41 @@ def print_final_summary(summary: dict):
                     src_tag = f"[{src}] " if src != stage else ""
                     print(f"      {j}. {src_tag}{te['config']}  score={te['score']:.4f}")
 
-    # ── Winner ───────────────────────────────────────────────────────────────
-    gb = summary.get("global_best")
-    if gb:
+    # ── Final leaders / selection guidance ──────────────────────────────────
+    def _print_candidate_block(label: str, candidate: dict) -> None:
         print(f"\n{'─'*W}")
-        print(f"  WINNER: [{gb['stage']}] {gb['config_name']}")
+        print(f"  {label}: [{candidate['stage']}] {candidate['config_name']}")
         print(f"{'─'*W}")
-        print(f"    Val total  = {gb['val_total_score']:.4f}")
-        print(f"    Val cls    = {gb['val_cls_score']:.4f}")
-        print(f"    Val change = {gb['val_change_score']:.4f}")
-        if gb.get("val_avg_total_tokens") is not None:
-            print(f"    Avg tok/smp = {gb['val_avg_total_tokens']:.0f}"
-                  f"  (in={gb.get('val_avg_input_tokens') or 0:.0f}"
-                  f" out={gb.get('val_avg_output_tokens') or 0:.0f})")
-        if gb.get("per_category_scores"):
-            cats = sorted(gb["per_category_scores"].keys())
+        print(f"    Val total  = {candidate['val_total_score']:.4f}")
+        print(f"    Val cls    = {candidate['val_cls_score']:.4f}")
+        print(f"    Val change = {candidate['val_change_score']:.4f}")
+        if candidate.get("val_avg_total_tokens") is not None:
+            print(f"    Avg tok/smp = {candidate['val_avg_total_tokens']:.0f}"
+                  f"  (in={candidate.get('val_avg_input_tokens') or 0:.0f}"
+                  f" out={candidate.get('val_avg_output_tokens') or 0:.0f})")
+        if candidate.get("per_category_scores"):
+            cats = sorted(candidate["per_category_scores"].keys())
             cat_str = "  ".join(
-                f"{c}={gb['per_category_scores'][c]:.3f}" for c in cats
+                f"{c}={candidate['per_category_scores'][c]:.3f}" for c in cats
             )
             print(f"    Per-cat    : {cat_str}")
+
+    score_leader = summary.get("score_leader")
+    selection_leader = summary.get("selection_leader")
+    selection_criteria = summary.get("selection_criteria", "score_only")
+
+    if selection_criteria == "pareto":
+        print(f"\n{'─'*W}")
+        print("  FINAL SELECTION: manual from Pareto front / plot")
+        print(f"{'─'*W}")
+        pareto_entries = summary.get("pareto_front") or []
+        print(f"    Selection criteria = pareto")
+        print(f"    Pareto candidates  = {len(pareto_entries)}")
+    elif selection_leader:
+        _print_candidate_block(f"SELECTION LEADER ({selection_criteria})", selection_leader)
+
+    if score_leader and score_leader != selection_leader:
+        _print_candidate_block("SCORE LEADER", score_leader)
 
     # ── Test set evaluation ───────────────────────────────────────────────────
     te = summary.get("test_eval")
@@ -881,6 +1002,7 @@ def plot_pareto_candidates(
     leaderboard: OptimizationLeaderboard,
     output_path: str | Path,
     title: str = "Tournament Candidates — Score vs Avg Tokens/Sample",
+    exclude_stages: list[str] | None = None,
 ):
     """Generate a 2D scatter plot: val_total_score (X, %) vs val_avg_total_tokens (Y)."""
     try:
@@ -891,7 +1013,8 @@ def plot_pareto_candidates(
         print(f"  [WARN] matplotlib not available — skipping scatter plot")
         return
 
-    entries = leaderboard.entries
+    excluded = set(exclude_stages or [])
+    entries = [e for e in leaderboard.entries if e.stage not in excluded]
     if not entries:
         print(f"  [WARN] No entries in leaderboard — skipping scatter plot")
         return

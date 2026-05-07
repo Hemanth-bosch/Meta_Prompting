@@ -16,10 +16,18 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from evaluation.dca_run_val_test_set_eval.split_utils import resolve_default_split_file
+
 # ---------------------------------------------------------------------------
 # Commands to run — one per entry.  Fix the "ython" typo in the originals.
 # ---------------------------------------------------------------------------
 PYTHON = sys.executable
+DEFAULT_SPLIT_FILE = str(resolve_default_split_file(REPO_ROOT))
 
 COMMANDS: list[tuple[str, list[str]]] = [
     # (
@@ -29,7 +37,7 @@ COMMANDS: list[tuple[str, list[str]]] = [
     #         "evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py",
     #         "--model-path",  ".cache/gpt-4.1-mini_MIPROv2_DCA_Lig_NoCot_max_3_3_v1_cfd_20260413191910.json",
     #         "--model-name",  "azure/gpt-4.1-mini",
-    #         "--split-file",  ".cache/dca_split_seed42.json",
+    #         "--split-file",  DEFAULT_SPLIT_FILE,
     #         "--which-set",   "val",
     #         "--no-cot",
     #         "--temperature", "0.1",
@@ -44,7 +52,7 @@ COMMANDS: list[tuple[str, list[str]]] = [
             "evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py",
             "--model-path",  ".cache/azure_gpt-4.1-mini_MIPROv2_DCA_Light_NoCot_dca_optimized_max_6_6_20260402141458.json",
             "--model-name",  "azure/gpt-5-mini",
-            "--split-file",  ".cache/dca_split_seed42.json",
+            "--split-file",  DEFAULT_SPLIT_FILE,
             "--which-set",   "test",
             "--no-cot",
             "--temperature", "1",
@@ -58,7 +66,7 @@ COMMANDS: list[tuple[str, list[str]]] = [
             "evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py",
             "--model-path",  ".cache/azure_gpt-4.1-mini_MIPROv2_DCA_Light_NoCot_dca_optimized_max_6_6_20260402141458.json",
             "--model-name",  "azure/gpt-5.2",
-            "--split-file",  ".cache/dca_split_seed42.json",
+            "--split-file",  DEFAULT_SPLIT_FILE,
             "--which-set",   "test",
             "--no-cot",
             "--temperature", "1",
@@ -72,7 +80,7 @@ COMMANDS: list[tuple[str, list[str]]] = [
             "evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py",
             "--model-path",  ".cache/azure_gpt-4.1-mini_MIPROv2_DCA_Light_NoCot_dca_optimized_max_6_6_20260402141458.json",
             "--model-name",  "azure/gpt-4.1-mini",
-            "--split-file",  ".cache/dca_split_seed42.json",
+            "--split-file",  DEFAULT_SPLIT_FILE,
             "--which-set",   "test",
             "--no-cot",
             "--temperature", "0.1",

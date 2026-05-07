@@ -1,56 +1,78 @@
 """
-DCA (Document Change Analysis) Prompt Optimization Pipeline
-============================================================
+extract_dca.py — Single-run DCA Prompt Optimization
+====================================================
 
-Compares original document images against re-imaged versions and classifies
-each pair as:
-  discard_image = "true"  -- images are identical or differences are trivial
-  discard_image = "false" -- meaningful changes exist
+PIPELINE OVERVIEW (what this script does end-to-end)
+-----------------------------------------------------
+  1. Parse CLI args → read env vars
+  2. Set up TeeLogger (all output → terminal + log file simultaneously)
+  3. Load dataset (~376 labelled image pairs from disk)
+  4. Stratified train/val/test split (60/20/20, seed=42)
+  5. Build the DSPy comparator module (Predict or ChainOfThought)
+  6. Optionally load a previously saved extractor (warm-start optimization)
+  7. Optionally inject a human-written instruction from a .md/.txt file
+  8. Save the "seed state" (prompt before optimization) to log/
+  9. Run the selected optimizer(s) via OptimizationRunner
+  10. Save the "optimized state" + final model .json to .cache/
+  11. Rename log + state files to share the model's base name for traceability
 
-Also provides a change summary describing what changed between the two images.
-1. If there's only one image and : it is informational: "NoMatchFound" - discard - false
-2. If there's only one image and : it is non informational: "Only one image present and it is non informational - watermark or logo" - discard - true
+TASK DESCRIPTION (what the comparator does)
+-------------------------------------------
+Given two document images (original vs. re-imaged version), classify:
+  discard_image = "true"   → images are identical / differences are trivial
+  discard_image = "false"  → meaningful changes exist
 
-3. If there are two images and they are both non informational: "Both images are non informational"
-4. They are visually identical/trivial changes: "Images are identical - no changes"
-In these cases - discard - true
+And produce a change summary.  Special-case rules:
+  A1: single non-informational image → discard=true, changes="Only one image and it is non informational"
+  A2: single informational image     → discard=false, changes="NoMatchFound"
+  B3: both non-informational         → discard=true,  changes="Both images are non informational..."
+  B5a: trivially identical           → discard=true,  changes="Images are identical - no changes"
+  B5b: meaningfully different        → discard=false,  changes=<detailed description>
+  Special: crossed-out               → discard=false, changes="Image has been crossed out"
+  Special: corrupted/unreadable      → discard=false, changes="Could not infer"
 
-5. If there are meaningful differences, describe the specific changes - discard - false
+OPTIMIZERS (select via --optimizer)
+-----------------------------------
+  bootstrap   BootstrapFewShotWithRandomSearch  — demo selection
+  miprov2     MIPROv2  — Bayesian instruction + demo search (recommended)
+  gepa        GEPA     — reflection-LM guided prompt improvement
+  simba       SimBA    — iterative prompt refinement on train set only
+  all         Run all four in sequence
 
-Other cases:
-1. When one of the images is completely crossed out - "Image 1/2 is crossed out"
-2. One of the images is tiny/corrupted/unreadable - "Could not infer"
-
-
-This script uses DSPy prompt optimization to improve the accuracy of both the
-classification decision and the change summary.  Four optimization strategies
-are supported via --optimizer (or run all four with "all"):
-
-  bootstrap   BootstrapFewShotWithRandomSearch
-  miprov2     MIPROv2 (Bayesian instruction + demo search)
-  gepa        GEPA (reflection-LM guided prompt improvement)
-  simba       SIMBA (iterative prompt refinement on train set only)
-
-Dataset
+DATASET
 -------
-~376 human-labelled image pairs from data/dca_data/image_pairs/.
-Ground truth in data/dca_data/image_pairs_llm_output_exp1/.
+  ~376 human-labelled image pairs: data/dca_data/image_pairs/
+  Ground truth JSONs:               data/dca_data/image_pairs_llm_output_exp1/
+  Split (seed=42, stratified by discard_image + category + doubt):
+    train 60%  |  val 20%  |  test 20%
 
-Split (seed=42, stratified on discard_image + category + doubt):
-  train 60%  |  val 20%  |  test 20%
-
-Usage
------
-    uv run python extract_dca.py
-    uv run python extract_dca.py --optimizer miprov2 --miprov2-auto heavy
-    uv run python extract_dca.py --optimizer all --save-model
-    uv run python extract_dca.py --model-name azure/gpt-4o --optimizer gepa --save-model
-
-On Windows, set PYTHONIOENCODING first to avoid Unicode issues:
+USAGE EXAMPLES
+--------------
+    # Quick run with default MIPROv2 medium
     $env:PYTHONIOENCODING="utf-8"; uv run python extract_dca.py
 
-Environment Variables (CLI flags take priority)
------------------------------------------------
+    # Heavy MIPROv2 optimization
+    uv run python extract_dca.py --optimizer miprov2 --miprov2-auto heavy
+
+    # Run all four optimizers
+    uv run python extract_dca.py --optimizer all
+
+    # Use a different model
+    uv run python extract_dca.py --model-name azure/gpt-4o --optimizer gepa
+
+    # Start from a human-written prompt file
+    uv run python extract_dca.py --initial-instruction-file human_prompts/v1_prompt_midas.md
+
+OUTPUT FILES (all in .cache/ and log/)
+---------------------------------------
+  {prefix}_seed_state.json       — DSPy state before optimization
+  {prefix}_optimized_state.json  — DSPy state after optimization
+  {prefix}.json                  — Final saved model (same as optimized_state, renamed)
+  {prefix}.log                   — Full console output for this run
+  {prefix}_run_summary.json      — Timing, scores, paths, best strategy
+
+ENVIRONMENT VARIABLES (.env, overridden by CLI flags)
+-----------------------------------------------------
   MODEL_NAME              Student LM (e.g. azure/gpt-4o-mini)
   REFLECTION_LM_NAME      Reflection LM for GEPA (e.g. azure/gpt-5)
   DCA_IMAGE_PAIRS_DIR     Image pairs directory
@@ -60,11 +82,14 @@ Environment Variables (CLI flags take priority)
 """
 
 import argparse
+import hashlib
 import json
 import logging
 import os
 import sys
+import time
 from datetime import datetime
+from pathlib import Path
 from typing import List
 
 import dotenv
@@ -82,6 +107,46 @@ from optimization import (
     create_gepa_strategy,
 )
 
+
+def _quote_cli_arg(value: str) -> str:
+    """Shell-quote a CLI argument value so it is safe to paste into a terminal.
+
+    Example: _quote_cli_arg("hello world") -> '"hello world"'
+    """
+    text = str(value)
+    if not text:
+        return '""'
+    if any(ch in text for ch in ' \t"'):
+        return '"' + text.replace('"', '\\"') + '"'
+    return text
+
+
+def _build_rerun_from_seed_command(seed_state_path: str) -> str:
+    """Build the CLI command needed to re-run this exact job from the saved seed state.
+
+    Useful when optimization fails mid-run: the seed (pre-optimization) state
+    is already on disk and this command lets you resume from that checkpoint
+    rather than regenerating the seed from scratch.
+
+    Strips ``--load-extractor`` and ``--skip-load`` from the original argv,
+    then appends ``--load-extractor <seed_state_path>`` so the next run
+    picks up from the saved seed prompt.
+    """
+    forwarded_args: list[str] = []
+    skip_next = False
+    for arg in sys.argv[1:]:
+        if skip_next:
+            skip_next = False
+            continue
+        if arg == "--load-extractor":
+            skip_next = True
+            continue
+        if arg == "--skip-load":
+            continue
+        forwarded_args.append(_quote_cli_arg(arg))
+    forwarded_args.extend(["--load-extractor", _quote_cli_arg(seed_state_path)])
+    return "uv run python extract_dca.py " + " ".join(forwarded_args)
+
 dotenv.load_dotenv(override=True)
 
 # ── Argument Parsing ─────────────────────────────────────────────
@@ -97,10 +162,10 @@ parser.add_argument("--no-cache", action="store_true",
                     help="Disable LLM response caching")
 parser.add_argument("--load-extractor", type=str, default=None,
                     help="Path to previously saved extractor to load")
+parser.add_argument("--auto-load-compatible-cache", action="store_true",
+                    help="Allow automatic loading of a compatible cached extractor when no explicit path is provided")
 parser.add_argument("--skip-load", action="store_true",
                     help="Skip loading cached extractor even if it exists")
-parser.add_argument("--save-model", action="store_true", default=True,
-                    help="Save the optimized model after training")
 parser.add_argument("--optimizer", type=str, default="miprov2",
                     choices=["miprov2", "bootstrap", "gepa", "simba", "all"],
                     help="Optimizer to use (default: miprov2)")
@@ -138,11 +203,135 @@ args = parser.parse_args()
 # Central flag — purely driven by the explicit switch
 _should_clear_descs: bool = args.clear_field_descs
 
+pairs_dir = args.pairs_dir
+gt_dir = args.gt_dir
+split_seed = 42
+_split_ratios = {"train": 0.6, "val": 0.2, "test": 0.2}
+_split_stratify_by = ["expected_discard_image", "expected_human_label_category", "doubt"]
+
+
+def _slug_token(value: str | None, default: str = "na") -> str:
+    """Convert any string to a safe filesystem/filename token.
+
+    Replaces non-alphanumeric chars with underscores and collapses doubles.
+    Example: _slug_token("azure/gpt-4.1 mini") -> "azure_gpt_4_1_mini"
+    """
+    text = str(value or "").strip().lower()
+    cleaned = [ch if ch.isalnum() else "_" for ch in text]
+    slug = "".join(cleaned).strip("_")
+    while "__" in slug:
+        slug = slug.replace("__", "_")
+    return slug or default
+
+
+def _short_hash(*parts: object, length: int = 10) -> str:
+    """Return a short deterministic hex hash of the given parts (JSON-serialised).
+
+    Used to fingerprint split configurations so that re-running with the same
+    dataset paths and ratios always maps to the same cached split manifest.
+    """
+    payload = json.dumps(parts, ensure_ascii=False, sort_keys=True, default=str)
+    return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:length]
+
+
+def _build_split_cache_path() -> str:
+    """Return a fingerprinted path for the split manifest JSON.
+
+    The path encodes the dataset name, ratios, and a content hash so that
+    different dataset/split configurations never collide on disk.
+    Example output: .cache/splits/dca_split_seed42_image_pairs_..._tr60va20te20_<hash>.json
+    """
+    pairs_tag = _slug_token(Path(os.path.abspath(pairs_dir)).name)[:24]
+    gt_tag = _slug_token(Path(os.path.abspath(gt_dir)).name)[:24]
+    ratios_tag = (
+        f"tr{int(_split_ratios['train'] * 100)}"
+        f"va{int(_split_ratios['val'] * 100)}"
+        f"te{int(_split_ratios['test'] * 100)}"
+    )
+    split_fingerprint = _short_hash(
+        os.path.abspath(pairs_dir),
+        os.path.abspath(gt_dir),
+        split_seed,
+        _split_ratios,
+        _split_stratify_by,
+    )
+    return os.path.join(
+        ".cache",
+        "splits",
+        f"dca_split_seed{split_seed}_{pairs_tag}_{gt_tag}_{ratios_tag}_{split_fingerprint}.json",
+    )
+
+
+def _build_dataset_cache_tag() -> str:
+    """Short tag that uniquely identifies the dataset (folder name + content hash).
+
+    Embedded in model filenames so saved models are traceable to their dataset.
+    """
+    dataset_name = _slug_token(Path(os.path.abspath(pairs_dir)).name)[:18]
+    return f"{dataset_name}_{_short_hash(os.path.abspath(pairs_dir), os.path.abspath(gt_dir))}"
+
+
+def _format_demo_tag(max_labeled_demos, max_bootstrapped_demos) -> str:
+    """Build a compact demo-count tag for filenames, e.g. 'd3b5' = 3 labeled, 5 bootstrapped."""
+    labeled = "na" if max_labeled_demos is None else str(max_labeled_demos)
+    boot = "na" if max_bootstrapped_demos is None else str(max_bootstrapped_demos)
+    return f"d{labeled}b{boot}"
+
+
+def _primary_predictor(program):
+    """Return the single predictor used by the DCA comparator program."""
+    predictors = list(program.predictors()) if hasattr(program, "predictors") else []
+    if not predictors:
+        raise AttributeError("Comparator program does not expose any predictors")
+    return predictors[0]
+
+
+def _get_program_signature(program):
+    """Read the active signature from the comparator's primary predictor."""
+    return _primary_predictor(program).signature
+
+
+def _set_program_signature(program, signature) -> None:
+    """Replace the active signature on the comparator's primary predictor."""
+    _primary_predictor(program).signature = signature
+
+
+def _find_matching_cached_extractor(
+    cache_root: str,
+    strategy_tag: str,
+    demo_tag: str,
+    model_tag: str,
+    cot_tag: str,
+    re_tag: str,
+    instr_tag: str,
+    cfd_tag: str,
+    dataset_tag: str,
+    split_seed_value: int,
+) -> str | None:
+    """Find the most-recently modified extractor in cache_root matching all tags.
+
+    Used for ``--auto-load-compatible-cache``: avoids re-running a slow
+    optimization if a compatible cached model already exists on disk.
+    Returns None when nothing matches.
+    """
+    root = Path(cache_root)
+    if not root.exists() or not root.is_dir():
+        return None
+
+    pattern = (
+        f"{model_tag}_{strategy_tag}_{cot_tag}{re_tag}_dca_optimized_{demo_tag}"
+        f"{instr_tag}{cfd_tag}_ds{dataset_tag}_sp{split_seed_value}_*.json"
+    )
+    matches = sorted(root.glob(pattern), key=lambda path: path.stat().st_mtime, reverse=True)
+    return str(matches[0]) if matches else None
+
 # ── Timestamp ────────────────────────────────────────────────────
 # Set once here so the log file and saved model share the same timestamp.
 # When launched from run_dca_grid.py each run receives a pre-generated unique
 # timestamp via --run-timestamp so parallel runs don't collide.
 current_time = args.run_timestamp if args.run_timestamp else datetime.now().strftime("%Y%m%d%H%M%S")
+pipeline_started_at = datetime.now().isoformat(timespec="seconds")
+pipeline_t0 = time.time()
 
 # ── Log filename prefix ───────────────────────────────────────────
 # Compute the same prefix that the saved model will use, so the log file
@@ -152,6 +341,7 @@ current_time = args.run_timestamp if args.run_timestamp else datetime.now().strf
 _model_display = (args.model_name or os.getenv("MODEL_NAME", "Unknown")).replace("/", "_")
 _cot_tag       = "NoCot" if args.no_cot else "CoT"
 _re_tag        = f"_RE{args.reasoning_effort}" if args.reasoning_effort else ""
+_dataset_tag   = _build_dataset_cache_tag()
 if args.optimizer == "miprov2":
     _strategy_display = f"MIPROv2_DCA_{args.miprov2_auto.capitalize()}"
 elif args.optimizer == "bootstrap":
@@ -166,7 +356,8 @@ _demo_tag   = f"_d{args.max_labeled_demos}b{args.max_bootstrapped_demos}"
 _instr_tag  = ("_" + os.path.splitext(os.path.basename(args.initial_instruction_file))[0]
                if args.initial_instruction_file else "")
 _cfd_tag    = "_cfd" if args.clear_field_descs else ""
-_log_prefix = f"{_model_display}_{_strategy_display}_{_cot_tag}{_re_tag}{_demo_tag}{_instr_tag}{_cfd_tag}"
+_split_tag  = f"_ds{_dataset_tag}_sp{split_seed}"
+_log_prefix = f"{_model_display}_{_strategy_display}_{_cot_tag}{_re_tag}{_demo_tag}{_instr_tag}{_cfd_tag}{_split_tag}"
 
 # ── TeeLogger ────────────────────────────────────────────────────
 # Captures all stdout AND stderr (including DSPy's logging output and tqdm
@@ -292,12 +483,6 @@ if args.model_name or args.no_cache:
     print(f"Model configured.\n")
 
 
-# ── Data Paths ───────────────────────────────────────────────────
-# Defaults already resolved from env vars in argparse above.
-pairs_dir = args.pairs_dir
-gt_dir    = args.gt_dir
-
-
 # ── Display Configuration ────────────────────────────────────────
 _re_display  = f" | reasoning_effort={args.reasoning_effort}" if args.reasoning_effort else ""
 _cot_display = "Predict (no CoT)" if args.no_cot else "ChainOfThought"
@@ -315,15 +500,15 @@ _opt_detail = {
 }.get(args.optimizer, args.optimizer)
 print(f"  Optimizer: {args.optimizer} ({_opt_detail})")
 print(f"  Load extractor: {args.load_extractor if not args.skip_load else 'No'}")
-print(f"  Save model: {args.save_model}")
+print(f"  Save model: always")
 print(f"  Initial instruction: {args.initial_instruction_file or '(signature docstring)'}")
 print(f"  Clear field descs: {args.clear_field_descs}")
 print(f"  Max labeled demos: {args.max_labeled_demos}  |  Max bootstrapped demos: {args.max_bootstrapped_demos}")
+print(f"  Dataset cache tag: {_dataset_tag}  |  Split seed: {split_seed}")
 print(f"\n Data Paths:")
 print(f"  Image pairs: {pairs_dir}")
 print(f"  Ground truth: {gt_dir}")
 print(f"{'='*80}\n")
-
 
 # ── Data Loading ─────────────────────────────────────────────────
 dataset = load_dca_dataset(pairs_dir, gt_dir)
@@ -334,8 +519,6 @@ if len(dataset) == 0:
     _log_file.close()
     exit(1)
 
-split_seed = 42
-
 def _pair_names(examples: List[dspy.Example]) -> list[str]:
     return [
         str(getattr(ex, "pair_name"))
@@ -343,14 +526,16 @@ def _pair_names(examples: List[dspy.Example]) -> list[str]:
         if getattr(ex, "pair_name", None) is not None
     ]
 
-split_dir = ".cache"
-os.makedirs(split_dir, exist_ok=True)
-split_latest_path = os.path.join(split_dir, f"dca_split_seed{split_seed}.json")
+split_latest_path = _build_split_cache_path()
+os.makedirs(os.path.dirname(split_latest_path), exist_ok=True)
 
 # Stratified split: train 60%, val 20%, test 20%
-# Delete .cache/dca_split_seed42.json to force a fresh split.
+# The split manifest path is fingerprinted by dataset path + split settings.
 train_set, val_set, test_set = stratified_split_dca_dataset(
-    dataset, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2,
+    dataset,
+    train_ratio=_split_ratios["train"],
+    val_ratio=_split_ratios["val"],
+    test_ratio=_split_ratios["test"],
     random_seed=split_seed, verbose=True
 )
 
@@ -359,9 +544,13 @@ test_names = _pair_names(test_set)
 
 split_manifest = {
     "created_at": datetime.now().isoformat(timespec="seconds"),
+    "cache_path": split_latest_path,
+    "dataset_cache_tag": _dataset_tag,
     "seed": split_seed,
-    "stratify_by": ["expected_discard_image", "expected_human_label_category", "doubt"],
-    "ratios": {"train": 0.6, "val": 0.2, "test": 0.2},
+    "stratify_by": _split_stratify_by,
+    "ratios": _split_ratios,
+    "pairs_dir": os.path.abspath(pairs_dir),
+    "gt_dir": os.path.abspath(gt_dir),
     "total_examples": len(dataset),
     "val":  {"count": len(val_names),  "pair_names": val_names},
     "test": {"count": len(test_names), "pair_names": test_names},
@@ -376,24 +565,51 @@ print(f"  train: {len(train_set)}  |  val: {len(val_set)}  |  test: {len(test_se
 
 # ── Create Extractor ─────────────────────────────────────────────
 # ChainOfThought: LM reasons step-by-step before answering (more accurate,
-#                 more tokens).
-# Predict (--no-cot): LM answers directly (faster, cheaper; test whether
-#                     reasoning is actually needed for this task).
-# optimizer.compile() mutates this object; the result can be serialized
-# with comparator.save(<path>).
+#                 more tokens).  Produced by dspy.ChainOfThought.
+# Predict (--no-cot): LM answers directly (faster, cheaper).  Use this to
+#                     test whether chain-of-thought reasoning is actually
+#                     needed for the task.
+#
+# The comparator wraps the DCAImageComparison signature (defined in
+# signatures/dca.py) which lists the input fields (images, metadata) and
+# output fields (discard_image, changes).  optimizer.compile() mutates
+# this object in-place; the result can be re-loaded with comparator.load().
 if args.no_cot:
     comparator = dspy.Predict(DCAImageComparison)
 else:
     comparator = dspy.ChainOfThought(DCAImageComparison)
 
+cache_dir = dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR") or ".cache"
+
 if not args.skip_load:
-    cached_extractor_path = args.load_extractor or dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_PATH")
+    explicit_cached_extractor = args.load_extractor or dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_PATH")
+    auto_cached_extractor = None
+    if explicit_cached_extractor is None and args.auto_load_compatible_cache and args.optimizer != "all":
+        auto_cached_extractor = _find_matching_cached_extractor(
+            cache_root=cache_dir,
+            strategy_tag=_strategy_display,
+            demo_tag=_demo_tag.lstrip("_"),
+            model_tag=_model_display,
+            cot_tag=_cot_tag,
+            re_tag=_re_tag,
+            instr_tag=_instr_tag,
+            cfd_tag=_cfd_tag,
+            dataset_tag=_dataset_tag,
+            split_seed_value=split_seed,
+        )
+    cached_extractor_path = explicit_cached_extractor or auto_cached_extractor
     if cached_extractor_path and os.path.exists(cached_extractor_path) and os.path.isfile(cached_extractor_path):
-        print(f"Loading cached extractor from: {cached_extractor_path}")
+        load_source = "explicit path" if explicit_cached_extractor else "auto-matched cache"
+        print(f"Loading cached extractor from ({load_source}): {cached_extractor_path}")
         comparator.load(cached_extractor_path)
         print("Extractor loaded successfully\n")
     else:
-        print("No cached extractor found, starting from scratch\n")
+        if explicit_cached_extractor is None and not args.auto_load_compatible_cache:
+            print("No explicit cached extractor provided; automatic cache matching is disabled by default. Starting from scratch\n")
+        elif explicit_cached_extractor is None and args.optimizer == "all":
+            print("Automatic cache matching is disabled for --optimizer all. Starting from scratch\n")
+        else:
+            print("No cached extractor found, starting from scratch\n")
 else:
     print("Skipping extractor loading (--skip-load)\n")
 
@@ -407,12 +623,15 @@ if args.initial_instruction_file:
         sys.exit(1)
     with open(_instr_path, encoding="utf-8") as _fh:
         _initial_instruction = _fh.read().strip()
-    comparator.signature = comparator.signature.with_instructions(_initial_instruction)
+    _signature = _get_program_signature(comparator)
+    _set_program_signature(comparator, _signature.with_instructions(_initial_instruction))
     print(f"Initial instruction loaded from: {_instr_path}\n")
 
 if _should_clear_descs:
-    for _fname in list(comparator.signature.fields):
-        comparator.signature = comparator.signature.with_updated_fields(_fname, desc="")
+    _signature = _get_program_signature(comparator)
+    for _fname in list(_signature.fields):
+        _signature = _signature.with_updated_fields(_fname, desc="")
+    _set_program_signature(comparator, _signature)
     print("Field descriptions cleared (--clear-field-descs).\n")
 
 # ── Verify seed instruction on the live signature object ─────────────────
@@ -420,13 +639,14 @@ if _should_clear_descs:
 # MIPROv2 will receive already contains the human prompt, not the class docstring.
 # Also prints field descriptions — those are fixed (MIPROv2 doesn't touch them)
 # but are always part of every LLM call.
-_live_instruction = comparator.signature.instructions
+_live_signature = _get_program_signature(comparator)
+_live_instruction = _live_signature.instructions
 print(f"\n{'='*80}")
-print("[SEED INSTRUCTION VERIFICATION] — full text read back from comparator.signature:")
+print("[SEED INSTRUCTION VERIFICATION] — full text read back from the active predictor signature:")
 print(f"{'='*80}")
 print(_live_instruction)
 print(f"\n--- Field descriptions (cleared={_should_clear_descs}) ---")
-for fname, finfo in comparator.signature.fields.items():
+for fname, finfo in _live_signature.fields.items():
     _desc = getattr(finfo, "json_schema_extra", {}) or {}
     _desc_str = _desc.get("desc", "") if isinstance(_desc, dict) else ""
     _desc_display = _desc_str[:200] if _desc_str else "(empty)"
@@ -448,9 +668,11 @@ print(f"Seed state saved   -> {_seed_prompt_path}\n")
 
 
 # ── Evaluation Setup ─────────────────────────────────────────────
-# dca_comparison_metric returns a weighted float 0-1:
-#   0.6 * classification_score + 0.4 * change_score
-# dspy.Evaluate reports scores on a 0-100 scale.
+# dca_comparison_metric returns a weighted float in [0, 1]:
+#   0.6 * classification_score + 0.4 * change_summary_score
+# dspy.Evaluate wraps this and reports on a 0-100 scale in its table.
+# num_threads=4 evaluates 4 examples concurrently to speed up scoring.
+# devset=None here because the runner passes val_set at compile time.
 evaluate = dspy.Evaluate(
     devset=None,
     metric=dca_comparison_metric,
@@ -461,36 +683,50 @@ evaluate = dspy.Evaluate(
 
 
 # ── Optimization Strategies ──────────────────────────────────────
-cache_dir = dotenv.get_key(dotenv.find_dotenv(), "CACHED_EXTRACTOR_DIR") or ".cache"
-
-custom_strategies = []
+# Each strategy is a named config object consumed by OptimizationRunner.
+# _register_strategy() adds it to both the ordered list (custom_strategies)
+# and the by-name lookup dict (strategy_by_name) used when saving the model.
+#
+# Strategy selection logic:
+#   --optimizer bootstrap   → only Bootstrap
+#   --optimizer miprov2     → only MIPROv2
+#   --optimizer gepa        → only GEPA
+#   --optimizer simba       → only SimBA
+#   --optimizer all         → all four run sequentially
+#
+# Each optimizer.compile() call starts from the SAME seed comparator and
+# competes on the val set.  The one with the highest val score is saved.
+    custom_strategies.append(strategy)
+    strategy_by_name[strategy.name] = strategy
 
 if args.optimizer in ("bootstrap", "all"):
-    custom_strategies.extend([
+    _register_strategy(
         create_bootstrap_strategy(
             name="Balanced_DCA_Bootstrap",
             description="Balanced approach with equal labeled and bootstrapped demos for DCA classification",
-            max_labeled_demos=4,        # Image context overhead; each demo adds tokens
-            max_bootstrapped_demos=4,   # Teacher-generated demos drawn from correct train predictions
-            num_candidate_programs=32,  # Random candidates to evaluate; more = better coverage
+            max_labeled_demos=1,        # Image context overhead; each demo adds tokens
+            max_bootstrapped_demos=1,   # Teacher-generated demos drawn from correct train predictions
+            num_candidate_programs=1,  # Random candidates to evaluate; more = better coverage
             num_candidate_traces=(2,5), # Generate 2-5 candidate traces per example for bootstrapping
             num_threads=4,              # Parallel LLM calls during candidate evaluation
-            max_rounds=2,               # Second round refines demo quality; >2 risks overfitting
-        ),
-        create_bootstrap_strategy(
-            name="Label_Heavy_DCA_Bootstrap",
-            description="Label-heavy approach focusing on ground truth examples for DCA classification",
-            max_labeled_demos=6,        # One extra human-verified example vs balanced variant
-            max_bootstrapped_demos=4,   # Fewer teacher demos to reduce noise risk
-            num_candidate_programs=32,  # Slightly more candidates for broader coverage
-            num_candidate_traces=(2,5), # Generate 2-5 candidate traces per example for bootstrapping
-            num_threads=4,
-            max_rounds=2,
-        ),
-    ])
+            max_rounds=1,               # Second round refines demo quality; >2 risks overfitting
+        )
+    )
+    # _register_strategy(
+    #     create_bootstrap_strategy(
+    #         name="Label_Heavy_DCA_Bootstrap",
+    #         description="Label-heavy approach focusing on ground truth examples for DCA classification",
+    #         max_labeled_demos=1,        # One extra human-verified example vs balanced variant
+    #         max_bootstrapped_demos=1,   # Fewer teacher demos to reduce noise risk
+    #         num_candidate_programs=1,  # Slightly more candidates for broader coverage
+    #         num_candidate_traces=(2,5), # Generate 2-5 candidate traces per example for bootstrapping
+    #         num_threads=4,
+    #         max_rounds=1,
+    #     )
+    # )
 
 if args.optimizer in ("miprov2", "all"):
-    custom_strategies.append(
+    _register_strategy(
         create_miprov2_strategy(
             name=f"MIPROv2_DCA_{args.miprov2_auto.capitalize()}",
             description=f"MIPROv2 ({args.miprov2_auto}) -- Bayesian instruction + demo search",
@@ -498,11 +734,11 @@ if args.optimizer in ("miprov2", "all"):
             max_labeled_demos=args.max_labeled_demos,
             max_bootstrapped_demos=args.max_bootstrapped_demos,
             num_threads=4,
-        ),
+        )
     )
 
 if args.optimizer in ("gepa", "all"):
-    custom_strategies.append(
+    _register_strategy(
         create_gepa_strategy(
             name=f"GEPA_DCA_{args.gepa_auto.capitalize()}",
             description=f"GEPA ({args.gepa_auto}) -- reflection-LM guided prompt improvement",
@@ -510,11 +746,11 @@ if args.optimizer in ("gepa", "all"):
             num_threads=4,
             track_stats=True,
             use_merge=True,
-        ),
+        )
     )
 
 if args.optimizer in ("simba", "all"):
-    custom_strategies.append(
+    _register_strategy(
         create_simba_strategy(
             name=f"SimBA_DCA_Steps{args.simba_max_steps}",
             description=f"SimBA ({args.simba_max_steps} steps) -- iterative prompt refinement",
@@ -523,7 +759,7 @@ if args.optimizer in ("simba", "all"):
             num_threads=4,
             bsize=32,
             num_candidates=6,
-        ),
+        )
     )
 
 print(f"\nOptimization strategies ({len(custom_strategies)}):")
@@ -543,7 +779,51 @@ runner = OptimizationRunner(
 print(f"\n{'='*80}")
 print(f"Starting Optimization...")
 print(f"{'='*80}\n")
-optimized_comparator, best_score = runner.run_optimization(custom_strategies)
+optimized_comparator = None
+best_score = None
+try:
+    optimized_comparator, best_score = runner.run_optimization(custom_strategies)
+except Exception as exc:
+    failed_at = datetime.now().isoformat(timespec="seconds")
+    rerun_command = _build_rerun_from_seed_command(_seed_prompt_path)
+    failure_summary = {
+        "run_type": "extract_dca",
+        "status": "failed",
+        "started_at": pipeline_started_at,
+        "failed_at": failed_at,
+        "total_duration_seconds": round(time.time() - pipeline_t0, 1),
+        "model_name": args.model_name or os.getenv("MODEL_NAME", "Unknown_Model"),
+        "optimizer_requested": args.optimizer,
+        "pairs_dir": os.path.abspath(pairs_dir),
+        "gt_dir": os.path.abspath(gt_dir),
+        "split_seed": split_seed,
+        "split_manifest_path": split_latest_path,
+        "seed_state_path": _seed_prompt_path,
+        "log_path": _stdout_log_path,
+        "error": str(exc),
+        "runner_summary": getattr(runner, "run_summary", {}),
+        "rerun_from_seed_command": rerun_command,
+    }
+
+    sys.stdout = _tee_stdout._original
+    sys.stderr = _tee_stderr._original
+    _log_file.close()
+
+    failure_summary_log_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}_error_summary.json")
+    failure_summary_cache_path = os.path.join(cache_dir, f"{_log_prefix}_dca_run_{current_time}_error_summary.json")
+    for _summary_path in (failure_summary_log_path, failure_summary_cache_path):
+        try:
+            with open(_summary_path, "w", encoding="utf-8") as _fp:
+                json.dump(failure_summary, _fp, indent=2, ensure_ascii=False)
+            print(f"Failure summary saved to: {_summary_path}", file=sys.__stdout__)
+        except OSError as summary_exc:
+            print(f"Could not save failure summary {_summary_path}: {summary_exc}", file=sys.__stdout__)
+
+    print("\nOptimization aborted after an unrecoverable optimizer failure.", file=sys.__stdout__)
+    print(f"Seed state is preserved at: {_seed_prompt_path}", file=sys.__stdout__)
+    print("Rerun from the saved seed state with:", file=sys.__stdout__)
+    print(f"  {rerun_command}", file=sys.__stdout__)
+    raise SystemExit(1) from exc
 
 if optimized_comparator is None:
     print("No strategy beat the baseline -- using unoptimized comparator.")
@@ -577,23 +857,27 @@ print(f"Optimized state saved -> {_opt_prompt_path}\n")
 # The CoT/NoCot and RE suffix ensure runs with different --no-cot / --reasoning-effort
 # flags never overwrite each other's saved files.
 model_name = (args.model_name or os.getenv("MODEL_NAME", "Unknown_Model")).replace("/", "_")
-best_strategy_name = runner.best_strategy_name.replace(" ", "_") if hasattr(runner, "best_strategy_name") else "Unknown"
+best_strategy_name = getattr(runner, "best_strategy_name", "Baseline")
+best_strategy_slug = best_strategy_name.replace(" ", "_")
+best_strategy_config = strategy_by_name.get(best_strategy_name)
 cot_tag = "NoCot" if args.no_cot else "CoT"
 re_tag  = f"_RE{args.reasoning_effort}" if args.reasoning_effort else ""
 
 model_path = None
-if args.save_model:
-    os.makedirs(cache_dir, exist_ok=True)
-    demo_tag  = f"max_{args.max_labeled_demos}_{args.max_bootstrapped_demos}"
-    instr_tag = ("_" + os.path.splitext(os.path.basename(args.initial_instruction_file))[0]
-                 if args.initial_instruction_file else "")
-    cfd_tag   = "_cfd" if args.clear_field_descs else ""
-    model_path = os.path.join(
-        cache_dir,
-        f"{model_name}_{best_strategy_name}_{cot_tag}{re_tag}_dca_optimized_{demo_tag}{instr_tag}{cfd_tag}_{current_time}.json",
-    )
-    optimized_comparator.save(model_path)
-    print(f"\nSaved optimized model to: {model_path}")
+os.makedirs(cache_dir, exist_ok=True)
+demo_tag = _format_demo_tag(
+    getattr(best_strategy_config, "max_labeled_demos", None),
+    getattr(best_strategy_config, "max_bootstrapped_demos", None),
+)
+instr_tag = ("_" + os.path.splitext(os.path.basename(args.initial_instruction_file))[0]
+             if args.initial_instruction_file else "")
+cfd_tag = "_cfd" if args.clear_field_descs else ""
+model_path = os.path.join(
+    cache_dir,
+    f"{model_name}_{best_strategy_slug}_{cot_tag}{re_tag}_dca_optimized_{demo_tag}{instr_tag}{cfd_tag}_ds{_dataset_tag}_sp{split_seed}_{current_time}.json",
+)
+optimized_comparator.save(model_path)
+print(f"\nSaved optimized model to: {model_path}")
 
 print(f"\n{'='*80}")
 print(f"DCA Pipeline complete!")
@@ -608,9 +892,51 @@ sys.stderr = _tee_stderr._original
 _log_file.close()
 if model_path is not None:
     model_stem = os.path.splitext(os.path.basename(model_path))[0]
+    final_run_summary = {
+        "run_type": "extract_dca",
+        "started_at": pipeline_started_at,
+        "completed_at": datetime.now().isoformat(timespec="seconds"),
+        "total_duration_seconds": round(time.time() - pipeline_t0, 1),
+        "model_name": args.model_name or os.getenv("MODEL_NAME", "Unknown_Model"),
+        "optimizer_requested": args.optimizer,
+        "best_strategy_name": best_strategy_name,
+        "best_score": best_score,
+        "pairs_dir": os.path.abspath(pairs_dir),
+        "gt_dir": os.path.abspath(gt_dir),
+        "split_seed": split_seed,
+        "split_manifest_path": split_latest_path,
+        "saved_model_path": model_path,
+        "seed_state_path": _seed_prompt_path,
+        "optimized_state_path": _opt_prompt_path,
+        "runner_summary": getattr(runner, "run_summary", {}),
+    }
     final_log_path = os.path.join(_log_dir, f"{model_stem}.log")
+    final_seed_state_path = os.path.join(_log_dir, f"{model_stem}_seed_state.json")
+    final_optimized_state_path = os.path.join(_log_dir, f"{model_stem}_optimized_state.json")
+    final_run_summary_log_path = os.path.join(_log_dir, f"{model_stem}_run_summary.json")
+    final_run_summary_cache_path = os.path.join(cache_dir, f"{model_stem}_run_summary.json")
     try:
         os.rename(_stdout_log_path, final_log_path)
         print(f"Log renamed to: {final_log_path}", file=sys.__stdout__)
     except OSError as e:
         print(f"Could not rename log file: {e}", file=sys.__stdout__)
+    try:
+        os.replace(_seed_prompt_path, final_seed_state_path)
+        print(f"Seed state renamed to: {final_seed_state_path}", file=sys.__stdout__)
+    except OSError as e:
+        print(f"Could not rename seed state file: {e}", file=sys.__stdout__)
+    try:
+        os.replace(_opt_prompt_path, final_optimized_state_path)
+        print(f"Optimized state renamed to: {final_optimized_state_path}", file=sys.__stdout__)
+    except OSError as e:
+        print(f"Could not rename optimized state file: {e}", file=sys.__stdout__)
+    final_run_summary["log_path"] = final_log_path
+    final_run_summary["seed_state_path"] = final_seed_state_path
+    final_run_summary["optimized_state_path"] = final_optimized_state_path
+    for _summary_path in (final_run_summary_log_path, final_run_summary_cache_path):
+        try:
+            with open(_summary_path, "w", encoding="utf-8") as _fp:
+                json.dump(final_run_summary, _fp, indent=2, ensure_ascii=False)
+            print(f"Run summary saved to: {_summary_path}", file=sys.__stdout__)
+        except OSError as e:
+            print(f"Could not save run summary file {_summary_path}: {e}", file=sys.__stdout__)

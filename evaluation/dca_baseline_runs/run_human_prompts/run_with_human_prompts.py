@@ -557,7 +557,7 @@ def main() -> None:
     parser.add_argument("--model-name", default=None, help="Alias for deployment; overrides --deployment if provided")
     parser.add_argument("--key-prefix", required=True, help="Example: v3_prompt_cr_gpt41, v3_prompt_cr_gpt52, v3_prompt_cr_gpt41_mini")
     parser.add_argument("--prompt", default="v3_prompt_cr.md", help="Prompt markdown file name in human_prompts directory")
-    parser.add_argument("--endpoint", default=os.getenv("AZURE_OPENAI_ENDPOINT", "https://aiq212-openai.openai.azure.com/"))
+    parser.add_argument("--endpoint", default=os.getenv("AZURE_OPENAI_ENDPOINT"))
     parser.add_argument("--api-version", default=os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview"))
     parser.add_argument("--start", type=int, default=None, help="Start pair index, e.g., 1 for pair_001")
     parser.add_argument("--end", type=int, default=None, help="End pair index, e.g., 50 for pair_050")

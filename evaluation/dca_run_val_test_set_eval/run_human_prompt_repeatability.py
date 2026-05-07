@@ -74,6 +74,7 @@ from evaluation.dca_metric import (
     compute_classification_score,
     compute_total_score,
 )
+from evaluation.dca_run_val_test_set_eval.split_utils import resolve_default_split_file
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -82,7 +83,7 @@ HUMAN_PROMPTS_DIR = REPO_ROOT / "evaluation" / "dca_baseline_runs" / "human_prom
 DEFAULT_IMAGE_DIR  = REPO_ROOT / "data" / "dca_data" / "image_pairs"
 DEFAULT_GT_DIR     = REPO_ROOT / "data" / "dca_data" / "image_pairs_llm_output_exp1"
 DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "eval_results" / "human_prompt_runs"
-DEFAULT_SPLIT_FILE = REPO_ROOT / ".cache" / "dca_split_seed42.json"
+DEFAULT_SPLIT_FILE = resolve_default_split_file(REPO_ROOT)
 DEFAULT_TEMPERATURE = 0.1
 
 

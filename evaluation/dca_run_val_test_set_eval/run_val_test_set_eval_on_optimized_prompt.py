@@ -42,34 +42,34 @@ Examples
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
         --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
         --model-name azure/gpt-4.1 \\
-        --split-file .cache/dca_split_seed42.json
+        --split-file .cache/splits/dca_split_seed42_<fingerprint>.json
 
     # Evaluate on val set:
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
         --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
         --model-name azure/gpt-4.1 \\
-        --split-file .cache/dca_split_seed42.json \\
+        --split-file .cache/splits/dca_split_seed42_<fingerprint>.json \
         --which-set val
 
     # Evaluate on both val and test:
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
         --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
         --model-name azure/gpt-4.1 \\
-        --split-file .cache/dca_split_seed42.json \\
+        --split-file .cache/splits/dca_split_seed42_<fingerprint>.json \
         --which-set both
 
     # Use a different temperature:
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
         --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
         --model-name azure/gpt-4.1 \\
-        --split-file .cache/dca_split_seed42.json \\
+        --split-file .cache/splits/dca_split_seed42_<fingerprint>.json \
         --temperature 0.0
 
     # Overwrite an existing run:
     python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \\
         --model-path .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json \\
         --model-name azure/gpt-4.1 \\
-        --split-file .cache/dca_split_seed42.json \\
+        --split-file .cache/splits/dca_split_seed42_<fingerprint>.json \
         --overwrite
 """
 
@@ -95,6 +95,8 @@ REPO_ROOT = SCRIPT_DIR.parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from evaluation.dca_run_val_test_set_eval.split_utils import resolve_default_split_file
+
 # ---------------------------------------------------------------------------
 # Imports (after sys.path is set)
 # ---------------------------------------------------------------------------
@@ -118,6 +120,7 @@ from evaluation.dca_metric import (
 DEFAULT_IMAGE_DIR   = REPO_ROOT / "data" / "dca_data" / "image_pairs"
 DEFAULT_GT_DIR      = REPO_ROOT / "data" / "dca_data" / "image_pairs_llm_output_exp1"
 DEFAULT_OUTPUT_DIR  = SCRIPT_DIR / "eval_results" / "optimized_prompt_runs"
+DEFAULT_SPLIT_FILE = resolve_default_split_file(REPO_ROOT)
 DEFAULT_TEMPERATURE = 0.1
 
 # ---------------------------------------------------------------------------
@@ -468,8 +471,8 @@ def main():
                         help="Path to saved DSPy optimized model JSON  (e.g. .cache/gpt-4.1_MIPROv2_DCA_Light_dca_optimized_2026032716.json)")
     parser.add_argument("--model-name",  type=str, required=True,
                         help="LM to use for inference  (e.g. azure/gpt-4.1)")
-    parser.add_argument("--split-file",  type=Path, required=True,
-                        help="Path to train/val/test split JSON  (e.g. .cache/dca_split_seed42.json)")
+    parser.add_argument("--split-file",  type=Path, default=DEFAULT_SPLIT_FILE,
+                        help="Path to train/val/test split JSON")
     parser.add_argument("--temperature",  type=float, default=DEFAULT_TEMPERATURE,
                         help=f"Inference temperature (default: {DEFAULT_TEMPERATURE})")
     parser.add_argument("--image-dir",   type=Path, default=DEFAULT_IMAGE_DIR)

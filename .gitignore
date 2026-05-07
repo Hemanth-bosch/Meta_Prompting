@@ -16,7 +16,15 @@ data/dca_data/*
 # Log files
 log/
 .cache/
-evaluation/dca_run_val_test_set_eval/eval_results
+eval_results/
+
+# Generated artifacts
+*.pptx
+*.ppt
+*.xlsx
+*.tex
+*.png
+.python-version
 
 
 # Byte-compiled / optimized / DLL files

@@ -825,7 +825,7 @@ def main() -> None:
     parser.add_argument("--key-prefix", required=True,
                         help="Prefix for output keys, e.g. v4_prompt_cr_gpt41. "
                              "Keys written: {prefix}_discard_image, {prefix}_changes, {prefix}_metadata")
-    parser.add_argument("--endpoint", default=os.getenv("AZURE_OPENAI_ENDPOINT", "https://aiq212-openai.openai.azure.com/"))
+    parser.add_argument("--endpoint", default=os.getenv("AZURE_OPENAI_ENDPOINT"))
     parser.add_argument("--api-version", default=os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview"))
     parser.add_argument("--start", type=int, default=None)
     parser.add_argument("--end", type=int, default=None)

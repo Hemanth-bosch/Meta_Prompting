@@ -2,10 +2,16 @@ import dspy
 from typing import Optional
 import dotenv
 import os
+from datetime import datetime
+import json
 from pathlib import Path
+import subprocess
+import shutil
+import sys
+from threading import Lock
+import time
 
 import certifi
-from azure.identity import AzureCliCredential
 from openai import AzureOpenAI, DefaultHttpxClient
 
 # Load environment variables
@@ -16,7 +22,7 @@ _dotenv_file = dotenv.find_dotenv()
 
 # Azure OpenAI credentials
 AZURE_API_KEY = dotenv.get_key(_dotenv_file, "AZURE_OPENAI_API_KEY")
-AZURE_ENDPOINT = dotenv.get_key(_dotenv_file, "AZURE_OPENAI_ENDPOINT") or os.getenv("AZURE_OPENAI_ENDPOINT", "https://aiq212-openai.openai.azure.com/")
+AZURE_ENDPOINT = dotenv.get_key(_dotenv_file, "AZURE_OPENAI_ENDPOINT") or os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_API_VERSION = dotenv.get_key(_dotenv_file, "AZURE_OPENAI_API_VERSION") or os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview")
 
 # Vertex AI credentials
@@ -66,7 +72,96 @@ def _build_ca_bundle() -> str:
 
 
 _azure_fallback_client = None
-_azure_cli_credential = None
+_azure_cli_token_cache: str | None = None
+_azure_cli_token_expiry = 0.0
+_azure_cli_token_lock = Lock()
+
+
+def _find_azure_cli_entrypoint() -> str:
+    az_path = shutil.which("az") or shutil.which("az.cmd") or shutil.which("az.bat")
+    if not az_path:
+        raise RuntimeError(
+            "Azure CLI executable 'az' was not found on PATH. "
+            "Install Azure CLI system-wide or run with AZURE_OPENAI_API_KEY configured."
+        )
+    az_path_obj = Path(az_path)
+    if os.name == "nt" and az_path_obj.suffix.lower() not in {".cmd", ".bat", ".exe"}:
+        for suffix in (".cmd", ".bat", ".exe"):
+            candidate = az_path_obj.with_suffix(suffix)
+            if candidate.exists():
+                return str(candidate)
+    return az_path
+
+
+def _build_azure_cli_command() -> tuple[list[str], dict[str, str]]:
+    az_path = _find_azure_cli_entrypoint()
+    env = os.environ.copy()
+
+    python_dir = str(Path(sys.executable).resolve().parent)
+    path_parts = env.get("PATH", "").split(os.pathsep) if env.get("PATH") else []
+    if not any(os.path.normcase(part) == os.path.normcase(python_dir) for part in path_parts if part):
+        env["PATH"] = os.pathsep.join([python_dir, *[part for part in path_parts if part]])
+
+    env.pop("PYTHONPATH", None)
+
+    command = [
+        az_path,
+        "account",
+        "get-access-token",
+        "--resource",
+        "https://cognitiveservices.azure.com",
+        "--output",
+        "json",
+    ]
+
+    return command, env
+
+
+def _parse_azure_cli_expiry(payload: dict) -> float:
+    expires_on = payload.get("expires_on") or payload.get("expiresOn")
+    if expires_on is None:
+        return 0.0
+
+    if isinstance(expires_on, (int, float)):
+        return float(expires_on)
+
+    if isinstance(expires_on, str):
+        stripped = expires_on.strip()
+        if stripped.isdigit():
+            return float(stripped)
+        for fmt in (
+            "%Y-%m-%d %H:%M:%S.%f",
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S.%fZ",
+            "%Y-%m-%dT%H:%M:%SZ",
+        ):
+            try:
+                return datetime.strptime(stripped, fmt).timestamp()
+            except ValueError:
+                continue
+
+    return 0.0
+
+
+def _fetch_azure_cli_token() -> tuple[str, float]:
+    command, env = _build_azure_cli_command()
+    result = subprocess.run(command, capture_output=True, text=True, env=env, check=False)
+    if result.returncode != 0:
+        stderr = (result.stderr or "").strip()
+        stdout = (result.stdout or "").strip()
+        details = stderr or stdout or f"Azure CLI exited with code {result.returncode}."
+        raise RuntimeError(
+            "Azure CLI token retrieval failed. "
+            "Run `az login` manually or configure AZURE_OPENAI_API_KEY. "
+            f"Details: {details}"
+        )
+
+    payload = json.loads(result.stdout)
+    token = payload.get("accessToken") or payload.get("access_token")
+    if not token:
+        raise RuntimeError("Azure CLI token retrieval returned no access token.")
+
+    return token, _parse_azure_cli_expiry(payload)
 
 
 def _azure_cli_token_provider() -> str:
@@ -75,11 +170,17 @@ def _azure_cli_token_provider() -> str:
     This callback is intentionally module-level (picklable-friendly) so DSPy
     can deepcopy LM instances during optimizers like MIPROv2.
     """
-    global _azure_cli_credential
-    if _azure_cli_credential is None:
-        _azure_cli_credential = AzureCliCredential()
-    token = _azure_cli_credential.get_token("https://cognitiveservices.azure.com/.default")
-    return token.token
+    global _azure_cli_token_cache, _azure_cli_token_expiry
+
+    with _azure_cli_token_lock:
+        now = time.time()
+        if _azure_cli_token_cache and now < (_azure_cli_token_expiry - 300):
+            return _azure_cli_token_cache
+
+        token, expires_at = _fetch_azure_cli_token()
+        _azure_cli_token_cache = token
+        _azure_cli_token_expiry = expires_at or (now + 300)
+        return token
 
 
 def _get_azure_client(auth_mode: str = "cli"):
@@ -100,19 +201,10 @@ def _get_azure_client(auth_mode: str = "cli"):
         )
     else:
         print("Initializing Azure CLI credential...")
-        credential = AzureCliCredential()
 
         print("Creating token provider...")
-        try:
-            from azure.identity import get_bearer_token_provider
-            token_provider = get_bearer_token_provider(
-                credential,
-                "https://cognitiveservices.azure.com/.default",
-            )
-        except ImportError:
-            def token_provider():
-                token = credential.get_token("https://cognitiveservices.azure.com/.default")
-                return token.token
+        def token_provider():
+            return _azure_cli_token_provider()
 
         print("Creating Azure OpenAI client with token provider...")
         _azure_fallback_client = AzureOpenAI(

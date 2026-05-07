@@ -150,7 +150,7 @@ See `env.template` for all supported variables including Vertex AI, OpenAI, and 
 
 The DCA dataset (429 image pairs) lives under `data/dca_data/` and is not included in the repository. Contact the data owner for access.
 
-Once data is in place, the frozen train/val/test split is created automatically on first run and saved to `.cache/dca_split_seed42.json`. Do not delete this file — all evaluation scripts depend on it for reproducibility.
+Once data is in place, the frozen train/val/test split is created automatically on first run and saved under `.cache/splits/` with a fingerprinted name like `.cache/splits/dca_split_seed42_<fingerprint>.json`. Some tooling also writes or reuses the legacy compatibility alias `.cache/dca_split_seed42.json`. Do not delete these split manifests — evaluation scripts depend on them for reproducibility.
 
 The DCA dataset has 8 categories (A1/A2/B1/B2/B3/B4/B5a/B5b). Three categories (B1, B2, B4) were originally underrepresented and were augmented with 53 synthetic pairs. Total: 376 original + 53 synthetic = 429 pairs. See [utils/dca_data_generation/ReadMe.md](utils/dca_data_generation/ReadMe.md).
 
@@ -181,10 +181,10 @@ The DCA pipeline has three modes depending on how much you want to run:
 
 ### Mode 1 — Multi-Stage Tournament (Recommended for best results)
 
-Runs four sequential optimization stages (Seed → Bootstrap → MIPROv2 → GEPA). Each stage uses the best candidates from the previous stage as its starting point. Produces a leaderboard and selects the overall best.
+Runs four sequential optimization stages (Seed → Bootstrap → MIPROv2 → GEPA). Each stage uses the best candidates from the previous stage as its starting point. Produces a leaderboard plus final score and Pareto summaries for manual or criteria-based selection.
 
 ```bash
-# Default: seed → bootstrap → miprov2, student model = gpt-4.1-mini
+# Default: seed → bootstrap → miprov2 → gepa, student model = gpt-4.1-mini
 uv run python -m dca_tournaments.run_tournament
 
 # First time — use dry-run to see what will run without calling the API
@@ -203,7 +203,7 @@ uv run python -m dca_tournaments.run_tournament --selection-criteria pareto
 
 # Resume an interrupted run
 uv run python -m dca_tournaments.run_tournament \
-    --resume .cache/tournament/tournament_20260428234355
+    --resume-from .cache/tournament/tournament_20260428234355
 ```
 
 See [dca_tournaments/README.md](dca_tournaments/README.md) for the full argument reference, stage details, and output artifacts.
@@ -224,7 +224,12 @@ uv run python extract_dca.py --optimizer gepa --gepa-auto medium
 
 # (DCA) SIMBA
 uv run python extract_dca.py --optimizer simba --simba-max-steps 8
+
+# If an optimizer stage fails after retries, rerun from the preserved seed state
+uv run python extract_dca.py --optimizer all --load-extractor log\..._seed_state.json
 ```
+
+Single-optimizer runs are now fail-fast: if Bootstrap, MIPROv2, GEPA, or SIMBA hits an unrecoverable optimizer error, the script stops immediately, writes an error summary JSON, preserves the seed state JSON, and prints a rerun command that resumes from that saved seed state instead of silently continuing with a degraded result.
 
 ### Mode 3 — Grid Runner
 
@@ -247,7 +252,6 @@ After optimization, evaluate the saved model on the frozen val or test split:
 uv run python evaluation/dca_run_val_test_set_eval/run_val_test_set_eval_on_optimized_prompt.py \
     --model-path .cache/my_optimized_model.json \
     --model-name azure/gpt-4.1-mini \
-    --split-file .cache/dca_split_seed42.json \
     --which-set val
 
 # (DCA) Evaluate human-prompt baseline runs on val + test
@@ -390,4 +394,125 @@ Ensure you have sufficient API quota before running optimization experiments —
 
 ## Adding a New Use Case
 
-To add a new document-processing task to this framework, follow the step-by-step guide in [ReadMe-Onboarding_new_use_case/ONBOARDING_NEW_USE_CASE.md](ReadMe-Onboarding_new_use_case/ONBOARDING_NEW_USE_CASE.md). The guide covers defining a signature, writing a data loader and metric, creating a pipeline script, and optionally adapting the tournament pipeline.
+> **Start here if you are adapting this framework for a new document-processing task.**
+
+Follow the step-by-step guide in [ReadMe-Onboarding_new_use_case/ONBOARDING_NEW_USE_CASE.md](ReadMe-Onboarding_new_use_case/ONBOARDING_NEW_USE_CASE.md). The guide covers:
+1. Defining a DSPy `Signature` for your task
+2. Writing a data loader and stratified splitter
+3. Implementing an evaluation metric
+4. Creating a pipeline entry-point script (like `extract_dca.py`)
+5. Optionally wiring the tournament pipeline for multi-stage optimization
+
+See also [ReadMe-Understand-Optimizers/](ReadMe-Understand-Optimizers/) for guidance on choosing between Bootstrap, MIPROv2, GEPA, and SIMBA for your use case.
+
+---
+
+## Runtime Expectations
+
+Optimizer runtime depends on the **student model**, **dataset size**, and **Azure API throughput** at the time of the run. Numbers below are measured from completed DCA tournaments with the default configuration (`mini_train=120`, `mini_val=45`, `top_k=2`, `n_threads=4`).
+
+### Default config — student: `gpt-4.1-mini`, seed/reflection: `gpt-5.2`
+
+| Stage | What runs | Typical duration | Notes |
+|-------|-----------|-----------------|-------|
+| **Seed** (Stage 0) | `gpt-5.2` generates 2 candidate instructions; evaluates 6 programs (bare + demo variants) on mini_val | 10–45 min | Can reach 130 min under heavy API load |
+| **Bootstrap** (Stage 1) | `n=16, max_rounds=2, d3b5` — 2 seeds × 1 config = 2 subprocess runs, teacher=`gpt-5.2` | 30–90 min per run; **~1–2 h total** | 4 threads inside each subprocess |
+| **MIPROv2** (Stage 2) | `medium` intensity, d3b5 — 2 subprocess runs, prompt_model=`gpt-5.2` | 25–140 min per run; **~1–3 h total** | Varies with API capacity |
+| **GEPA** (Stage 3) | `medium` auto, image reflection, `gpt-5.2` — 2 subprocess runs | 75–160 min per run; **~2–3 h total** | Image reflection adds cost; up to 10 images per mini_val example |
+| **Full tournament** | All 4 stages in sequence | **3.5–8 h** | gpt-4.1-mini student, default DCA dataset |
+
+### With student: `gpt-4.1` (full model — approx. 5× slower inference)
+
+| Stage | Typical duration |
+|-------|-----------------|
+| Seed | 30–75 min |
+| Bootstrap | ~90 min |
+| MIPROv2 | ~6 h |
+| GEPA | ~12 h |
+| **Full tournament** | **~22 h** |
+
+> These measurements are from DCA image-pair comparisons (429 pairs). Your use case may be faster (text-only, smaller dataset) or slower (larger images, more output fields).
+
+---
+
+## Resuming an Interrupted Run
+
+If a tournament is interrupted (network timeout, crash, manual stop), resume it from where it stopped:
+
+```bash
+# Each tournament saves state to .cache/tournament/<tournament_id>/
+uv run python -m dca_tournaments.run_tournament \
+    --resume-from .cache/tournament/tournament_20260428234355
+```
+
+**What gets reused vs re-run:**
+- Stages with a `stage_completed.json` marker are **skipped entirely**.
+- Interrupted stages are **resumed** — compiled candidates already in the leaderboard are reused; only missing work items run.
+- The tournament config is reloaded from `<tournament_id>/config.json` — no need to pass flags again.
+
+If an optimizer subprocess fails, the error summary and seed state are preserved. The console prints the exact `--resume-from` command to restart.
+
+---
+
+## Test Set Evaluation
+
+By default the tournament does **not** evaluate on the hold-out test set. Test evaluation should happen once, on a final selected candidate, to avoid repeated measurement leakage.
+
+To enable test evaluation at the end of a tournament:
+
+```bash
+uv run python -m dca_tournaments.run_tournament --run-test-eval
+```
+
+The test score appears in `tournament_summary.json` under `test_evaluation` and in the final console output. It does **not** influence candidate selection — selection always uses the val set score.
+
+---
+
+## Troubleshooting
+
+### Azure CLI not found / `az` is not recognized
+
+```
+Error: Azure CLI executable 'az' was not found in PATH (after venv removal)
+```
+
+1. Install Azure CLI: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+2. Log in: `az login`
+3. Verify: `az account show` — should print your subscription
+4. Re-run the script
+
+Alternatively, set `AZURE_OPENAI_API_KEY` in `.env` to use direct API-key auth and skip Azure CLI entirely.
+
+### Python not recognized / venv activation fails (Windows)
+
+```
+python : The term 'python' is not recognized
+```
+
+Use `uv run` (recommended — it activates the venv automatically):
+```powershell
+uv run python -m dca_tournaments.run_tournament
+```
+
+Or activate manually first:
+```powershell
+.\.meta-prompting\Scripts\Activate.ps1
+python -m dca_tournaments.run_tournament
+```
+
+### `UnicodeEncodeError` on Windows
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+uv run python -m dca_tournaments.run_tournament
+```
+
+### Tournament produces ~0.0 scores on all candidates
+
+This is the nested-ThreadPoolExecutor / Azure ContextVar bug. The tournament pipeline already isolates each optimizer in a subprocess to prevent it. If you see near-zero scores from your own code:
+- Do not call `optimizer.compile()` directly from a thread pool — use the subprocess isolation pattern in `optimizer_subprocess.py`.
+- Verify Azure credentials are valid: auth failures also produce silent 0-scores in some DSPy versions.
+
+### `FileNotFoundError` during GEPA (Windows MAX_PATH)
+
+Windows limits paths to 260 characters. After cross-stage cascading, config names can become very long. Fix: clone the repo to a short root path (e.g. `C:\mp\`) rather than a deeply nested OneDrive folder.

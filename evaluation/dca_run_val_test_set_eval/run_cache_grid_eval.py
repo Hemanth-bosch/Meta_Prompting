@@ -5,7 +5,7 @@ Finds every *.json in .cache/ dated >= CUTOFF_DATE (default: 2026-04-13),
 runs each with:
     run_val_test_set_eval_on_optimized_prompt.py
         --model-name azure/gpt-4.1-mini
-        --split-file .cache/dca_split_seed42.json
+        --split-file <auto-resolved from .cache>
         --which-set val --no-cot --temperature 0.1 --overwrite
 
 Then reads back each result JSON and renders a comparison table.
@@ -33,6 +33,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+from evaluation.dca_run_val_test_set_eval.split_utils import (
+    is_split_manifest_file,
+    resolve_default_split_file,
+)
+
 def _find_repo_root() -> Path:
     """Walk up from this file until we find the directory containing pyproject.toml."""
     here = Path(__file__).resolve()
@@ -47,11 +52,11 @@ EVAL_SCRIPT = REPO_ROOT / "evaluation" / "dca_run_val_test_set_eval" / "run_val_
 CACHE_DIR   = REPO_ROOT / ".cache"
 OUTPUT_DIR  = REPO_ROOT / "evaluation" / "dca_run_val_test_set_eval" / "eval_results" / "optimized_prompt_runs"
 LOG_DIR     = REPO_ROOT / "log" / "cache_grid_eval"
-SKIP_FILES  = {"dca_split_seed42.json", "judge_summary_cache.json"}
+SKIP_FILES  = {"judge_summary_cache.json"}
 
 DEFAULT_CUTOFF       = "2026-04-13"
 DEFAULT_INFERENCE_LM = "azure/gpt-4.1-mini"
-DEFAULT_SPLIT_FILE   = ".cache/dca_split_seed42.json"
+DEFAULT_SPLIT_FILE   = str(resolve_default_split_file(REPO_ROOT))
 DEFAULT_TEMPERATURE  = 0.1
 DEFAULT_BATCH_SIZE   = 4
 
@@ -206,7 +211,7 @@ def _audit_log(log_path: Optional[Path],
 def find_model_files(cutoff: datetime) -> list[Path]:
     files = []
     for f in sorted(CACHE_DIR.glob("*.json")):
-        if f.name in SKIP_FILES:
+        if f.name in SKIP_FILES or is_split_manifest_file(f):
             continue
         mtime = datetime.fromtimestamp(f.stat().st_mtime, tz=timezone.utc)
         if mtime >= cutoff:

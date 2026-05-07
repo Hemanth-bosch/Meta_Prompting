@@ -182,7 +182,7 @@ After running with default settings on the original 376-pair dataset:
 
 ## Dataset Split
 
-The frozen train/val/test split is saved at `.cache/dca_split_seed42.json` after the first run of `extract_dca.py` or the tournament pipeline. It stratifies by `expected_discard_image`, `human_label_category`, and `doubt`. New pairs added after the split manifest was created are automatically assigned to the train set.
+The frozen train/val/test split is saved under `.cache/splits/` after the first run of `extract_dca.py` or the tournament pipeline, using a fingerprinted filename like `.cache/splits/dca_split_seed42_<fingerprint>.json`. Some tooling may also maintain the legacy compatibility alias `.cache/dca_split_seed42.json`. It stratifies by `expected_discard_image`, `human_label_category`, and `doubt`. New pairs added after the split manifest was created are automatically assigned to the train set.
 
 Split ratios: 60% train / 20% val / 20% test (seed=42).
 

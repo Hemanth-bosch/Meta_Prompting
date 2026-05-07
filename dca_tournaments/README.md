@@ -26,7 +26,7 @@ This folder contains the end-to-end multi-stage tournament pipeline for optimizi
 The tournament pipeline applies four increasingly powerful DSPy optimizers in sequence:
 
 ```
-Stage 0 — Seed         LLM-written instruction candidates (gpt-5.2 generates, gpt-4.1-mini evaluates)
+Stage 0 — Seed         LLM-written instruction candidates (gpt-5.2 generates, student model evaluates)
 Stage 1 — Bootstrap    Few-shot example selection + random search
 Stage 2 — MIPROv2      Bayesian instruction + demo optimization
 Stage 3 — GEPA         Generative prompt adaptation with image-aware reflection
@@ -59,7 +59,7 @@ dca_tournaments/
 # Activate environment
 source .venv/bin/activate         # Windows: .venv\Scripts\activate
 
-# Default run: seed → bootstrap → miprov2, student = gpt-4.1-mini
+# Default run: seed → bootstrap → miprov2 → gepa, student = gpt-4.1-mini
 uv run python -m dca_tournaments.run_tournament
 
 # Dry run — print config and estimated API calls, then exit
@@ -83,7 +83,7 @@ uv run python -m dca_tournaments.run_tournament \
 
 # Resume an interrupted run
 uv run python -m dca_tournaments.run_tournament \
-    --resume .cache/tournament/tournament_20260428234355
+    --resume-from .cache/tournament/tournament_20260428234355
 ```
 
 ---
@@ -94,12 +94,13 @@ uv run python -m dca_tournaments.run_tournament \
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `--stages` | `seed,bootstrap,miprov2` | Comma-separated list of stages to run. Valid: `seed,bootstrap,miprov2,gepa` |
+| `--stages` | `seed,bootstrap,miprov2,gepa` | Comma-separated list of stages to run. Valid: `seed,bootstrap,miprov2,gepa` |
 | `--top-k` | `2` | Candidates passed from one stage to the next |
 | `--skip-final-tournament` | False | Skip the final full-val-set re-evaluation |
-| `--skip-test-eval` | False | Skip the test-set evaluation subprocess at the end |
+| `--test-eval` | False | Run the optional test-set evaluation subprocess at the end |
+| `--test-eval-criteria` | `best_score` | Candidate selection rule for test-set evaluation |
 | `--dry-run` | False | Print config + estimated runs, then exit without running anything |
-| `--resume` | None | Path to a previous tournament output directory to continue from |
+| `--resume-from` | None | Path to a previous tournament output directory to continue from |
 
 ### Models
 
@@ -176,7 +177,7 @@ uv run python -m dca_tournaments.run_tournament \
 | `--output-dir` | `.cache/tournament/<timestamp>` | Where to save all artifacts |
 | `--log-dir` | `log/tournament/<timestamp>` | Where to save logs |
 | `--mini-train-size` | `120` | Size of the mini training set used during optimization |
-| `--mini-val-size` | `60` | Size of the mini val set used during evaluation |
+| `--mini-val-size` | `41` | Size of the mini val set used during evaluation |
 | `--max-parallel` | `1` | Max concurrent optimizer subprocesses |
 | `--eval-num-threads` | `4` | Threads for parallel val-set evaluation |
 
@@ -261,7 +262,7 @@ Key fields:
 | `student_model_name` | `azure/gpt-4.1-mini` | Inference + optimization LM |
 | `seed_model_name` | `azure/gpt-5.2` | Seed-writing LM |
 | `mini_train_size` | `120` | Training subset for optimization |
-| `mini_val_size` | `60` | Val subset for intermediate scoring |
+| `mini_val_size` | `41` | Val subset for intermediate scoring |
 | `selection_criteria` | `score_only` | `score_only`, `pareto`, or `tokens_only` |
 | `max_parallel_optimizations` | `1` | Concurrent optimizer subprocesses |
 | `eval_num_threads` | `4` | Threads per evaluate_candidate() call |
@@ -310,14 +311,21 @@ Each `program.meta.json` sidecar records:
 
 ## 9. Resume and Recovery
 
-Pass `--resume <output_dir>` to continue an interrupted run:
+Pass `--resume-from <output_dir>` to continue an interrupted run:
 
 ```bash
 uv run python -m dca_tournaments.run_tournament \
-    --resume .cache/tournament/tournament_20260428234355
+    --resume-from .cache/tournament/tournament_20260428234355
 ```
 
-The pipeline loads the existing leaderboard, skips stages that already have entries, and continues from where it left off. If a stage is partially complete, already-evaluated candidates are not re-run.
+Tournament execution is now fail-fast for optimizer stages: if any Bootstrap, MIPROv2, or GEPA subprocess run fails after its own retries, the tournament aborts, keeps the partial leaderboard, writes `summary_error.json`, and prints the exact `--resume-from` command.
+
+Resume behavior uses stage completion markers instead of just checking whether a stage has any entries. That means a partially completed stage is resumed in place: already-evaluated candidates are reused from the leaderboard, and only the missing optimizer runs are executed.
+
+Fully completed stages are skipped during resume. Incomplete stages are not skipped.
+
+The current Azure CLI auth path is also hardened for Windows virtual environments: the code avoids the venv-local `az.BAT` shim that can fail with `'python' is not recognized as an internal or external command`.
+
 
 ---
 

@@ -1,8 +1,57 @@
-"""Stage 0 — LLM-written seed prompt generation.
+"""Stage 0 \u2014 LLM-written seed prompt generation.
 
-Uses a strong LLM (e.g. gpt-5.2) to generate N candidate instructions,
-evaluates each on the val set (bare + with demos variants), tracks token
-usage, and returns all candidates as CandidateEntry objects.
+ROLE IN THE PIPELINE
+--------------------
+SeedPromptGenerator is called once at the start of the tournament (Stage 0).
+Its job is to produce the initial set of candidate instructions that all
+subsequent optimization stages will refine.
+
+WHAT IT DOES (step by step)
+----------------------------
+  1. Create a \"bare\" baseline module with the default DCAImageComparison
+     signature (no custom instruction, no demos).
+  2. Evaluate the baseline on mini_val to get the starting score.
+  3. Run the baseline on mini_train to find failing examples
+     (seed_context_mode=\"worst\") OR select the best examples already
+     correct (seed_context_mode=\"best\") \u2014 these form the context shown
+     to the seed LLM.
+  4. Build a structured meta-prompt that includes:
+       - Category reference table (A1, A2, B1\u2026B5b) with discard rules
+       - N context examples (images + ground truth) from step 3
+       - Instruction to write a better prompt for the DCA task
+  5. Call the seed LLM (seed_model, e.g. gpt-5.2) N times to get N
+     candidate instruction texts.
+  6. For each candidate instruction:
+       a. Inject it into the DCAImageComparison signature
+       b. Evaluate bare (no demos) on mini_val
+       c. Optionally evaluate a \"with_demos\" variant (Bootstrap adds 3 demos)
+  7. All evaluations run concurrently up to seed_parallel_evaluations.
+  8. Add a safety-net pair: bare baseline + with_demos baseline.
+     This guarantees the pool always contains the unoptimized baseline so
+     subsequent stages can never regress below the starting point.
+  9. Return all CandidateEntry objects; run_tournament.py will select top-K.
+
+CONTEXT MODES
+-------------
+  \"worst\"  (default): Show the baseline\u2019s worst-scoring training examples.
+            Gives the seed LLM failure cases to fix.
+  \"best\":  Show the training examples the baseline already gets right.
+            Useful when the baseline is already strong and you want the
+            seed LLM to understand what correct outputs look like.
+
+EXAMPLE
+-------
+  generator = SeedPromptGenerator(
+      seed_model_name=\"azure/gpt-5.2\",
+      student_model_name=\"azure/gpt-4.1-mini\",
+      n_candidates=2,
+      seed_context_mode=\"best\",
+  )
+  seed_entries = generator.generate(
+      train_set=mini_train, val_set=mini_val,
+      metric=metric, leaderboard=lb,
+      output_dir=config.output_dir, log_dir=config.log_dir,
+  )
 """
 
 from __future__ import annotations
@@ -178,6 +227,7 @@ class SeedPromptGenerator:
         # Single-pass: score all examples, collect worst failures AND compute
         # aggregate metrics in one shot (avoids a redundant second evaluation).
         print(f"  [{_ts()}] Running single-pass baseline scoring + worst-example mining...")
+        baseline_started_at = datetime.now().isoformat(timespec="seconds")
         failures, baseline_eval = find_worst_performing_examples(
             baseline, train_set, metric,
             n=self.max_context_examples,
@@ -195,6 +245,10 @@ class SeedPromptGenerator:
             "config_name": "seed_baseline",
             "student_model": self.student_model_name,
             "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "optimization_started_at": baseline_started_at,
+            "optimization_completed_at": datetime.now().isoformat(timespec="seconds"),
+            "optimization_duration_seconds": round(time.time() - step1_t0, 1),
+            "evaluation_duration_seconds": baseline_eval.get("eval_time_seconds"),
             "note": "Baseline run on TRAIN set (diagnostic only, excluded from Pareto)",
             "eval_result": baseline_eval,
         })
@@ -218,6 +272,10 @@ class SeedPromptGenerator:
                 "config_name": "seed_baseline",
                 "model": self.student_model_name,
                 "student_model": self.student_model_name,
+                "optimization_started_at": baseline_started_at,
+                "optimization_completed_at": datetime.now().isoformat(timespec="seconds"),
+                "optimization_duration_seconds": round(time.time() - step1_t0, 1),
+                "evaluation_duration_seconds": baseline_eval.get("eval_time_seconds"),
                 "eval_result": baseline_eval,
             },
         )
@@ -449,6 +507,8 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
         if not candidates:
             print("\n  [ERROR] No valid candidates generated. Falling back to baseline.")
             # Save baseline as the only seed
+            fallback_started_at = datetime.now().isoformat(timespec="seconds")
+            fallback_t0 = time.time()
             baseline_path = output_dir / "seed_candidate_0_baseline.json"
             save_candidate(baseline, baseline_path, metadata={
                 "stage": "seed", "config_name": "baseline_fallback",
@@ -458,6 +518,8 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
             })
             info = get_program_info(baseline)
             eval_result = evaluate_candidate(baseline, val_set, metric, self.eval_num_threads)
+            fallback_completed_at = datetime.now().isoformat(timespec="seconds")
+            fallback_duration_seconds = round(time.time() - fallback_t0, 1)
             entry = CandidateEntry(
                 program_path=str(baseline_path),
                 stage="seed",
@@ -481,6 +543,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                     "model": self.student_model_name,
                     "seed_model": self.seed_model_name,
                     "student_model": self.student_model_name,
+                    "optimization_started_at": fallback_started_at,
+                    "optimization_completed_at": fallback_completed_at,
+                    "optimization_duration_seconds": fallback_duration_seconds,
+                    "evaluation_duration_seconds": eval_result.get("eval_time_seconds"),
                     "eval_result": eval_result,
                     "log_dir": str(log_dir) if log_dir else None,
                 },
@@ -520,6 +586,7 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                 cache=False,
             )
             with dspy.settings.context(lm=worker_lm):
+                variant_started_at = datetime.now().isoformat(timespec="seconds")
                 variant_t0 = time.time()
 
                 # Create module with injected instruction
@@ -537,17 +604,17 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                             module.signature = module.signature.with_updated_fields(fname, desc=desc)
 
                 # Add demos for the "with_demos" variant.
-                # NOTE: intentionally omit image_original/image_reimage from the
-                # demo Example object.  Including raw image objects as demo inputs
-                # injects many images into the LM context, which reliably causes
-                # structured-output parsing failures (60/60 errors, score=0.0).
-                # Keeping only the gold label fields (discard_image, changes) gives
-                # the model output-format guidance without the image payload.
+                # Each demo includes the actual image_original / image_reimage
+                # (dspy.Image objects) so the model sees real visual examples
+                # alongside the gold labels.  Up to max_context_examples demos
+                # are used; None images are silently omitted by DSPy.
                 if variant == "with_demos" and failures:
                     demos = []
                     for f in failures[:self.max_context_examples]:
                         ex = f["example"]
                         demo = dspy.Example(
+                            image_original=getattr(ex, "image_original", None),
+                            image_reimage=getattr(ex, "image_reimage", None),
                             discard_image=str(getattr(ex, "expected_discard_image", "")),
                             changes=str(getattr(ex, "expected_changes", "")),
                         ).with_inputs("image_original", "image_reimage")
@@ -576,6 +643,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                     "student_model": self.student_model_name,
                     "model": self.student_model_name,
                     "timestamp": datetime.now().isoformat(timespec="seconds"),
+                    "optimization_started_at": variant_started_at,
+                    "optimization_completed_at": datetime.now().isoformat(timespec="seconds"),
+                    "optimization_duration_seconds": round(time.time() - variant_t0, 1),
+                    "evaluation_duration_seconds": eval_result.get("eval_time_seconds"),
                     "instruction_preview": instruction[:300],
                     "eval_result": eval_result,
                 })
@@ -615,6 +686,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                         "seed_model": self.seed_model_name,
                         "student_model": self.student_model_name,
                         "n_context_examples": len(failures),
+                        "optimization_started_at": variant_started_at,
+                        "optimization_completed_at": datetime.now().isoformat(timespec="seconds"),
+                        "optimization_duration_seconds": round(time.time() - variant_t0, 1),
+                        "evaluation_duration_seconds": eval_result.get("eval_time_seconds"),
                         "eval_result": eval_result,
                         "log_dir": str(log_dir) if log_dir else None,
                     },
@@ -660,8 +735,12 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
         # Baseline bare — evaluate on val_set (not train_set) for fair comparison
         baseline_for_val = dspy.ChainOfThought(DCAImageComparison) if self.use_cot else dspy.Predict(DCAImageComparison)
         worker_lm_bl = create_lm(self.student_model_name, temperature=self.seed_eval_temperature, cache=False)
+        baseline_val_started_at = datetime.now().isoformat(timespec="seconds")
+        baseline_val_t0 = time.time()
         with dspy.settings.context(lm=worker_lm_bl):
             baseline_val_eval = evaluate_candidate(baseline_for_val, val_set, metric, self.eval_num_threads, lm=worker_lm_bl)
+        baseline_val_completed_at = datetime.now().isoformat(timespec="seconds")
+        baseline_val_duration_seconds = round(time.time() - baseline_val_t0, 1)
 
         baseline_val_info = get_program_info(baseline_for_val)
         baseline_val_path = output_dir / "seed_baseline_bare.json"
@@ -670,6 +749,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
             "variant": "bare", "student_model": self.student_model_name,
             "model": self.student_model_name,
             "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "optimization_started_at": baseline_val_started_at,
+            "optimization_completed_at": baseline_val_completed_at,
+            "optimization_duration_seconds": baseline_val_duration_seconds,
+            "evaluation_duration_seconds": baseline_val_eval.get("eval_time_seconds"),
             "note": "Baseline (original signature) evaluated on val_set as safety-net seed",
             "eval_result": baseline_val_eval,
         })
@@ -690,6 +773,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
             val_eval_time_seconds=baseline_val_eval.get("eval_time_seconds"),
             metadata={"stage": "seed", "config_name": "seed_baseline_bare",
                       "variant": "bare", "model": self.student_model_name,
+                      "optimization_started_at": baseline_val_started_at,
+                      "optimization_completed_at": baseline_val_completed_at,
+                      "optimization_duration_seconds": baseline_val_duration_seconds,
+                      "evaluation_duration_seconds": baseline_val_eval.get("eval_time_seconds"),
                       "eval_result": baseline_val_eval},
         )
         entries.append(baseline_val_entry)
@@ -704,17 +791,21 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
             demos_list = []
             for f_item in failures[:self.max_context_examples]:
                 ex = f_item["example"]
-                # Same image-stripping as _eval_variant: omit image fields from
-                # the demo to avoid injecting large image payloads into LM context.
                 demo = dspy.Example(
+                    image_original=getattr(ex, "image_original", None),
+                    image_reimage=getattr(ex, "image_reimage", None),
                     discard_image=str(getattr(ex, "expected_discard_image", "")),
                     changes=str(getattr(ex, "expected_changes", "")),
                 ).with_inputs("image_original", "image_reimage")
                 demos_list.append(demo)
             baseline_demos.demos = demos_list
 
+            bl_demos_started_at = datetime.now().isoformat(timespec="seconds")
+            bl_demos_t0 = time.time()
             with dspy.settings.context(lm=worker_lm_bl):
                 bl_demos_eval = evaluate_candidate(baseline_demos, val_set, metric, self.eval_num_threads, lm=worker_lm_bl)
+            bl_demos_completed_at = datetime.now().isoformat(timespec="seconds")
+            bl_demos_duration_seconds = round(time.time() - bl_demos_t0, 1)
 
             bl_demos_info = get_program_info(baseline_demos)
             bl_demos_path = output_dir / "seed_baseline_with_demos.json"
@@ -723,6 +814,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                 "variant": "with_demos", "student_model": self.student_model_name,
                 "model": self.student_model_name,
                 "timestamp": datetime.now().isoformat(timespec="seconds"),
+                "optimization_started_at": bl_demos_started_at,
+                "optimization_completed_at": bl_demos_completed_at,
+                "optimization_duration_seconds": bl_demos_duration_seconds,
+                "evaluation_duration_seconds": bl_demos_eval.get("eval_time_seconds"),
                 "note": "Baseline + worst-example demos as safety-net seed",
                 "eval_result": bl_demos_eval,
             })
@@ -743,6 +838,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                 val_eval_time_seconds=bl_demos_eval.get("eval_time_seconds"),
                 metadata={"stage": "seed", "config_name": "seed_baseline_with_demos",
                           "variant": "with_demos", "model": self.student_model_name,
+                          "optimization_started_at": bl_demos_started_at,
+                          "optimization_completed_at": bl_demos_completed_at,
+                          "optimization_duration_seconds": bl_demos_duration_seconds,
+                          "evaluation_duration_seconds": bl_demos_eval.get("eval_time_seconds"),
                           "eval_result": bl_demos_eval},
             )
             entries.append(bl_demos_entry)
@@ -784,6 +883,10 @@ GUIDELINES FOR YOUR {self.n_candidates} IMPROVED VARIANT(S):
                     "n_demos": e.n_demos,
                     "instruction_length": e.instruction_length,
                     "val_avg_total_tokens": e.val_avg_total_tokens,
+                    "optimization_started_at": (e.metadata or {}).get("optimization_started_at"),
+                    "optimization_completed_at": (e.metadata or {}).get("optimization_completed_at"),
+                    "optimization_duration_seconds": (e.metadata or {}).get("optimization_duration_seconds"),
+                    "evaluation_duration_seconds": (e.metadata or {}).get("evaluation_duration_seconds", e.val_eval_time_seconds),
                     "program_path": e.program_path,
                 }
                 for i, e in enumerate(entries)

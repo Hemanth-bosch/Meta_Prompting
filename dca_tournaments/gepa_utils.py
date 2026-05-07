@@ -5,7 +5,8 @@ from __future__ import annotations
 import logging
 import re
 import threading
-from dataclasses import dataclass
+
+import dspy
 
 logger = logging.getLogger("tournament.gepa_utils")
 
@@ -53,21 +54,41 @@ gepa_image_store = _GepaImageStore()
 # Multimodal Reflection LM wrapper
 # ═══════════════════════════════════════════════════════════════════
 
-@dataclass
-class MultimodalReflectionLM:
-    """Wrap a base LM to inject image URLs into a GEPA reflection prompt."""
+class MultimodalReflectionLM(dspy.BaseLM):
+    """BaseLM-compatible wrapper that injects image URLs into reflection prompts.
 
-    base_lm: object
-    detail: str = "low"
-    max_images: int = 6
+    DSPy teleprompters validate that active LMs are instances of ``dspy.BaseLM``.
+    Wrapping a plain callable causes runtime failures in trajectory capture.
+    """
 
-    def __call__(self, prompt=None, messages=None, **kwargs):
+    def __init__(self, base_lm: dspy.BaseLM, detail: str = "low", max_images: int = 6):
+        if not isinstance(base_lm, dspy.BaseLM):
+            raise TypeError(f"base_lm must be dspy.BaseLM, got {type(base_lm)!r}")
+
+        self.base_lm = base_lm
+        self.detail = detail
+        self.max_images = max_images
+
+        base_kwargs = dict(getattr(base_lm, "kwargs", {}) or {})
+        temperature = base_kwargs.pop("temperature", 0.0)
+        max_tokens = base_kwargs.pop("max_tokens", 1000)
+
+        super().__init__(
+            model=getattr(base_lm, "model", "multimodal-reflection-wrapper"),
+            model_type=getattr(base_lm, "model_type", "chat"),
+            temperature=temperature,
+            max_tokens=max_tokens,
+            cache=getattr(base_lm, "cache", True),
+            **base_kwargs,
+        )
+
+    def forward(self, prompt=None, messages=None, **kwargs):
         image_urls = gepa_image_store.get_recent_images(self.max_images)
         if not image_urls:
-            return self._call_base_lm(prompt=prompt, messages=messages, **kwargs)
+            return self._forward_base(prompt=prompt, messages=messages, **kwargs)
 
         if messages is not None:
-            return self._call_base_lm(
+            return self._forward_base(
                 messages=self._inject_images(messages, image_urls),
                 **kwargs,
             )
@@ -77,20 +98,54 @@ class MultimodalReflectionLM:
             {"type": "image_url", "image_url": {"url": url, "detail": self.detail}}
             for url in image_urls[:self.max_images]
         ]
-        return self._call_base_lm(messages=[{"role": "user", "content": content}], **kwargs)
+        return self._forward_base(messages=[{"role": "user", "content": content}], **kwargs)
 
-    def __getattr__(self, name):
-        return getattr(self.base_lm, name)
+    async def aforward(self, prompt=None, messages=None, **kwargs):
+        image_urls = gepa_image_store.get_recent_images(self.max_images)
+        if not image_urls:
+            return await self._aforward_base(prompt=prompt, messages=messages, **kwargs)
 
-    def _call_base_lm(self, prompt=None, messages=None, **kwargs):
         if messages is not None:
-            return self.base_lm(messages=messages, **kwargs)
-        if prompt is not None:
-            try:
-                return self.base_lm(prompt, **kwargs)
-            except TypeError:
-                return self.base_lm(prompt=prompt, **kwargs)
-        return self.base_lm(**kwargs)
+            return await self._aforward_base(
+                messages=self._inject_images(messages, image_urls),
+                **kwargs,
+            )
+
+        prompt_text = "" if prompt is None else str(prompt)
+        content = [{"type": "text", "text": prompt_text}] + [
+            {"type": "image_url", "image_url": {"url": url, "detail": self.detail}}
+            for url in image_urls[:self.max_images]
+        ]
+        return await self._aforward_base(messages=[{"role": "user", "content": content}], **kwargs)
+
+    def copy(self, **kwargs):
+        copied_base = self.base_lm.copy(**kwargs)
+        copied = MultimodalReflectionLM(
+            base_lm=copied_base,
+            detail=kwargs.get("detail", self.detail),
+            max_images=kwargs.get("max_images", self.max_images),
+        )
+        for key, value in kwargs.items():
+            if hasattr(copied, key):
+                setattr(copied, key, value)
+            elif value is None:
+                copied.kwargs.pop(key, None)
+            else:
+                copied.kwargs[key] = value
+        return copied
+
+    def _forward_base(self, prompt=None, messages=None, **kwargs):
+        if messages is not None:
+            return self.base_lm.forward(messages=messages, **kwargs)
+        return self.base_lm.forward(prompt=prompt, **kwargs)
+
+    async def _aforward_base(self, prompt=None, messages=None, **kwargs):
+        if hasattr(self.base_lm, "aforward"):
+            if messages is not None:
+                return await self.base_lm.aforward(messages=messages, **kwargs)
+            return await self.base_lm.aforward(prompt=prompt, **kwargs)
+        # Fallback: if async path is unavailable, use sync forward.
+        return self._forward_base(prompt=prompt, messages=messages, **kwargs)
 
     def _inject_images(self, messages: list[dict], image_urls: list[str]) -> list[dict]:
         image_blocks = [
