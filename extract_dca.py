@@ -696,6 +696,10 @@ evaluate = dspy.Evaluate(
 #
 # Each optimizer.compile() call starts from the SAME seed comparator and
 # competes on the val set.  The one with the highest val score is saved.
+custom_strategies: list = []
+strategy_by_name: dict = {}
+
+def _register_strategy(strategy) -> None:
     custom_strategies.append(strategy)
     strategy_by_name[strategy.name] = strategy
 

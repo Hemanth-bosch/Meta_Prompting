@@ -6,6 +6,29 @@ This repository provides a framework for automatically optimizing LLM prompts us
 
 ---
 
+## Table of Contents
+
+1. [Getting Started in 5 Minutes](#getting-started-in-5-minutes)
+2. [Use Cases](#use-cases-in-this-repository)
+3. [Project Structure](#project-structure)
+4. [Setup](#setup)
+5. [Data Setup](#data-setup)
+6. [Running the DCA Pipeline](#running-the-dca-pipeline)
+7. [Running JO and YANASE Pipelines](#running-the-jo-and-yanase-pipelines)
+8. [Human Prompt Baselines](#dca-human-prompt-baseline-pipeline)
+9. [Performance Results](#performance-results)
+10. [LLM Provider Configuration](#llm-provider-configuration)
+11. [Adding a New Use Case](#adding-a-new-use-case)
+12. [Runtime Expectations](#runtime-expectations)
+13. [Cost Estimates](#cost-estimates)
+14. [Example Output Files](#example-output-files)
+15. [Resuming an Interrupted Run](#resuming-an-interrupted-run)
+16. [Test Set Evaluation](#test-set-evaluation)
+17. [FAQ](#faq)
+18. [Troubleshooting](#troubleshooting)
+
+---
+
 ## Use Cases in This Repository
 
 Three use cases are currently implemented. Each has its own data, signature, metric, and pipeline scripts.
@@ -95,6 +118,49 @@ meta-prompting/
 ├── .cache/                     # Auto-generated: saved optimized programs + split manifests
 └── .env                        # Your credentials (copy from env.template, do not commit)
 ```
+
+---
+
+## Getting Started in 5 Minutes
+
+> **Fastest path to running a DCA tournament on your machine.**
+
+**Step 1 — Install**
+```bash
+git clone https://github.boschdevcloud.com/WAX3SYV/meta-prompting.git
+cd meta-prompting
+uv sync
+```
+
+**Step 2 — Configure credentials**
+```bash
+cp env.template .env
+# Edit .env: set AZURE_OPENAI_ENDPOINT and either AZURE_OPENAI_API_KEY or use az login
+```
+
+**Step 3 — Get data**
+
+Download `dca_data.zip` from the SharePoint link in [data/README.md](data/README.md) and extract it to `data/dca_data/`.
+
+**Step 4 — Dry-run (no API calls)**
+```bash
+uv run python -m dca_tournaments.run_tournament --dry-run
+```
+This prints the full configuration and estimated API calls, then exits. Verify the models, dataset size, and stage list look correct.
+
+**Step 5 — Run**
+```bash
+# Fastest config: mini dataset, gpt-4.1-mini student (3.5–8 h)
+uv run python -m dca_tournaments.run_tournament \
+    --stages seed,bootstrap,miprov2,gepa \
+    --student-model azure/gpt-4.1-mini \
+    --seed-model azure/gpt-5.2 \
+    --reflection-model azure/gpt-5.2 \
+    --mini-train-size 120 --mini-val-size 45 \
+    --max-parallel 2 --eval-num-threads 4
+```
+
+Results land in `.cache/tournament/<timestamp>/`. See [Running the DCA Pipeline](#running-the-dca-pipeline) for the full options reference.
 
 ---
 
@@ -435,6 +501,38 @@ Optimizer runtime depends on the **student model**, **dataset size**, and **Azur
 
 ---
 
+## Cost Estimates
+
+Costs depend on Azure pricing tier, model versions, and API load. The estimates below are rough ballparks for the DCA use case (image-pair inputs — **images are the dominant cost factor**).
+
+### gpt-4.1-mini student + gpt-5.2 seed/reflection (default config)
+
+| Stage | Main model cost driver | Approx. cost |
+|-------|----------------------|-------------|
+| Seed (Stage 0) | gpt-5.2 seed generation + mini_val eval (45 examples) | $1–5 |
+| Bootstrap (Stage 1) | gpt-4.1-mini mini_val eval across candidates | $1–4 |
+| MIPROv2 (Stage 2) | gpt-5.2 proposal calls + gpt-4.1-mini eval (~30 trials) | $3–10 |
+| GEPA (Stage 3) | gpt-5.2 image reflection + gpt-4.1-mini mini_val eval | $3–15 |
+| **Full tournament** | | **~$8–35** |
+
+### gpt-4.1 student (full model, 5× more expensive inference)
+
+| Stage | Approx. cost |
+|-------|-------------|
+| Seed | $3–12 |
+| Bootstrap | $5–15 |
+| MIPROv2 | $15–40 |
+| GEPA | $25–60 |
+| **Full tournament** | **~$50–130** |
+
+> **Notes:**
+> - DCA image inputs are JPEG/PNG pairs — each example sends 2 images to the model. Token counts vary with image size and Azure vision billing mode.
+> - Costs scale roughly linearly with `mini_val_size` and number of optimizer trials.
+> - Check current Azure OpenAI pricing at [azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/](https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/).
+> - Text-only use cases (no images) are significantly cheaper — typically 5–10× less per example.
+
+---
+
 ## Resuming an Interrupted Run
 
 If a tournament is interrupted (network timeout, crash, manual stop), resume it from where it stopped:
@@ -465,6 +563,96 @@ uv run python -m dca_tournaments.run_tournament --run-test-eval
 ```
 
 The test score appears in `tournament_summary.json` under `test_evaluation` and in the final console output. It does **not** influence candidate selection — selection always uses the val set score.
+
+---
+
+## Example Output Files
+
+After a completed tournament, `.cache/tournament/<tournament_id>/` contains:
+
+```
+tournament_20260507_123456/
+├── config.json                      # Full TournamentConfig used for this run (reload with --resume-from)
+├── leaderboard.json                 # All candidates ever evaluated, with scores and token stats
+├── leaderboard.xlsx                 # Excel version with per-stage sheets and Pareto highlights
+├── tournament_summary.json          # Final result: best candidate, scores, stage timing, test eval
+├── summary_scores.csv               # Per-candidate score table (easy to diff across runs)
+├── pareto_plot.png                  # Score vs. avg-tokens scatter, Pareto front highlighted
+│
+├── seed/
+│   ├── stage_completed.json         # Written on success — resume skips this stage
+│   ├── seed_0_bare/                 # Candidate: seed instruction 0, no demos
+│   │   └── program.json            #   Saved DSPy program (load with comparator.load())
+│   ├── seed_0_with_demos/
+│   └── seed_baseline_bare/         # Safety-net: original signature bare (cannot regress below this)
+│
+├── bootstrap/
+│   ├── stage_completed.json
+│   └── Balanced_DCA_Bootstrap_seed0/
+│       └── program.json
+│
+├── miprov2/
+│   ├── stage_completed.json
+│   └── MIPROv2_light_seed0/
+│       └── program.json
+│
+└── gepa/
+    ├── stage_completed.json
+    └── GEPA_medium_seed0/
+        └── program.json
+```
+
+**Key files to inspect after a run:**
+
+| File | What to look at |
+|------|-----------------|
+| `tournament_summary.json` | `best_candidate.val_total_score`, `best_candidate.program_path`, `stage_timings` |
+| `leaderboard.json` | Full candidate list — sort by `val_total_score` or `val_avg_total_tokens` |
+| `leaderboard.xlsx` | Pareto sheet highlights token-efficient candidates; use for manual selection |
+| `summary_scores.csv` | Quick diff across multiple tournament runs |
+| `<stage>/<config>/program.json` | Load directly: `comparator.load("program.json")` then run inference |
+
+To load the best program for inference:
+```python
+import dspy
+from signatures.dca import DCAImageComparison
+
+comparator = dspy.Predict(DCAImageComparison)
+comparator.load(".cache/tournament/tournament_20260507_123456/gepa/GEPA_medium_seed0/program.json")
+```
+
+---
+
+## FAQ
+
+**Q: Do I need to run all four stages every time?**
+
+No. Pass `--stages` to choose which stages to run. A common starting point is `--stages seed,bootstrap` which is fast (~1–2 h with gpt-4.1-mini) and often sufficient for a first optimized prompt. Add `miprov2` or `gepa` once you want to push further.
+
+**Q: Can I use this for a use case other than DCA?**
+
+Yes — the tournament pipeline is use-case-agnostic. You need a DSPy `Signature`, a data loader, a metric function, and a small wiring script. Follow the [ReadMe-Onboarding_new_use_case/ONBOARDING_NEW_USE_CASE.md](ReadMe-Onboarding_new_use_case/ONBOARDING_NEW_USE_CASE.md) guide for step-by-step instructions. The DCA tournament is the reference implementation.
+
+**Q: I don't have Azure CLI. Can I still use the pipeline?**
+
+Yes. Set `AZURE_OPENAI_API_KEY` in your `.env` file with a direct API key. The pipeline checks for a key first and only falls back to Azure CLI if the key is absent. See the Troubleshooting section for the exact `.env` entry.
+
+**Q: How do I pick the best result after a tournament?**
+
+Open `leaderboard.xlsx` in the tournament output directory. The **Pareto sheet** highlights candidates that are on the score-vs-token efficiency frontier. For deployment, pick from the Pareto front:
+- If inference cost does not matter → take the row with the highest `val_total_score`.
+- If you want to minimize token usage → pick the Pareto candidate with the lowest `val_avg_total_tokens` that still meets your minimum score threshold.
+
+The `program_path` column gives the exact `.json` file to load with `comparator.load(path)`.
+
+**Q: Can I continue optimization starting from a previous best candidate?**
+
+Yes. Use `--seed-from-file` to skip Stage 0 and start Bootstrap/MIPROv2/GEPA from an existing saved program:
+```bash
+uv run python -m dca_tournaments.run_tournament \
+    --seed-from-file .cache/tournament/tournament_20260507_123456/gepa/GEPA_medium_seed0/program.json \
+    --stages bootstrap,miprov2,gepa
+```
 
 ---
 
