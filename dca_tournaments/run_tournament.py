@@ -740,7 +740,10 @@ def main():
         if "seed" in config.stages:
             if is_resume_mode and _stage_is_completed(config.output_dir, "seed") and leaderboard.stage_entries("seed") and not config.seed_from_file:
                 print("\nSkipping Stage 0 (seed): already completed in resumed leaderboard.")
-                seed_entries = leaderboard.top_k(config.top_k, stage="seed")
+                seed_entries = leaderboard.top_k(
+                    config.top_k, stage="seed",
+                    criteria=config.selection_criteria,
+                )
                 stage_execution_history["seed"] = {"status": "resumed"}
             else:
                 stages_run.append("seed")
@@ -864,7 +867,10 @@ def main():
 
         if not seed_entries and is_resume_mode:
             for fallback_stage in ("gepa", "miprov2", "bootstrap", "seed"):
-                existing = leaderboard.top_k(config.top_k, stage=fallback_stage)
+                existing = leaderboard.top_k(
+                    config.top_k, stage=fallback_stage,
+                    criteria=config.selection_criteria,
+                )
                 if existing:
                     seed_entries = existing
                     break
