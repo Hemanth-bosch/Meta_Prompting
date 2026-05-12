@@ -1028,10 +1028,10 @@ def main():
                 # Select top-K for next stage (respect cross_stage_selection)
                 if config.cross_stage_selection:
                     current_top = leaderboard.top_k(
-                        config.top_k + 5,
+                        config.top_k,
                         criteria=config.selection_criteria,
                         exclude_stages=["seed_baseline"],
-                    )[:config.top_k]
+                    )
                 else:
                     current_top = leaderboard.top_k(
                         config.top_k, stage=stage,
@@ -1139,10 +1139,10 @@ def main():
             if config.cross_stage_selection:
                 # Select from ALL entries across all stages (exclude seed_baseline)
                 current_top = leaderboard.top_k(
-                    config.top_k + 5,
+                    config.top_k,
                     criteria=config.selection_criteria,
                     exclude_stages=["seed_baseline"],
-                )[:config.top_k]
+                )
             else:
                 # Select from current stage only
                 current_top = leaderboard.top_k(
