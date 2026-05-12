@@ -199,6 +199,11 @@ class StageRunner:
         print(f"  Seeds    : {len(seed_entries)}")
         print(f"  Stage LM : {self.config.get_stage_model(stage)}")
         print(f"  Output   : {stage_dir}")
+        if self.config.use_hybrid_metric:
+            print(f"  Compile metric : HYBRID ({self.config.hybrid_penalty_mode})")
+        else:
+            print(f"  Compile metric : raw DCA")
+        print(f"  Eval metric    : raw DCA (leaderboard scores)")
 
         start = time.time()
 
@@ -469,6 +474,14 @@ class StageRunner:
                 "bootstrap_num_threads": cfg.bootstrap_num_threads,
                 "bootstrap_teacher_model": cfg.bootstrap_teacher_model,
                 "bootstrap_stop_at_score": cfg.bootstrap_stop_at_score,
+                # Hybrid metric config (applied inside compile() only)
+                "use_hybrid_metric": cfg.use_hybrid_metric,
+                "hybrid_score_weight": cfg.hybrid_score_weight,
+                "hybrid_length_weight": cfg.hybrid_length_weight,
+                "hybrid_max_prompt_tokens": cfg.hybrid_max_prompt_tokens,
+                "hybrid_penalty_mode": cfg.hybrid_penalty_mode,
+                "hybrid_target_tokens": cfg.hybrid_target_tokens,
+                "hybrid_penalty_steepness": cfg.hybrid_penalty_steepness,
             }
 
             token_data = self._spawn_optimizer(worker_cfg, stage_dir, config_name)
@@ -611,6 +624,14 @@ class StageRunner:
                 "miprov2_minibatch_size": cfg.miprov2_minibatch_size,
                 "miprov2_metric_threshold": cfg.miprov2_metric_threshold,
                 "miprov2_teacher_model": cfg.miprov2_teacher_model,
+                # Hybrid metric config (applied inside compile() only)
+                "use_hybrid_metric": cfg.use_hybrid_metric,
+                "hybrid_score_weight": cfg.hybrid_score_weight,
+                "hybrid_length_weight": cfg.hybrid_length_weight,
+                "hybrid_max_prompt_tokens": cfg.hybrid_max_prompt_tokens,
+                "hybrid_penalty_mode": cfg.hybrid_penalty_mode,
+                "hybrid_target_tokens": cfg.hybrid_target_tokens,
+                "hybrid_penalty_steepness": cfg.hybrid_penalty_steepness,
             }
 
             token_data = self._spawn_optimizer(worker_cfg, stage_dir, config_name)
@@ -751,6 +772,14 @@ class StageRunner:
                 "gepa_candidate_selection_strategy": cfg.gepa_candidate_selection_strategy,
                 "gepa_train_size": cfg.gepa_train_size,
                 "gepa_val_size": cfg.gepa_val_size,
+                # Hybrid metric config (applied inside compile() only)
+                "use_hybrid_metric": cfg.use_hybrid_metric,
+                "hybrid_score_weight": cfg.hybrid_score_weight,
+                "hybrid_length_weight": cfg.hybrid_length_weight,
+                "hybrid_max_prompt_tokens": cfg.hybrid_max_prompt_tokens,
+                "hybrid_penalty_mode": cfg.hybrid_penalty_mode,
+                "hybrid_target_tokens": cfg.hybrid_target_tokens,
+                "hybrid_penalty_steepness": cfg.hybrid_penalty_steepness,
             }
 
             token_data = self._spawn_optimizer(worker_cfg, stage_dir, config_name)
@@ -957,9 +986,11 @@ class StageRunner:
         # _evaluate_and_save calls (max_parallel > 1) each have their own
         # lm.history — preventing interleaved entries and wrong token counts.
         # Stage-to-stage promotion is always judged on the overall student model.
+        # Post-stage evaluation always uses raw DCA metric (no hybrid penalty).
+        # Hybrid penalty is only applied during optimizer compile() in the subprocess.
         eval_lm = create_lm(self.config.student_model_name, cache=False)
         eval_result = evaluate_candidate(
-            compiled_program, self.val_set, self.metric,
+            compiled_program, self.val_set, dca_comparison_metric,
             self.config.eval_num_threads, lm=eval_lm,
         )
         info = get_program_info(compiled_program)

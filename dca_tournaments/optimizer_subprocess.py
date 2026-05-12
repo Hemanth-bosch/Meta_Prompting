@@ -208,16 +208,17 @@ def _normalize_compiled_field_descs(compiled_program, original_field_descs, stag
 
 # ── Stage runners ─────────────────────────────────────────────────
 
-def _run_bootstrap(student, train_set, val_set, cfg: dict) -> object:
+def _run_bootstrap(student, train_set, val_set, cfg: dict, metric=None) -> object:
     from dspy.teleprompt import BootstrapFewShotWithRandomSearch
 
+    metric = metric or dca_comparison_metric
     bc = cfg["bootstrap_cfg"]
     n_candidates = bc.get("n", 16)
     max_rounds = bc.get("max_rounds", 2)
     num_threads = cfg.get("bootstrap_num_threads", 4)
 
     bs_kwargs = dict(
-        metric=dca_comparison_metric,
+        metric=metric,
         max_labeled_demos=bc["max_labeled_demos"],
         max_bootstrapped_demos=bc["max_bootstrapped_demos"],
         num_candidate_programs=n_candidates,
@@ -238,9 +239,10 @@ def _run_bootstrap(student, train_set, val_set, cfg: dict) -> object:
     return compiled
 
 
-def _run_miprov2(student, train_set, val_set, cfg: dict) -> object:
+def _run_miprov2(student, train_set, val_set, cfg: dict, metric=None) -> object:
     from dspy.teleprompt import MIPROv2
 
+    metric = metric or dca_comparison_metric
     mc = cfg["miprov2_cfg"]
     intensity = mc["auto"]
     max_labeled = mc["max_labeled_demos"]
@@ -254,7 +256,7 @@ def _run_miprov2(student, train_set, val_set, cfg: dict) -> object:
             student.signature = student.signature.with_updated_fields(fname, desc="")
 
     mipro_kwargs = dict(
-        metric=dca_comparison_metric,
+        metric=metric,
         auto=intensity,
         max_labeled_demos=max_labeled,
         max_bootstrapped_demos=max_bootstrapped,
@@ -279,7 +281,7 @@ def _run_miprov2(student, train_set, val_set, cfg: dict) -> object:
     return compiled
 
 
-def _run_gepa(student, train_set, val_set, cfg: dict) -> object:
+def _run_gepa(student, train_set, val_set, cfg: dict, metric_with_feedback=None) -> object:
     try:
         from dspy import GEPA
     except ImportError:
@@ -306,11 +308,12 @@ def _run_gepa(student, train_set, val_set, cfg: dict) -> object:
     # Apply the reflective-dataset patch
     patch_gepa_reflective_dataset(send_images=gepa_reflection_images)
 
-    # Choose metric
+    # Choose metric — use hybrid-wrapped feedback metric if provided
+    base_feedback_metric = metric_with_feedback or dca_comparison_metric_with_feedback
     if gepa_reflection_images:
-        gepa_metric = make_image_storing_metric(dca_comparison_metric_with_feedback)
+        gepa_metric = make_image_storing_metric(base_feedback_metric)
     else:
-        gepa_metric = dca_comparison_metric_with_feedback
+        gepa_metric = base_feedback_metric
 
     gepa_kwargs: dict = {
         "metric": gepa_metric,
@@ -428,6 +431,33 @@ def main() -> int:
         "total_tokens": 0,
     }
 
+    # ── Build compile-time metric (hybrid if configured) ──────────
+    compile_metric = dca_comparison_metric
+    compile_metric_with_feedback = dca_comparison_metric_with_feedback
+    if cfg.get("use_hybrid_metric"):
+        from evaluation.dca_metric import make_hybrid_metric
+        compile_metric, compile_metric_with_feedback = make_hybrid_metric(
+            dca_comparison_metric,
+            dca_comparison_metric_with_feedback,
+            score_weight=cfg.get("hybrid_score_weight", 0.5),
+            length_weight=cfg.get("hybrid_length_weight", 0.5),
+            max_prompt_tokens=cfg.get("hybrid_max_prompt_tokens", 8000),
+            penalty_mode=cfg.get("hybrid_penalty_mode", "linear"),
+            target_tokens=cfg.get("hybrid_target_tokens", 2500),
+            penalty_steepness=cfg.get("hybrid_penalty_steepness", 2.0),
+        )
+        if cfg.get("hybrid_penalty_mode") == "exponential":
+            print(f"  [{_ts()}] COMPILE METRIC: hybrid (exponential, "
+                  f"target={cfg.get('hybrid_target_tokens')} tok, "
+                  f"k={cfg.get('hybrid_penalty_steepness')})")
+        else:
+            print(f"  [{_ts()}] COMPILE METRIC: hybrid (linear, "
+                  f"score_w={cfg.get('hybrid_score_weight')}, "
+                  f"len_w={cfg.get('hybrid_length_weight')}, "
+                  f"max_tok={cfg.get('hybrid_max_prompt_tokens')})")
+    else:
+        print(f"  [{_ts()}] COMPILE METRIC: raw dca_comparison_metric")
+
     # ── Run compile() ─────────────────────────────────────────────
     try:
         # dspy.track_usage() MUST be disabled for all optimizer stages.
@@ -462,7 +492,7 @@ def main() -> int:
         tracker_cm = nullcontext()
         with tracker_cm as tracker:
             if stage == "bootstrap":
-                compiled = _run_bootstrap(student, mini_train, mini_val, cfg)
+                compiled = _run_bootstrap(student, mini_train, mini_val, cfg, metric=compile_metric)
             elif stage == "miprov2":
                 # MIPROv2 may use a different model per combo
                 mc = cfg.get("miprov2_cfg", {})
@@ -473,9 +503,9 @@ def main() -> int:
                         combo_lm_kwargs["temperature"] = cfg["optimization_temperature"]
                     dspy.configure(lm=create_lm(model_name, **combo_lm_kwargs))
                     print(f"  [{_ts()}] MIPROv2 reconfigured to {model_name}")
-                compiled = _run_miprov2(student, mini_train, mini_val, cfg)
+                compiled = _run_miprov2(student, mini_train, mini_val, cfg, metric=compile_metric)
             elif stage == "gepa":
-                compiled = _run_gepa(student, mini_train, mini_val, cfg)
+                compiled = _run_gepa(student, mini_train, mini_val, cfg, metric_with_feedback=compile_metric_with_feedback)
             else:
                 print(f"[ERROR] Unknown stage: {stage}", file=sys.stderr)
                 return 1

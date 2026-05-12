@@ -712,33 +712,27 @@ def main():
             for stage_name in config.stages:
                 print(f"  {stage_name:12s}: {len(leaderboard.stage_entries(stage_name))}")
 
+        # Evaluation, top-k selection, and final re-eval always use the raw
+        # DCA metric.  The hybrid penalty is constructed inside each optimizer
+        # subprocess (optimizer_subprocess.py) and applied only during
+        # compile() — it never affects leaderboard scores.
         metric = dca_comparison_metric
         metric_with_feedback = dca_comparison_metric_with_feedback
         if config.use_hybrid_metric:
-            from evaluation.dca_metric import make_hybrid_metric
-            metric, metric_with_feedback = make_hybrid_metric(
-                dca_comparison_metric,
-                dca_comparison_metric_with_feedback,
-                score_weight=config.hybrid_score_weight,
-                length_weight=config.hybrid_length_weight,
-                max_prompt_tokens=config.hybrid_max_prompt_tokens,
-                penalty_mode=config.hybrid_penalty_mode,
-                target_tokens=config.hybrid_target_tokens,
-                penalty_steepness=config.hybrid_penalty_steepness,
-            )
             if config.hybrid_penalty_mode == "exponential":
                 print(
-                    f"\n  Hybrid metric enabled: exponential penalty  "
-                    f"target={config.hybrid_target_tokens} tok  k={config.hybrid_penalty_steepness}  "
-                    f"(raw DCA score at eval)"
+                    f"\n  Hybrid metric enabled for optimizer compile():"
+                    f"\n    Mode: exponential  target={config.hybrid_target_tokens} tok  "
+                    f"k={config.hybrid_penalty_steepness}"
                 )
             else:
                 print(
-                    f"\n  Hybrid metric enabled: "
-                    f"score*{config.hybrid_score_weight} + "
-                    f"length_efficiency*{config.hybrid_length_weight} "
-                    f"(max_prompt_tokens={config.hybrid_max_prompt_tokens}; raw DCA score at eval)"
+                    f"\n  Hybrid metric enabled for optimizer compile():"
+                    f"\n    Mode: linear  score_w={config.hybrid_score_weight}  "
+                    f"len_w={config.hybrid_length_weight}  "
+                    f"max_tok={config.hybrid_max_prompt_tokens}"
                 )
+            print(f"    Eval / top-k / final-reeval: raw DCA metric (no penalty)")
 
         # ── Stage 0: Seed generation ────────────────────────────
         seed_entries = []
@@ -1180,6 +1174,7 @@ def main():
             # this pass makes every entry comparable on the same data.
             all_entries = list(leaderboard.entries)
             _save_full_val_reeval_audit(config, "pre", all_entries)
+            print(f"  Metric: raw DCA (dca_comparison_metric, no hybrid penalty)")
             print(f"  Re-evaluating {len(all_entries)} candidates on full val set "
                   f"({len(val_set)} examples)...")
 
