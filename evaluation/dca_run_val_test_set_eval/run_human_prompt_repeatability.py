@@ -99,16 +99,21 @@ DEFAULT_TEMPERATURE = 0.1
 class RunConfig:
     prompt_file: str   # relative to HUMAN_PROMPTS_DIR, or absolute path
     model_name:  str
+    reasoning_effort: Optional[str] = None   # "low", "medium", "high" (for future use)
 
 
 RUNS: dict[str, RunConfig] = {
     # ── v1 prompt (midas) ────────────────────────────────────────────
-    "v1_gpt41mini": RunConfig("v1_prompt_midas.md",  "azure/gpt-4.1-mini"),
-    "v1_gpt41":     RunConfig("v1_prompt_midas.md",  "azure/gpt-4.1"),
+    # "v1_gpt41mini": RunConfig("v1_prompt_midas.md",  "azure/gpt-4.1-mini"),
+    # "v1_gpt41":     RunConfig("v1_prompt_midas.md",  "azure/gpt-4.1"),
+    # "v1_gpt5mini": RunConfig("v1_prompt_midas.md",  "azure/gpt-5-mini", "low"),
+    # "v1_gpt5.2":     RunConfig("v1_prompt_midas.md",  "azure/gpt-5.2", "low"),
 
     # ── v2 prompt (cr) ───────────────────────────────────────────────
-    "v2_gpt41mini": RunConfig("v2_prompt_cr.md",     "azure/gpt-4.1-mini"),
-    "v2_gpt41":     RunConfig("v2_prompt_cr.md",     "azure/gpt-4.1"),
+    # "v2_gpt41mini": RunConfig("v2_prompt_cr.md",     "azure/gpt-4.1-mini"),
+    # "v2_gpt41":     RunConfig("v2_prompt_cr.md",     "azure/gpt-4.1"),
+    # "v2_gpt5mini": RunConfig("v2_prompt_cr.md",     "azure/gpt-5-mini", "low"),
+    "v2_gpt5.2":     RunConfig("v2_prompt_cr.md",     "azure/gpt-5.2", "low"),
 
     # # ── v3 prompt (cr) ───────────────────────────────────────────────
     # "v3_gpt41mini": RunConfig("v3_prompt_cr.md",     "azure/gpt-4.1-mini"),
@@ -129,14 +134,28 @@ def _run_key(run_name: str, temperature: float) -> str:
 def normalize_bool(value: Any) -> Optional[bool]:
     if isinstance(value, bool):
         return value
-    if isinstance(value, str):
-        v = value.strip().lower()
-        if v in {"true", "yes", "1"}:
-            return True
-        if v in {"false", "no", "0"}:
-            return False
     if isinstance(value, int):
         return bool(value)
+    # Some models (e.g. gpt-5.2) return a dict like {"discard_image": false, "changes": "..."}
+    # instead of a plain boolean — extract the nested key and recurse.
+    if isinstance(value, dict):
+        return normalize_bool(value.get("discard_image"))
+    if isinstance(value, str):
+        v = value.strip()
+        # Try JSON-parsing if it looks like an object
+        if v.startswith("{"):
+            try:
+                import json as _json
+                parsed = _json.loads(v)
+                if isinstance(parsed, dict):
+                    return normalize_bool(parsed.get("discard_image"))
+            except Exception:
+                pass
+        vl = v.lower()
+        if vl in {"true", "yes", "1"}:
+            return True
+        if vl in {"false", "no", "0"}:
+            return False
     return None
 
 
@@ -580,7 +599,7 @@ def main():
         print(f"Model       : {cfg.model_name}  temperature={args.temperature}")
         print(f"{'='*80}")
 
-        lm = create_lm(cfg.model_name, cache=False, temperature=args.temperature)
+        lm = create_lm(cfg.model_name, cache=False, temperature=args.temperature, reasoning_effort=cfg.reasoning_effort)
         dspy.configure(lm=lm)
 
         # Build comparator with human prompt injected as instruction (no demos)

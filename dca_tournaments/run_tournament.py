@@ -113,6 +113,7 @@ from dca_tournaments.stage_runner import StageRunner
 from dca_tournaments.tour_utils import (
     TeeLogger,
     evaluate_candidate_at_temperature,
+    is_eval_result_trustworthy,
     load_candidate,
     save_candidate,
     generate_summary,
@@ -1215,15 +1216,23 @@ def main():
                     }
 
                     # Update entry scores with eval-temperature results
-                    entry.val_total_score = result["total_score"]
-                    entry.val_cls_score = result["cls_score"]
-                    entry.val_change_score = result["change_score"]
-                    entry.per_category_scores = result["per_category_scores"]
-                    entry.val_avg_total_tokens     = result.get("avg_total_tokens")
-                    entry.val_avg_input_tokens     = result.get("avg_input_tokens")
-                    entry.val_avg_output_tokens    = result.get("avg_output_tokens")
-                    entry.val_avg_reasoning_tokens = result.get("avg_reasoning_tokens")
-                    entry.val_eval_time_seconds    = result.get("eval_time_seconds")
+                    # Skip update if eval was unreliable (transient outage, high error rate)
+                    if not is_eval_result_trustworthy(result):
+                        n_errors = result.get("n_errors", 0)
+                        n_evaluated = result.get("n_evaluated", 0)
+                        print(f"    [WARN] Unreliable eval for {entry.config_name} "
+                              f"({n_errors}/{n_evaluated} errors, tok={result.get('avg_total_tokens')}) "
+                              f"— keeping previous leaderboard values.")
+                    else:
+                        entry.val_total_score = result["total_score"]
+                        entry.val_cls_score = result["cls_score"]
+                        entry.val_change_score = result["change_score"]
+                        entry.per_category_scores = result["per_category_scores"]
+                        entry.val_avg_total_tokens     = result.get("avg_total_tokens")
+                        entry.val_avg_input_tokens     = result.get("avg_input_tokens")
+                        entry.val_avg_output_tokens    = result.get("avg_output_tokens")
+                        entry.val_avg_reasoning_tokens = result.get("avg_reasoning_tokens")
+                        entry.val_eval_time_seconds    = result.get("eval_time_seconds")
                     if entry.metadata is None:
                         entry.metadata = {}
                     entry.metadata["pre_full_val_eval"] = pre_eval_snapshot

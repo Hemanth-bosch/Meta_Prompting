@@ -341,6 +341,7 @@ def evaluate_candidate(
         "change_score": avg_change,
         "per_category_scores": per_category,
         "n_evaluated": len(val_set),
+        "n_errors": errors_count[0],
         "eval_time_seconds": elapsed,
         **token_stats,
     }
@@ -390,6 +391,111 @@ def evaluate_candidate_at_temperature(
 
 
 # ═══════════════════════════════════════════════════════════════════
+# Eval result validation (Layer 3)
+# ═══════════════════════════════════════════════════════════════════
+
+def is_eval_result_trustworthy(
+    result: dict,
+    *,
+    max_error_rate: float = 0.20,
+    min_tokens: float = 500,
+) -> bool:
+    """Check whether an evaluation result is reliable enough to persist.
+
+    Returns False (= discard / keep previous values) when:
+      - All examples failed (n_evaluated == 0)
+      - Error rate exceeds ``max_error_rate`` (default 20%)
+      - Token data is null/missing despite a supposedly successful run
+      - Token count is implausibly low (below ``min_tokens`` per sample)
+
+    Use at every boundary where eval results are written to the leaderboard
+    or candidate entries, to prevent Azure outages or transient errors from
+    poisoning the persisted state.
+    """
+    n_evaluated = result.get("n_evaluated", 0)
+    if n_evaluated == 0:
+        return False
+
+    n_errors = result.get("n_errors", 0)
+    error_rate = n_errors / n_evaluated
+    if error_rate > max_error_rate:
+        return False
+
+    avg_tok = result.get("avg_total_tokens")
+    if avg_tok is None:
+        return False
+    if avg_tok < min_tokens:
+        # Sanity floor: a real DCA inference always uses >500 tokens
+        # (prompt alone is ~2.5k). A low value indicates demos were
+        # silently dropped or the eval didn't actually run properly.
+        return False
+
+    return True
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Demo key normalization
+# ═══════════════════════════════════════════════════════════════════
+
+def normalize_demos(program) -> int:
+    """Fix ``expected_*`` prefixed demo keys so they survive save/load.
+
+    DSPy's labeled demos (from training data, non-augmented) store output
+    fields as ``expected_<field>``.  In memory, ``dspy.Example.__getattr__``
+    silently maps ``example.<field>`` → ``example.expected_<field>``, so
+    everything works.  But after ``program.save()`` + ``program.load()``
+    the demos become **plain dicts** — the ``expected_*`` prefix is now a
+    dead literal key that ``ChatAdapter`` cannot match to the signature's
+    output fields, so the demo is silently dropped from the prompt.
+
+    This function:
+      1. Renames ``expected_<output_field>`` → ``<output_field>``
+      2. Drops non-signature metadata keys (``pair_name``, ``doubt``, etc.)
+      3. Sets ``augmented = True`` on fixed demos (signals bare-key format)
+
+    Call this **before** ``program.save()`` and **after** ``program.load()``.
+
+    Returns the number of demos that were fixed.
+    """
+    demos = getattr(program, "demos", None)
+    if not demos:
+        return 0
+
+    sig = getattr(program, "signature", None)
+    if sig is None:
+        return 0
+
+    output_fields = set(sig.output_fields.keys())
+    allowed_keys = set(sig.fields.keys()) | {"augmented"}
+
+    fixed = 0
+    normalized = []
+    for demo in demos:
+        items = demo.items() if isinstance(demo, dict) else list(demo._store.items())
+        needs_fix = any(
+            k.startswith("expected_") and k[len("expected_"):] in output_fields
+            for k, _ in items
+        )
+        if not needs_fix:
+            normalized.append(demo if isinstance(demo, dict) else dict(items))
+            continue
+
+        new_demo: dict = {}
+        for k, v in items:
+            if k.startswith("expected_") and k[len("expected_"):] in output_fields:
+                new_demo[k[len("expected_"):]] = v
+            elif k in allowed_keys:
+                new_demo[k] = v
+            # else: drop non-signature metadata (pair_name, doubt, etc.)
+        new_demo["augmented"] = True
+        normalized.append(new_demo)
+        fixed += 1
+
+    program.demos = normalized
+    return fixed
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Save / Load candidates
 # ═══════════════════════════════════════════════════════════════════
 
@@ -398,12 +504,25 @@ def save_candidate(
     path: str | Path,
     metadata: dict | None = None,
 ) -> Path:
-    """Save a DSPy program and its metadata sidecar."""
+    """Save a DSPy program and its metadata sidecar.
+
+    Performs post-save verification: reloads the file and checks that demo
+    keys round-trip correctly (no lingering ``expected_*`` prefixes that
+    would cause silent demo dropout at inference time).
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
+    # Normalize expected_* demo keys before saving
+    n_fixed = normalize_demos(program)
+    if n_fixed:
+        logger.info("save_candidate: normalized %d demo(s) with expected_* keys → %s", n_fixed, path.name)
+
     # Save DSPy state
     program.save(str(path))
+
+    # ── Layer 1: Post-save verification ───────────────────────────
+    _verify_saved_program(path, program)
 
     # Save metadata sidecar for every candidate
     meta = dict(metadata or {})
@@ -415,8 +534,64 @@ def save_candidate(
     return path
 
 
+def _verify_saved_program(path: Path, original_program) -> None:
+    """Verify that a saved program file has correct demo keys.
+
+    Raises RuntimeError if:
+      - Demo count in saved file differs from in-memory program
+      - Any demo still has ``expected_*`` keys that would be silently dropped
+    """
+    sig = getattr(original_program, "signature", None)
+    if sig is None:
+        return  # can't verify without a signature
+
+    output_field_names = set(sig.output_fields.keys())
+    expected_demo_count = len(getattr(original_program, "demos", []))
+
+    # Read the raw JSON to inspect demo keys at the serialization level
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return  # if we can't read, skip (don't crash on verification)
+
+    # Find demos in the saved state (DSPy stores them at various locations)
+    saved_demos = raw.get("demos", [])
+    if not saved_demos:
+        # Check nested structure (Module wrapping)
+        for key in raw:
+            if isinstance(raw[key], dict) and "demos" in raw[key]:
+                saved_demos = raw[key]["demos"]
+                break
+
+    # Check 1: demo count
+    if expected_demo_count > 0 and len(saved_demos) != expected_demo_count:
+        logger.warning(
+            "VERIFY FAILED: demo count mismatch in %s (memory=%d, file=%d)",
+            path.name, expected_demo_count, len(saved_demos),
+        )
+
+    # Check 2: no lingering expected_* output keys
+    for i, demo in enumerate(saved_demos):
+        if not isinstance(demo, dict):
+            continue
+        bad_keys = [
+            k for k in demo
+            if k.startswith("expected_") and k[len("expected_"):] in output_field_names
+        ]
+        if bad_keys:
+            raise RuntimeError(
+                f"VERIFY FAILED: demo {i} in {path.name} has unrenamed expected_* keys: "
+                f"{bad_keys}. normalize_demos() did not fix these before save. "
+                f"This would cause silent demo dropout at inference time."
+            )
+
+
 def load_candidate(path: str | Path, use_cot: bool = False):
-    """Load a saved DSPy program (Predict or ChainOfThought)."""
+    """Load a saved DSPy program (Predict or ChainOfThought).
+
+    After loading, normalizes any lingering ``expected_*`` demo keys and
+    verifies the loaded demo count matches what the file contains.
+    """
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f"Program file not found: {path}")
@@ -427,7 +602,46 @@ def load_candidate(path: str | Path, use_cot: bool = False):
         program = dspy.Predict(DCAImageComparison)
 
     program.load(str(path))
+
+    # Normalize expected_* demo keys from old/buggy saved files
+    n_fixed = normalize_demos(program)
+    if n_fixed:
+        logger.info("load_candidate: normalized %d demo(s) with expected_* keys ← %s", n_fixed, path.name)
+
+    # Layer 1: verify loaded demos are usable
+    _verify_loaded_demos(program, path)
+
     return program
+
+
+def _verify_loaded_demos(program, path: Path) -> None:
+    """Warn if a loaded program has fewer usable demos than expected.
+
+    This catches the case where ``expected_*`` keys survived normalization
+    (shouldn't happen after fix) or where DSPy's load silently dropped demos.
+    """
+    sig = getattr(program, "signature", None)
+    if sig is None:
+        return
+
+    demos = getattr(program, "demos", [])
+    if not demos:
+        return
+
+    output_fields = set(sig.output_fields.keys())
+    for i, demo in enumerate(demos):
+        items = demo.items() if isinstance(demo, dict) else list(demo._store.items())
+        has_output = any(k in output_fields for k, _ in items)
+        has_bad_expected = any(
+            k.startswith("expected_") and k[len("expected_"):] in output_fields
+            for k, _ in items
+        )
+        if has_bad_expected and not has_output:
+            logger.error(
+                "LOAD VERIFY: demo %d in %s still has dead expected_* keys after normalize. "
+                "This demo will be silently dropped from the prompt.",
+                i, path.name,
+            )
 
 
 def get_program_info(program) -> dict:

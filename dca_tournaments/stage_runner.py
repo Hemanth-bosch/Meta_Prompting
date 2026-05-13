@@ -65,6 +65,7 @@ from dca_tournaments.tour_config import TournamentConfig
 from dca_tournaments.leaderboard import CandidateEntry, OptimizationLeaderboard
 from dca_tournaments.tour_utils import (
     evaluate_candidate,
+    is_eval_result_trustworthy,
     save_candidate,
     load_candidate,
     get_program_info,
@@ -1075,4 +1076,7 @@ class StageRunner:
         )
 
         self.leaderboard.add(entry)
+        if not is_eval_result_trustworthy(eval_result):
+            print(f"    [{_ts()}] [WARN] Eval result for {config_name} may be unreliable "
+                  f"(high error rate or null tokens) — entry added but flagged")
         return entry

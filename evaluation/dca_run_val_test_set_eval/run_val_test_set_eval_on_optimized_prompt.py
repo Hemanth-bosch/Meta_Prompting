@@ -105,6 +105,7 @@ import numpy as np
 
 from config import create_lm, AZURE_API_KEY
 from signatures.dca import DCAImageComparison
+from dca_tournaments.tour_utils import normalize_demos
 from evaluation.dca_metric import (
     FIELD_WEIGHT_CLS,
     FIELD_WEIGHT_CHANGE,
@@ -668,6 +669,10 @@ def main():
     print(f"Loading optimized program: {args.model_path.name}")
     comparator = dspy.Predict(DCAImageComparison) if no_cot else dspy.ChainOfThought(DCAImageComparison)
     comparator.load(str(args.model_path))
+    # Normalize expected_* demo keys from old/buggy saved files
+    _n_fixed = normalize_demos(comparator)
+    if _n_fixed:
+        print(f"[demo-fix] Normalized {_n_fixed} demo(s) with expected_* keys")
     print("Model ready.\n")
 
     # ── Load split ────────────────────────────────────────────────────────────

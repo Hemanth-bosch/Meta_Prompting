@@ -74,6 +74,7 @@ from utils import load_dca_dataset, stratified_split_dca_dataset
 from evaluation.dca_metric import dca_comparison_metric, dca_comparison_metric_with_feedback
 from dca_tournaments.tour_utils import (
     create_mini_dataset,
+    normalize_demos,
     save_candidate,
     load_candidate,
     token_usage_from_tracker,
@@ -551,9 +552,16 @@ def main() -> int:
     if stage == "gepa":
         for _pred in compiled.predictors():
             _pred.lm = None
+
+    # Normalize expected_* demo keys so labeled demos survive save/load
+    for _pred in compiled.predictors():
+        n_fixed = normalize_demos(_pred)
+        if n_fixed:
+            print(f"  [{_ts()}] Normalized {n_fixed} demo(s) with expected_* keys")
+
     out_path = Path(output_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    compiled.save(str(out_path))
+    save_candidate(compiled, out_path)
     print(f"  [{_ts()}] Saved compiled program → {out_path}")
 
     token_usage_path = cfg.get("token_usage_path")

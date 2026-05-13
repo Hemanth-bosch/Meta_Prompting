@@ -48,7 +48,7 @@ from __future__ import annotations
 import json
 import math
 import threading
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, fields
 from pathlib import Path
 from typing import Optional, List
 
@@ -113,6 +113,16 @@ class CandidateEntry:
         parent = Path(self.parent_path).stem if self.parent_path else "—"
         return f"[{self.stage}] {self.config_name}  from={parent}"
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "CandidateEntry":
+        """Construct from a dict, ignoring unknown keys (Layer 2).
+
+        This replaces raw ``CandidateEntry(**d)`` which crashes on extra keys
+        (e.g. 'rank' written for display but not part of the dataclass).
+        """
+        _known = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in d.items() if k in _known})
+
 
 class OptimizationLeaderboard:
     """Thread-safe, auto-persisting registry of candidate programs.
@@ -149,6 +159,13 @@ class OptimizationLeaderboard:
         Thread-safe — guarded by an internal lock.
         """
         with self._lock:
+            # Idempotent: update existing entry with same config_name (Layer 4)
+            for i, existing in enumerate(self.entries):
+                if existing.config_name == entry.config_name:
+                    self.entries[i] = entry
+                    self.entries.sort(key=lambda e: e.val_total_score, reverse=True)
+                    self.save()
+                    return
             self.entries.append(entry)
             self.entries.sort(key=lambda e: e.val_total_score, reverse=True)
             self.save()
@@ -467,6 +484,7 @@ class OptimizationLeaderboard:
         Writes to *path* if given, otherwise to ``self.save_path``.
         Silently skips when no path is configured (in-memory-only mode).
         """
+        path = Path(path) if path else self.save_path
         if not path:
             return  # no save_path configured — skip silently
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -488,7 +506,11 @@ class OptimizationLeaderboard:
             return self
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        self.entries = [CandidateEntry(**e) for e in data.get("entries", [])]
+        _known = {f.name for f in fields(CandidateEntry)}
+        self.entries = [
+            CandidateEntry.from_dict(e)
+            for e in data.get("entries", [])
+        ]
         self.entries.sort(key=lambda e: e.val_total_score, reverse=True)
         return self
 

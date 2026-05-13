@@ -99,6 +99,7 @@ from config import reconfigure_lm, reflectin_lm
 from signatures.dca import DCAImageComparison
 from utils import load_dca_dataset, stratified_split_dca_dataset
 from evaluation.dca_metric import dca_comparison_metric, dca_comparison_metric_with_feedback
+from dca_tournaments.tour_utils import normalize_demos, save_candidate, load_candidate
 from optimization import (
     OptimizationRunner,
     create_bootstrap_strategy,
@@ -601,7 +602,7 @@ if not args.skip_load:
     if cached_extractor_path and os.path.exists(cached_extractor_path) and os.path.isfile(cached_extractor_path):
         load_source = "explicit path" if explicit_cached_extractor else "auto-matched cache"
         print(f"Loading cached extractor from ({load_source}): {cached_extractor_path}")
-        comparator.load(cached_extractor_path)
+        comparator = load_candidate(cached_extractor_path, use_cot=(not args.no_cot))
         print("Extractor loaded successfully\n")
     else:
         if explicit_cached_extractor is None and not args.auto_load_compatible_cache:
@@ -660,7 +661,11 @@ if args.initial_instruction_file:
     else:
         print("[OK] Seed instruction verified: live signature matches the instruction file exactly.\n")
 
-# ── Save seed state (DSPy's own dump_state — same format as .save()) ─────────
+# ── Save seed state (DSPy's own dump_state — same format as .save()) ─────────────
+# Normalize expected_* demo keys so labeled demos survive save/load
+_n_fixed = normalize_demos(comparator)
+if _n_fixed:
+    print(f"[demo-fix] Normalized {_n_fixed} seed demo(s) with expected_* keys")
 _seed_prompt_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}_seed_state.json")
 with open(_seed_prompt_path, "w", encoding="utf-8") as _fp:
     json.dump(comparator.dump_state(), _fp, indent=2, ensure_ascii=False)
@@ -850,6 +855,10 @@ print(_opt_instruction or "<could not retrieve>")
 print(f"{'='*80}\n")
 
 # ── Save optimized state (DSPy's own dump_state — same format as .save()) ────
+# Normalize expected_* demo keys so labeled demos survive save/load
+_n_fixed = normalize_demos(optimized_comparator)
+if _n_fixed:
+    print(f"[demo-fix] Normalized {_n_fixed} optimized demo(s) with expected_* keys")
 _opt_prompt_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}_optimized_state.json")
 with open(_opt_prompt_path, "w", encoding="utf-8") as _fp:
     json.dump(optimized_comparator.dump_state(), _fp, indent=2, ensure_ascii=False)
@@ -880,7 +889,7 @@ model_path = os.path.join(
     cache_dir,
     f"{model_name}_{best_strategy_slug}_{cot_tag}{re_tag}_dca_optimized_{demo_tag}{instr_tag}{cfd_tag}_ds{_dataset_tag}_sp{split_seed}_{current_time}.json",
 )
-optimized_comparator.save(model_path)
+save_candidate(optimized_comparator, model_path)
 print(f"\nSaved optimized model to: {model_path}")
 
 print(f"\n{'='*80}")

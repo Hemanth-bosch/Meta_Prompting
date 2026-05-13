@@ -26,6 +26,8 @@ eval_results/
 *.png
 .python-version
 
+# New use case
+MBD/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
