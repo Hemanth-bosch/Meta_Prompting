@@ -1,0 +1,258 @@
+================ role: system ================
+Your input fields are:
+1. `context_analysis` (str): 
+2. `equation_json` (str): 
+3. `const_values` (str): 
+4. `weakspot_operation` (str): 
+5. `instance_names` (str): 
+6. `example_explanation_output` (str): 
+7. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, the test cases you generate MUST satisfy EVERY guideline listed here: at minimum each guideline must be exercised by at least one test case, and NONE may be skipped — treat them as hard BU requirements (extra cases are fine). If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `test_cases` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## instance_names ## ]]
+{instance_names}
+
+[[ ## example_explanation_output ## ]]
+{example_explanation_output}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Generate **test cases** for the identified weakspot.
+        
+        ### Output Requirements:
+        First give the "Detailed Explanation" of the testcase.
+        The output should have single JSON for all the test cases and should have the following structure:
+        ```json
+        [
+            {
+                "Pre-Condition": ["...", "...", ...],
+                "Steps": [
+                    {
+                        "Actions": ["...", "...", ...],
+                        "Expected Results": ["...", "...", ...]
+                    },
+                    ...
+                ],
+                "Detailed Explanation": "..."
+            },
+            ...
+        ]
+        ```
+        
+        ### Formatting Guidelines:
+        1. **Detailed Explanation**:
+           - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+        
+        2. **Pre-Condition**:
+           - Only include value assignments in the format: "<value_name> = <value>".
+           - Do not include any variables which are part of present in Action.
+        
+        3. **Steps**:
+           - Each step should consist of:
+             - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+             - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+        
+        4. **String Types**:
+           - Only use the following types of strings in the output:
+             - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+             - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+             - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+        
+        ### Additional Constraints:
+        - **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+        - **NOTE** Pre-Condition and Actions **cannot be same variables**
+        - Do not add new constant values that are not part of the provided input.
+        - DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+        - Ensure all steps are logically consistent with the input equation and constants.
+        - Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+        
+        EXAMPLE:
+        (An example test-case in the exact expected format is provided in the `example_explanation_output` input field.)
+        
+        ### Input Details:
+        
+        **Constant Values**: provided in the `const_values` input field
+        **Weakspot Operation**: provided in the `weakspot_operation` input field
+        **Weakspot Context**: provided in the `context_analysis` input field
+        **use this Expected Results**: provided in the `instance_names` input field
+        
+        From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+        Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+        **DO NOT** generate values for dT in the testcases.
+        
+        Using the provided JSON data, generate the test cases as specified.
+        
+        (The equation JSON is provided in the `equation_json` input field.)
+        
+        ### Task:
+        Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+        Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+        Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+        
+        Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+        The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+================ role: user ================
+[[ ## context_analysis ## ]]
+The weakspot element identified is "$op4", which corresponds to the instance "InjRly_T15TOffD_I" implementing the function "Srv_TrnOffDly_out". This element implements a turn-off delay debounce logic, which ensures that the output remains true immediately when the input is true, but only switches to false if the input has been false continuously for at least the specified delay time. This behavior is critical in debouncing signals to avoid premature or spurious false outputs.
+
+The inputs to this element are "signal", "delayTime", and "Dt". Among these, "Dt" represents the sample time and is fixed (constant), so it is excluded from the list of alterable inputs. The other inputs "signal" and "delayTime" are variable and can be altered for testing. The "signal" input is linked to "$op0" (variable "T15_st"), and "delayTime" is linked to "$op2" (an ImplementationCast of a constant "InjRly_tiOffDly_C").
+
+The output of this element is connected to "$op5" (local variable "_flgDlydlnPostDrive"), which is a boolean local variable representing the delayed output signal. This output can be checked to verify the correct behavior of the delay element.
+
+Test cases should focus on verifying the immediate true output when the input signal is true, the delayed false output after the input signal remains false for the delay time, and the initialization behavior where the internal timer is set to MAXSINT32 to avoid false outputs immediately after reset. Additionally, tests should ensure that multiple calls to the "out" method within the same process step do not cause the timer to increment incorrectly.
+
+### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op4
+- **Instance Name:** InjRly_T15TOffD_I
+- **Function Name:** Srv_TrnOffDly_out
+- **Role and Working:**
+  - Implements a turn-off delay debounce function.
+  - When the input signal is true, the output is immediately set to true.
+  - When the input signal transitions to false, the output remains true until the input has been false continuously for the specified delay time.
+  - Internally, a timer counts the elapsed time since the input became false.
+  - The internal timer is initialized to MAXSINT32 to ensure the output is false immediately after reset if the input was never true.
+  - The function must be called exactly once per process step to avoid incorrect timer increments.
+  - The output is a boolean indicating the debounced signal state.
+
+### 2. Inputs That Can Be Altered
+| Input Name | Reference Key | Type Information | Notes |
+|------------|---------------|------------------|-------|
+| signal     | $op0          | Variable, uint8 (logical signal) | Input signal to debounce |
+| delayTime  | $op2          | ImplementationCast, sint32 (cast of constant delay) | Delay time for turn-off debounce |
+| Dt         | $op3          | Variable, sint32 (sample time) | Fixed sample time, excluded from alteration |
+
+- **Excluded Inputs:** Dt ($op3) is fixed and must not be altered.
+
+### 3. Outputs That Can Be Checked
+| Output Variable | Reference Key | Type | Connection to Weakspot |
+|-----------------|---------------|------|-----------------------|
+| _flgDlydlnPostDrive | $op5          | Local, bool | Direct output of the delay element, reflects debounced signal |
+
+- The output "_flgDlydlnPostDrive" depends directly on the weakspot element's output and can be monitored to verify correct delay behavior.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1: Immediate True Output**
+  - Input signal is set to true.
+  - Verify output is immediately true regardless of delay time.
+- **Testcase 2: Delayed False Output**
+  - Input signal transitions from true to false.
+  - Verify output remains true for the duration of delayTime.
+  - After delayTime elapses with input false, output switches to false.
+- **Testcase 3: Initialization Behavior**
+  - After reset, with input signal false and internal timer initialized to MAXSINT32.
+  - Verify output is false immediately (no false true output due to timer zero initialization).
+- **Testcase 4: Single Calculation per Process Step**
+  - Ensure the function "out" is called once per process step.
+  - Verify that multiple calls do not cause the timer to increment incorrectly (simulate multiple calls and check output consistency).
+
+These testcases cover the critical functional aspects of the turn-off delay element, ensuring correct debounce behavior, initialization, and proper usage constraints.
+
+[[ ## equation_json ## ]]
+{"$op4": {"oid": "52", "type": "Function", "instance_name": "InjRly_T15TOffD_I", "function_name": "Srv_TrnOffDly_out", "class_method_name": "out", "sequence_number": "1", "method_name": "Proc_20ms", "decision": null, "condition": [], "arg_names": ["signal", "delayTime", "Dt"], "args": ["$op0", "$op2", "$op3"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["T15_st"], "unique_params": ["dT", "InjRly_tiOffDly_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [null, null]}, "$op5": {"oid": "11", "type": "Local", "instance_name": "_flgDlydlnPostDrive", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op4"], "read": true, "write": false, "physical_type": "log", "data_type": "bool", "unique_variables": ["T15_st"], "unique_params": ["dT", "InjRly_tiOffDly_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 1.0]}, "$op0": {"oid": "18", "type": "Variable", "instance_name": "T15_st", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "log", "data_type": "uint8", "unique_variables": ["T15_st"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 1.0]}, "$op2": {"oid": "36", "type": "ImplementationCast", "instance_name": "impl_cast", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op1"], "read": false, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": [], "unique_params": ["InjRly_tiOffDly_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [-2147.483648, 2147.483647]}, "$op3": {"oid": "30", "type": "Variable", "instance_name": "dT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_params": ["dT"], "unique_variables": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [-2147483648.0, 2147483647.0]}, "$op27": {"oid": "31", "type": "Variable", "instance_name": "InjPwrRly_r", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op26"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": ["WtrPmp3_flgAftRunReq", "T15_st", "Emwp_swtActv", "InjRly_flgDDEWakup"], "unique_params": ["dT", "InjRly_tiOffDly_C"], "unique_consts": ["THS_EMWPAVL_SC", "PRC_ZERO", "WTRPMP_CTRLSRC3_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [-400.0, 399.98779296875]}}
+
+[[ ## const_values ## ]]
+{"THS_EMWPAVL_SC": 1, "WTRPMP_CTRLSRC3_SC": 2, "PRC_100": 0.0, "dT": "20000.0", "PRC_ZERO": 0.0}
+
+[[ ## weakspot_operation ## ]]
+$op4
+
+[[ ## instance_names ## ]]
+InjPwrRly_r
+
+[[ ## example_explanation_output ## ]]
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#     {
+#         "Pre-Condition": [
+#             "delayTime = 5000"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "signal = 1"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 0",
+#                     "Wait delayTime"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             }
+#         ]
+#     },
+#     {
+#         "Pre-Condition": [
+#             "delayTime = 3000"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "signal = 0",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 1",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 0",
+#                     "Wait delayTime"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             }
+#         ]
+#     }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+[[ ## kb_guidelines ## ]]
+
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## test_cases ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

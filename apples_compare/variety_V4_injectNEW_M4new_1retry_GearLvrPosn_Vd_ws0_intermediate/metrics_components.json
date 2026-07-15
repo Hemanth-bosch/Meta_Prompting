@@ -1,0 +1,15 @@
+{
+  "m1": 1.0,
+  "m1_details": "I/O classification correct",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 1.0,
+  "m3_details": "All structural checks passed",
+  "m4": 1.0,
+  "m4_details": "[newKB:getBit_unsigned_getBit] 1/1 covered | missing: none\n    JUDGE REASONING: 1: COVERED — TC1 sets X=4 (00000100) and expects output=1 for bit position 2 (bit set); TC2 sets X=251 (11111011) and expects output=0 for bit position 2 (bit cleared), both verifying output equals the logical status of the specified bit position.",
+  "m7": 0.5,
+  "m7_details": "N/A — function-call weakspot (getBit_unsigned_getBit); see M8 for functional correctness",
+  "m8": 0.0,
+  "m8_details": "M8=0 (constant DLL output 0 across 3 checked steps — test under-stimulates the weakspot; 1/3 passes coincidental)",
+  "_weighted_composite_pct": 77.5
+}

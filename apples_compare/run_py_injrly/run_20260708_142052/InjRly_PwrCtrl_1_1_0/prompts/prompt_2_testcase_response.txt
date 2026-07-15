@@ -1,0 +1,85 @@
+```json
+[
+    {
+        "Pre-Condition": [
+            "delayTime = 60000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "InjPwrRly_r = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait @"
+                ],
+                "Expected Results": [
+                    "InjPwrRly_r = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the immediate true output behavior of the turn-off delay debounce logic. When the input signal is set to true and held true, the output should immediately reflect true without any delay. The first step sets the signal to true and expects the output to be true instantly. The second step holds the signal true and waits one raster time to confirm the output remains true. This validates that the debounce logic does not delay the true state."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 40000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "InjPwrRly_r = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "InjPwrRly_r = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 20000"
+                ],
+                "Expected Results": [
+                    "InjPwrRly_r = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 20000"
+                ],
+                "Expected Results": [
+                    "InjPwrRly_r = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case validates the delayed false output behavior when the input signal transitions from true to false and remains false longer than the specified delay time. Initially, the signal is true and output is true. When the signal changes to false, the output remains true during the delay period (two steps of 20000 each, totaling 40000). After the delay time elapses, the output transitions to false. This confirms the turn-off delay debounce logic correctly holds the output true during the delay and switches off only after the delay time."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 60000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "InjPwrRly_r = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case checks the initialization behavior of the debounce logic. After system reset or initialization, the internal timer is set to a maximum value, ensuring the output is false if the input signal is false. Setting the signal to false immediately after initialization should result in the output being false without delay. This confirms that the debounce logic does not produce a delayed true output on startup when the input is false."
+    }
+]
+```

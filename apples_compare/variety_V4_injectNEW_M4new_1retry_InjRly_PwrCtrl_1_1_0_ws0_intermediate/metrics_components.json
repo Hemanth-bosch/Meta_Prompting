@@ -1,0 +1,15 @@
+{
+  "m1": 1.0,
+  "m1_details": "I/O classification correct",
+  "m2": 0.6666666666666666,
+  "m2_details": "Abstract: impl_cast",
+  "m3": 0.9743589743589743,
+  "m3_details": "TC3: missing explanation",
+  "m4": 0.5714285714285714,
+  "m4_details": "[newKB:Srv_TrnOffDly] 4/7 covered | missing: \"Checking the Delay of falling edge — Initialize the Delay pa\", \"Repeat all the above cases with maximum value for the turn o\", \"Repeat all the above cases with minimum value for the turn-o\"\n    JUDGE REASONING: 1: NOT COVERED — No TC explicitly sets Input=FALSE after “initialize delay parameter and set input to zero” while checking Output=FALSE as the falling-edge-delay case; TC1 uses delay=0 and shows output follows 0, but does not exercise a falling-edge transition with a nonzero delay as described. Need: delay>0, start Input=TRUE/Output=TRUE, then set Input=FALSE and verify Output stays TRUE until delay expires (or per guideline wording, explicitly show falling-edge behavior with Output=FALSE check).\n2: COVERED — TC1 Step 2 sets signal 1 (Input=TRUE) with delayTime=0 and expects output 1 immediately.\n3: COVERED — TC2 Step 1 sets signal 0 then waits 20000 (<40000 delay) and expects output stays 1; Step 2 sets signal back to 1 before delay expiry and expects output remains 1.\n4: COVERED — TC2 Step 3 waits full 40000 after setting signal 0 and expects output becomes 0 after the delay time.\n5: NOT COVERED — “Repeat all above with maximum turn-off delay in design” is not met: TC3 uses 2147483647 but does not repeat all scenarios (no rising-edge immediate check, no full-delay falling-edge check, no init/zero-input case). Need: re-run guidelines 1–4 (and 7 if applicable) with the design-specified maximum delay, including a wait equal to that delay to observe output transition.\n6: NOT COVERED — “Repeat all above with minimum turn-off delay in design” is not met: TC4 uses -2147483648 (also not established as design minimum) and does not repeat all scenarios; plus it doesn’t verify full-delay behavior consistently. Need: re-run guidelines 1–4 with design minimum (often 0) and confirm behaviors at that parameter.\n7: COVERED — TC1 delayTime=0 shows output follows input immediately for both 0 and 1 (Steps 1–2), demonstrating no delay between input and output.",
+  "m7": 0.5,
+  "m7_details": "N/A — function-call weakspot (Srv_TrnOffDly_out); see M8 for functional correctness",
+  "m8": 0.8888888888888888,
+  "m8_details": "M8: 8/9 steps pass sequential DLL check",
+  "_weighted_composite_pct": 76.87728937728937
+}

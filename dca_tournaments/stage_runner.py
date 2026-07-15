@@ -1,48 +1,18 @@
-"""StageRunner \u2014 generic stage execution engine for the tournament pipeline.
+"""StageRunner — generic stage execution engine for the tournament pipeline.
 
-ROLE IN THE PIPELINE
---------------------
-StageRunner is called once per stage (bootstrap / miprov2 / gepa) by
-run_tournament.py.  It takes a list of seed CandidateEntry objects (the
-top-K from the previous stage) and a stage name, then:
+Given a stage name, a set of seed CandidateEntry objects, and the tournament
+configuration, this module:
 
-  1. Expands seeds \xd7 optimizer_configs into a work-item list.
-     Example: 2 seeds \xd7 1 bootstrap config = 2 work items.
-
-  2. For each work item that hasn\u2019t already been completed (resume-safe),
-     spawns an isolated subprocess running optimizer_subprocess.py.
-     The subprocess writes the compiled program to disk and exits.
-
-  3. After the subprocess exits, evaluates the saved program in-process
-     using evaluate_candidate() which extracts per-sample token stats
-     from lm.history (the LM\u2019s own API-reported token counts).
-
-  4. Creates a CandidateEntry and adds it to the shared leaderboard.
-
-  5. Returns all new CandidateEntry objects produced by the stage.
-
-WHY SUBPROCESSES?
------------------
-DSPy optimizers use ThreadPoolExecutors internally.  On Windows/Azure,
-nested thread pools (parent process \u2192 optimizer \u2192 Azure HTTP client) cause
-race conditions and near-zero metric scores.  Spawning each optimizer as a
-fresh subprocess with no inherited state completely eliminates this bug.
-
-WORK ITEM NAMING
-----------------
-Config names are built as \"{stage}_{cfg_name}_from_{seed_name}\" where
-seed_name is the full file stem of the seed program.  With cross-stage
-selection enabled, cascaded stages can produce long names like:
-  gepa_medium_from_miprov2_medium_..._from_bootstrap_..._from_seed_candidate_0
-On Windows (MAX_PATH=260), very long paths may cause FileNotFoundError.
-Workaround: keep the tournament output folder path short.
-
-RESUME SAFETY
--------------
-The stage_dir contains one _subprocess_config.json and one .json result per
-work item.  If a work item\u2019s result file already exists on disk it is reused
-(no re-optimization).  Combined with stage_completed.json this means an
-interrupted run can be resumed at zero cost for completed work items.
+1. Generates the combinatorial set of (seed × optimizer_config) pairs
+2. For each pair: spawns an isolated subprocess that runs optimizer.compile()
+   and saves the compiled program to disk.  The subprocess has a fresh Python
+   interpreter with no inherited DSPy ContextVar state and no nested thread
+   pools — this eliminates the 0-score bug caused by nested ThreadPoolExecutors
+   interfering with the Azure client and DSPy's metric evaluation.
+3. After the subprocess exits, loads the saved program and evaluates it
+   in-process using evaluate_candidate() which diffs lm.history to extract
+   per-sample avg token stats (input/output/reasoning) from the LM API JSON.
+4. Returns all new CandidateEntry objects produced by the stage.
 """
 
 from __future__ import annotations
@@ -65,7 +35,6 @@ from dca_tournaments.tour_config import TournamentConfig
 from dca_tournaments.leaderboard import CandidateEntry, OptimizationLeaderboard
 from dca_tournaments.tour_utils import (
     evaluate_candidate,
-    is_eval_result_trustworthy,
     save_candidate,
     load_candidate,
     get_program_info,
@@ -84,19 +53,7 @@ def _ts() -> str:
 
 
 class StageExecutionError(RuntimeError):
-    """Raised when all optimizer runs in a stage fail.
-
-    Partial failure (some runs succeed, some fail) is tolerated and
-    logged as a warning.  Only raised when *every* config-seed pair
-    fails and there are no new entries to add to the leaderboard.
-
-    Attributes
-    ----------
-    stage           Name of the failed stage ("bootstrap", etc.)
-    failed_configs  Config names whose subprocesses returned exit-code != 0
-    completed_runs  Number of work items that DID succeed
-    total_runs      Total work items attempted in this stage
-    """
+    """A tournament stage produced one or more failed optimizer runs."""
 
     def __init__(self, stage: str, failed_configs: list[str], completed_runs: int, total_runs: int):
         self.stage = stage
@@ -137,12 +94,9 @@ class StageRunner:
         metric_with_feedback=None,
         leaderboard: OptimizationLeaderboard | None = None,
     ):
-        # IMPORTANT: train_set and val_set must be the MINI subsets
-        # (mini_train / mini_val from create_mini_dataset).
-        # The full val and test sets are NEVER used here \u2014 they are only used
-        # in the final re-evaluation step in run_tournament.py after all
-        # stages complete.  Using minis keeps each subprocess fast (~minutes)
-        # rather than hours.
+        # train_set and val_set must be the MINI subsets (mini_train / mini_val).
+        # Full val and test sets are never used here — only in the final
+        # re-evaluation step in run_tournament.py after all stages complete.
         self.config = config
         self.train_set = train_set
         self.val_set = val_set
@@ -172,24 +126,7 @@ class StageRunner:
         stage: str,
         seed_entries: list[CandidateEntry],
     ) -> list[CandidateEntry]:
-        """Execute one full optimization stage and return new CandidateEntry objects.
-
-        Steps
-        -----
-        1. Build the list of optimizer configs for this stage.
-        2. For each (seed x config) pair:
-           a. Check if a completed result already exists on disk (resume-safe).
-           b. If not, call _spawn_optimizer() to run the subprocess.
-           c. After subprocess exits, load + evaluate the compiled program.
-           d. Add CandidateEntry to leaderboard.
-        3. Raise StageExecutionError if all work items failed.
-        4. Return the new entries produced by this stage only.
-
-        Parameters
-        ----------
-        stage         One of "bootstrap", "miprov2", "gepa".
-        seed_entries  Top-K entries from previous stage used as starting points.
-        """
+        """Execute a full stage and return the new CandidateEntry objects."""
         stage_dir = Path(self.config.output_dir) / self.get_stage_dir_name(stage)
         stage_dir.mkdir(parents=True, exist_ok=True)
         log_dir = Path(self.config.log_dir)
@@ -200,11 +137,6 @@ class StageRunner:
         print(f"  Seeds    : {len(seed_entries)}")
         print(f"  Stage LM : {self.config.get_stage_model(stage)}")
         print(f"  Output   : {stage_dir}")
-        if self.config.use_hybrid_metric:
-            print(f"  Compile metric : HYBRID ({self.config.hybrid_penalty_mode})")
-        else:
-            print(f"  Compile metric : raw DCA")
-        print(f"  Eval metric    : raw DCA (leaderboard scores)")
 
         start = time.time()
 
@@ -475,14 +407,6 @@ class StageRunner:
                 "bootstrap_num_threads": cfg.bootstrap_num_threads,
                 "bootstrap_teacher_model": cfg.bootstrap_teacher_model,
                 "bootstrap_stop_at_score": cfg.bootstrap_stop_at_score,
-                # Hybrid metric config (applied inside compile() only)
-                "use_hybrid_metric": cfg.use_hybrid_metric,
-                "hybrid_score_weight": cfg.hybrid_score_weight,
-                "hybrid_length_weight": cfg.hybrid_length_weight,
-                "hybrid_max_prompt_tokens": cfg.hybrid_max_prompt_tokens,
-                "hybrid_penalty_mode": cfg.hybrid_penalty_mode,
-                "hybrid_target_tokens": cfg.hybrid_target_tokens,
-                "hybrid_penalty_steepness": cfg.hybrid_penalty_steepness,
             }
 
             token_data = self._spawn_optimizer(worker_cfg, stage_dir, config_name)
@@ -625,14 +549,6 @@ class StageRunner:
                 "miprov2_minibatch_size": cfg.miprov2_minibatch_size,
                 "miprov2_metric_threshold": cfg.miprov2_metric_threshold,
                 "miprov2_teacher_model": cfg.miprov2_teacher_model,
-                # Hybrid metric config (applied inside compile() only)
-                "use_hybrid_metric": cfg.use_hybrid_metric,
-                "hybrid_score_weight": cfg.hybrid_score_weight,
-                "hybrid_length_weight": cfg.hybrid_length_weight,
-                "hybrid_max_prompt_tokens": cfg.hybrid_max_prompt_tokens,
-                "hybrid_penalty_mode": cfg.hybrid_penalty_mode,
-                "hybrid_target_tokens": cfg.hybrid_target_tokens,
-                "hybrid_penalty_steepness": cfg.hybrid_penalty_steepness,
             }
 
             token_data = self._spawn_optimizer(worker_cfg, stage_dir, config_name)
@@ -773,14 +689,6 @@ class StageRunner:
                 "gepa_candidate_selection_strategy": cfg.gepa_candidate_selection_strategy,
                 "gepa_train_size": cfg.gepa_train_size,
                 "gepa_val_size": cfg.gepa_val_size,
-                # Hybrid metric config (applied inside compile() only)
-                "use_hybrid_metric": cfg.use_hybrid_metric,
-                "hybrid_score_weight": cfg.hybrid_score_weight,
-                "hybrid_length_weight": cfg.hybrid_length_weight,
-                "hybrid_max_prompt_tokens": cfg.hybrid_max_prompt_tokens,
-                "hybrid_penalty_mode": cfg.hybrid_penalty_mode,
-                "hybrid_target_tokens": cfg.hybrid_target_tokens,
-                "hybrid_penalty_steepness": cfg.hybrid_penalty_steepness,
             }
 
             token_data = self._spawn_optimizer(worker_cfg, stage_dir, config_name)
@@ -987,11 +895,9 @@ class StageRunner:
         # _evaluate_and_save calls (max_parallel > 1) each have their own
         # lm.history — preventing interleaved entries and wrong token counts.
         # Stage-to-stage promotion is always judged on the overall student model.
-        # Post-stage evaluation always uses raw DCA metric (no hybrid penalty).
-        # Hybrid penalty is only applied during optimizer compile() in the subprocess.
         eval_lm = create_lm(self.config.student_model_name, cache=False)
         eval_result = evaluate_candidate(
-            compiled_program, self.val_set, dca_comparison_metric,
+            compiled_program, self.val_set, self.metric,
             self.config.eval_num_threads, lm=eval_lm,
         )
         info = get_program_info(compiled_program)
@@ -1076,7 +982,4 @@ class StageRunner:
         )
 
         self.leaderboard.add(entry)
-        if not is_eval_result_trustworthy(eval_result):
-            print(f"    [{_ts()}] [WARN] Eval result for {config_name} may be unreliable "
-                  f"(high error rate or null tokens) — entry added but flagged")
         return entry

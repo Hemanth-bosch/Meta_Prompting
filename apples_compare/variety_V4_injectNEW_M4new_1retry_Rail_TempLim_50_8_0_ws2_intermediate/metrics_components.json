@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: Expected Results verify no real output ['Rail_trqRampSwitch'] (weighs 1x); got ['out']; TC2: Expected Results verify no real output ['Rail_trqRampSwitch'] (weighs 1x); got ['out']; TC3: Expected Results verify no real output ['Rail_trqRampSwitch'] (weighs 1x); got ['out']; TC4: Expected Results verify no real output ['Rail_trqRampSwitch'] (weighs 1x); got ['out']",
+  "m2": 0.8333333333333334,
+  "m2_details": "Abstract: out",
+  "m3": 1.0,
+  "m3_details": "All structural checks passed",
+  "m4": 0.5,
+  "m4_details": "[newKB:Srv_RampSwitch] 2/4 covered | missing: \"Checking the slope up (with several SLOPE UP between null an\", \"Checking the slope down (with several SLOPE DOWN between nul\"\n    JUDGE REASONING: 1: COVERED — TC1 Step1 sets Swtch=0 with Xa/Xb and expects out=2500 (=Target2/Xb) at initialization.\n2: NOT COVERED — Need a test that explicitly ramps from a lower to a higher target with defined SLOPE UP settings (incl. multiple slope-up values between 0..MAX) and expects monotonic increase to the new higher input, finally reaching Input value.\n3: NOT COVERED — Need a test that explicitly ramps from a higher to a lower target with defined SLOPE DOWN settings (incl. multiple slope-down values between 0..MAX) and expects monotonic decrease to the new lower input, finally reaching Input value.\n4: COVERED — TC4 switches 0→1 (Step2) then waits (Step3) showing intermediate ramp value out=1940; switches back 1→0 before completion (Step4) and expects ramp reversal from intermediate (Step5 out=1980); then switches again 0→1 before completion (Step6) and expects ramp reversal again from intermediate (Step7 out=1860).",
+  "m7": 0.225,
+  "m7_details": "DLL inline: 1 first-try + 1 retry-pass + 6 fail / 8 eqs",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['rail_trqrampswitch']",
+  "_weighted_composite_pct": 54.208333333333336
+}

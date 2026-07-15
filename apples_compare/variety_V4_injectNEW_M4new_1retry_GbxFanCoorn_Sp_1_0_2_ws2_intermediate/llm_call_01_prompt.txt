@@ -1,0 +1,143 @@
+================ role: system ================
+Your input fields are:
+1. `equation_json` (str): 
+2. `const_values` (str): 
+3. `weakspot_operation` (str): 
+4. `weakspot_context` (str): 
+5. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, your context analysis and the test scenarios you identify MUST reflect and require EVERY guideline listed here — treat them as hard, non-negotiable BU requirements; none may be skipped. If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `context_analysis` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## weakspot_context ## ]]
+{weakspot_context}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        You are provided with the following information (supplied in the input fields below):
+        
+        Below is the data you should use:
+        - **Equation JSON**: provided in the `equation_json` input field
+        - **Constant Values**: provided in the `const_values` input field
+        - **Weakspot Element**: provided in the `weakspot_operation` input field
+        - **Weakspot Context**: provided in the `weakspot_context` input field
+        
+        ### 1. Equation JSON
+        This JSON describes a complex equation broken down into multiple elements. Each element is identified by a unique key and includes properties such as:
+        - **instance_name** -- the name of the variable or component represented by the element.
+        - **function_name** -- the function or operation that this element performs.
+        - **arg_names** -- a list of names for the input arguments used by the element.
+        - **args** -- a list of references (by key) to other elements that supply the input values for this element.
+        
+        ### 2. Constant Values
+        A dictionary of constant values that are used within the equation.
+        
+        ### 3. Weakspot Information
+        - **Weakspot Element**: This is the unique key of the weakspot element in the equation.
+        - **Weakspot Context**: A text description providing details on how the weakspot element is intended to work (its behavior, role, and impact).
+        
+        **Note:** The parameter representing the raster sample time (e.g. "dT") should be considered fixed and must not be listed among the inputs that can be altered.
+        ---
+        
+        ### Task:
+        Using the provided data, generate a detailed context for the identified weakspot element. Your response should include:
+        
+        1. **Overview of the Weakspot Element:**
+           - Identify the weakspot element by its unique key.
+           - Describe its role using its "instance_name" and "function_name".
+           - Describe in full detail, the working of the weakspot element.
+        
+        2. **Inputs That Can Be Altered:**
+           - Extract and list the names of the input parameters for the weakspot element (from its "arg_names" field).
+           - For each input, specify the corresponding reference from the "args" list that provides its value.
+           - Get the type information about these input operations from the equations json dictionary.
+           - **Exclude** any parameter that is fixed (for example, the sample time parameter or Literals or System Constants).
+        
+        3. **Outputs That Can Be Checked:**
+           - Identify any output variables that are directly produced by or depend on the weakspot element.
+           - Describe how these outputs are connected to the weakspot element.
+           - Only Local or Variable type output values can be checked.
+        
+        4. **Possible Testcases for Weakspot Element:**
+           - Provide a brief overview of the types of test cases that can be generated for the weakspot element.
+           - Include any specific conditions or scenarios that should be tested to validate the weakspot element.
+           - Keep the number of testcases to a minimum, checking the full working with the least number of testcases.
+        
+        Your answer should be clear and well organized, using headings, bullet points, and tables as needed. Generate the detailed context now.
+
+================ role: user ================
+[[ ## equation_json ## ]]
+{"$op19": {"oid": "61", "type": "Function", "instance_name": "GbxFanCoorn_Sp_Srv_DebounceDEB_I", "function_name": "Srv_Debounce_out", "class_method_name": "out", "sequence_number": "2", "method_name": null, "decision": null, "condition": [], "arg_names": ["X", "Param", "Dt"], "args": ["$op16", "$op17", "$op18"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op20": {"oid": "96", "type": "Local", "instance_name": "GbxFan_st", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op3"], "arg_names": [], "args": ["$op19"], "read": true, "write": false, "physical_type": "log", "data_type": "bool", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "1.0"]}, "$op16": {"oid": "31", "type": "Operation", "instance_name": "And", "function_name": "And", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op12", "$op15"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op17": {"oid": "52", "type": "Function", "instance_name": "GbxFanCoorn_Sp_DebounceParam_tDEBt_I", "function_name": "Srv_DebounceParam_t_get", "class_method_name": "get", "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "", "data_type": "", "unique_variables": [], "unique_params": ["GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op18": {"oid": "92", "type": "Variable", "instance_name": "dT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_params": ["dT"], "unique_variables": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147483648.0", "2147483647.0"]}, "$op24": {"oid": "19", "type": "Variable", "instance_name": "GbxFan_r", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op23"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-400.0", "399.98779296875"]}}
+
+[[ ## const_values ## ]]
+{"dT": "20000.0"}
+
+[[ ## weakspot_operation ## ]]
+$op19
+
+[[ ## weakspot_context ## ]]
+   Srv\_Debounce
+
+Srv\_Debounce
+
+Srv\_Debounce debounces a toggling boolean input signal and returns the debounced state of the signal as boolean value.  
+This function is used to debounce a digital input signal by separate high to low and low to high debounce times
+
+| Hint |
+| --- |
+| Each function call calculates a new debounce timer value and thus result might be wrong if called not exactly once per process call.  This class does not contain sequence numbers for the class methods.  The out value has to be connected to a variable to compute the class.  if the output is used in multiple places, there is a risk that the class output might be calculated twice. To avoid this use a process local variable at the output of the class(incase output is used in multiple places). |
+
+ 
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| init | Sets the internal state of Boolean function |
+| out | Returns the debounced input value |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| Dt | Dt sample time  Attention:  Dt element and Dt port must have the same conversion formula.  Hint:  If using Per\_Dur as implementation for Dt element in BDE, simulation does not work for time dependent elements. Therefore it is recommended to use Time\_Dt. | sint32 Time\_Dt |
+| param | Instance of the structure which holds the timing parameters for the debounce element | Srv\_DebounceParam\_t |
+| return | The debounced value of the input signal. | uint8 ident (logical signal is returned) |
+| timer | timer for low to high transition | sint32 Time\_Dt |
+| x | Input signal | uint8 ident (logical signal is expected at the input) |
+| x/old | Internal state | uint8 Ident(logical signal) |
+
+| Related information | |
+| --- | --- |
+| Srv\_DebounceParam\_t  SRV: SrvX\_Debounce  Doors link (SRV) : SrvX\_Debounce | |
+
+[[ ## kb_guidelines ## ]]
+## Validated test guidelines for Srv_Debounce (newKB) — cover these scenarios:
+1. Checking the correct initialization of the debounce — Initialize the debounce; Check: Output = initialization value
+2. Checking the delay on rising edge — Set: Input = FALSE; Wait: Output = FALSE; Change the input from FALSE to TRUE; Set: Input = TRUE; Wait: Till the debounce time is over; Check: Output = TRUE
+3. Checking the suppressing on falling signal change smaller than debouncing time — Set the input from true to false and before time DEBOUNCE back to true; Set: Input = FALSE & then before debounce time is over set input = TRUE; Check: Output = TRUE after debounce time is over
+4. Checking the delay on falling edge — Change the input from TRUE to FALSE; Set: Input = FALSE; Wait: Till the debounce time is over; Check: Output = FALSE
+5. Checking the suppressing on rising signal change smaller than debouncing time — Set the input from false to true and before time DEBOUNCE back to false; Set: Input = TRUE & then before debounce time is over set input = FALSE; Check: Output = FALSE after debounce time is over
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## context_analysis ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

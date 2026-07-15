@@ -1,0 +1,73 @@
+You are provided with the following information:
+
+Below is the data you should use:
+- **Equation JSON**: {'$op21': {'oid': '41711', 'type': 'Function', 'instance_name': 'getBit_unsigned_U8', 'function_name': 'getBit_unsigned_getBit', 'class_method_name': 'getBit', 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': ['bitLeiste', 'bitPosition'], 'args': ['$op19', '$op20'], 'read': True, 'write': False, 'physical_type': '', 'data_type': '', 'unique_variables': ['Gbx_SigSrcEval'], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [None, None]}, '$op22': {'oid': '41564', 'type': 'Operation', 'instance_name': 'Not', 'function_name': 'Not', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op21'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': ['Gbx_SigSrcEval'], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op19': {'oid': '41618', 'type': 'Variable', 'instance_name': 'Gbx_SigSrcEval', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': [], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['Gbx_SigSrcEval'], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op20': {'oid': '41602', 'type': 'Literal', 'instance_name': '2', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': [], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op26': {'oid': '41530', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op24'], 'arg_names': [], 'args': ['$op25'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['Gbx_SigSrcEval', 'PT_stTraType', 'GbxPos_flgGNSPrsntVD'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op10': {'oid': '1160', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'Else', 'condition': ['$op6'], 'arg_names': [], 'args': ['$op9'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op14': {'oid': '41575', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op12'], 'arg_names': [], 'args': ['$op13'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Gbx_bNPos', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op16': {'oid': '41580', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'Else', 'condition': ['$op12'], 'arg_names': [], 'args': ['$op15'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Gbx_bNPos', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op28': {'oid': '41534', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'Else', 'condition': ['$op24'], 'arg_names': [], 'args': ['$op27'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['Gbx_SigSrcEval', 'PT_stTraType', 'GbxPos_flgGNSPrsntVD'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op8': {'oid': '1054', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op6'], 'arg_names': [], 'args': ['$op7'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}}
+- **Constant Values**: {'TRA_MT': 0, 'dT': '10.0'}
+- **Weakspot Element**: $op21
+- **Weakspot Context**:
+   getBit\_unsigned
+
+getBit\_unsigned
+
+Returns the value of the bit at selected position for a unsigned input value.
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| getBit | Returns the value of the bit at selected position for a unsigned input value |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| bitPosition | Position of the bit that needs to be fetched. | uint8 OneToOne |
+| bitLeiste | Input value | u16:uint16 u32:uint32  u8:uint8  OneToOne |
+| return | The value of selected bit. | uint8 |
+
+### 1. Equation JSON
+This JSON describes a complex equation broken down into multiple elements. Each element is identified by a unique key and includes properties such as:
+- **instance_name** -- the name of the variable or component represented by the element.
+- **function_name** -- the function or operation that this element performs.
+- **arg_names** -- a list of names for the input arguments used by the element.
+- **args** -- a list of references (by key) to other elements that supply the input values for this element.
+
+### 2. Constant Values
+A dictionary of constant values that are used within the equation.
+
+### 3. Weakspot Information
+- **Weakspot Element**: This is the unique key of the weakspot element in the equation.
+- **Weakspot Context**: A text description providing details on how the weakspot element is intended to work (its behavior, role, and impact).
+
+**Note:** The parameter representing the raster sample time (e.g. "dT") should be considered fixed and must not be listed among the inputs that can be altered.
+---
+
+### Task:
+Using the provided data, generate a detailed context for the identified weakspot element. Your response should include:
+
+1. **Overview of the Weakspot Element:**
+   - Identify the weakspot element by its unique key.
+   - Describe its role using its "instance_name" and "function_name".
+   - Describe in full detail, the working of the weakspot element.
+
+2. **Inputs That Can Be Altered:**
+   - Extract and list the names of the input parameters for the weakspot element (from its "arg_names" field).
+   - For each input, specify the corresponding reference from the "args" list that provides its value.
+   - Get the type information about these input operations from the equations json dictionary.
+   - **Exclude** any parameter that is fixed (for example, the sample time parameter or Literals or System Constants).
+
+3. **Outputs That Can Be Checked:**
+   - Identify any output variables that are directly produced by or depend on the weakspot element.
+   - Describe how these outputs are connected to the weakspot element.
+   - Only Local or Variable type output values can be checked.
+
+4. **Possible Testcases for Weakspot Element:**
+   - Provide a brief overview of the types of test cases that can be generated for the weakspot element.
+   - Include any specific conditions or scenarios that should be tested to validate the weakspot element.
+   - Keep the number of testcases to a minimum, checking the full working with the least number of testcases.
+
+Your answer should be clear and well organized, using headings, bullet points, and tables as needed. Generate the detailed context now.
+
+---

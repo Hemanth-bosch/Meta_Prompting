@@ -1,0 +1,241 @@
+{
+  "_README": "AUTO-DRAFT candidates for review. Curate into required_io.json — keep ONLY what you are sure of. required_inputs excludes dT (Prompt 1 forbids altering it); review _C params & large sets (_flags).",
+  "EGSSig_LamSymcp_1_6_0#2": {
+    "required_inputs": [
+      "EGSDO2_flgDynAdpnLtrS0B1",
+      "EGSDO2_flgDynAdpnLtrS0B2",
+      "EGSDO2_flgDynAdpnLtrS1B1",
+      "EGSDO2_flgDynAdpnLtrS1B2",
+      "EGSDO2_flgDynAdpnLtrS2B1",
+      "EGSDO2_flgDynAdpnLtrS2B2",
+      "EGSDO2_flgDynAdpnRtlS0B1",
+      "EGSDO2_flgDynAdpnRtlS0B2",
+      "EGSDO2_flgDynAdpnRtlS1B1",
+      "EGSDO2_flgDynAdpnRtlS1B2",
+      "EGSDO2_flgDynAdpnRtlS2B1",
+      "EGSDO2_flgDynAdpnRtlS2B2",
+      "EGSDO2_tiDlyAdpnS0B1",
+      "EGSDO2_tiDlyAdpnS0B2",
+      "EGSDO2_tiDlyAdpnS1B1",
+      "EGSDO2_tiDlyAdpnS1B2",
+      "EGSDO2_tiDlyAdpnS2B1",
+      "EGSDO2_tiDlyAdpnS2B2",
+      "EGSDO2_tiTranAdpnS0B1",
+      "EGSDO2_tiTranAdpnS0B2",
+      "EGSDO2_tiTranAdpnS1B1",
+      "EGSDO2_tiTranAdpnS1B2",
+      "EGSDO2_tiTranAdpnS2B1",
+      "EGSDO2_tiTranAdpnS2B2",
+      "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk1",
+      "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk2",
+      "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk1",
+      "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk2",
+      "EGSPrepn_ratLamS1B1",
+      "EGSPrepn_ratLamS1B2",
+      "EGSPrepn_ratLamS2B1",
+      "EGSPrepn_ratLamS2B2",
+      "EGSSig_tiConTrigFil_C",
+      "flgAdpnFilOld"
+    ],
+    "required_preconds": [
+      "EGSPREPN_TYPSNSR1BNK1_SC",
+      "EGSPREPN_TYPSNSR1BNK2_SC",
+      "EGSPREPN_TYPSNSR2BNK1_SC",
+      "EGSPREPN_TYPSNSR2BNK2_SC",
+      "EGSSIG_SELO2SNSR0BNK1_SC",
+      "EGSSIG_SELO2SNSR0BNK2_SC",
+      "EGSSIG_SELO2SNSR1BNK1_SC",
+      "EGSSIG_SELO2SNSR1BNK2_SC"
+    ],
+    "required_outputs": [
+      "EGSPrepn_ratLamSymcS1B1",
+      "EGSPrepn_ratLamSymcS1B2",
+      "EGSPrepn_ratLamSymcS2B1",
+      "EGSPrepn_ratLamSymcS2B2"
+    ],
+    "_flags": [
+      "REVIEW _C params (maybe fixed calibrations, drop if not test-driven): ['EGSSig_tiConTrigFil_C']",
+      "LARGE input set (34) — likely includes forward-cone signals; trim to what a test must drive"
+    ]
+  },
+  "EGSSig_LamSymcp_1_6_0#5": {
+    "required_inputs": [
+      "EGSDO2_flgDynAdpnLtrS0B1",
+      "EGSDO2_flgDynAdpnLtrS0B2",
+      "EGSDO2_flgDynAdpnLtrS1B1",
+      "EGSDO2_flgDynAdpnLtrS1B2",
+      "EGSDO2_flgDynAdpnLtrS2B1",
+      "EGSDO2_flgDynAdpnLtrS2B2",
+      "EGSDO2_flgDynAdpnRtlS0B1",
+      "EGSDO2_flgDynAdpnRtlS0B2",
+      "EGSDO2_flgDynAdpnRtlS1B1",
+      "EGSDO2_flgDynAdpnRtlS1B2",
+      "EGSDO2_flgDynAdpnRtlS2B1",
+      "EGSDO2_flgDynAdpnRtlS2B2",
+      "EGSDO2_tiDlyAdpnS0B1",
+      "EGSDO2_tiDlyAdpnS0B2",
+      "EGSDO2_tiDlyAdpnS1B1",
+      "EGSDO2_tiDlyAdpnS1B2",
+      "EGSDO2_tiDlyAdpnS2B1",
+      "EGSDO2_tiDlyAdpnS2B2",
+      "EGSDO2_tiTranAdpnS0B1",
+      "EGSDO2_tiTranAdpnS0B2",
+      "EGSDO2_tiTranAdpnS1B1",
+      "EGSDO2_tiTranAdpnS1B2",
+      "EGSDO2_tiTranAdpnS2B1",
+      "EGSDO2_tiTranAdpnS2B2",
+      "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk1",
+      "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk2",
+      "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk1",
+      "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk2",
+      "EGSPrepn_ratLamS1B1",
+      "EGSPrepn_ratLamS1B2",
+      "EGSPrepn_ratLamS2B1",
+      "EGSPrepn_ratLamS2B2",
+      "EGSSig_tiConTrigFil_C",
+      "flgAdpnFilOld"
+    ],
+    "required_preconds": [
+      "EGSPREPN_TYPSNSR1BNK1_SC",
+      "EGSPREPN_TYPSNSR1BNK2_SC",
+      "EGSPREPN_TYPSNSR2BNK1_SC",
+      "EGSPREPN_TYPSNSR2BNK2_SC",
+      "EGSSIG_SELO2SNSR0BNK1_SC",
+      "EGSSIG_SELO2SNSR0BNK2_SC",
+      "EGSSIG_SELO2SNSR1BNK1_SC",
+      "EGSSIG_SELO2SNSR1BNK2_SC"
+    ],
+    "required_outputs": [
+      "EGSPrepn_ratLamSymcS1B1",
+      "EGSPrepn_ratLamSymcS1B2",
+      "EGSPrepn_ratLamSymcS2B1",
+      "EGSPrepn_ratLamSymcS2B2"
+    ],
+    "_flags": [
+      "REVIEW _C params (maybe fixed calibrations, drop if not test-driven): ['EGSSig_tiConTrigFil_C']",
+      "LARGE input set (34) — likely includes forward-cone signals; trim to what a test must drive"
+    ]
+  },
+  "GbxFanCoorn_Sp_1_0_2#2": {
+    "required_inputs": [
+      "Com_stGbxFanReq",
+      "Epm_nEng",
+      "GbxFan_nThres_C",
+      "GbxFan_stSel_C",
+      "GbxFan_tiHiLo_C",
+      "GbxFan_tiLoHi_C"
+    ],
+    "required_preconds": [],
+    "required_outputs": [
+      "GbxFan_r"
+    ],
+    "_flags": [
+      "REVIEW _C params (maybe fixed calibrations, drop if not test-driven): ['GbxFan_nThres_C', 'GbxFan_stSel_C', 'GbxFan_tiHiLo_C', 'GbxFan_tiLoHi_C']"
+    ]
+  },
+  "oilsepactr_coorr#20": {
+    "required_inputs": [
+      "CoEng_stMai",
+      "Epm_nEng",
+      "OilSepActr_flgNormActv",
+      "OilSepActr_nMaxShdwn_C",
+      "OilSepActr_tiDlyShdwn_C",
+      "flgStCoorr"
+    ],
+    "required_preconds": [
+      "COENG_ST_RUNNING"
+    ],
+    "required_outputs": [
+      "OilSepActr_stCoorr"
+    ],
+    "_flags": [
+      "REVIEW _C params (maybe fixed calibrations, drop if not test-driven): ['OilSepActr_nMaxShdwn_C', 'OilSepActr_tiDlyShdwn_C']"
+    ]
+  },
+  "InjRly_PwrCtrl_1_1_0#0": {
+    "required_inputs": [
+      "Emwp_swtActv",
+      "InjRly_flgDDEWakup",
+      "InjRly_tiOffDly_C",
+      "T15_st",
+      "WtrPmp3_flgAftRunReq"
+    ],
+    "required_preconds": [
+      "PRC_ZERO",
+      "THS_EMWPAVL_SC",
+      "WTRPMP_CTRLSRC3_SC"
+    ],
+    "required_outputs": [
+      "InjPwrRly_r"
+    ],
+    "_flags": [
+      "REVIEW _C params (maybe fixed calibrations, drop if not test-driven): ['InjRly_tiOffDly_C']"
+    ]
+  },
+  "moftqptdveh_fil#0": {
+    "required_inputs": [
+      "MO_125",
+      "MO_8192",
+      "MoFTqPtdVeh_dTqRatePtdDec",
+      "MoFTqPtdVeh_dTqRatePtdInc",
+      "MoFTqPtdVeh_tqWhlVMD",
+      "MoFTqPtdVeh_tqWhlXTSOld",
+      "_s32_dTq"
+    ],
+    "required_preconds": [
+      "MOFSRV_LIB_RAMP_END"
+    ],
+    "required_outputs": [
+      "MoFTqPtdVeh_tqWhlXTS"
+    ],
+    "_flags": []
+  },
+  "Rail_TempLim_50.8.0#2": {
+    "required_inputs": [
+      "EnvP_p",
+      "Epm_nEng",
+      "FuelT_t",
+      "Rail_dtrqLimRmpNeg_C",
+      "Rail_dtrqLimRmpPos_C",
+      "Rail_stMon",
+      "Rail_stTrqLimFlSysActv_C"
+    ],
+    "required_preconds": [
+      "DSMGENN_SC",
+      "MON_CPC",
+      "MON_PCV"
+    ],
+    "required_outputs": [
+      "Rail_trqFlTempLim"
+    ],
+    "_flags": [
+      "REVIEW _C params (maybe fixed calibrations, drop if not test-driven): ['Rail_dtrqLimRmpNeg_C', 'Rail_dtrqLimRmpPos_C', 'Rail_stTrqLimFlSysActv_C']"
+    ]
+  },
+  "a2mamg#0": {
+    "required_inputs": [
+      "B_gsch_msg"
+    ],
+    "required_preconds": [],
+    "required_outputs": [
+      "PT_stTraShftOp"
+    ],
+    "_flags": []
+  },
+  "GearLvrPosn_Vd#0": {
+    "required_inputs": [
+      "Com_bPedSigMonEna",
+      "GbxPos_flgGNSPrsntVD",
+      "Gbx_SigSrcEval",
+      "Gbx_bNPos",
+      "PT_stTraType"
+    ],
+    "required_preconds": [
+      "TRA_MT"
+    ],
+    "required_outputs": [
+      "Gbx_stTrsmNeutOBD"
+    ],
+    "_flags": []
+  }
+}

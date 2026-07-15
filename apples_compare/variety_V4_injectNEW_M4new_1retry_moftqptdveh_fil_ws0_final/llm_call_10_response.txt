@@ -1,0 +1,15 @@
+[[ ## reasoning ## ]]
+The equation chain is simply Variable(MoFTqPtdVeh_tqWhlVMD) → $op116, which means the output is directly the value of Variable(MoFTqPtdVeh_tqWhlVMD).
+
+The target value is 60000, so Variable(MoFTqPtdVeh_tqWhlVMD) must be assigned 60000.
+
+No other variables, parameters, or system constants appear in the equation, so no other assignments are needed.
+
+The constant MOFSRV_LIB_RAMP_END is given as 0 but does not appear in the equation, so it is not assigned.
+
+```json
+[
+    "Variable(MoFTqPtdVeh_tqWhlVMD) = 60000"
+]
+```
+[[ ## completed ## ]]

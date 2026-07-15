@@ -1,0 +1,14 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=Rail_TempLim_50.8.0 ws=2 fn=Srv_RampSwitch_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 11
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 1390 chars
+  METRICS: M1=1.0  M2=1.0  M3=1.0  M4=1.0  M7=0.2  M8=0.42857142857142855
+  weighted composite = 79.4%
+  M4 detail: [newKB:Srv_RampSwitch] 4/4 covered | missing: none
+    JUDGE REASONING: 1: COVERED — TC1: sets Xa=1500/Xb=1000, then Swtch=0 expects output 1500 and Swtch=1 expects output 1000, demonstrating initialization to the selected target.
+2: COVERED — TC2: starts at Swtch=1 (output 1000), switches to 0 (higher target 2000) and checks ramp-up progression (1000 → 1020 after 1 tick, 1200 after 10 ticks, 2000 after 50 ticks) i.e., correct slope-up behavior to the new input.
+3: COVERED — TC3: starts at Swtch=0 (output 2000), switches to 1 (lower target 1000) and checks ramp-down progression (2000 → 1980 after 1 tick, 1920 after additional 4 ticks), i.e., correct slope-down behavior.
+4: COVERED — TC3: after beginning ramp-down (toward 1000), switches back to 0 before reaching target (at intermediate 1920) and expects immediate hold at 1920 then ramp-up (1940 after 1 tick, 2000 after 10 ticks), exercising abortion and restart from intermediate value.
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

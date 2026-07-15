@@ -1,0 +1,196 @@
+Generate **test cases** for the identified weakspot.
+
+### Output Requirements:
+First give the "Detailed Explanation" of the testcase.
+The output should have single JSON for all the test cases and should have the following structure:
+```json
+[
+    {
+        "Pre-Condition": ["...", "...", ...],
+        "Steps": [
+            {
+                "Actions": ["...", "...", ...],
+                "Expected Results": ["...", "...", ...]
+            },
+            ...
+        ],
+        "Detailed Explanation": "..."
+    },
+    ...
+]
+```
+
+### Formatting Guidelines:
+1. **Detailed Explanation**:
+   - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+
+2. **Pre-Condition**:
+   - Only include value assignments in the format: "<value_name> = <value>".
+   - Do not include any variables which are part of present in Action.
+
+3. **Steps**:
+   - Each step should consist of:
+     - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+     - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+
+4. **String Types**:
+   - Only use the following types of strings in the output:
+     - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+     - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+     - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+
+### Additional Constraints:
+- **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+- **NOTE** Pre-Condition and Actions **cannot be same variables**
+- Do not add new constant values that are not part of the provided input.
+- DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+- Ensure all steps are logically consistent with the input equation and constants.
+- Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+
+EXAMPLE:
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#   {
+#     "Pre-Condition": [],
+#     "Steps": [
+#       {
+#         "Actions": [
+#           "reset = false",
+#           "compute = false",
+# 		  "T = 5",
+# 		  "in = 10",
+# 		  "initValue = 20"
+#         ],
+#         "Expected Results": [
+#           "out = 0"
+#         ]
+#       },
+#       {
+#         "Actions": [
+#           "reset = true",
+#           "compute = false",
+# 		  "T = 5",
+# 		  "in = 10",
+# 		  "initValue = 20"
+#         ],
+#         "Expected Results": [
+#           "out = initValue"
+#         ]
+#       },
+#       {
+#         "Actions": [
+#           "reset = false",
+#           "compute = true",
+# 		  "T = 0.2",
+# 		  "in = 10",
+# 		  "initValue = 20"
+#         ],
+#         "Expected Results": [
+#           "out = ((@/T)*(in-out(t-@)))+out(t-@)"
+#         ]
+#       }
+#     ]
+#   }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+### Input Details:
+
+**Constant Values**: {'EGSPREPN_TYPSNSR1BNK1_SC': 1, 'EGSPREPN_TYPSNSR2BNK1_SC': 0, 'EGSSIG_SELO2SNSR1BNK1_SC': 0, 'EGSSIG_SELO2SNSR0BNK2_SC': 0, 'EGSPREPN_TYPSNSR2BNK2_SC': 0, 'dT': '10000.0', 'EGSSIG_SELO2SNSR0BNK1_SC': 1, 'EGSPREPN_TYPSNSR1BNK2_SC': 0, 'EGSSIG_SELO2SNSR1BNK2_SC': 0}
+**Weakspot Operation**: $op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+**Weakspot Context**:
+**Detailed Context for Weakspot Element**
+
+---
+
+### 1. Overview of the Weakspot Element
+
+- **Weakspot Element Key:**  
+  `$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam`
+
+- **Instance Name:**  
+  `ratLamAdpn_LT_I`
+
+- **Function Name:**  
+  `LowpassT_out`
+
+- **Role and Working:**  
+  This element represents the output method (`out`) of a LowpassT filter instance named `ratLamAdpn_LT_I`. The LowpassT function calculates a proportional element with a first-order time constant, effectively implementing a low-pass filter on the input signal.
+
+  The working principle of this element is to compute the filtered output value based on an initial value and a gain constant `T`. The filter smooths the input signal by attenuating high-frequency components, controlled by the time constant `T`. The parameter `T` must be greater than or equal to 1 and cannot be negative, ensuring stable filter behavior.
+
+  The element takes two inputs:
+  - `initValue`: The initial value for the filter.
+  - `T`: The gain constant (time constant) controlling the filter's responsiveness.
+
+  The output is the new filtered value after applying the low-pass filter logic.
+
+---
+
+### 2. Inputs That Can Be Altered
+
+| Input Name | Reference Key (from `args`) | Type Information (from Equation JSON) | Description |
+|------------|-----------------------------|--------------------------------------|-------------|
+| `initValue` | `$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam` | Type: Local<br>Instance Name: `_ratLamTmp`<br>Decision: If | Local variable representing the initial value for the filter. It is conditionally assigned based on an `If` decision. |
+| `T` | `$op17_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam` | Type: Parameter<br>Instance Name: `EGSSig_tiConTrigFil_C`<br>Unique Params: ['EGSSig_tiConTrigFil_C'] | Parameter representing the gain constant (time constant) for the filter. This is a unique parameter and can be altered for testing. |
+
+**Note:**  
+- The parameter `EGSSig_tiConTrigFil_C` is a gain constant and not a fixed sample time parameter like `dT`, so it is considered alterable.  
+- No other inputs are listed for this element.
+
+---
+
+### 3. Outputs That Can Be Checked
+
+- **Direct Output Variable:**  
+  There is no explicit Local or Variable type output directly named for this element in the provided JSON. However, this element is used as an argument in other operations, specifically in the "Smaller" operations (`$op23_...` and `$op24_...`) which compare its output with other values.
+
+- **Dependent Output Variables:**  
+  Variables that depend on this weakspot element include:
+
+  | Variable Key | Instance Name | Description | Relation to Weakspot Element |
+  |--------------|---------------|-------------|------------------------------|
+  | `$op23` | `EGSPrepn_ratLamSymcS1B1` | Variable representing a filtered lambda ratio for sensor 1 bank 1 | Reads the output of `$op72_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam` which is related to the weakspot element's output. |
+  
+  The weakspot element's output is used in calculations that eventually update these variables, which are of type `Variable` and can be checked in tests.
+
+---
+
+### 4. Possible Testcases for Weakspot Element
+
+| Testcase Description | Purpose | Key Conditions to Test |
+|----------------------|---------|-----------------------|
+| **Testcase 1: Valid Lowpass Filter Output with Normal Parameters** | Verify that the LowpassT filter computes correct output when `initValue` and `T` are within normal expected ranges. | - `initValue` set to a typical initial value.<br>- `T` set to a valid gain constant ≥ 1.<br>- Check output matches expected filtered value. |
+| **Testcase 2: Boundary Condition for Gain Constant `T`** | Validate behavior when `T` is at its minimum allowed value (1) and just above it. | - `T` = 1 (minimum valid).<br>- `T` slightly greater than 1.<br>- Confirm filter stability and output correctness. |
+| **Testcase 3: Conditional Initialization of `initValue`** | Test the conditional assignment of `initValue` based on the `If` decision in `$op7`. | - Provide conditions that trigger both branches of the `If`.<br>- Verify that the filter output changes accordingly. |
+
+**Summary:**  
+These three testcases cover the essential behavior of the weakspot element, including normal operation, boundary conditions for the gain constant, and the conditional initialization of the filter input. This minimal set ensures the LowpassT filter's correctness and robustness.
+
+---
+
+**End of Detailed Context**
+**use this Expected Results**:
+['EGSPrepn_ratLamSymcS1B2', 'EGSPrepn_ratLamSymcS2B2', 'EGSPrepn_ratLamSymcS1B1', 'EGSPrepn_ratLamSymcS2B1']
+
+From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+**DO NOT** generate values for dT in the testcases.
+
+Using the provided JSON data, generate the test cases as specified.
+
+{'const_values': {'EGSPREPN_TYPSNSR1BNK1_SC': 1, 'EGSPREPN_TYPSNSR2BNK1_SC': 0, 'EGSSIG_SELO2SNSR1BNK1_SC': 0, 'EGSSIG_SELO2SNSR0BNK2_SC': 0, 'EGSPREPN_TYPSNSR2BNK2_SC': 0, 'dT': '10000.0', 'EGSSIG_SELO2SNSR0BNK1_SC': 1, 'EGSPREPN_TYPSNSR1BNK2_SC': 0, 'EGSSIG_SELO2SNSR1BNK2_SC': 0}, 'weakspot_operation': '$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', 'equation': {'$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '2721', 'type': 'Function', 'instance_name': 'ratLamAdpn_LT_I', 'function_name': 'LowpassT_out', 'class_method_name': 'out', 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': ['initValue', 'T'], 'args': ['$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op17_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op23_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9669', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op24_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9686', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op23_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9669', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op24_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9686', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op23_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9669', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op24_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9686', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op23_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9669', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op24_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '9686', 'type': 'Operation', 'instance_name': 'Smaller', 'function_name': 'Smaller', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op20_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', '$op22_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '10523', 'type': 'Local', 'instance_name': '_ratLamTmp', 'function_name': None, 'class_method_name': None, 'sequence_number': '1', 'method_name': None, 'decision': 'If', 'condition': ['$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'arg_names': [], 'args': ['$op4_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op17_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': {'oid': '2633', 'type': 'Parameter', 'instance_name': 'EGSSig_tiConTrigFil_C', 'function_name': None, 'class_method_name': None, 'sequence_number': '1', 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': [], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_variables': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op71': {'oid': '15621', 'type': 'Variable', 'instance_name': 'EGSPrepn_ratLamSymcS1B2', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op53'], 'arg_names': [], 'args': ['$op72_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': True, 'write': False, 'physical_type': 'real64', 'data_type': 'uint16', 'unique_variables': ['EGSDO2_flgDynAdpnLtrS0B2', 'EGSDO2_flgDynAdpnLtrS1B2', 'EGSDO2_flgDynAdpnRtlS0B2', 'EGSDO2_flgDynAdpnRtlS1B2', 'EGSDO2_tiDlyAdpnS0B2', 'EGSDO2_tiDlyAdpnS1B2', 'EGSDO2_tiTranAdpnS0B2', 'EGSDO2_tiTranAdpnS1B2', 'EGSPrepn_flgEgSnsrPrsntSnsr1Bnk2', 'EGSPrepn_ratLamS1B2', 'flgAdpnFilOld'], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': ['EGSSIG_SELO2SNSR0BNK2_SC', 'EGSPREPN_TYPSNSR1BNK2_SC'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': ['0.0', '15.999755859375']}, '$op95': {'oid': '15633', 'type': 'Variable', 'instance_name': 'EGSPrepn_ratLamSymcS2B2', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op77'], 'arg_names': [], 'args': ['$op72_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': True, 'write': False, 'physical_type': 'real64', 'data_type': 'uint16', 'unique_variables': ['EGSDO2_flgDynAdpnLtrS1B2', 'EGSDO2_flgDynAdpnLtrS2B2', 'EGSDO2_flgDynAdpnRtlS1B2', 'EGSDO2_flgDynAdpnRtlS2B2', 'EGSDO2_tiDlyAdpnS1B2', 'EGSDO2_tiDlyAdpnS2B2', 'EGSDO2_tiTranAdpnS1B2', 'EGSDO2_tiTranAdpnS2B2', 'EGSPrepn_flgEgSnsrPrsntSnsr2Bnk2', 'EGSPrepn_ratLamS2B2', 'flgAdpnFilOld'], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': ['EGSPREPN_TYPSNSR2BNK2_SC', 'EGSSIG_SELO2SNSR1BNK2_SC'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': ['0.0', '15.999755859375']}, '$op23': {'oid': '15597', 'type': 'Variable', 'instance_name': 'EGSPrepn_ratLamSymcS1B1', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op5'], 'arg_names': [], 'args': ['$op72_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': True, 'write': False, 'physical_type': 'real64', 'data_type': 'uint16', 'unique_variables': ['EGSDO2_flgDynAdpnLtrS0B1', 'EGSDO2_flgDynAdpnLtrS1B1', 'EGSDO2_flgDynAdpnRtlS0B1', 'EGSDO2_flgDynAdpnRtlS1B1', 'EGSDO2_tiDlyAdpnS0B1', 'EGSDO2_tiDlyAdpnS1B1', 'EGSDO2_tiTranAdpnS0B1', 'EGSDO2_tiTranAdpnS1B1', 'EGSPrepn_flgEgSnsrPrsntSnsr1Bnk1', 'EGSPrepn_ratLamS1B1', 'flgAdpnFilOld'], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': ['EGSSIG_SELO2SNSR0BNK1_SC', 'EGSPREPN_TYPSNSR1BNK1_SC'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': ['0.0', '15.999755859375']}, '$op47': {'oid': '15609', 'type': 'Variable', 'instance_name': 'EGSPrepn_ratLamSymcS2B1', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op29'], 'arg_names': [], 'args': ['$op72_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam'], 'read': True, 'write': False, 'physical_type': 'real64', 'data_type': 'uint16', 'unique_variables': ['EGSDO2_flgDynAdpnLtrS1B1', 'EGSDO2_flgDynAdpnLtrS2B1', 'EGSDO2_flgDynAdpnRtlS1B1', 'EGSDO2_flgDynAdpnRtlS2B1', 'EGSDO2_tiDlyAdpnS1B1', 'EGSDO2_tiDlyAdpnS2B1', 'EGSDO2_tiTranAdpnS1B1', 'EGSDO2_tiTranAdpnS2B1', 'EGSPrepn_flgEgSnsrPrsntSnsr2Bnk1', 'EGSPrepn_ratLamS2B1', 'flgAdpnFilOld'], 'unique_params': ['EGSSig_tiConTrigFil_C'], 'unique_consts': ['EGSSIG_SELO2SNSR1BNK1_SC', 'EGSPREPN_TYPSNSR2BNK1_SC'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': ['0.0', '15.999755859375']}}}
+
+### Task:
+Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+
+Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+---

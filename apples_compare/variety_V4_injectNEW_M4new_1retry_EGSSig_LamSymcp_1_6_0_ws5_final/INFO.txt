@@ -1,0 +1,18 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=EGSSig_LamSymcp_1_6_0 ws=5 fn=LowpassT_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 25
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 449 chars
+  METRICS: M1=0.6666666666666666  M2=1.0  M3=1.0  M4=0.875  M7=0.41428571428571426  M8=0.0
+  weighted composite = 67.0%
+  M4 detail: [KB:LowpassT] 7/8 covered | missing: "Check the maximum relative deviation of the output"
+    JUDGE REASONING: 1: COVERED — TC1 Step 1→2 applies a small input increase 5→5.5 and expects filtered output 5→5.25 after one raster.
+2: COVERED — TC2 Step 1→2 applies a large input increase 3→10 and expects output 3→6.5 after one raster (T=1).
+3: COVERED — TC1 Step 2→3 applies a small input decrease 5.5→5.2 and expects output 5.25→5.225 after one raster.
+4: COVERED — TC2 Step 2→3/4 includes large input decreases 10→1 (and 1→0) and expects output to decrease gradually (6.5→5.7→4.56) with T=5.
+5: NOT COVERED — no test explicitly computes/compares “maximum relative deviation” (e.g., asserts |y−u|/|u| ≤ limit over time or identifies worst-case deviation); would need a test that measures relative deviation and checks it against a stated max criterion.
+6: COVERED — TC2 varies the effective filter gain via time constant changes (T=1 then T=5) and checks changed output response (6.5 then 5.7/4.56).
+7: COVERED — TC3 uses min/max style values: min input 0 (precondition), max-ish input 15.999755859375 (Step 3), and min/max time constant behavior via T=1, T=10, and T=0; expected outputs are specified (0, 7.5, 8.25, 10).
+8: COVERED — TC3 Step 4 sets T=0 (disabled) with input 10 and expects output immediately equals input (10).
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

@@ -456,8 +456,8 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--gepa-auto", type=str, default=None,
                    choices=["light", "medium", "heavy"],
                    help="GEPA intensity (default: medium)")
-    g.add_argument("--gepa-reflection-images", action="store_true", default=False,
-                   help="Send images to reflection LM during GEPA")
+    g.add_argument("--gepa-reflection-images", action=argparse.BooleanOptionalAction, default=None,
+                   help="Send images to reflection LM during GEPA (default: True). Use --no-gepa-reflection-images to disable.")
     g.add_argument("--gepa-reflection-detail", type=str, default=None,
                    choices=["low", "high", "auto"],
                    help="Image detail level for reflection (default: low)")

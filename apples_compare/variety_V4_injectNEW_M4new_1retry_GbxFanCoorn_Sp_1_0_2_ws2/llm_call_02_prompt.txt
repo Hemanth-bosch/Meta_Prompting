@@ -1,0 +1,291 @@
+================ role: system ================
+Your input fields are:
+1. `context_analysis` (str): 
+2. `equation_json` (str): 
+3. `const_values` (str): 
+4. `weakspot_operation` (str): 
+5. `instance_names` (str): 
+6. `example_explanation_output` (str): 
+7. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, the test cases you generate MUST satisfy EVERY guideline listed here: at minimum each guideline must be exercised by at least one test case, and NONE may be skipped — treat them as hard BU requirements (extra cases are fine). If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `test_cases` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## instance_names ## ]]
+{instance_names}
+
+[[ ## example_explanation_output ## ]]
+{example_explanation_output}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Generate **test cases** for the identified weakspot.
+        
+        ### Output Requirements:
+        First give the "Detailed Explanation" of the testcase.
+        The output should have single JSON for all the test cases and should have the following structure:
+        ```json
+        [
+            {
+                "Pre-Condition": ["...", "...", ...],
+                "Steps": [
+                    {
+                        "Actions": ["...", "...", ...],
+                        "Expected Results": ["...", "...", ...]
+                    },
+                    ...
+                ],
+                "Detailed Explanation": "..."
+            },
+            ...
+        ]
+        ```
+        
+        ### Formatting Guidelines:
+        1. **Detailed Explanation**:
+           - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+        
+        2. **Pre-Condition**:
+           - Only include value assignments in the format: "<value_name> = <value>".
+           - Do not include any variables which are part of present in Action.
+        
+        3. **Steps**:
+           - Each step should consist of:
+             - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+             - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+        
+        4. **String Types**:
+           - Only use the following types of strings in the output:
+             - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+             - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+             - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+        
+        ### Additional Constraints:
+        - **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+        - **NOTE** Pre-Condition and Actions **cannot be same variables**
+        - Do not add new constant values that are not part of the provided input.
+        - DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+        - Ensure all steps are logically consistent with the input equation and constants.
+        - Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+        
+        EXAMPLE:
+        (An example test-case in the exact expected format is provided in the `example_explanation_output` input field.)
+        
+        ### Input Details:
+        
+        **Constant Values**: provided in the `const_values` input field
+        **Weakspot Operation**: provided in the `weakspot_operation` input field
+        **Weakspot Context**: provided in the `context_analysis` input field
+        **use this Expected Results**: provided in the `instance_names` input field
+        
+        From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+        Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+        **DO NOT** generate values for dT in the testcases.
+        
+        Using the provided JSON data, generate the test cases as specified.
+        
+        (The equation JSON is provided in the `equation_json` input field.)
+        
+        ### Task:
+        Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+        Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+        Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+        
+        Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+        The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+================ role: user ================
+[[ ## context_analysis ## ]]
+The weakspot element identified is "$op19", which corresponds to the function instance "GbxFanCoorn_Sp_Srv_DebounceDEB_I" implementing the "Srv_Debounce_out" function. This function is responsible for debouncing a boolean input signal, i.e., filtering out rapid toggling by applying separate debounce times for rising and falling edges. The function takes three inputs: the input signal "X", a parameter structure "Param" containing debounce timing parameters, and the sample time "Dt". It outputs the debounced boolean state of the input signal.
+
+The inputs that can be altered are "X" and "Param" because "Dt" is a fixed sample time constant and should not be changed. The input "X" is provided by "$op16" (an "And" operation), and "Param" is provided by "$op17" (a function returning debounce parameters). Both inputs are dynamic and can be manipulated in test scenarios.
+
+The output of this debounce function is used by "$op20" (local variable "GbxFan_st"), which depends on "$op19" and represents the debounced state as a boolean. This output is the primary observable that can be checked to validate the debounce behavior.
+
+Test cases should cover initialization correctness, rising edge delay, falling edge delay, and suppression of signal changes shorter than debounce times on both rising and falling edges, as per the provided Bosch BU test guidelines. These tests ensure the debounce function behaves correctly under typical and edge conditions.
+
+### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op19
+- **Instance Name:** GbxFanCoorn_Sp_Srv_DebounceDEB_I
+- **Function Name:** Srv_Debounce_out
+- **Role and Working:**
+  - This element implements a debounce function that processes a boolean input signal to remove noise caused by rapid toggling.
+  - It uses separate debounce times for transitions from low to high and from high to low.
+  - The function calculates a new debounce timer value on each call and returns the debounced output state.
+  - It requires consistent calling frequency (once per process call) to maintain correct timing.
+  - The output is a logical boolean indicating the stable debounced state of the input signal.
+
+### 2. Inputs That Can Be Altered
+| Input Name | Reference Key | Type Information | Notes |
+|------------|---------------|------------------|-------|
+| X          | $op16         | Operation (And)  | Dynamic boolean input signal derived from logical AND of other signals |
+| Param      | $op17         | Function (Srv_DebounceParam_t_get) | Provides debounce timing parameters (high-to-low and low-to-high debounce times) |
+| Dt         | $op18         | Variable (sint32) | Fixed sample time constant (20000.0), **excluded from alteration** |
+
+- The input "X" is a boolean signal that can be manipulated by changing the inputs to the AND operation.
+- The "Param" input provides the debounce timing parameters and can be adjusted to test different debounce durations.
+- The sample time "Dt" is fixed and must not be altered.
+
+### 3. Outputs That Can Be Checked
+| Output Variable | Reference Key | Type | Connection to Weakspot |
+|-----------------|---------------|------|-----------------------|
+| GbxFan_st       | $op20         | Local (bool) | Directly depends on $op19 output; represents the debounced boolean state |
+
+- The output "GbxFan_st" is the debounced state resulting from the debounce function.
+- This output is the primary observable to verify the correctness of the debounce logic.
+
+### 4. Possible Testcases for Weakspot Element
+Based on the Bosch BU test guidelines for Srv_Debounce, the minimal set of test cases includes:
+
+1. **Initialization Test**
+   - Initialize the debounce function.
+   - Check that the output equals the expected initialization value.
+
+2. **Rising Edge Delay Test**
+   - Set input "X" to FALSE and wait until output is FALSE.
+   - Change input "X" from FALSE to TRUE.
+   - Maintain input TRUE for the debounce time.
+   - Verify output changes to TRUE only after debounce time elapses.
+
+3. **Suppress Falling Signal Change Shorter Than Debounce Time**
+   - Set input from TRUE to FALSE.
+   - Before debounce time expires, set input back to TRUE.
+   - Verify output remains TRUE after debounce time.
+
+4. **Falling Edge Delay Test**
+   - Change input from TRUE to FALSE.
+   - Maintain input FALSE for debounce time.
+   - Verify output changes to FALSE only after debounce time elapses.
+
+5. **Suppress Rising Signal Change Shorter Than Debounce Time**
+   - Set input from FALSE to TRUE.
+   - Before debounce time expires, set input back to FALSE.
+   - Verify output remains FALSE after debounce time.
+
+These test cases ensure the debounce function correctly filters input signal transitions and respects the configured debounce times.
+
+[[ ## equation_json ## ]]
+{"$op19": {"oid": "61", "type": "Function", "instance_name": "GbxFanCoorn_Sp_Srv_DebounceDEB_I", "function_name": "Srv_Debounce_out", "class_method_name": "out", "sequence_number": "2", "method_name": null, "decision": null, "condition": [], "arg_names": ["X", "Param", "Dt"], "args": ["$op16", "$op17", "$op18"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op20": {"oid": "96", "type": "Local", "instance_name": "GbxFan_st", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op3"], "arg_names": [], "args": ["$op19"], "read": true, "write": false, "physical_type": "log", "data_type": "bool", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "1.0"]}, "$op16": {"oid": "31", "type": "Operation", "instance_name": "And", "function_name": "And", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op12", "$op15"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op17": {"oid": "52", "type": "Function", "instance_name": "GbxFanCoorn_Sp_DebounceParam_tDEBt_I", "function_name": "Srv_DebounceParam_t_get", "class_method_name": "get", "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "", "data_type": "", "unique_variables": [], "unique_params": ["GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op18": {"oid": "92", "type": "Variable", "instance_name": "dT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_params": ["dT"], "unique_variables": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147483648.0", "2147483647.0"]}, "$op24": {"oid": "19", "type": "Variable", "instance_name": "GbxFan_r", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op23"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-400.0", "399.98779296875"]}}
+
+[[ ## const_values ## ]]
+{"dT": "20000.0"}
+
+[[ ## weakspot_operation ## ]]
+$op19
+
+[[ ## instance_names ## ]]
+GbxFan_r
+
+[[ ## example_explanation_output ## ]]
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#     {
+#         "Pre-Condition": [
+#             "THighLow = 20",
+#             "TLowHigh = 20",
+#             "X = 1"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "X = 0",
+#                     "Wait THighLow"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "X = 1",
+#                     "Wait TLowHigh"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             }
+#         ]
+#     },
+#     {
+#         "Pre-Condition": [
+#             "THighLow = 10",
+#             "TLowHigh = 10",
+#             "X = 0"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "Wait 100",
+#                     "X = 1",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "Wait TLowHigh"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "X = 0",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "X = 1",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             }
+#         ]
+#     }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+[[ ## kb_guidelines ## ]]
+## Validated test guidelines for Srv_Debounce (newKB) — cover these scenarios:
+1. Checking the correct initialization of the debounce — Initialize the debounce; Check: Output = initialization value
+2. Checking the delay on rising edge — Set: Input = FALSE; Wait: Output = FALSE; Change the input from FALSE to TRUE; Set: Input = TRUE; Wait: Till the debounce time is over; Check: Output = TRUE
+3. Checking the suppressing on falling signal change smaller than debouncing time — Set the input from true to false and before time DEBOUNCE back to true; Set: Input = FALSE & then before debounce time is over set input = TRUE; Check: Output = TRUE after debounce time is over
+4. Checking the delay on falling edge — Change the input from TRUE to FALSE; Set: Input = FALSE; Wait: Till the debounce time is over; Check: Output = FALSE
+5. Checking the suppressing on rising signal change smaller than debouncing time — Set the input from false to true and before time DEBOUNCE back to false; Set: Input = TRUE & then before debounce time is over set input = FALSE; Check: Output = FALSE after debounce time is over
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## test_cases ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

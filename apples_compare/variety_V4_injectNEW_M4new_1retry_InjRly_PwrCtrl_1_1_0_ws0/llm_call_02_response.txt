@@ -1,0 +1,167 @@
+[[ ## reasoning ## ]]
+The weakspot element implements a turn-off delay debounce function that outputs TRUE immediately when the input signal is TRUE, and delays the transition from TRUE to FALSE by a specified delay time when the input signal goes FALSE. The key inputs to test are the logical input signal and the delay time parameter, while the sample time (Dt) is fixed and must not be altered.
+
+The KB guidelines specify seven scenarios that must be covered, including initialization, rising edge response, input fluctuations within the delay time, falling edge delay, and repeating these tests with maximum, minimum, and zero delay values.
+
+To satisfy these requirements with minimal test cases, I will generate three test cases:
+
+1. **Test Case 1:** Validate initialization and falling edge delay with a nominal delay value. This covers the initialization with input FALSE and verifies output FALSE immediately, and also tests the falling edge delay behavior.
+
+2. **Test Case 2:** Validate rising edge response and input fluctuation within delay time with a nominal delay value. This covers the immediate output TRUE on rising edge and verifies that a brief FALSE input that returns to TRUE before delay expiration does not cause output to fall.
+
+3. **Test Case 3:** Repeat the above tests with maximum, minimum, and zero delay values to verify boundary conditions and ensure correct behavior across the parameter range.
+
+Each test case includes detailed steps with value assignments and wait times consistent with the fixed sample time (dT = 20000.0). The output variable checked is the delayed output logical variable ($op5), which reflects the weakspot element output.
+
+This approach ensures all KB guidelines are exercised at least once, with minimal redundancy, and adheres strictly to the formatting and content constraints.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [
+            "delayTime = 100000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0",
+                    "Wait 100000"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case validates the initialization and falling edge delay behavior with a nominal delay time of 100000. Initially, the input signal is FALSE, so the output should be FALSE immediately, confirming correct initialization. Then the input is set to TRUE, and the output should switch to TRUE immediately, verifying the rising edge response. Finally, the input is set to FALSE and held for the full delay time, after which the output should switch to FALSE, confirming the turn-off delay functionality."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 100000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0",
+                    "Wait 50000"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies that a brief FALSE input that does not last the full delay time does not cause the output to fall prematurely. Starting with input and output TRUE, the input is set to FALSE and held for half the delay time (50000), during which the output should remain TRUE. Then the input returns to TRUE, and the output should remain TRUE immediately. This confirms that the turn-off delay debounce prevents premature output falling due to transient input changes."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0",
+                    "Wait 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "delayTime = 2147483647"
+                ],
+                "Expected Results": []
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0",
+                    "Wait 2147483647"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "delayTime = -2147483648"
+                ],
+                "Expected Results": []
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0",
+                    "Wait 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case covers boundary conditions by repeating the initialization, rising edge, and falling edge delay tests with zero, maximum (2147483647), and minimum (-2147483648) delay values. For zero delay, the output should follow the input immediately with no delay. For maximum delay, the output should remain TRUE for the entire delay period before switching to FALSE. For minimum delay (negative value), the behavior is tested to ensure no unexpected delays occur, effectively treated as zero delay. This ensures the element behaves correctly across the full range of delay parameter values."
+    }
+]
+
+[[ ## completed ## ]]

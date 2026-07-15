@@ -1,0 +1,128 @@
+```json
+[
+    {
+        "Pre-Condition": [
+            "EGSPrepn_ratLamSymcS1B2 = 0",
+            "EGSPrepn_ratLamSymcS2B1 = 0",
+            "EGSPrepn_ratLamSymcS2B2 = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "initValue = 5",
+                    "T = 10"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 5"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10000"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 5"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the normal operation of the LowpassT_out filter with a valid initialization value and a time constant T greater than 1. The initial output should match the initValue at the first step, confirming correct initialization. After waiting one raster period (dT), the output should remain stable if the input does not change, validating the filter's steady-state behavior."
+    },
+    {
+        "Pre-Condition": [
+            "EGSPrepn_ratLamSymcS1B2 = 0",
+            "EGSPrepn_ratLamSymcS2B1 = 0",
+            "EGSPrepn_ratLamSymcS2B2 = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "initValue = 3",
+                    "T = 1"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 3"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10000"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 3"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case tests the boundary condition where the time constant T is set to the minimum allowed value of 1. The filter output should initialize correctly to the initValue and remain stable after one raster period. This ensures that the filter handles the lower boundary of T without errors or unexpected behavior."
+    },
+    {
+        "Pre-Condition": [
+            "EGSPrepn_ratLamSymcS1B2 = 0",
+            "EGSPrepn_ratLamSymcS2B1 = 0",
+            "EGSPrepn_ratLamSymcS2B2 = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "initValue = 7",
+                    "T = 0"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 7"
+                ]
+            },
+            {
+                "Actions": [
+                    "T = -5"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 7"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case examines the filter's behavior when given invalid time constants (T less than 1, including zero and negative values). The expected behavior is that the filter either ignores the invalid T and maintains the output at the initValue or handles it gracefully without crashing. This test validates robustness against invalid parameter inputs."
+    },
+    {
+        "Pre-Condition": [
+            "EGSPrepn_ratLamSymcS1B2 = 0",
+            "EGSPrepn_ratLamSymcS2B1 = 0",
+            "EGSPrepn_ratLamSymcS2B2 = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "initValue = 2",
+                    "T = 5"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 2"
+                ]
+            },
+            {
+                "Actions": [
+                    "initValue = 10"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 2"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10000"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 3"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10000"
+                ],
+                "Expected Results": [
+                    "EGSPrepn_ratLamSymcS1B1 = 5"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case evaluates the step input response of the filter. Initially, the filter output equals the initValue. When the input changes abruptly from 2 to 10, the output should not jump immediately but instead increase gradually over subsequent raster periods, demonstrating the smoothing effect of the lowpass filter. The expected output values after each wait reflect the filter's time constant influence on the output transition."
+    }
+]
+```

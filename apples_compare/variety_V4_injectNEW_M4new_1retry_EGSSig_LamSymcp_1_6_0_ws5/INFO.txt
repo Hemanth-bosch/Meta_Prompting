@@ -1,0 +1,18 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=EGSSig_LamSymcp_1_6_0 ws=5 fn=LowpassT_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini
+  pipeline LLM calls (llm_call_*) = 27
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 449 chars
+  METRICS: M1=0.6666666666666666  M2=1.0  M3=0.8181818181818182  M4=0.5  M7=0.49333333333333335  M8=0.0
+  weighted composite = 58.0%
+  M4 detail: [KB:LowpassT] 4/8 covered | missing: "Test with small decrease in value of input", "Check the maximum relative deviation of the output", "Test with different gain constant" …
+    JUDGE REASONING: 1: COVERED — TC1 applies a small input step 5→6 (Actions) and checks gradual rise in output (Expected 5.2 then 5.56).
+2: COVERED — TC4 applies a large input step 3→15 and checks output increases gradually (Expected 3.12 then 3.41).
+3: NOT COVERED — need a testcase with an explicit small decrease (e.g., 6→5) and expected filtered output decrease values.
+4: COVERED — TC2 applies a large decrease 10→2 and expects output to match 2 after one update (Expected=2).
+5: NOT COVERED — TC4 mentions “relative deviation” but provides no explicit stimulus/measurement/acceptance criterion for *maximum relative deviation* (no computed deviation and no limit in Expected Results). Need a testcase that calculates (|in−out|/|in| or similar) and asserts it ≤ a specified max.
+6: NOT COVERED — no testcase changes/sets a gain constant parameter (only T is varied). Need tests with at least two different gain values and corresponding expected outputs.
+7: NOT COVERED — TC5 uses min/max-ish input with T=100, TC2 uses T=1, but no single testcase (or explicit pair) that exercises *both min and max input* together with *min and max time constant*, with expected results stated for those combinations. Need explicit runs for (in=min,max) × (T=min,max).
+8: COVERED — TC3 uses extremely large T=1,000,000 to represent disabled/near-disabled behavior and expects output to remain unchanged at 7 despite input 7→12.
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

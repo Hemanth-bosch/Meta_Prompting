@@ -1,0 +1,11 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=a2mamg ws=0 fn=putBit_unsigned_putBit
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 2
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 331 chars
+  METRICS: M1=0.6666666666666666  M2=1.0  M3=0.6666666666666666  M4=0.0  M7=0.5  M8=0.0
+  weighted composite = 45.8%
+  M4 detail: [newKB:putBit_unsigned_putBit] 0/1 covered | missing: "Checking the Bit Operation : SetBit — Set: Set the input var"
+    JUDGE REASONING: 1: NOT COVERED — No test case explicitly provides (a) an input X in the “xxxxxxxx” form with a specified bit *position number* to set TRUE and (b) checks that the output’s logical status at that specified position is TRUE. TC1/TC2 toggle inputs but do not specify the bit position parameter nor verify the “logical status of the position” as the expected result; a needed TC would set X to a defined pattern, apply putBit with an explicit Position=k and Value=TRUE, and expect bit(k)=1 (and optionally unchanged other bits).
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

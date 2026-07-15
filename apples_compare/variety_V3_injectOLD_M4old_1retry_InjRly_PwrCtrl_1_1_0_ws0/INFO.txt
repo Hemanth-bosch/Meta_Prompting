@@ -1,0 +1,7 @@
+VARIETY 3: V3_injectOLD_M4old_1retry
+  weakspot=InjRly_PwrCtrl_1_1_0 ws=0 fn=Srv_TrnOffDly_out
+  inject_kb_guidelines=True  KB=old  max_retries=1  model=azure/gpt-4.1-mini
+  pipeline LLM calls (llm_call_*) = 2
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 0 chars
+  M4 score = 0.5  ([no-kb] coverage not judgeable — no KB spec (neutral 0.5))

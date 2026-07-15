@@ -1,0 +1,14 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=moftqptdveh_fil ws=0 fn=MoFSrv_Lib_RampEnhd_Out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 9
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 1303 chars
+  METRICS: M1=1.0  M2=0.8333333333333334  M3=0.8035714285714286  M4=0.5  M7=0.9666666666666667  M8=0.0
+  weighted composite = 69.1%
+  M4 detail: [newKB:MoFSrv_Lib_RampEnhd_Out] 2/4 covered | missing: "Checking the slope up (with several SLOPE UP between null an", "Checking the slope down (with several SLOPE DOWN between nul"
+    JUDGE REASONING: 1: COVERED — TC1 sets State=50000 and Target=50000 (init/no ramp) and expects _s32_Tq1=50000, Dir=0.
+2: NOT COVERED — TC2 shows ramp-up increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE UP between null and MAX”; need a TC that tries multiple SlopePos values (incl. 0 and near/max) and waits until _s32_Tq1==Target.
+3: NOT COVERED — TC3 shows ramp-down increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE DOWN between null and MAX”; need a TC with multiple SlopeNeg values (incl. 0 and near/max) and wait until _s32_Tq1==Target.
+4: COVERED — TC4 ramps up (Target 50000; expects _s32_Tq1 increases), then changes Target to 20000 before reaching it and expects ramp-down from intermediate value (_s32_Tq1=30100, Dir=-1), then changes Target to 40000 before reaching 20000 and expects ramp-up from intermediate value (_s32_Tq1=30020, Dir=1).
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

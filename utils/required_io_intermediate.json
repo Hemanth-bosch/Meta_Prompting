@@ -1,0 +1,63 @@
+{
+  "_README": "INTERMEDIATE-output Required-I/O KB, keyed by weakspot INSTANCE 'fc_name#ws_id'. Same schema as required_io.json, but required_outputs = the weakspot element's ACTUAL intermediate OUTPUT SIGNAL (checkable), NOT the final measurable output/instance_names. DERIVATION RULE (validated vs weakspot context): the weakspot op's immediate consumer that is a 'Local' variable IS the checkable output signal (the op's own instance_name is the block INSTANCE name for stateful blocks, e.g. InjRly_T15TOffD_I, NOT a signal); if there is no Local consumer (output feeds an Operation/Variable directly) the op's own instance_name IS the output value. Use with --required-io-outputs + --required-io-path pointing at THIS file to steer Prompt-2 generation to the weakspot intermediate output. required_inputs/required_preconds left EMPTY (M2 completeness SKIPPED -> signal-resolution only). required_outputs also drives M1 scoring. The '_README' key is ignored by the loader.",
+  "a2mamg#0": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["getBit_unsigned_U8"],
+    "_source": "INTERMEDIATE: getBit weakspot $op4 output (consumer=Operation 'Not' -> no Local, so op's own output value). fc#ws 'a2mamg#0' is SHARED by two ops; this plain key serves the getBit $op4 instance. Final = mkriech_w_msg/mdwancan_msg/B_creepact_msg."
+  },
+  "a2mamg#0#$op5": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["putBit_unsigned"],
+    "_source": "INTERMEDIATE (OP-DISAMBIGUATED): the OTHER a2mamg#0 weakspot is $op5 putBit_unsigned_putBit; consumer=Variable PT_stTraShftOp (the final), so op's own output value 'putBit_unsigned' is the intermediate. Resolved via 'fc#ws#op' when weakspot_op_key='$op5'. Final = PT_stTraShftOp."
+  },
+  "InjRly_PwrCtrl_1_1_0#0": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["_flgDlydlnPostDrive"],
+    "_source": "INTERMEDIATE: weakspot $op4 Srv_TrnOffDly output -> Local $op5 '_flgDlydlnPostDrive' (context: 'the output is connected to the local variable _flgDlydlnPostDrive of type bool'). NOT the block instance InjRly_T15TOffD_I. Final = InjPwrRly_r."
+  },
+  "Rail_TempLim_50.8.0#2": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["Rail_trqRampSwitch"],
+    "_source": "INTERMEDIATE: weakspot $op39 Srv_RampSwitch output (consumer=Variable Rail_trqFlTempLim=the FINAL, so op's own output value is the intermediate). Final = Rail_trqFlTempLim."
+  },
+  "GearLvrPosn_Vd#0": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["getBit_unsigned_U8"],
+    "_source": "INTERMEDIATE: weakspot getBit_unsigned_getBit output (consumer=Operation 'Not' -> op's own output value). Final = Gbx_stTrsmNeutOBD."
+  },
+  "EGSSig_LamSymcp_1_6_0#2": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["ratLamAdpn_LT_I"],
+    "_source": "INTERMEDIATE: weakspot LowpassT_out(_ratLamTmp, EGSSig_tiConTrigFil_C) = filtered lambda-adaptation ratio 'ratLamAdpn_LT_I'. Traced full eq: output feeds two Smaller comparisons vs a pruned $op20 (range check), no named Local captures it (unlike EGSSig#5's _ratLamTiConAdpn), forward cone pruned. 'ratLamAdpn_LT_I' IS the genuine filter output (input=_ratLamTmp). Final = EGSPrepn_ratLamSymcS1B1..S2B2."
+  },
+  "EGSSig_LamSymcp_1_6_0#5": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["_ratLamTiConAdpn"],
+    "_source": "INTERMEDIATE: weakspot LowpassT output -> Local '_ratLamTiConAdpn'. NOT the block instance tiConAdpn_LT_I. Final = EGSPrepn_ratLamSymcS1B1..S2B2."
+  },
+  "GbxFanCoorn_Sp_1_0_2#2": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["GbxFan_st"],
+    "_source": "INTERMEDIATE: weakspot Srv_Debounce output -> Local 'GbxFan_st' (debounced state). NOT the block instance GbxFanCoorn_Sp_Srv_DebounceDEB_I. Final = GbxFan_r."
+  },
+  "moftqptdveh_fil#0": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["_s32_Tq1"],
+    "_source": "INTERMEDIATE: weakspot MoFSrv_Lib_RampEnhd output -> Local '_s32_Tq1'. NOT the block instance RampEnhd_Trq. Final = MoFTqPtdVeh_tqWhlXTS."
+  },
+  "oilsepactr_coorr#20": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["OilSepActr_flgSpdShdwn"],
+    "_source": "INTERMEDIATE: weakspot Srv_TrnOnDly output -> Local 'OilSepActr_flgSpdShdwn'. NOT the block instance OilSepActr_ShwdnTOnD_I. Final = OilSepActr_stCoorr."
+  }
+}

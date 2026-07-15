@@ -1,0 +1,11 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=a2mamg ws=0 fn=getBit_unsigned_getBit
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini
+  pipeline LLM calls (llm_call_*) = 2
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 335 chars
+  METRICS: M1=0.6666666666666666  M2=0.35  M3=1.0  M4=0.0  M7=0.5  M8=0.0
+  weighted composite = 41.1%
+  M4 detail: [newKB:getBit_unsigned_getBit] 0/1 covered | missing: "Checking the Bit Operation : GetBit — Set: Set the input var"
+    JUDGE REASONING: 1: NOT COVERED — All TCs (TC1–TC4) only vary X (CNFMDWAN) and implicitly assume bit Position=0; no test case explicitly sets/provides a Position input and checks output for a nonzero position. Needed: at least one TC that sets X to a known pattern (e.g., 0b00010000) and explicitly sets Position=4 (and another position cleared) with Expected Results out=1/out=0 accordingly.
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

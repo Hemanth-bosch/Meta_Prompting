@@ -1,0 +1,275 @@
+[[ ## reasoning ## ]]
+The weakspot identified is a low-pass filter function "LowpassT_out" with inputs "initValue" and "T" (time constant). The filter smooths input signals, and the time constant T must be ≥ 1. The test cases must validate the filter's behavior under various input changes and time constants, including boundary conditions and disabled behavior, as per the KB guidelines.
+
+To cover all mandatory guidelines with minimal redundancy, the following test cases are designed:
+
+1. **Small Increase in Input**: Start with an initial value and apply a small increase in input to verify the filter output rises smoothly, confirming the filter's smoothing effect on minor changes.
+
+2. **Large Increase in Input**: Apply a large step increase in input to verify the filter's response and settling behavior, ensuring it does not overshoot or behave unexpectedly.
+
+3. **Small Decrease in Input**: Apply a small decrease in input to verify the filter output decreases smoothly, confirming symmetric behavior for decreasing inputs.
+
+4. **Large Decrease in Input**: Apply a large step decrease in input to verify the filter's response and settling behavior on downward steps.
+
+5. **Different Gain Constants (T)**: Test with minimum allowed time constant (T=1) and a larger time constant (e.g., T=10) to verify the effect of T on filter speed and smoothing.
+
+6. **Min-Max Input and Time Constant**: Test with minimum input (0) and maximum input (e.g., 16, based on variable range) combined with min and max time constants to verify boundary behavior.
+
+7. **Disabled Filter Behavior**: Simulate the filter disabled by setting T to a very large value or by resetting output to input, verifying output matches input or expected behavior.
+
+8. **Maximum Relative Deviation Check**: Verify that the output relative deviation from expected filtered value is within acceptable limits, ensuring filter accuracy.
+
+Each test case includes pre-conditions to set initial values and parameters, steps to apply input changes and time constants, and expected results to verify output correctness. The test cases use only value assignments, waits, and value checks as per formatting guidelines. The sample time dT is fixed and not altered.
+
+This set of test cases ensures comprehensive coverage of the lowpass filter weakspot, exercising all KB guidelines with minimal overlap.
+
+[[ ## test_cases ## ]]
+[
+  {
+    "Pre-Condition": [
+      "initValue = 5",
+      "T = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 5",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 5"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 6",
+          "T = 5",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 5.2"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the filter's response to a small increase in input value from 5 to 6 with a moderate time constant T=5. The initial output equals the initial value. After one sample time, the output should increase smoothly but not reach the input immediately, demonstrating the low-pass filtering effect on small input changes."
+  },
+  {
+    "Pre-Condition": [
+      "initValue = 2",
+      "T = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 2",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 2"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 12",
+          "T = 5",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 4"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case checks the filter's behavior for a large increase in input from 2 to 12 with time constant T=5. The output should start at the initial value and move towards the new input gradually, showing the filter's smoothing and settling behavior on large step changes."
+  },
+  {
+    "Pre-Condition": [
+      "initValue = 10",
+      "T = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 10",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 9",
+          "T = 5",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 9.8"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the filter's response to a small decrease in input from 10 to 9 with T=5. The output should decrease smoothly, confirming the filter's symmetric behavior for decreasing inputs and its smoothing effect on small negative changes."
+  },
+  {
+    "Pre-Condition": [
+      "initValue = 14",
+      "T = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 14",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 14"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 4",
+          "T = 5",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 12"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case examines the filter's behavior for a large decrease in input from 14 to 4 with T=5. The output should start at the initial value and decrease gradually, demonstrating the filter's smoothing and settling behavior on large downward steps."
+  },
+  {
+    "Pre-Condition": [
+      "initValue = 5",
+      "T = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 5",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 5"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 10",
+          "T = 1",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 5",
+          "T = 10",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 9.5"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case tests the filter with minimum time constant T=1 and a larger time constant T=10. With T=1, the filter output should follow the input immediately (no smoothing). With T=10, the output changes slowly, demonstrating the effect of the gain constant on filter speed and smoothing."
+  },
+  {
+    "Pre-Condition": [
+      "initValue = 0",
+      "T = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 0",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 16",
+          "T = 1",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 16"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 16",
+          "T = 10",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 16"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies filter behavior at input boundaries (min=0, max=16) with min and max time constants. The output should match input immediately for T=1 and change slowly for T=10, confirming correct handling of input and time constant extremes."
+  },
+  {
+    "Pre-Condition": [
+      "initValue = 7",
+      "T = 1000000"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 7",
+          "T = 1000000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 7"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 10",
+          "T = 1000000",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 7"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case simulates the disabled filter behavior by setting an extremely large time constant T, effectively disabling the filter's response to input changes. The output should remain at the initial value despite input changes, verifying the filter's disabled behavior."
+  },
+  {
+    "Pre-Condition": [
+      "initValue = 5",
+      "T = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "initValue = 10",
+          "T = 5",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 6"
+        ]
+      },
+      {
+        "Actions": [
+          "initValue = 10",
+          "T = 5",
+          "Wait @"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 7.2"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case checks the maximum relative deviation of the filter output by applying a step input and observing the output over two sample times. The output should approach the input gradually, and the relative deviation should be within acceptable limits, confirming filter accuracy."
+  }
+]
+
+[[ ## completed ## ]]

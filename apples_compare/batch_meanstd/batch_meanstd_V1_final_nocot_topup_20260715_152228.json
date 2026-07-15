@@ -1,0 +1,114 @@
+{
+  "config": {
+    "repeats": 1,
+    "models": [
+      "azure/gpt-4.1-mini"
+    ],
+    "temperature": 1.0,
+    "split": "val",
+    "limit": 0,
+    "rules": {
+      "composite_weights": {
+        "m1": 0.2,
+        "m2": 0.15,
+        "m3": 0.15,
+        "m4": 0.2,
+        "m7": 0.15,
+        "m8": 0.15
+      },
+      "M1_IO_CHECK_WEIGHT": 1,
+      "M3_OVERLAP_WEIGHT": 2,
+      "M8_GATE_ON_WRONG_IO": true,
+      "M7_REF_PIN": 4,
+      "required_io_in_prompt": true,
+      "required_io_path": "utils/required_io.json",
+      "M8_FULL_RESOLVE": true,
+      "M4_judge_model": "azure/gpt-5.2",
+      "temperature": 1.0,
+      "cache": false,
+      "cot": false,
+      "varieties": [
+        "V1"
+      ]
+    },
+    "metric_code_version": {
+      "M1_IO_CHECK_WEIGHT": 1,
+      "M3_OVERLAP_WEIGHT": 2,
+      "M8_GATE_ON_WRONG_IO": true
+    }
+  },
+  "report": {
+    "azure/gpt-4.1-mini": {
+      "V1": {
+        "m1": {
+          "mean": 0.7999999999999999,
+          "std": 0.0
+        },
+        "m2": {
+          "mean": 0.8366666666666667,
+          "std": 0.0
+        },
+        "m3": {
+          "mean": 0.9519211822660099,
+          "std": 0.0
+        },
+        "m4": {
+          "mean": 0.375,
+          "std": 0.0
+        },
+        "m7": {
+          "mean": 0.325,
+          "std": 0.0
+        },
+        "m8": {
+          "mean": 0.08,
+          "std": 0.0
+        },
+        "composite": {
+          "mean": 56.403817733990145,
+          "std": 0.0
+        }
+      }
+    }
+  },
+  "raw_per_repeat": {
+    "azure/gpt-4.1-mini": {
+      "V1": [
+        {
+          "m1": 0.7999999999999999,
+          "m2": 0.8366666666666667,
+          "m3": 0.9519211822660099,
+          "m4": 0.375,
+          "m7": 0.325,
+          "m8": 0.08,
+          "composite": 56.403817733990145,
+          "_n_examples": 5
+        }
+      ]
+    }
+  },
+  "per_example_composite": {
+    "azure/gpt-4.1-mini": {
+      "V1": {
+        "GearLvrPosn_Vd#ws0": [
+          60.83
+        ],
+        "InjRly_PwrCtrl_1_1_0#ws0": [
+          53.55
+        ],
+        "EGSSig_LamSymcp_1_6_0#ws2": [
+          52.5
+        ],
+        "oilsepactr_coorr#ws20": [
+          58.26
+        ],
+        "Rail_TempLim_50.8.0#ws2": [
+          56.88
+        ]
+      }
+    }
+  },
+  "fail_count": {
+    "azure/gpt-4.1-mini": 0
+  }
+}

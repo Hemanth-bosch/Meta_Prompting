@@ -1,0 +1,65 @@
+[[ ## reasoning ## ]]
+The weakspot element $op21 implements a bit extraction function that extracts the bit at a fixed position 2 from an unsigned input variable `Gbx_SigSrcEval`. The key aspect to test is whether the function correctly returns the logical value (0 or 1) of the bit at position 2 for various input values. Since the bit position is fixed and cannot be altered, the only input that can be varied is the input variable `Gbx_SigSrcEval`.
+
+To comprehensively validate this weakspot, the test cases should cover:
+- A case where bit 2 is set to 1, ensuring the function returns 1.
+- A case where bit 2 is cleared (0), ensuring the function returns 0.
+- A case with a larger input value (e.g., 32-bit range) to confirm the function correctly extracts bit 2 regardless of the input size and other bits.
+
+Each test case will set `Gbx_SigSrcEval` to a specific value, then check the output bit value from $op21. This directly exercises the bit extraction logic and satisfies the KB guideline requiring verification of the bit operation.
+
+The test cases are minimal yet sufficient to confirm the correctness of the bit extraction at position 2 for different input scenarios.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [
+            "Gbx_SigSrcEval = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 4"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets the input variable Gbx_SigSrcEval to 4, which in binary is 00000100. The bit at position 2 (counting from 0) is set to 1. The test verifies that the getBit function correctly extracts this bit and returns 1, confirming correct bit extraction when the bit is set."
+    },
+    {
+        "Pre-Condition": [
+            "Gbx_SigSrcEval = 255"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 251"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets Gbx_SigSrcEval to 251 (binary 11111011), where bit 2 is cleared (0). The test verifies that the getBit function returns 0, confirming correct bit extraction when the bit is cleared."
+    },
+    {
+        "Pre-Condition": [
+            "Gbx_SigSrcEval = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 1028"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case uses a larger input value 1028 (binary 0000010000000100) to confirm that the function correctly extracts bit 2 even when the input is larger than 8 bits. Bit 2 is set to 1 in this value. This ensures the function handles larger input sizes correctly."
+    }
+]
+
+[[ ## completed ## ]]

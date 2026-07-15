@@ -1,0 +1,18 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=EGSSig_LamSymcp_1_6_0 ws=5 fn=LowpassT_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 16
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 449 chars
+  METRICS: M1=0.6666666666666666  M2=1.0  M3=0.8591549295774648  M4=0.625  M7=0.5333333333333333  M8=0.0
+  weighted composite = 61.7%
+  M4 detail: [KB:LowpassT] 5/8 covered | missing: "Test with small decrease in value of input", "Check the maximum relative deviation of the output", "Test the disabled behavior of the filter"
+    JUDGE REASONING: 1: COVERED — TC1 applies a small input increase (in: 5 → 5.5 with T=5) and expects output to move slightly (5 → 5.1 after 10000).
+2: COVERED — TC2 applies a large input increase (in: 3 → 10 with T=5) and expects a partial rise (3 → 4.4 after 10000), i.e., no immediate jump.
+3: NOT COVERED — no test applies a *small* decrease (e.g., in: 5 → 4.5) with an expected small downward output change; TC3 is a large decrease.
+4: COVERED — TC3 applies a large input decrease (in: 8 → 2 with T=5) and expects output to decrease gradually (8 → 6.2 after 10000).
+5: NOT COVERED — none of the test cases defines/assesses a “maximum relative deviation” metric (no explicit relative error/deviation calculation or threshold in expected results).
+6: COVERED — TC4 explicitly varies gain/time constant T (T=1 then T=10) and checks the resulting behavior (with T=1 output reaches 10 after 10000; demonstrates different T settings are exercised).
+7: COVERED — TC5 exercises min/max input (0 and 16) and min/max-ish T (T=1 and T=1000) with explicit expected outputs (e.g., after T=1 step output goes 0 → 16).
+8: NOT COVERED — no explicit “disabled” control/state is stimulated and verified; setting T=1000 in TC5 still expects output to equal input (16), not an explicit disabled/bypass/freeze behavior. A needed test would set the block into its defined disabled mode (if such an enable/disable exists) and expect bypass or held output accordingly.
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

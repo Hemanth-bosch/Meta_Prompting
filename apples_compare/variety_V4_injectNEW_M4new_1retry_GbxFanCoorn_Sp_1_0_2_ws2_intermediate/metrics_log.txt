@@ -1,0 +1,1025 @@
+2026-07-14 15:20:33,939 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:20:33,940 INFO    extract_mbd_full: forward(): START — weakspot_op_key=$op19 raster_time=20000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\GbxFanCoorn_Sp_1_0_2\env_libs\GbxFanCoorn_Sp_1_0_2.dll
+2026-07-14 15:20:33,940 DEBUG   extract_mbd_full: forward(): equation_json (len=3329) = {"$op19": {"oid": "61", "type": "Function", "instance_name": "GbxFanCoorn_Sp_Srv_DebounceDEB_I", "function_name": "Srv_Debounce_out", "class_method_name": "out", "sequence_number": "2", "method_name": null, "decision": null, "condition": [], "arg_names": ["X", "Param", "Dt"], "args": ["$op16", "$op17", "$op18"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op20": {"oid": "96", "type": "Local", "instance_name": "GbxFan_st", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op3"], "arg_names": [], "args": ["$op19"], "read": true, "write": false, "physical_type": "log", "data_type": "bool", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "1.0"]}, "$op16": {"oid": "31", "type": "Operation", "instance_name": "And", "function_name": "And", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op12", "$op15"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op17": {"oid": "52", "type": "Function", "instance_name": "GbxFanCoorn_Sp_DebounceParam_tDEBt_I", "function_name": "Srv_DebounceParam_t_get", "class_method_name": "get", "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "", "data_type": "", "unique_variables": [], "unique_params": ["GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op18": {"oid": "92", "type": "Variable", "instance_name": "dT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_params": ["dT"], "unique_variables": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147483648.0", "2147483647.0"]}, "$op24": {"oid": "19", "type": "Variable", "instance_name": "GbxFan_r", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op23"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": ["Epm_nEng", "Com_stGbxFanReq"], "unique_params": ["GbxFan_nThres_C", "GbxFan_stSel_C", "GbxFan_tiHiLo_C", "GbxFan_tiLoHi_C", "dT"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-400.0", "399.98779296875"]}}
+2026-07-14 15:20:33,940 DEBUG   extract_mbd_full: forward(): const_values = {"dT": "20000.0"}
+2026-07-14 15:20:33,940 DEBUG   extract_mbd_full: forward(): weakspot_context (len=1860) =    Srv\_Debounce
+
+Srv\_Debounce
+
+Srv\_Debounce debounces a toggling boolean input signal and returns the debounced state of the signal as boolean value.  
+This function is used to debounce a digital input signal by separate high to low and low to high debounce times
+
+| Hint |
+| --- |
+| Each function call calculates a new debounce timer value and thus result might be wrong if called not exactly once per process call.  This class does not contain sequence numbers for the class methods.  The out value has to be connected to a variable to compute the class.  if the output is used in multiple places, there is a risk that the class output might be calculated twice. To avoid this use a process local variable at the output of the class(incase output is used in multiple places). |
+
+ 
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| init | Sets the internal state of Boolean function |
+| out | Returns the debounced input value |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| Dt | Dt sample time  Attention:  Dt element and Dt port must have the same conversion formula.  Hint:  If using Per\_Dur as implementation for Dt element in BDE, simulation does not work for time dependent elements. Therefore it is recommended to use Time\_Dt. | sint32 Time\_Dt |
+| param | Instance of the structure which holds the timing parameters for the debounce element | Srv\_DebounceParam\_t |
+| return | The debounced value of the input signal. | uint8 ident (logical signal is returned) |
+| timer | timer for low to high transition | sint32 Time\_Dt |
+| x | Input signal | uint8 ident (logical signal is expected at the input) |
+| x/old | Internal state | uint8 Ident(logical signal) |
+
+| Related information | |
+| --- | --- |
+| Srv\_DebounceParam\_t  SRV: SrvX\_Debounce  Doors link (SRV) : SrvX\_Debounce | |
+2026-07-14 15:20:33,940 DEBUG   extract_mbd_full: forward(): instance_names = GbxFan_r
+2026-07-14 15:20:33,941 INFO    extract_mbd_full: forward(): KB guidelines resolved (fn=Srv_Debounce_out, +1107 chars) -> kb_guidelines FIELD on Prompt 1 AND Prompt 2
+2026-07-14 15:20:33,941 INFO    extract_mbd_full: forward(): ----- Prompt 1 (context_extractor) — calling LM -----
+2026-07-14 15:20:54,237 INFO    extract_mbd_full: forward(): Prompt 1 DONE — context_analysis (len=4553)
+2026-07-14 15:20:54,238 DEBUG   extract_mbd_full: forward(): Prompt 1 context_analysis = The weakspot element identified is "$op19", which corresponds to the function instance "GbxFanCoorn_Sp_Srv_DebounceDEB_I" implementing the "Srv_Debounce_out" function. This function performs a debounce operation on a boolean input signal, filtering out rapid toggling by applying separate debounce times for rising and falling edges. The debounce function takes three inputs: the input signal "X", a parameter structure "Param" containing debounce timing parameters, and the sample time "Dt". The output is the debounced boolean state of the input signal.
+
+The inputs that can be altered for testing are "X" and "Param" because "Dt" is a fixed sample time constant (20000.0) and must not be changed. The input "X" is provided by "$op16" (an "And" operation), and "Param" is provided by "$op17" (a function returning debounce parameters). Both "$op16" and "$op17" are function or operation elements, not fixed constants or literals, so they are valid inputs to vary.
+
+The output that can be checked is the debounced boolean value produced by "$op19". This output is used by "$op20" (a local variable "GbxFan_st") which depends on "$op19" and is of boolean type, making it suitable for verification.
+
+Test cases should cover the key debounce behaviors as per the provided guidelines: initialization correctness, delay on rising edge, suppression of falling edge changes shorter than debounce time, delay on falling edge, and suppression of rising edge changes shorter than debounce time. These tests ensure the debounce logic correctly filters input signal transitions according to the configured debounce times.
+
+### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op19
+- **Instance Name:** GbxFanCoorn_Sp_Srv_DebounceDEB_I
+- **Function Name:** Srv_Debounce_out
+- **Role and Working:**
+  - This element implements the debounce logic for a boolean input signal.
+  - It filters out rapid toggling by applying separate debounce times for transitions from low to high and high to low.
+  - The function calculates a new debounce timer value on each call and returns the debounced output state.
+  - It requires being called exactly once per process cycle to maintain correct timing.
+  - The output is a boolean indicating the stable debounced state of the input signal.
+
+### 2. Inputs That Can Be Altered
+| Input Name | Reference Key | Type Information | Notes |
+|------------|---------------|------------------|-------|
+| X          | $op16         | Operation (And)  | Boolean input signal after logical AND operation; can be varied by changing inputs to $op16 |
+| Param      | $op17         | Function (Srv_DebounceParam_t_get) | Provides debounce timing parameters; can be varied by changing configuration or parameters |
+| Dt         | $op18         | Variable (sint32) | Fixed sample time constant (20000.0); must NOT be altered |
+
+- **Excluded Input:** Dt is fixed and must not be changed.
+
+### 3. Outputs That Can Be Checked
+| Output Variable | Reference Key | Type | Connection to Weakspot |
+|-----------------|---------------|------|-----------------------|
+| GbxFan_st       | $op20         | Local (bool) | Depends directly on $op19 output; represents the debounced boolean state |
+
+- The output "GbxFan_st" is a local boolean variable that reflects the debounced state computed by the weakspot element and is suitable for verification.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1: Initialization Check**
+  - Initialize the debounce function.
+  - Verify that the output equals the expected initialization value.
+
+- **Testcase 2: Rising Edge Delay**
+  - Set input X to FALSE and wait until output is FALSE.
+  - Change input X from FALSE to TRUE.
+  - Maintain input TRUE for the debounce time.
+  - Verify output changes to TRUE only after debounce time elapses.
+
+- **Testcase 3: Suppress Falling Edge Short Changes**
+  - Set input from TRUE to FALSE.
+  - Before debounce time expires, set input back to TRUE.
+  - Verify output remains TRUE after debounce time.
+
+- **Testcase 4: Falling Edge Delay**
+  - Change input from TRUE to FALSE.
+  - Maintain input FALSE for debounce time.
+  - Verify output changes to FALSE only after debounce time elapses.
+
+- **Testcase 5: Suppress Rising Edge Short Changes**
+  - Set input from FALSE to TRUE.
+  - Before debounce time expires, set input back to FALSE.
+  - Verify output remains FALSE after debounce time.
+
+These testcases cover the full functional behavior of the debounce element with minimal redundancy, ensuring correct timing and suppression of spurious transitions.
+2026-07-14 15:20:54,238 INFO    extract_mbd_full: forward(): Required-I/O KB PROMPT override (fc=GbxFanCoorn_Sp_1_0_2 ws=2) — Expected Results instance_names 'GbxFan_r' -> 'GbxFan_st'
+2026-07-14 15:20:54,238 INFO    extract_mbd_full: forward(): ----- Prompt 2 (testcase_generator) — calling LM -----
+2026-07-14 15:21:19,760 INFO    extract_mbd_full: forward(): Prompt 2 DONE — test_cases_raw (len=4625)
+2026-07-14 15:21:19,760 DEBUG   extract_mbd_full: forward(): Prompt 2 test_cases_raw = [
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the correct initialization of the debounce function. Starting with input X = FALSE (0), after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state."
+    },
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case checks the debounce delay on the rising edge. Starting with input X = FALSE, the output is FALSE. When input changes to TRUE, the output should remain FALSE during the debounce time (10 sample times assumed as debounce time). After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior."
+    },
+    {
+        "Pre-Condition": [
+            "X = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 0"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5",
+                    "X = 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies suppression of falling edge changes shorter than the debounce time. Starting with input TRUE, the input changes to FALSE but returns to TRUE before the debounce time expires (5 sample times wait before reverting). The output should remain TRUE throughout, confirming that short falling edge changes are suppressed."
+    },
+    {
+        "Pre-Condition": [
+            "X = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 0"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case checks the debounce delay on the falling edge. Starting with input TRUE, the input changes to FALSE. The output should remain TRUE during the debounce time (10 sample times). After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior."
+    },
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5",
+                    "X = 0"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies suppression of rising edge changes shorter than the debounce time. Starting with input FALSE, the input changes to TRUE but returns to FALSE before the debounce time expires (5 sample times wait before reverting). The output should remain FALSE throughout, confirming that short rising edge changes are suppressed."
+    }
+]
+2026-07-14 15:21:19,761 INFO    extract_mbd_full: forward(): ----- Bridge: parsing Prompt 2 JSON output -----
+2026-07-14 15:21:19,761 DEBUG   extract_mbd_full: forward(): bridge — extracted JSON via regex match
+2026-07-14 15:21:19,761 INFO    extract_mbd_full: forward(): bridge — parsed 5 test case(s) from Prompt 2
+2026-07-14 15:21:19,761 DEBUG   extract_mbd_full: forward(): relations (count=3) = {'X': 'Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C)))', 'Param': 'Function(Srv_DebounceParam_t_setParam,GbxFanCoorn_Sp_DebounceParam_tDEBt_I,Parameter(GbxFan_tiLoHi_C),Parameter(GbxFan_tiHiLo_C),Operation(IfThenElse,Operation(Equal,Parameter(GbxFan_stSel_C),Literal(1.0))))', 'Dt': 'dT'}
+2026-07-14 15:21:19,761 DEBUG   extract_mbd_full: forward(): equation_results_raw — 3 entr(ies)
+2026-07-14 15:21:19,762 DEBUG   extract_mbd_full: forward(): update_test_cases() -> 5 test case(s)
+2026-07-14 15:21:19,763 INFO    extract_mbd_full: forward(): extract_and_replace_equations() -> 2 equation(s) extracted
+2026-07-14 15:21:19,763 DEBUG   extract_mbd_full: forward(): equation_dict[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] = Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C))) = 0
+2026-07-14 15:21:19,763 DEBUG   extract_mbd_full: forward(): equation_dict[58c96eae-36cd-4300-adcc-c56fe1614baf] = Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C))) = 1
+2026-07-14 15:21:19,763 DEBUG   extract_mbd_full: forward(): unique_constants referenced = []
+2026-07-14 15:21:19,763 DEBUG   extract_mbd_full: forward(): filtered_const_values = {}
+2026-07-14 15:21:19,763 INFO    extract_mbd_full: _get_function_caller: cache MISS — dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\GbxFanCoorn_Sp_1_0_2\env_libs\GbxFanCoorn_Sp_1_0_2.dll FCname=GbxFanCoorn_Sp_1_0_2 work_dir=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data
+2026-07-14 15:21:19,764 DEBUG   extract_mbd_full: _get_function_caller: signal_sheet_list has 12 row(s)
+2026-07-14 15:21:19,764 DEBUG   extract_mbd_full: _get_function_caller: model_interface_data has 4 row(s)
+2026-07-14 15:21:20,992 INFO    extract_mbd_full: _get_function_caller: FunctionCaller initialized successfully (FCname=GbxFanCoorn_Sp_1_0_2)
+2026-07-14 15:21:20,992 INFO    extract_mbd_full: forward(): function_caller=available (None means DLL verification disabled)
+2026-07-14 15:21:20,993 INFO    extract_mbd_full: forward(): merged_equation_map has 2 entr(ies) (out of 2 equation_dict entries)
+2026-07-14 15:21:20,993 INFO    extract_mbd_full: forward(): ===== Equation 1/2 (uid=e1bc5afe-54e6-43b0-adcc-f792fa47a75c) =====
+2026-07-14 15:21:20,993 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] equation_to_solve = Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C))) = 0
+2026-07-14 15:21:20,993 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] original_equation = Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C)))
+2026-07-14 15:21:20,993 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] assignment_chain = Operation(GreaterOrEqual,$op13,$op14) → $op15
+Operation(Equal,$op10,$op11) → $op12
+Parameter(GbxFan_nThres_C) → $op14
+Variable(Com_stGbxFanReq) → $op10
+Variable(Epm_nEng) → $op13
+Literal(1.0) → $op11
+2026-07-14 15:21:20,993 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] final_substituted_equation = Operation(And,Operation(Equal,$op10,$op11),Operation(GreaterOrEqual,$op13,$op14))
+2026-07-14 15:21:20,993 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] eq_to_solve (reversed assignment_chain, 6 line(s)) = ['Literal(1.0) → $op11', 'Variable(Epm_nEng) → $op13', 'Variable(Com_stGbxFanReq) → $op10', 'Parameter(GbxFan_nThres_C) → $op14', 'Operation(Equal,$op10,$op11) → $op12', 'Operation(GreaterOrEqual,$op13,$op14) → $op15']
+2026-07-14 15:21:20,994 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] lhs_value (target) = 0
+2026-07-14 15:21:20,994 INFO    extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:21:28,784 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "Variable(Epm_nEng) = 0",
+  "Variable(Com_stGbxFanReq) = 1",
+  "Parameter(GbxFan_nThres_C) = 1"
+]
+```
+2026-07-14 15:21:28,785 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] Prompt 4 attempt#1 simulated_response (3 item(s)) = ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']
+2026-07-14 15:21:28,786 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] locked_param_block (after first pass) = '## Locked parameter values -- do not change on retry:\nParameter(GbxFan_nThres_C) = 1\n\n'
+2026-07-14 15:21:28,789 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] attempt#1 final_assignments = ['$op13 = 0', '$op10 = 1', '$op14 = 1', '$op12 = 0', '$op15 = 0']
+2026-07-14 15:21:28,789 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] attempt#1 substitution_dict = {'$op13': '0', '$op10': '1', '$op14': '1', '$op12': '0', '$op15': '0'}
+2026-07-14 15:21:28,790 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] attempt#1 substituted expression = ['Operation(And,Operation(Equal,1,$op11),Operation(GreaterOrEqual,0,1))']
+2026-07-14 15:21:28,790 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] attempt#1 BODMAS chain (3 step(s)) = ['Operation(GreaterOrEqual,0,1) → $op1', 'Operation(Equal,1,$op11) → $op2', 'Operation(And,$op2,$op1) → $op3']
+2026-07-14 15:21:28,794 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] attempt#1 final_check (DLL-resolved) = ['$op1 = 0', '$op2 = 0', '$op3 = 0']
+2026-07-14 15:21:28,794 INFO    extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] attempt#1: expected='0' actual='0' -> PASS
+2026-07-14 15:21:28,794 INFO    extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:21:28,795 DEBUG   extract_mbd_full: forward(): eq[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] updated_dict[e1bc5afe-54e6-43b0-adcc-f792fa47a75c] = ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']
+2026-07-14 15:21:28,795 INFO    extract_mbd_full: forward(): ===== Equation 2/2 (uid=58c96eae-36cd-4300-adcc-c56fe1614baf) =====
+2026-07-14 15:21:28,795 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] equation_to_solve = Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C))) = 1
+2026-07-14 15:21:28,795 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] original_equation = Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C)))
+2026-07-14 15:21:28,795 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] assignment_chain = Operation(GreaterOrEqual,$op13,$op14) → $op15
+Operation(Equal,$op10,$op11) → $op12
+Parameter(GbxFan_nThres_C) → $op14
+Variable(Com_stGbxFanReq) → $op10
+Variable(Epm_nEng) → $op13
+Literal(1.0) → $op11
+2026-07-14 15:21:28,795 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] final_substituted_equation = Operation(And,Operation(Equal,$op10,$op11),Operation(GreaterOrEqual,$op13,$op14))
+2026-07-14 15:21:28,795 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] eq_to_solve (reversed assignment_chain, 6 line(s)) = ['Literal(1.0) → $op11', 'Variable(Epm_nEng) → $op13', 'Variable(Com_stGbxFanReq) → $op10', 'Parameter(GbxFan_nThres_C) → $op14', 'Operation(Equal,$op10,$op11) → $op12', 'Operation(GreaterOrEqual,$op13,$op14) → $op15']
+2026-07-14 15:21:28,795 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] lhs_value (target) = 1
+2026-07-14 15:21:28,795 INFO    extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:21:36,953 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "Parameter(GbxFan_nThres_C) = 1",
+  "Variable(Epm_nEng) = 1",
+  "Variable(Com_stGbxFanReq) = 1"
+]
+```
+2026-07-14 15:21:36,954 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] Prompt 4 attempt#1 simulated_response (3 item(s)) = ['Parameter(GbxFan_nThres_C) = 1', 'Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1']
+2026-07-14 15:21:36,965 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] attempt#1 final_assignments = ['$op13 = 1', '$op10 = 1', '$op14 = 1', '$op12 = 0', '$op15 = 1']
+2026-07-14 15:21:36,965 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] attempt#1 substitution_dict = {'$op13': '1', '$op10': '1', '$op14': '1', '$op12': '0', '$op15': '1'}
+2026-07-14 15:21:36,965 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] attempt#1 substituted expression = ['Operation(And,Operation(Equal,1,$op11),Operation(GreaterOrEqual,1,1))']
+2026-07-14 15:21:36,965 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] attempt#1 BODMAS chain (3 step(s)) = ['Operation(GreaterOrEqual,1,1) → $op1', 'Operation(Equal,1,$op11) → $op2', 'Operation(And,$op2,$op1) → $op3']
+2026-07-14 15:21:36,970 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] attempt#1 final_check (DLL-resolved) = ['$op1 = 1', '$op2 = 0', '$op3 = 0']
+2026-07-14 15:21:36,970 INFO    extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] attempt#1: expected='1' actual='0' -> MISMATCH
+2026-07-14 15:21:36,970 INFO    extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='1' actual='0') -----
+2026-07-14 15:21:52,312 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] retry#1 raw variable_assignments = ```json
+[
+    "Variable(Epm_nEng) = 1",
+    "Variable(Com_stGbxFanReq) = 1",
+    "Parameter(GbxFan_nThres_C) = 1"
+]
+```
+2026-07-14 15:21:52,313 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] retry#1 simulated_response (3 item(s)) = ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']
+2026-07-14 15:21:52,324 INFO    extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] retry#1: expected='1' actual='0' -> FAIL
+2026-07-14 15:21:52,325 INFO    extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] M7 inline score = 0.0 (FAIL after 1 retries — expected='1' actual='0')
+2026-07-14 15:21:52,325 DEBUG   extract_mbd_full: forward(): eq[58c96eae-36cd-4300-adcc-c56fe1614baf] updated_dict[58c96eae-36cd-4300-adcc-c56fe1614baf] = ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']
+2026-07-14 15:21:52,325 INFO    extract_mbd_full: forward(): M7 INLINE — score=0.5 (DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs)
+2026-07-14 15:21:52,325 INFO    extract_mbd_full: forward(): ----- Post-processing chain -----
+2026-07-14 15:21:52,325 DEBUG   extract_mbd_full: forward(): post-process — update_equation_values() done; equation_dict now = {'e1bc5afe-54e6-43b0-adcc-f792fa47a75c': ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1'], '58c96eae-36cd-4300-adcc-c56fe1614baf': ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']}
+2026-07-14 15:21:52,325 DEBUG   extract_mbd_full: forward(): post-process — map_equations_to_json() -> pre_final = [{'Pre-Condition': [['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state.'}, {'Pre-Condition': [['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '10 sample times assumed as debounce time. After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior.'}, {'Pre-Condition': [['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5', ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain TRUE throughout, confirming that short falling edge changes are suppressed.'}, {'Pre-Condition': [['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '10 sample times. After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior.'}, {'Pre-Condition': [['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5', ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1', 'Parameter(GbxFan_nThres_C) = 1']], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain FALSE throughout, confirming that short rising edge changes are suppressed.'}]
+2026-07-14 15:21:52,325 DEBUG   extract_mbd_full: forward(): post-process — remove_variable_and_parameter_blocks() -> [{'Pre-Condition': [['Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state.'}, {'Pre-Condition': [['Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1']], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '10 sample times assumed as debounce time. After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior.'}, {'Pre-Condition': [['Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1']], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5', ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1']], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain TRUE throughout, confirming that short falling edge changes are suppressed.'}, {'Pre-Condition': [['Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1']], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '10 sample times. After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior.'}, {'Pre-Condition': [['Parameter(GbxFan_nThres_C) = 1']], 'Steps': [{'Actions': ['Wait 1', ['Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1']], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5', ['Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1']], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain FALSE throughout, confirming that short rising edge changes are suppressed.'}]
+2026-07-14 15:21:52,326 DEBUG   extract_mbd_full: forward(): post-process — flatten_precondition_and_actions() -> [{'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '10 sample times assumed as debounce time. After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5', 'Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain TRUE throughout, confirming that short falling edge changes are suppressed.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '10 sample times. After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5', 'Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain FALSE throughout, confirming that short rising edge changes are suppressed.'}]
+2026-07-14 15:21:52,326 DEBUG   extract_mbd_full: forward(): post-process — deduplicate_actions() -> [{'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '10 sample times assumed as debounce time. After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5', 'Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain TRUE throughout, confirming that short falling edge changes are suppressed.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '10 sample times. After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior.'}, {'Pre-Condition': ['Parameter(GbxFan_nThres_C) = 1'], 'Steps': [{'Actions': ['Wait 1', 'Variable(Epm_nEng) = 1', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5', 'Variable(Epm_nEng) = 0', 'Variable(Com_stGbxFanReq) = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain FALSE throughout, confirming that short rising edge changes are suppressed.'}]
+2026-07-14 15:21:52,326 DEBUG   extract_mbd_full: forward(): post-process — all_unselected_vars (final) = set()
+2026-07-14 15:21:52,327 DEBUG   extract_mbd_full: forward(): post-process — clean_deduplicated_solution() -> [{'Pre-Condition': ['GbxFan_nThres_C = 1'], 'Steps': [{'Actions': ['Wait 1'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state.'}, {'Pre-Condition': ['GbxFan_nThres_C = 1'], 'Steps': [{'Actions': ['Wait 1', 'Epm_nEng = 1', 'Com_stGbxFanReq = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '10 sample times assumed as debounce time. After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior.'}, {'Pre-Condition': ['GbxFan_nThres_C = 1'], 'Steps': [{'Actions': ['Wait 1', 'Epm_nEng = 0', 'Com_stGbxFanReq = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5', 'Epm_nEng = 1', 'Com_stGbxFanReq = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 1']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain TRUE throughout, confirming that short falling edge changes are suppressed.'}, {'Pre-Condition': ['GbxFan_nThres_C = 1'], 'Steps': [{'Actions': ['Wait 1', 'Epm_nEng = 0', 'Com_stGbxFanReq = 1'], 'Expected Results': ['GbxFan_st = 1']}, {'Actions': ['Wait 10'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '10 sample times. After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior.'}, {'Pre-Condition': ['GbxFan_nThres_C = 1'], 'Steps': [{'Actions': ['Wait 1', 'Epm_nEng = 1', 'Com_stGbxFanReq = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5', 'Epm_nEng = 0', 'Com_stGbxFanReq = 1'], 'Expected Results': ['GbxFan_st = 0']}, {'Actions': ['Wait 5'], 'Expected Results': ['GbxFan_st = 0']}], 'Detailed Explanation': '5 sample times wait before reverting. The output should remain FALSE throughout, confirming that short rising edge changes are suppressed.'}]
+2026-07-14 15:21:52,327 INFO    extract_mbd_full: forward(): post-process — remove_unselected_mux_actions() -> final_json with 5 test case(s)
+2026-07-14 15:21:52,327 DEBUG   extract_mbd_full: forward(): FINAL JSON = [
+  {
+    "Pre-Condition": [
+      "GbxFan_nThres_C = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Wait 1"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state."
+  },
+  {
+    "Pre-Condition": [
+      "GbxFan_nThres_C = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Wait 1",
+          "Epm_nEng = 1",
+          "Com_stGbxFanReq = 1"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "10 sample times assumed as debounce time. After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior."
+  },
+  {
+    "Pre-Condition": [
+      "GbxFan_nThres_C = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Wait 1",
+          "Epm_nEng = 0",
+          "Com_stGbxFanReq = 1"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 5",
+          "Epm_nEng = 1",
+          "Com_stGbxFanReq = 1"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 5"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "5 sample times wait before reverting. The output should remain TRUE throughout, confirming that short falling edge changes are suppressed."
+  },
+  {
+    "Pre-Condition": [
+      "GbxFan_nThres_C = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Wait 1",
+          "Epm_nEng = 0",
+          "Com_stGbxFanReq = 1"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "10 sample times. After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior."
+  },
+  {
+    "Pre-Condition": [
+      "GbxFan_nThres_C = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Wait 1",
+          "Epm_nEng = 1",
+          "Com_stGbxFanReq = 1"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 5",
+          "Epm_nEng = 0",
+          "Com_stGbxFanReq = 1"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 5"
+        ],
+        "Expected Results": [
+          "GbxFan_st = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "5 sample times wait before reverting. The output should remain FALSE throughout, confirming that short rising edge changes are suppressed."
+  }
+]
+2026-07-14 15:21:52,327 INFO    extract_mbd_full: forward(): END — test_cases_pre_postprocess (Prompt2 raw, 4625 chars), final test_cases (2068 chars), m7_inline_score=0.5
+2026-07-14 15:21:52,327 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:21:52,333 INFO    mbd_metric: _compute_all_components: required_io KB HIT for GbxFanCoorn_Sp_1_0_2#2 -> {'required_inputs': [], 'required_preconds': [], 'required_outputs': ['GbxFan_st']}
+2026-07-14 15:21:52,333 INFO    mbd_metric: ======================================================================
+2026-07-14 15:21:52,333 INFO    mbd_metric: _compute_all_components: fc_name=GbxFanCoorn_Sp_1_0_2 weakspot_id=2 weakspot_op_key=$op19 raster_time=20000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\GbxFanCoorn_Sp_1_0_2\env_libs\GbxFanCoorn_Sp_1_0_2.dll
+2026-07-14 15:21:52,333 INFO    mbd_metric: _compute_all_components: use_pre_postprocess=True
+2026-07-14 15:21:52,333 DEBUG   mbd_metric: _compute_all_components: pre_tc_str (Prompt 2 raw / M1,M3,M4,M6 input) = [
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the correct initialization of the debounce function. Starting with input X = FALSE (0), after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state."
+    },
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case checks the debounce delay on the rising edge. Starting with input X = FALSE, the output is FALSE. When input changes to TRUE, the output should remain FALSE during the debounce time (10 sample times assumed as debounce time). After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior."
+    },
+    {
+        "Pre-Condition": [
+            "X = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 0"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5",
+                    "X = 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies suppression of falling edge changes shorter than the debounce time. Starting with input TRUE, the input changes to FALSE but returns to TRUE before the debounce time expires (5 sample times wait before reverting). The output should remain TRUE throughout, confirming that short falling edge changes are suppressed."
+    },
+    {
+        "Pre-Condition": [
+            "X = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 0"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case checks the debounce delay on the falling edge. Starting with input TRUE, the input changes to FALSE. The output should remain TRUE during the debounce time (10 sample times). After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior."
+    },
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1",
+                    "X = 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5",
+                    "X = 0"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 5"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies suppression of rising edge changes shorter than the debounce time. Starting with input FALSE, the input changes to TRUE but returns to FALSE before the debounce time expires (5 sample times wait before reverting). The output should remain FALSE throughout, confirming that short rising edge changes are suppressed."
+    }
+]
+2026-07-14 15:21:52,333 DEBUG   mbd_metric: _compute_all_components: final_tc_str (final JSON / M2,M7,M8 input) = [{"Pre-Condition": ["GbxFan_nThres_C = 1"], "Steps": [{"Actions": ["Wait 1"], "Expected Results": ["GbxFan_st = 0"]}], "Detailed Explanation": "0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state."}, {"Pre-Condition": ["GbxFan_nThres_C = 1"], "Steps": [{"Actions": ["Wait 1", "Epm_nEng = 1", "Com_stGbxFanReq = 1"], "Expected Results": ["GbxFan_st = 0"]}, {"Actions": ["Wait 10"], "Expected Results": ["GbxFan_st = 1"]}], "Detailed Explanation": "10 sample times assumed as debounce time. After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior."}, {"Pre-Condition": ["GbxFan_nThres_C = 1"], "Steps": [{"Actions": ["Wait 1", "Epm_nEng = 0", "Com_stGbxFanReq = 1"], "Expected Results": ["GbxFan_st = 1"]}, {"Actions": ["Wait 5", "Epm_nEng = 1", "Com_stGbxFanReq = 1"], "Expected Results": ["GbxFan_st = 1"]}, {"Actions": ["Wait 5"], "Expected Results": ["GbxFan_st = 1"]}], "Detailed Explanation": "5 sample times wait before reverting. The output should remain TRUE throughout, confirming that short falling edge changes are suppressed."}, {"Pre-Condition": ["GbxFan_nThres_C = 1"], "Steps": [{"Actions": ["Wait 1", "Epm_nEng = 0", "Com_stGbxFanReq = 1"], "Expected Results": ["GbxFan_st = 1"]}, {"Actions": ["Wait 10"], "Expected Results": ["GbxFan_st = 0"]}], "Detailed Explanation": "10 sample times. After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior."}, {"Pre-Condition": ["GbxFan_nThres_C = 1"], "Steps": [{"Actions": ["Wait 1", "Epm_nEng = 1", "Com_stGbxFanReq = 1"], "Expected Results": ["GbxFan_st = 0"]}, {"Actions": ["Wait 5", "Epm_nEng = 0", "Com_stGbxFanReq = 1"], "Expected Results": ["GbxFan_st = 0"]}, {"Actions": ["Wait 5"], "Expected Results": ["GbxFan_st = 0"]}], "Detailed Explanation": "5 sample times wait before reverting. The output should remain FALSE throughout, confirming that short rising edge changes are suppressed."}]
+2026-07-14 15:21:52,334 INFO    mbd_metric: M3: ===== Structural Validity (raster_time=20000) =====
+2026-07-14 15:21:52,334 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:21:52,335 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=1 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,335 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'X': '0'}, 1 step(s), explanation='This test case verifies the correct initialization of the debounce function. Sta'
+2026-07-14 15:21:52,335 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,336 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,336 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'X': '0'}, 2 step(s), explanation='This test case checks the debounce delay on the rising edge. Starting with input'
+2026-07-14 15:21:52,336 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,336 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=5 act={'X': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,336 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=5 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,336 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'X': '1'}, 3 step(s), explanation='This test case verifies suppression of falling edge changes shorter than the deb'
+2026-07-14 15:21:52,336 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'X': '1'}, 2 step(s), explanation='This test case checks the debounce delay on the falling edge. Starting with inpu'
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=5 act={'X': '0'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=5 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'X': '0'}, 3 step(s), explanation='This test case verifies suppression of rising edge changes shorter than the debo'
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: M3: TC1 explanation check PASS
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: M3: TC1.S1 Wait check FAIL (w=1 not multiple of dT=20000)
+2026-07-14 15:21:52,337 DEBUG   mbd_metric: M3: TC1.S1 exp GbxFan_st=0 numeric check PASS
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC1.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC1 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC2 explanation check PASS
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC2.S1 Wait check FAIL (w=1 not multiple of dT=20000)
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC2.S1 action X=1 numeric check PASS
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC2.S1 exp GbxFan_st=0 numeric check PASS
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC2.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC2.S2 Wait check FAIL (w=10 not multiple of dT=20000)
+2026-07-14 15:21:52,338 DEBUG   mbd_metric: M3: TC2.S2 exp GbxFan_st=1 numeric check PASS
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC2.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC2 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3 explanation check PASS
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S1 Wait check FAIL (w=1 not multiple of dT=20000)
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S1 action X=0 numeric check PASS
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S1 exp GbxFan_st=1 numeric check PASS
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S2 Wait check FAIL (w=5 not multiple of dT=20000)
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S2 action X=1 numeric check PASS
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S2 exp GbxFan_st=1 numeric check PASS
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S3 Wait check FAIL (w=5 not multiple of dT=20000)
+2026-07-14 15:21:52,339 DEBUG   mbd_metric: M3: TC3.S3 exp GbxFan_st=1 numeric check PASS
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC3.S3 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC3 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4 explanation check PASS
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4.S1 Wait check FAIL (w=1 not multiple of dT=20000)
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4.S1 action X=0 numeric check PASS
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4.S1 exp GbxFan_st=1 numeric check PASS
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4.S2 Wait check FAIL (w=10 not multiple of dT=20000)
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4.S2 exp GbxFan_st=0 numeric check PASS
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,340 DEBUG   mbd_metric: M3: TC4 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5 explanation check PASS
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S1 Wait check FAIL (w=1 not multiple of dT=20000)
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S1 action X=1 numeric check PASS
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S1 exp GbxFan_st=0 numeric check PASS
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S2 Wait check FAIL (w=5 not multiple of dT=20000)
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S2 action X=0 numeric check PASS
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S2 exp GbxFan_st=0 numeric check PASS
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S3 Wait check FAIL (w=5 not multiple of dT=20000)
+2026-07-14 15:21:52,341 DEBUG   mbd_metric: M3: TC5.S3 exp GbxFan_st=0 numeric check PASS
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: M3: TC5.S3 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: M3: TC5 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:21:52,342 INFO    mbd_metric: M3: RESULT score=0.7755 (38/49 weighted checks passed)
+2026-07-14 15:21:52,342 INFO    mbd_metric: M3: failed checks: TC1.S1: Wait 1 not multiple of dT=20000; TC2.S1: Wait 1 not multiple of dT=20000; TC2.S2: Wait 10 not multiple of dT=20000; TC3.S1: Wait 1 not multiple of dT=20000; TC3.S2: Wait 5 not multiple of dT=20000; TC3.S3: Wait 5 not multiple of dT=20000; TC4.S1: Wait 1 not multiple of dT=20000; TC4.S2: Wait 10 not multiple of dT=20000; TC5.S1: Wait 1 not multiple of dT=20000; TC5.S2: Wait 5 not multiple of dT=20000; TC5.S3: Wait 5 not multiple of dT=20000
+2026-07-14 15:21:52,342 INFO    mbd_metric: M1: ===== I/O Classification =====
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=1 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'X': '0'}, 1 step(s), explanation='This test case verifies the correct initialization of the debounce function. Sta'
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,342 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'X': '0'}, 2 step(s), explanation='This test case checks the debounce delay on the rising edge. Starting with input'
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=5 act={'X': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=5 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'X': '1'}, 3 step(s), explanation='This test case verifies suppression of falling edge changes shorter than the deb'
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'X': '1'}, 2 step(s), explanation='This test case checks the debounce delay on the falling edge. Starting with inpu'
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=5 act={'X': '0'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,343 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=5 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'X': '0'}, 3 step(s), explanation='This test case verifies suppression of rising edge changes shorter than the debo'
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: weakspot output signals (required_io KB) = {'GbxFan_st'}
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: fixed_vars (SystemConstant/Literal/dT) = {'dT'}
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: TC1 precond_vars={'X'} action_vars=set() expected_vars={'GbxFan_st'}
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: TC1 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: TC1 output-verified check PASS
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: TC1 output-not-set-as-input check PASS
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: TC2 precond_vars={'X'} action_vars={'X'} expected_vars={'GbxFan_st'}
+2026-07-14 15:21:52,344 DEBUG   mbd_metric: M1: TC2 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC2 output-verified check PASS
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC2 output-not-set-as-input check PASS
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC3 precond_vars={'X'} action_vars={'X'} expected_vars={'GbxFan_st'}
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC3 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC3 output-verified check PASS
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC3 output-not-set-as-input check PASS
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC4 precond_vars={'X'} action_vars={'X'} expected_vars={'GbxFan_st'}
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC4 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC4 output-verified check PASS
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC4 output-not-set-as-input check PASS
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC5 precond_vars={'X'} action_vars={'X'} expected_vars={'GbxFan_st'}
+2026-07-14 15:21:52,345 DEBUG   mbd_metric: M1: TC5 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: M1: TC5 output-verified check PASS
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: M1: TC5 output-not-set-as-input check PASS
+2026-07-14 15:21:52,346 INFO    mbd_metric: M1: RESULT score=1.0000 (15/15 checks passed)
+2026-07-14 15:21:52,346 INFO    mbd_metric: M4: ===== Test Coverage (weakspot_op_key=$op19, KB_LOADED=True) =====
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=1 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'X': '0'}, 1 step(s), explanation='This test case verifies the correct initialization of the debounce function. Sta'
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,346 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'X': '0'}, 2 step(s), explanation='This test case checks the debounce delay on the rising edge. Starting with input'
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=5 act={'X': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=5 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'X': '1'}, 3 step(s), explanation='This test case verifies suppression of falling edge changes shorter than the deb'
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'X': '1'}, 2 step(s), explanation='This test case checks the debounce delay on the falling edge. Starting with inpu'
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=5 act={'X': '0'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=5 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'X': '0'}, 3 step(s), explanation='This test case verifies suppression of rising edge changes shorter than the debo'
+2026-07-14 15:21:52,347 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:21:52,348 DEBUG   mbd_metric: M4: weakspot op_entry function_name/class_method_name/method_name = 'Srv_Debounce_out'
+2026-07-14 15:21:52,348 DEBUG   mbd_metric: M4: resolve_guidelines('Srv_Debounce_out') -> source=newKB block_type='Srv_Debounce' (5 guideline(s))
+2026-07-14 15:21:52,348 DEBUG   mbd_metric: M4: guidelines_text=
+1: Checking the correct initialization of the debounce — Initialize the debounce; Check: Output = initialization value
+2: Checking the delay on rising edge — Set: Input = FALSE; Wait: Output = FALSE; Change the input from FALSE to TRUE; Set: Input = TRUE; Wait: Till the debounce time is over; Check: Output = TRUE
+3: Checking the suppressing on falling signal change smaller than debouncing time — Set the input from true to false and before time DEBOUNCE back to true; Set: Input = FALSE & then before debounce time is over set input = TRUE; Check: Output = TRUE after debounce time is over
+4: Checking the delay on falling edge — Change the input from TRUE to FALSE; Set: Input = FALSE; Wait: Till the debounce time is over; Check: Output = FALSE
+5: Checking the suppressing on rising signal change smaller than debouncing time — Set the input from false to true and before time DEBOUNCE back to false; Set: Input = TRUE & then before debounce time is over set input = FALSE; Check: Output = FALSE after debounce time is over
+2026-07-14 15:21:52,348 DEBUG   mbd_metric: M4: full test-case text for judge=
+TC1:
+  Pre-Condition: {'X': '0'}
+  Step 1: Wait=1, Actions={}, Expected Results={'GbxFan_st': '0'}
+  Explanation: This test case verifies the correct initialization of the debounce function. Starting with input X = FALSE (0), after waiting one sample time (dT), the output GbxFan_st should be FALSE (0), confirming that the debounce output initializes correctly to the input state.
+TC2:
+  Pre-Condition: {'X': '0'}
+  Step 1: Wait=1, Actions={'X': '1'}, Expected Results={'GbxFan_st': '0'}
+  Step 2: Wait=10, Actions={}, Expected Results={'GbxFan_st': '1'}
+  Explanation: This test case checks the debounce delay on the rising edge. Starting with input X = FALSE, the output is FALSE. When input changes to TRUE, the output should remain FALSE during the debounce time (10 sample times assumed as debounce time). After waiting the debounce time, the output should change to TRUE, confirming the rising edge delay behavior.
+TC3:
+  Pre-Condition: {'X': '1'}
+  Step 1: Wait=1, Actions={'X': '0'}, Expected Results={'GbxFan_st': '1'}
+  Step 2: Wait=5, Actions={'X': '1'}, Expected Results={'GbxFan_st': '1'}
+  Step 3: Wait=5, Actions={}, Expected Results={'GbxFan_st': '1'}
+  Explanation: This test case verifies suppression of falling edge changes shorter than the debounce time. Starting with input TRUE, the input changes to FALSE but returns to TRUE before the debounce time expires (5 sample times wait before reverting). The output should remain TRUE throughout, confirming that short falling edge changes are suppressed.
+TC4:
+  Pre-Condition: {'X': '1'}
+  Step 1: Wait=1, Actions={'X': '0'}, Expected Results={'GbxFan_st': '1'}
+  Step 2: Wait=10, Actions={}, Expected Results={'GbxFan_st': '0'}
+  Explanation: This test case checks the debounce delay on the falling edge. Starting with input TRUE, the input changes to FALSE. The output should remain TRUE during the debounce time (10 sample times). After waiting the debounce time, the output should change to FALSE, confirming the falling edge delay behavior.
+TC5:
+  Pre-Condition: {'X': '0'}
+  Step 1: Wait=1, Actions={'X': '1'}, Expected Results={'GbxFan_st': '0'}
+  Step 2: Wait=5, Actions={'X': '0'}, Expected Results={'GbxFan_st': '0'}
+  Step 3: Wait=5, Actions={}, Expected Results={'GbxFan_st': '0'}
+  Explanation: This test case verifies suppression of rising edge changes shorter than the debounce time. Starting with input FALSE, the input changes to TRUE but returns to FALSE before the debounce time expires (5 sample times wait before reverting). The output should remain FALSE throughout, confirming that short rising edge changes are suppressed.
+2026-07-14 15:21:52,348 INFO    mbd_metric: M4: calling TestCoverageJudge LLM (block_type=Srv_Debounce, 5 guideline(s), 5 test case(s))
+2026-07-14 15:21:52,348 INFO    mbd_metric: M4: judge LM dedicated to azure/gpt-5.2 (independent of the inference LM)
+2026-07-14 15:21:56,605 DEBUG   mbd_metric: M4: judge raw covered_indices='1,2,3,4,5'
+2026-07-14 15:21:56,607 DEBUG   mbd_metric: M4: judge parsed covered set = {1, 2, 3, 4, 5}
+2026-07-14 15:21:56,607 DEBUG   mbd_metric: M4: judge coverage_reasoning = 1: COVERED — TC1 initializes with X=0 and after 1 tick expects GbxFan_st=0 (init value/output state verified).
+2: COVERED — TC2 drives X 0→1, expects output stays 0 during debounce (Step1), then after waiting 10 expects output=1 (Step2).
+3: COVERED — TC3 drives X 1→0 then back to 1 before debounce expires (Wait 5), expects output remains 1 throughout and after total debounce window (final Step3 expects 1).
+4: COVERED — TC4 drives X 1→0, expects output stays 1 during debounce (Step1) then after waiting 10 expects output=0 (Step2).
+5: COVERED — TC5 drives X 0→1 then back to 0 before debounce expires (Wait 5), expects output remains 0 throughout and after total debounce window (final Step3 expects 0).
+2026-07-14 15:21:56,607 INFO    mbd_metric: M4: RESULT score=1.0000 [newKB:Srv_Debounce] 5/5 covered | missing: none
+    JUDGE REASONING: 1: COVERED — TC1 initializes with X=0 and after 1 tick expects GbxFan_st=0 (init value/output state verified).
+2: COVERED — TC2 drives X 0→1, expects output stays 0 during debounce (Step1), then after waiting 10 expects output=1 (Step2).
+3: COVERED — TC3 drives X 1→0 then back to 1 before debounce expires (Wait 5), expects output remains 1 throughout and after total debounce window (final Step3 expects 1).
+4: COVERED — TC4 drives X 1→0, expects output stays 1 during debounce (Step1) then after waiting 10 expects output=0 (Step2).
+5: COVERED — TC5 drives X 0→1 then back to 0 before debounce expires (Wait 5), expects output remains 0 throughout and after total debounce window (final Step3 expects 0).
+2026-07-14 15:21:56,607 INFO    mbd_metric: M2: ===== Signal Resolution (final JSON) =====
+2026-07-14 15:21:56,607 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:21:56,607 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=1 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,607 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'GbxFan_nThres_C': '1'}, 1 step(s), explanation='0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0),'
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=1 act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'GbxFan_nThres_C': '1'}, 2 step(s), explanation='10 sample times assumed as debounce time. After waiting the debounce time, the o'
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=1 act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=5 act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=5 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'GbxFan_nThres_C': '1'}, 3 step(s), explanation='5 sample times wait before reverting. The output should remain TRUE throughout, '
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=1 act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,608 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'GbxFan_nThres_C': '1'}, 2 step(s), explanation='10 sample times. After waiting the debounce time, the output should change to FA'
+2026-07-14 15:21:56,609 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=1 act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,609 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=5 act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,609 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=5 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,609 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'GbxFan_nThres_C': '1'}, 3 step(s), explanation='5 sample times wait before reverting. The output should remain FALSE throughout,'
+2026-07-14 15:21:56,609 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:21:56,609 DEBUG   mbd_metric: M2: known_names count=13 (signalsheet+model_interface+equation)
+2026-07-14 15:21:56,610 DEBUG   mbd_metric: M2: var='GbxFan_nThres_C' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:21:56,610 DEBUG   mbd_metric: M2: var='GbxFan_st' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:21:56,610 DEBUG   mbd_metric: M2: var='Epm_nEng' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:21:56,610 DEBUG   mbd_metric: M2: var='Com_stGbxFanReq' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:21:56,610 INFO    mbd_metric: M2: RESULT score=1.0000 (4/4 UNIQUE vars resolved)
+2026-07-14 15:21:56,610 INFO    mbd_metric: M7: ===== DLL Pass Rate (using INLINE score from forward()) =====
+2026-07-14 15:21:56,611 INFO    mbd_metric: M7: RESULT score=0.5000 (DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs) [inline, from Prompt 4 retry loop]
+2026-07-14 15:21:56,611 INFO    mbd_metric: M8: ===== Functional Correctness (sequential DLL, final JSON) =====
+2026-07-14 15:21:56,611 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:21:56,611 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=1 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,611 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'GbxFan_nThres_C': '1'}, 1 step(s), explanation='0, after waiting one sample time (dT), the output GbxFan_st should be FALSE (0),'
+2026-07-14 15:21:56,611 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=1 act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,611 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,611 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'GbxFan_nThres_C': '1'}, 2 step(s), explanation='10 sample times assumed as debounce time. After waiting the debounce time, the o'
+2026-07-14 15:21:56,611 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=1 act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=5 act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=5 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'GbxFan_nThres_C': '1'}, 3 step(s), explanation='5 sample times wait before reverting. The output should remain TRUE throughout, '
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=1 act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'GbxFan_nThres_C': '1'}, 2 step(s), explanation='10 sample times. After waiting the debounce time, the output should change to FA'
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=1 act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=5 act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,612 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=5 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:56,613 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'GbxFan_nThres_C': '1'}, 3 step(s), explanation='5 sample times wait before reverting. The output should remain FALSE throughout,'
+2026-07-14 15:21:56,613 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:21:56,613 INFO    mbd_metric: M8: 5 final test case(s) to verify
+2026-07-14 15:21:56,613 DEBUG   mbd_metric: M8: main_entry.original_equation=Operation(And,Operation(Equal,Variable(Com_stGbxFanReq),Literal(1.0)),Operation(GreaterOrEqual,Variable(Epm_nEng),Parameter(GbxFan_nThres_C)))
+2026-07-14 15:21:56,613 DEBUG   mbd_metric: M8: main_entry.assignment_chain=
+Operation(GreaterOrEqual,$op13,$op14) → $op15
+Operation(Equal,$op10,$op11) → $op12
+Parameter(GbxFan_nThres_C) → $op14
+Variable(Com_stGbxFanReq) → $op10
+Variable(Epm_nEng) → $op13
+Literal(1.0) → $op11
+2026-07-14 15:21:56,613 DEBUG   mbd_metric: M8: main_entry.final_substituted_equation=Operation(And,Operation(Equal,$op10,$op11),Operation(GreaterOrEqual,$op13,$op14))
+2026-07-14 15:21:56,613 INFO    mbd_metric: M8: initializing FunctionCaller FCname=GbxFanCoorn_Sp_1_0_2 work_dir=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data
+2026-07-14 15:21:57,035 INFO    mbd_metric: M8: FunctionCaller initialized successfully
+2026-07-14 15:21:57,036 INFO    mbd_metric: M8: FULL_RESOLVE ON — inst_to_type widened by 6 chain-leaf signal(s) -> 12 total (physical inputs now recognised)
+2026-07-14 15:21:57,036 INFO    mbd_metric: M8: weakspot_op_key=$op19 ws_fn_name='Srv_Debounce_out' ws_instance='GbxFanCoorn_Sp_Srv_DebounceDEB_I' ws_arg_names=['X', 'Param', 'Dt'] ws_args=['$op16', '$op17', '$op18'] -> _is_fn_call_ws=True
+2026-07-14 15:21:57,037 DEBUG   mbd_metric: M8: _arg_instance = {'$op16': 'And', '$op17': 'GbxFanCoorn_Sp_DebounceParam_tDEBt_I', '$op18': 'dT'}
+2026-07-14 15:21:57,037 DEBUG   mbd_metric: M8: _op_to_entry keys = ['$op16', '$op17', '$op18']
+2026-07-14 15:21:57,037 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:21:57,037 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=1 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:57,037 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'X': '0'}, 1 step(s), explanation='This test case verifies the correct initialization of the debounce function. Sta'
+2026-07-14 15:21:57,037 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:57,038 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:57,038 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'X': '0'}, 2 step(s), explanation='This test case checks the debounce delay on the rising edge. Starting with input'
+2026-07-14 15:21:57,038 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:57,038 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=5 act={'X': '1'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:57,038 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=5 act={} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:57,038 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'X': '1'}, 3 step(s), explanation='This test case verifies suppression of falling edge changes shorter than the deb'
+2026-07-14 15:21:57,038 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=1 act={'X': '0'} exp={'GbxFan_st': '1'}
+2026-07-14 15:21:57,039 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:57,039 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'X': '1'}, 2 step(s), explanation='This test case checks the debounce delay on the falling edge. Starting with inpu'
+2026-07-14 15:21:57,039 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=1 act={'X': '1'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:57,039 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=5 act={'X': '0'} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:57,039 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=5 act={} exp={'GbxFan_st': '0'}
+2026-07-14 15:21:57,039 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'X': '0'}, 3 step(s), explanation='This test case verifies suppression of rising edge changes shorter than the debo'
+2026-07-14 15:21:57,039 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:21:57,039 INFO    mbd_metric: M8: ----- TC1: precond={'GbxFan_nThres_C': '1'} -----
+2026-07-14 15:21:57,451 DEBUG   mbd_metric: M8: TC1 state reset via FunctionCaller rebuild (no <FCname>_init exists)
+2026-07-14 15:21:57,463 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:57,469 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:57,469 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:57,473 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:57,473 DEBUG   mbd_metric: M8: TC1 warm-up _call_dll(precond) -> 0.0
+2026-07-14 15:21:57,473 INFO    mbd_metric: M8: TC1.S1: wait=1 -> n_advances=1, act={}, exp={'GbxFan_st': '0'}
+2026-07-14 15:21:57,473 DEBUG   mbd_metric: M8: TC1.S1 current_inputs after applying actions = {'GbxFan_nThres_C': '1'}
+2026-07-14 15:21:57,482 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:57,488 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:57,489 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:57,788 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:57,788 INFO    mbd_metric: M8: TC1.S1: DLL actual output = 0.0
+2026-07-14 15:21:57,788 INFO    mbd_metric: M8: TC1.S1 -> PASS (GbxFan_st: actual=0.0 expected=0.0 diff=0.0000 tol=0.5000)
+2026-07-14 15:21:57,788 INFO    mbd_metric: M8: ----- TC2: precond={'GbxFan_nThres_C': '1'} -----
+2026-07-14 15:21:58,188 DEBUG   mbd_metric: M8: TC2 state reset via FunctionCaller rebuild (no <FCname>_init exists)
+2026-07-14 15:21:58,198 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:58,202 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:58,202 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:58,205 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:58,206 DEBUG   mbd_metric: M8: TC2 warm-up _call_dll(precond) -> 0.0
+2026-07-14 15:21:58,206 INFO    mbd_metric: M8: TC2.S1: wait=1 -> n_advances=1, act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}, exp={'GbxFan_st': '0'}
+2026-07-14 15:21:58,206 DEBUG   mbd_metric: M8: TC2.S1 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:21:58,213 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:58,219 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:58,219 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:58,513 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:58,513 INFO    mbd_metric: M8: TC2.S1: DLL actual output = 0.0
+2026-07-14 15:21:58,513 INFO    mbd_metric: M8: TC2.S1 -> PASS (GbxFan_st: actual=0.0 expected=0.0 diff=0.0000 tol=0.5000)
+2026-07-14 15:21:58,513 INFO    mbd_metric: M8: TC2.S2: wait=10 -> n_advances=1, act={}, exp={'GbxFan_st': '1'}
+2026-07-14 15:21:58,513 DEBUG   mbd_metric: M8: TC2.S2 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:21:58,528 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:58,534 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:58,534 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:58,822 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:58,822 INFO    mbd_metric: M8: TC2.S2: DLL actual output = 0.0
+2026-07-14 15:21:58,822 INFO    mbd_metric: M8: TC2.S2 -> FAIL (GbxFan_st: actual=0.0 expected=1.0 diff=1.0000 tol=0.5000)
+2026-07-14 15:21:58,822 INFO    mbd_metric: M8: ----- TC3: precond={'GbxFan_nThres_C': '1'} -----
+2026-07-14 15:21:59,229 DEBUG   mbd_metric: M8: TC3 state reset via FunctionCaller rebuild (no <FCname>_init exists)
+2026-07-14 15:21:59,238 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:59,244 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:59,244 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:59,246 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:59,246 DEBUG   mbd_metric: M8: TC3 warm-up _call_dll(precond) -> 0.0
+2026-07-14 15:21:59,246 INFO    mbd_metric: M8: TC3.S1: wait=1 -> n_advances=1, act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}, exp={'GbxFan_st': '1'}
+2026-07-14 15:21:59,246 DEBUG   mbd_metric: M8: TC3.S1 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:21:59,253 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:59,259 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:59,259 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:59,548 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:59,549 INFO    mbd_metric: M8: TC3.S1: DLL actual output = 0.0
+2026-07-14 15:21:59,549 INFO    mbd_metric: M8: TC3.S1 -> FAIL (GbxFan_st: actual=0.0 expected=1.0 diff=1.0000 tol=0.5000)
+2026-07-14 15:21:59,549 INFO    mbd_metric: M8: TC3.S2: wait=5 -> n_advances=1, act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}, exp={'GbxFan_st': '1'}
+2026-07-14 15:21:59,549 DEBUG   mbd_metric: M8: TC3.S2 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:21:59,556 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:59,562 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:59,562 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:21:59,847 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:21:59,847 INFO    mbd_metric: M8: TC3.S2: DLL actual output = 0.0
+2026-07-14 15:21:59,848 INFO    mbd_metric: M8: TC3.S2 -> FAIL (GbxFan_st: actual=0.0 expected=1.0 diff=1.0000 tol=0.5000)
+2026-07-14 15:21:59,848 INFO    mbd_metric: M8: TC3.S3: wait=5 -> n_advances=1, act={}, exp={'GbxFan_st': '1'}
+2026-07-14 15:21:59,848 DEBUG   mbd_metric: M8: TC3.S3 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:21:59,858 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:21:59,864 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:21:59,865 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:00,147 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:00,147 INFO    mbd_metric: M8: TC3.S3: DLL actual output = 0.0
+2026-07-14 15:22:00,147 INFO    mbd_metric: M8: TC3.S3 -> FAIL (GbxFan_st: actual=0.0 expected=1.0 diff=1.0000 tol=0.5000)
+2026-07-14 15:22:00,147 INFO    mbd_metric: M8: ----- TC4: precond={'GbxFan_nThres_C': '1'} -----
+2026-07-14 15:22:00,555 DEBUG   mbd_metric: M8: TC4 state reset via FunctionCaller rebuild (no <FCname>_init exists)
+2026-07-14 15:22:00,564 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:22:00,569 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:22:00,569 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:00,571 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:00,571 DEBUG   mbd_metric: M8: TC4 warm-up _call_dll(precond) -> 0.0
+2026-07-14 15:22:00,571 INFO    mbd_metric: M8: TC4.S1: wait=1 -> n_advances=1, act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}, exp={'GbxFan_st': '1'}
+2026-07-14 15:22:00,571 DEBUG   mbd_metric: M8: TC4.S1 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:22:00,578 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:22:00,582 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:22:00,582 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:00,874 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:00,874 INFO    mbd_metric: M8: TC4.S1: DLL actual output = 0.0
+2026-07-14 15:22:00,874 INFO    mbd_metric: M8: TC4.S1 -> FAIL (GbxFan_st: actual=0.0 expected=1.0 diff=1.0000 tol=0.5000)
+2026-07-14 15:22:00,874 INFO    mbd_metric: M8: TC4.S2: wait=10 -> n_advances=1, act={}, exp={'GbxFan_st': '0'}
+2026-07-14 15:22:00,875 DEBUG   mbd_metric: M8: TC4.S2 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:22:00,884 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:22:00,889 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:22:00,890 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:01,177 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:01,177 INFO    mbd_metric: M8: TC4.S2: DLL actual output = 0.0
+2026-07-14 15:22:01,177 INFO    mbd_metric: M8: TC4.S2 -> PASS (GbxFan_st: actual=0.0 expected=0.0 diff=0.0000 tol=0.5000)
+2026-07-14 15:22:01,177 INFO    mbd_metric: M8: ----- TC5: precond={'GbxFan_nThres_C': '1'} -----
+2026-07-14 15:22:01,578 DEBUG   mbd_metric: M8: TC5 state reset via FunctionCaller rebuild (no <FCname>_init exists)
+2026-07-14 15:22:01,586 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:22:01,592 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:22:01,592 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:01,594 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:01,594 DEBUG   mbd_metric: M8: TC5 warm-up _call_dll(precond) -> 0.0
+2026-07-14 15:22:01,594 INFO    mbd_metric: M8: TC5.S1: wait=1 -> n_advances=1, act={'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}, exp={'GbxFan_st': '0'}
+2026-07-14 15:22:01,594 DEBUG   mbd_metric: M8: TC5.S1 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '1', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:22:01,602 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:22:01,607 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:22:01,607 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:01,899 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:01,900 INFO    mbd_metric: M8: TC5.S1: DLL actual output = 0.0
+2026-07-14 15:22:01,900 INFO    mbd_metric: M8: TC5.S1 -> PASS (GbxFan_st: actual=0.0 expected=0.0 diff=0.0000 tol=0.5000)
+2026-07-14 15:22:01,900 INFO    mbd_metric: M8: TC5.S2: wait=5 -> n_advances=1, act={'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}, exp={'GbxFan_st': '0'}
+2026-07-14 15:22:01,900 DEBUG   mbd_metric: M8: TC5.S2 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:22:01,913 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:22:01,919 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:22:01,919 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:02,203 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:02,204 INFO    mbd_metric: M8: TC5.S2: DLL actual output = 0.0
+2026-07-14 15:22:02,204 INFO    mbd_metric: M8: TC5.S2 -> PASS (GbxFan_st: actual=0.0 expected=0.0 diff=0.0000 tol=0.5000)
+2026-07-14 15:22:02,204 INFO    mbd_metric: M8: TC5.S3: wait=5 -> n_advances=1, act={}, exp={'GbxFan_st': '0'}
+2026-07-14 15:22:02,204 DEBUG   mbd_metric: M8: TC5.S3 current_inputs after applying actions = {'GbxFan_nThres_C': '1', 'Epm_nEng': '0', 'Com_stGbxFanReq': '1'}
+2026-07-14 15:22:02,210 DEBUG   mbd_metric: M8: _call_dll: arg[0] X=$op16 (inst=And, src=chain-live) -> 0
+2026-07-14 15:22:02,216 DEBUG   mbd_metric: M8: _call_dll: arg[1] Param=$op17 (inst=GbxFanCoorn_Sp_DebounceParam_tDEBt_I, src=chain) -> 1
+2026-07-14 15:22:02,216 DEBUG   mbd_metric: M8: _call_dll: arg[2] Dt=$op18 (inst=dT, src=const) -> 20000.0
+2026-07-14 15:22:02,504 DEBUG   mbd_metric: M8: _call_dll: fc.functionCall(Srv_Debounce_out, [0.0, 1.0, 20000.0], instance=GbxFanCoorn_Sp_Srv_DebounceDEB_I) -> {'ptr_instanceName': 'GbxFanCoorn_Sp_Srv_DebounceDEB_I', 'result': 0.0} (unwrapped=0.0)
+2026-07-14 15:22:02,505 INFO    mbd_metric: M8: TC5.S3: DLL actual output = 0.0
+2026-07-14 15:22:02,505 INFO    mbd_metric: M8: TC5.S3 -> PASS (GbxFan_st: actual=0.0 expected=0.0 diff=0.0000 tol=0.5000)
+2026-07-14 15:22:02,505 INFO    mbd_metric: M8: CONSTANT DLL output (0) across all 11 checked step(s) — test under-stimulates the weakspot; the 6/11 'passes' are coincidental -> M8=0 (unverifiable)
+2026-07-14 15:22:02,505 INFO    mbd_metric: ======================================================================
+2026-07-14 15:22:02,505 INFO    mbd_metric: _compute_all_components: SUMMARY OF ALL METRIC SCORES
+2026-07-14 15:22:02,506 INFO    mbd_metric:   M1 (I/O Classification,  15%) = 1.0000 | I/O classification correct
+2026-07-14 15:22:02,506 INFO    mbd_metric:   M2 (Signal Resolution,   15%) = 1.0000 | All signals resolved
+2026-07-14 15:22:02,506 INFO    mbd_metric:   M3 (Structural Validity, 10%) = 0.7755 | TC1.S1: Wait 1 not multiple of dT=20000; TC2.S1: Wait 1 not multiple of dT=20000; TC2.S2: Wait 10 not multiple of dT=20000; TC3.S1: Wait 1 not multiple of dT=20000; TC3.S2: Wait 5 not multiple of dT=20000; TC3.S3: Wait 5 not multiple of dT=20000; TC4.S1: Wait 1 not multiple of dT=20000; TC4.S2: Wait 10 not multiple of dT=20000
+2026-07-14 15:22:02,506 INFO    mbd_metric:   M4 (Test Coverage,       20%) = 1.0000 | [newKB:Srv_Debounce] 5/5 covered | missing: none
+    JUDGE REASONING: 1: COVERED — TC1 initializes with X=0 and after 1 tick expects GbxFan_st=0 (init value/output state verified).
+2: COVERED — TC2 drives X 0→1, expects output stays 0 during debounce (Step1), then after waiting 10 expects output=1 (Step2).
+3: COVERED — TC3 drives X 1→0 then back to 1 before debounce expires (Wait 5), expects output remains 1 throughout and after total debounce window (final Step3 expects 1).
+4: COVERED — TC4 drives X 1→0, expects output stays 1 during debounce (Step1) then after waiting 10 expects output=0 (Step2).
+5: COVERED — TC5 drives X 0→1 then back to 0 before debounce expires (Wait 5), expects output remains 0 throughout and after total debounce window (final Step3 expects 0).
+2026-07-14 15:22:02,506 INFO    mbd_metric:   M7 (DLL Pass Rate,       20%) = 0.5000 | DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs
+2026-07-14 15:22:02,506 INFO    mbd_metric:   M8 (Functional Correct., 20%) = 0.0000 | M8=0 (constant DLL output 0 across 11 checked steps — test under-stimulates the weakspot; 6/11 passes coincidental)
+2026-07-14 15:22:02,507 INFO    mbd_metric: ======================================================================

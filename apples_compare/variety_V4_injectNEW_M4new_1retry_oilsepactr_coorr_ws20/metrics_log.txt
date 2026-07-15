@@ -1,0 +1,808 @@
+2026-07-13 17:13:28,438 INFO    extract_mbd_full: ======================================================================
+2026-07-13 17:13:28,439 INFO    extract_mbd_full: forward(): START — weakspot_op_key=$op187 raster_time=100000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\oilsepactr_coorr\env_libs\oilsepactr_coorr.dll
+2026-07-13 17:13:28,439 DEBUG   extract_mbd_full: forward(): equation_json (len=3324) = {"$op187": {"oid": "1006", "type": "Function", "instance_name": "OilSepActr_ShwdnTOnD_I", "function_name": "Srv_TrnOnDly_out", "class_method_name": "out", "sequence_number": "14", "method_name": "Proc_100ms", "decision": null, "condition": [], "arg_names": ["Dt", "delayTime", "signal"], "args": ["$op181", "$op183", "$op186"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C", "dT", "OilSepActr_tiDlyShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op188": {"oid": "497", "type": "Local", "instance_name": "OilSepActr_flgSpdShdwn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op187"], "read": true, "write": false, "physical_type": "log", "data_type": "bool", "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C", "dT", "OilSepActr_tiDlyShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "1.0"]}, "$op181": {"oid": "1024", "type": "Variable", "instance_name": "dT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_params": ["dT"], "unique_variables": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147.483648", "2147.483647"]}, "$op183": {"oid": "1694", "type": "ImplementationCast", "instance_name": "Time_DT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op182"], "read": false, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": [], "unique_params": ["OilSepActr_tiDlyShdwn_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147.483648", "2147.483647"]}, "$op186": {"oid": "278", "type": "Operation", "instance_name": "And", "function_name": "And", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op184", "$op180", "$op185"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": []}, "$op215": {"oid": "148", "type": "Variable", "instance_name": "OilSepActr_stCoorr", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op214"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["flgStCoorr"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "255.0"]}}
+2026-07-13 17:13:28,439 DEBUG   extract_mbd_full: forward(): const_values = {"COENG_ST_AUTOSTOPPING": 0, "COENG_ST_READY": 0, "dT": "0.1", "COENG_ST_RUNNING": 0, "POSTDRV_SOFTRST_SY": 0, "COENG_ST_STARTING": 0}
+2026-07-13 17:13:28,440 DEBUG   extract_mbd_full: forward(): weakspot_context (len=2090) =    Srv\_TrnOnDly
+
+Srv\_TrnOnDly
+
+The turn on delay debounces the false to true transition. This means that if the input is false the output is set to false immediately. The output is set to true if the input has been true for at least the delay time.
+
+ 
+
+| Hint | |
+| --- | --- |
+| This class does not contain sequence numbers for the class methods.  The out value has to be connected to a variable to compute the class.  if the output is used in multiple places, there is a risk that the class output might be calculated twice. To avoid this use a process local variable at the output of the class(incase output is used in multiple places). | |
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| set\_Time | The internal time value is set to the value provide by TimeVal: |
+| out | The method "out" calculates the delay element and delivers the result on the out port of the element. |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| delayTime | Delay time | sint32 |
+| Dt | Dt sample time  Attention:  Dt element and Dt port must have the same conversion formula.  Hint:  If using Per\_Dur as implementation for Dt element in BDE, simulation does not work for time dependent elements. Therefore it is recommended to use Time\_Dt. | sint32 Time\_Dt |
+| out | Calculation of delay element and returning result on the out port | uint8 ident(logical signal is returned) |
+| return | returns flase if the input is false the output is set to false immediately. returns  true if the input has been true for at least the delay time. | uint8 ident(logical) |
+| signal | Input signal | uint8 ident (logical signal is expected at the input) |
+| time | static element for holding the time value . | sint32 Time\_Dt  same memory location as set in the TrnOffDly class Settings->Memory Location of Instance |
+| timeVal | Time value for initialization of the time value | sint32 Time\_Dt |
+
+| Related information | |
+| --- | --- |
+| TurnOnDelayA , Srv\_TrnOffDly ,TurnOffDelayA  SRV: SrvX\_TrnOnDlyBoolean\_B  Doors link(SRV): SrvX\_trnOnDly | |
+2026-07-13 17:13:28,440 DEBUG   extract_mbd_full: forward(): instance_names = OilSepActr_stCoorr
+2026-07-13 17:13:28,440 INFO    extract_mbd_full: forward(): KB guidelines resolved (fn=Srv_TrnOnDly_out, +1077 chars) -> kb_guidelines FIELD on Prompt 1 AND Prompt 2
+2026-07-13 17:13:28,440 INFO    extract_mbd_full: forward(): ----- Prompt 1 (context_extractor) — calling LM -----
+2026-07-13 17:13:45,267 INFO    extract_mbd_full: forward(): Prompt 1 DONE — context_analysis (len=4794)
+2026-07-13 17:13:45,268 DEBUG   extract_mbd_full: forward(): Prompt 1 context_analysis = The weakspot element identified is $op187, which corresponds to the instance "OilSepActr_ShwdnTOnD_I" implementing the function "Srv_TrnOnDly_out". This element implements a turn-on delay logic that debounces the false-to-true transition of a logical input signal. Specifically, when the input signal is false, the output is immediately set to false. When the input signal transitions to true, the output only switches to true if the input remains true continuously for at least the configured delay time. This behavior prevents spurious or transient true signals from causing premature output activation.
+
+The inputs to this element are:
+- Dt (sample time)
+- delayTime (the configured delay duration)
+- signal (the logical input signal to be delayed)
+
+From the equation JSON, Dt is linked to $op181, which is a Variable named "dT" and is fixed as a constant value of 0.1 (sample time). According to the instructions, Dt is fixed and must not be altered. The other inputs are delayTime, linked to $op183 (an ImplementationCast of "Time_DT" from $op182), and signal, linked to $op186 (an "And" operation combining multiple signals).
+
+The output of $op187 is connected to $op188, a Local variable "OilSepActr_flgSpdShdwn" of boolean type, which can be checked as the output flag indicating the delayed signal state.
+
+The test guidelines specify a comprehensive set of test cases to validate the turn-on delay behavior, including:
+- Verifying immediate false output when input is false
+- Verifying output switches true only after delay time when input is true
+- Verifying immediate false output on falling edge
+- Verifying no output change if input true duration is less than delay
+- Repeating tests with minimum, maximum, and zero delay values
+
+These tests ensure the element correctly implements the debouncing delay logic under all relevant conditions.
+
+### 1. Overview of the Weakspot Element
+- **Element Key:** $op187
+- **Instance Name:** OilSepActr_ShwdnTOnD_I
+- **Function Name:** Srv_TrnOnDly_out
+- **Role and Working:**
+  - Implements a turn-on delay (debounce) for a logical input signal.
+  - If input signal is false, output is immediately false.
+  - If input signal is true, output switches to true only after the input remains true for the configured delay time.
+  - Prevents false triggering from transient input signals.
+  - The method "out" calculates and returns the delayed output signal.
+
+### 2. Inputs That Can Be Altered
+| Input Name | Reference Key | Type | Description | Alterable? |
+|------------|---------------|------|-------------|------------|
+| Dt (sample time) | $op181 | Variable (dT) | Sample time, fixed at 0.1 | No (fixed) |
+| delayTime | $op183 | ImplementationCast (Time_DT) | Delay time parameter controlling the debounce duration | Yes |
+| signal | $op186 | Operation (And) | Logical input signal to be delayed | Yes |
+
+- Dt is fixed and must not be altered.
+- delayTime and signal are inputs that can be varied to test different delay durations and input signal conditions.
+
+### 3. Outputs That Can Be Checked
+- The output of $op187 is connected to $op188:
+  - **$op188:** Local variable "OilSepActr_flgSpdShdwn" (boolean)
+  - This variable reflects the delayed output signal.
+  - It can be monitored to verify the correct delayed behavior of the turn-on delay element.
+
+### 4. Possible Testcases for Weakspot Element
+Based on the provided guidelines and the element's behavior, the minimal set of testcases includes:
+
+| Testcase | Description | Purpose |
+|----------|-------------|---------|
+| 1. Delay of rising edge with input FALSE | Initialize delayTime; input = FALSE; verify output = FALSE immediately | Verify no false positive output when input is false |
+| 2. Delay on rising edge with input TRUE | Start with output = FALSE; set input = TRUE; wait delayTime; verify output switches TRUE after delay | Verify output switches true only after delay time |
+| 3. Immediate falling edge response | Start with output = TRUE; set input = FALSE; verify output = FALSE immediately | Verify output resets immediately on input falling edge |
+| 4. Input TRUE for less than delay time | Start with output = FALSE; set input = TRUE then FALSE before delayTime; verify output remains FALSE | Verify no output change if input true duration is too short |
+| 5. Repeat tests with maximum delayTime | Use maximum allowed delayTime value | Verify behavior at upper delay limit |
+| 6. Repeat tests with minimum delayTime | Use minimum allowed delayTime value | Verify behavior at lower delay limit |
+| 7. Repeat tests with zero delayTime | Set delayTime = 0; verify output follows input immediately | Verify no delay behavior when delayTime is zero |
+
+These testcases cover the full functional spectrum of the turn-on delay element, ensuring robustness and correctness.
+2026-07-13 17:13:45,268 INFO    extract_mbd_full: forward(): ----- Prompt 2 (testcase_generator) — calling LM -----
+2026-07-13 17:14:03,978 INFO    extract_mbd_full: forward(): Prompt 2 DONE — test_cases_raw (len=4617)
+2026-07-13 17:14:03,979 DEBUG   extract_mbd_full: forward(): Prompt 2 test_cases_raw = [
+    {
+        "Pre-Condition": [
+            "delayTime = 1",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 1"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 0.5",
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the basic turn-on delay behavior with a nominal delayTime of 1 second. Initially, the input signal is false, and the output must be false immediately, confirming no false positive output. When the input signal transitions to true and remains true for the full delayTime, the output switches to true, validating the delayed rising edge behavior. On the falling edge of the input signal, the output resets immediately to false, confirming immediate response to false input. Finally, when the input signal is true for less than the delayTime (0.5 seconds), the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 5",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 5"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 2",
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case repeats the basic turn-on delay tests with the maximum delayTime of 5 seconds. It verifies that the output remains false when the input is false, switches to true only after the full 5-second delay when the input is true, resets immediately on falling edge, and does not switch to true if the input true duration is less than the delay (2 seconds). This ensures the element behaves correctly at the upper delay limit, covering guideline 5."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 0",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the behavior when delayTime is zero, meaning no delay should be applied. The output must follow the input immediately: false input results in false output, true input results in true output without waiting, and falling edge resets output immediately. This confirms that the element correctly handles zero delay, covering guideline 7 and effectively the minimum delay scenario (guideline 6)."
+    }
+]
+2026-07-13 17:14:03,979 INFO    extract_mbd_full: forward(): ----- Bridge: parsing Prompt 2 JSON output -----
+2026-07-13 17:14:03,980 DEBUG   extract_mbd_full: forward(): bridge — extracted JSON via regex match
+2026-07-13 17:14:03,980 INFO    extract_mbd_full: forward(): bridge — parsed 3 test case(s) from Prompt 2
+2026-07-13 17:14:03,980 DEBUG   extract_mbd_full: forward(): relations (count=3) = {'Dt': 'dT', 'delayTime': 'ImplementationCast(Time_DT)', 'signal': 'Operation(And,Operation(Smaller,Variable(Epm_nEng),Parameter(OilSepActr_nMaxShdwn_C)),Local(OilSepActr_flgEngSpd,Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I)),Local(OilSepActr_flgNormActv))'}
+2026-07-13 17:14:03,980 DEBUG   extract_mbd_full: forward(): equation_results_raw — 3 entr(ies)
+2026-07-13 17:14:03,980 DEBUG   extract_mbd_full: forward(): update_test_cases() -> 3 test case(s)
+2026-07-13 17:14:03,981 INFO    extract_mbd_full: forward(): extract_and_replace_equations() -> 2 equation(s) extracted
+2026-07-13 17:14:03,981 DEBUG   extract_mbd_full: forward(): equation_dict[7b88b966-794d-454e-8ea0-5b2f75b552f7] = Operation(And,Operation(Smaller,Variable(Epm_nEng),Parameter(OilSepActr_nMaxShdwn_C)),Local(OilSepActr_flgEngSpd,Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I)),Local(OilSepActr_flgNormActv)) = 0
+2026-07-13 17:14:03,981 DEBUG   extract_mbd_full: forward(): equation_dict[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] = Operation(And,Operation(Smaller,Variable(Epm_nEng),Parameter(OilSepActr_nMaxShdwn_C)),Local(OilSepActr_flgEngSpd,Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I)),Local(OilSepActr_flgNormActv)) = 1
+2026-07-13 17:14:03,981 DEBUG   extract_mbd_full: forward(): unique_constants referenced = []
+2026-07-13 17:14:03,981 DEBUG   extract_mbd_full: forward(): filtered_const_values = {}
+2026-07-13 17:14:03,981 INFO    extract_mbd_full: _get_function_caller: cache MISS — dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\oilsepactr_coorr\env_libs\oilsepactr_coorr.dll FCname=oilsepactr_coorr work_dir=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data
+2026-07-13 17:14:03,981 DEBUG   extract_mbd_full: _get_function_caller: signal_sheet_list has 69 row(s)
+2026-07-13 17:14:03,982 DEBUG   extract_mbd_full: _get_function_caller: model_interface_data has 25 row(s)
+2026-07-13 17:14:04,977 INFO    extract_mbd_full: _get_function_caller: FunctionCaller initialized successfully (FCname=oilsepactr_coorr)
+2026-07-13 17:14:04,977 INFO    extract_mbd_full: forward(): function_caller=available (None means DLL verification disabled)
+2026-07-13 17:14:04,977 INFO    extract_mbd_full: forward(): merged_equation_map has 2 entr(ies) (out of 2 equation_dict entries)
+2026-07-13 17:14:04,977 INFO    extract_mbd_full: forward(): ===== Equation 1/2 (uid=7b88b966-794d-454e-8ea0-5b2f75b552f7) =====
+2026-07-13 17:14:04,977 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] equation_to_solve = Operation(And,Operation(Smaller,Variable(Epm_nEng),Parameter(OilSepActr_nMaxShdwn_C)),Local(OilSepActr_flgEngSpd,Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I)),Local(OilSepActr_flgNormActv)) = 0
+2026-07-13 17:14:04,977 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] original_equation = Operation(And,Operation(Smaller,Variable(Epm_nEng),Parameter(OilSepActr_nMaxShdwn_C)),Local(OilSepActr_flgEngSpd,Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I)),Local(OilSepActr_flgNormActv))
+2026-07-13 17:14:04,977 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] assignment_chain = Local(OilSepActr_flgEngSpd,$op179) → $op180
+Operation(Smaller,$op150,$op172) → $op184
+Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I) → $op179
+Parameter(OilSepActr_nMaxShdwn_C) → $op172
+Local(OilSepActr_flgNormActv) → $op185
+Variable(Epm_nEng) → $op150
+2026-07-13 17:14:04,978 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] final_substituted_equation = Operation(And,Operation(Smaller,$op150,$op172),$op180,$op185)
+2026-07-13 17:14:04,978 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] eq_to_solve (reversed assignment_chain, 6 line(s)) = ['Variable(Epm_nEng) → $op150', 'Local(OilSepActr_flgNormActv) → $op185', 'Parameter(OilSepActr_nMaxShdwn_C) → $op172', 'Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I) → $op179', 'Operation(Smaller,$op150,$op172) → $op184', 'Local(OilSepActr_flgEngSpd,$op179) → $op180']
+2026-07-13 17:14:04,978 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] lhs_value (target) = 0
+2026-07-13 17:14:04,978 INFO    extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-13 17:14:12,433 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "Variable(Epm_nEng) = 10",
+  "Parameter(OilSepActr_nMaxShdwn_C) = 5"
+]
+```
+2026-07-13 17:14:12,435 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] Prompt 4 attempt#1 simulated_response (2 item(s)) = ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']
+2026-07-13 17:14:12,435 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] locked_param_block (after first pass) = '## Locked parameter values -- do not change on retry:\nParameter(OilSepActr_nMaxShdwn_C) = 5\n\n'
+2026-07-13 17:14:12,441 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] attempt#1 final_assignments = ['$op150 = 10', '$op172 = 5', '$op185 = 0', '$op179 = 1', '$op184 = 0', '$op180 = 1']
+2026-07-13 17:14:12,442 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] attempt#1 substitution_dict = {'$op150': '10', '$op172': '5', '$op185': '0', '$op179': '1', '$op184': '0', '$op180': '1'}
+2026-07-13 17:14:12,442 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] attempt#1 substituted expression = ['Operation(And,Operation(Smaller,10,5),1,0)']
+2026-07-13 17:14:12,442 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] attempt#1 BODMAS chain (2 step(s)) = ['Operation(Smaller,10,5) → $op1', 'Operation(And,$op1,1,0) → $op2']
+2026-07-13 17:14:12,445 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] attempt#1 final_check (DLL-resolved) = ['$op1 = 0', '$op2 = 0']
+2026-07-13 17:14:12,446 INFO    extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] attempt#1: expected='0' actual='0' -> PASS
+2026-07-13 17:14:12,446 INFO    extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-13 17:14:12,446 DEBUG   extract_mbd_full: forward(): eq[7b88b966-794d-454e-8ea0-5b2f75b552f7] updated_dict[7b88b966-794d-454e-8ea0-5b2f75b552f7] = ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']
+2026-07-13 17:14:12,446 INFO    extract_mbd_full: forward(): ===== Equation 2/2 (uid=6ebce9bb-2d1e-431c-b83e-46d3bfa227af) =====
+2026-07-13 17:14:12,446 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] equation_to_solve = Operation(And,Operation(Smaller,Variable(Epm_nEng),Parameter(OilSepActr_nMaxShdwn_C)),Local(OilSepActr_flgEngSpd,Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I)),Local(OilSepActr_flgNormActv)) = 1
+2026-07-13 17:14:12,446 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] original_equation = Operation(And,Operation(Smaller,Variable(Epm_nEng),Parameter(OilSepActr_nMaxShdwn_C)),Local(OilSepActr_flgEngSpd,Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I)),Local(OilSepActr_flgNormActv))
+2026-07-13 17:14:12,446 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] assignment_chain = Local(OilSepActr_flgEngSpd,$op179) → $op180
+Operation(Smaller,$op150,$op172) → $op184
+Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I) → $op179
+Parameter(OilSepActr_nMaxShdwn_C) → $op172
+Local(OilSepActr_flgNormActv) → $op185
+Variable(Epm_nEng) → $op150
+2026-07-13 17:14:12,446 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] final_substituted_equation = Operation(And,Operation(Smaller,$op150,$op172),$op180,$op185)
+2026-07-13 17:14:12,446 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] eq_to_solve (reversed assignment_chain, 6 line(s)) = ['Variable(Epm_nEng) → $op150', 'Local(OilSepActr_flgNormActv) → $op185', 'Parameter(OilSepActr_nMaxShdwn_C) → $op172', 'Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I) → $op179', 'Operation(Smaller,$op150,$op172) → $op184', 'Local(OilSepActr_flgEngSpd,$op179) → $op180']
+2026-07-13 17:14:12,446 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] lhs_value (target) = 1
+2026-07-13 17:14:12,446 INFO    extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-13 17:14:17,529 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+    "Parameter(OilSepActr_nMaxShdwn_C) = 5",
+    "Variable(Epm_nEng) = 4"
+]
+```
+2026-07-13 17:14:17,530 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] Prompt 4 attempt#1 simulated_response (2 item(s)) = ['Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(Epm_nEng) = 4']
+2026-07-13 17:14:17,537 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] attempt#1 final_assignments = ['$op150 = 4', '$op172 = 5', '$op185 = 0', '$op179 = 1', '$op184 = 1', '$op180 = 1']
+2026-07-13 17:14:17,537 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] attempt#1 substitution_dict = {'$op150': '4', '$op172': '5', '$op185': '0', '$op179': '1', '$op184': '1', '$op180': '1'}
+2026-07-13 17:14:17,537 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] attempt#1 substituted expression = ['Operation(And,Operation(Smaller,4,5),1,0)']
+2026-07-13 17:14:17,537 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] attempt#1 BODMAS chain (2 step(s)) = ['Operation(Smaller,4,5) → $op1', 'Operation(And,$op1,1,0) → $op2']
+2026-07-13 17:14:17,542 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] attempt#1 final_check (DLL-resolved) = ['$op1 = 1', '$op2 = 0']
+2026-07-13 17:14:17,542 INFO    extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] attempt#1: expected='1' actual='0' -> MISMATCH
+2026-07-13 17:14:17,542 INFO    extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='1' actual='0') -----
+2026-07-13 17:14:24,770 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] retry#1 raw variable_assignments = [
+    "Variable(Epm_nEng) = 4",
+    "Parameter(OilSepActr_nMaxShdwn_C) = 5",
+    "Variable(OilSepActr_EngSpdFF_I) = 1"
+]
+2026-07-13 17:14:24,773 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] retry#1 simulated_response (3 item(s)) = ['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1']
+2026-07-13 17:14:24,783 INFO    extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] retry#1: expected='1' actual='0' -> FAIL
+2026-07-13 17:14:24,783 INFO    extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] M7 inline score = 0.0 (FAIL after 1 retries — expected='1' actual='0')
+2026-07-13 17:14:24,783 DEBUG   extract_mbd_full: forward(): eq[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] updated_dict[6ebce9bb-2d1e-431c-b83e-46d3bfa227af] = ['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1']
+2026-07-13 17:14:24,783 INFO    extract_mbd_full: forward(): M7 INLINE — score=0.5 (DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs)
+2026-07-13 17:14:24,784 INFO    extract_mbd_full: forward(): ----- Post-processing chain -----
+2026-07-13 17:14:24,784 DEBUG   extract_mbd_full: forward(): post-process — update_equation_values() done; equation_dict now = {'7b88b966-794d-454e-8ea0-5b2f75b552f7': ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5'], '6ebce9bb-2d1e-431c-b83e-46d3bfa227af': ['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1']}
+2026-07-13 17:14:24,784 DEBUG   extract_mbd_full: forward(): post-process — map_equations_to_json() -> pre_final = [{'Pre-Condition': ['Time_DT = 1', ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Steps': [{'Actions': [['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': [['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 0.5', ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '0.5 seconds, the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4.'}, {'Pre-Condition': ['Time_DT = 5', ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Steps': [{'Actions': [['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 5'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': [['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 2', ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '2 seconds. This ensures the element behaves correctly at the upper delay limit, covering guideline 5.'}, {'Pre-Condition': ['Time_DT = 0', ['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Steps': [{'Actions': [['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Parameter(OilSepActr_nMaxShdwn_C) = 5', 'Variable(OilSepActr_EngSpdFF_I) = 1']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': [['Variable(Epm_nEng) = 10', 'Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': 'guideline 6.'}]
+2026-07-13 17:14:24,784 DEBUG   extract_mbd_full: forward(): post-process — remove_variable_and_parameter_blocks() -> [{'Pre-Condition': ['Time_DT = 1', ['Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Steps': [{'Actions': [['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': [['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 0.5', ['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '0.5 seconds, the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4.'}, {'Pre-Condition': ['Time_DT = 5', ['Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Steps': [{'Actions': [['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 5'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': [['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Wait 2', ['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '2 seconds. This ensures the element behaves correctly at the upper delay limit, covering guideline 5.'}, {'Pre-Condition': ['Time_DT = 0', ['Parameter(OilSepActr_nMaxShdwn_C) = 5']], 'Steps': [{'Actions': [['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': [['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': [['Variable(Epm_nEng) = 10']], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': 'guideline 6.'}]
+2026-07-13 17:14:24,784 DEBUG   extract_mbd_full: forward(): post-process — flatten_precondition_and_actions() -> [{'Pre-Condition': ['Time_DT = 1', 'Parameter(OilSepActr_nMaxShdwn_C) = 5'], 'Steps': [{'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 0.5', 'Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '0.5 seconds, the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4.'}, {'Pre-Condition': ['Time_DT = 5', 'Parameter(OilSepActr_nMaxShdwn_C) = 5'], 'Steps': [{'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 5'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 2', 'Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '2 seconds. This ensures the element behaves correctly at the upper delay limit, covering guideline 5.'}, {'Pre-Condition': ['Time_DT = 0', 'Parameter(OilSepActr_nMaxShdwn_C) = 5'], 'Steps': [{'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': 'guideline 6.'}]
+2026-07-13 17:14:24,786 DEBUG   extract_mbd_full: forward(): post-process — deduplicate_actions() -> [{'Pre-Condition': ['Time_DT = 1', 'Parameter(OilSepActr_nMaxShdwn_C) = 5'], 'Steps': [{'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 0.5'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '0.5 seconds, the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4.'}, {'Pre-Condition': ['Time_DT = 5', 'Parameter(OilSepActr_nMaxShdwn_C) = 5'], 'Steps': [{'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 5'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1', 'Wait 2'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '2 seconds. This ensures the element behaves correctly at the upper delay limit, covering guideline 5.'}, {'Pre-Condition': ['Time_DT = 0', 'Parameter(OilSepActr_nMaxShdwn_C) = 5'], 'Steps': [{'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Variable(Epm_nEng) = 4', 'Variable(OilSepActr_EngSpdFF_I) = 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Variable(Epm_nEng) = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': 'guideline 6.'}]
+2026-07-13 17:14:24,786 DEBUG   extract_mbd_full: forward(): post-process — all_unselected_vars (final) = set()
+2026-07-13 17:14:24,786 DEBUG   extract_mbd_full: forward(): post-process — clean_deduplicated_solution() -> [{'Pre-Condition': ['Time_DT = 1', 'OilSepActr_nMaxShdwn_C = 5'], 'Steps': [{'Actions': ['Epm_nEng = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Epm_nEng = 4', 'OilSepActr_EngSpdFF_I = 1', 'Wait 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Epm_nEng = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Epm_nEng = 4', 'OilSepActr_EngSpdFF_I = 1', 'Wait 0.5'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '0.5 seconds, the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4.'}, {'Pre-Condition': ['Time_DT = 5', 'OilSepActr_nMaxShdwn_C = 5'], 'Steps': [{'Actions': ['Epm_nEng = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Epm_nEng = 4', 'OilSepActr_EngSpdFF_I = 1', 'Wait 5'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Epm_nEng = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Epm_nEng = 4', 'OilSepActr_EngSpdFF_I = 1', 'Wait 2'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': '2 seconds. This ensures the element behaves correctly at the upper delay limit, covering guideline 5.'}, {'Pre-Condition': ['Time_DT = 0', 'OilSepActr_nMaxShdwn_C = 5'], 'Steps': [{'Actions': ['Epm_nEng = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}, {'Actions': ['Epm_nEng = 4', 'OilSepActr_EngSpdFF_I = 1'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 1']}, {'Actions': ['Epm_nEng = 10'], 'Expected Results': ['OilSepActr_flgSpdShdwn = 0']}], 'Detailed Explanation': 'guideline 6.'}]
+2026-07-13 17:14:24,787 INFO    extract_mbd_full: forward(): post-process — remove_unselected_mux_actions() -> final_json with 3 test case(s)
+2026-07-13 17:14:24,787 DEBUG   extract_mbd_full: forward(): FINAL JSON = [
+  {
+    "Pre-Condition": [
+      "Time_DT = 1",
+      "OilSepActr_nMaxShdwn_C = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Epm_nEng = 10"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 4",
+          "OilSepActr_EngSpdFF_I = 1",
+          "Wait 1"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 10"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 4",
+          "OilSepActr_EngSpdFF_I = 1",
+          "Wait 0.5"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "0.5 seconds, the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4."
+  },
+  {
+    "Pre-Condition": [
+      "Time_DT = 5",
+      "OilSepActr_nMaxShdwn_C = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Epm_nEng = 10"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 4",
+          "OilSepActr_EngSpdFF_I = 1",
+          "Wait 5"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 10"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 4",
+          "OilSepActr_EngSpdFF_I = 1",
+          "Wait 2"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "2 seconds. This ensures the element behaves correctly at the upper delay limit, covering guideline 5."
+  },
+  {
+    "Pre-Condition": [
+      "Time_DT = 0",
+      "OilSepActr_nMaxShdwn_C = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Epm_nEng = 10"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 4",
+          "OilSepActr_EngSpdFF_I = 1"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Epm_nEng = 10"
+        ],
+        "Expected Results": [
+          "OilSepActr_flgSpdShdwn = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "guideline 6."
+  }
+]
+2026-07-13 17:14:24,787 INFO    extract_mbd_full: forward(): END — test_cases_pre_postprocess (Prompt2 raw, 4617 chars), final test_cases (1654 chars), m7_inline_score=0.5
+2026-07-13 17:14:24,787 INFO    extract_mbd_full: ======================================================================
+2026-07-13 17:14:24,791 INFO    mbd_metric: _compute_all_components: required_io KB HIT for oilsepactr_coorr#20 -> {'required_inputs': [], 'required_preconds': [], 'required_outputs': ['OilSepActr_stCoorr']}
+2026-07-13 17:14:24,791 INFO    mbd_metric: ======================================================================
+2026-07-13 17:14:24,791 INFO    mbd_metric: _compute_all_components: fc_name=oilsepactr_coorr weakspot_id=20 weakspot_op_key=$op187 raster_time=100000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\oilsepactr_coorr\env_libs\oilsepactr_coorr.dll
+2026-07-13 17:14:24,792 INFO    mbd_metric: _compute_all_components: use_pre_postprocess=True
+2026-07-13 17:14:24,792 DEBUG   mbd_metric: _compute_all_components: pre_tc_str (Prompt 2 raw / M1,M3,M4,M6 input) = [
+    {
+        "Pre-Condition": [
+            "delayTime = 1",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 1"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 0.5",
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the basic turn-on delay behavior with a nominal delayTime of 1 second. Initially, the input signal is false, and the output must be false immediately, confirming no false positive output. When the input signal transitions to true and remains true for the full delayTime, the output switches to true, validating the delayed rising edge behavior. On the falling edge of the input signal, the output resets immediately to false, confirming immediate response to false input. Finally, when the input signal is true for less than the delayTime (0.5 seconds), the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 5",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 5"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 2",
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case repeats the basic turn-on delay tests with the maximum delayTime of 5 seconds. It verifies that the output remains false when the input is false, switches to true only after the full 5-second delay when the input is true, resets immediately on falling edge, and does not switch to true if the input true duration is less than the delay (2 seconds). This ensures the element behaves correctly at the upper delay limit, covering guideline 5."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 0",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the behavior when delayTime is zero, meaning no delay should be applied. The output must follow the input immediately: false input results in false output, true input results in true output without waiting, and falling edge resets output immediately. This confirms that the element correctly handles zero delay, covering guideline 7 and effectively the minimum delay scenario (guideline 6)."
+    }
+]
+2026-07-13 17:14:24,792 DEBUG   mbd_metric: _compute_all_components: final_tc_str (final JSON / M2,M7,M8 input) = [{"Pre-Condition": ["Time_DT = 1", "OilSepActr_nMaxShdwn_C = 5"], "Steps": [{"Actions": ["Epm_nEng = 10"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}, {"Actions": ["Epm_nEng = 4", "OilSepActr_EngSpdFF_I = 1", "Wait 1"], "Expected Results": ["OilSepActr_flgSpdShdwn = 1"]}, {"Actions": ["Epm_nEng = 10"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}, {"Actions": ["Epm_nEng = 4", "OilSepActr_EngSpdFF_I = 1", "Wait 0.5"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}], "Detailed Explanation": "0.5 seconds, the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4."}, {"Pre-Condition": ["Time_DT = 5", "OilSepActr_nMaxShdwn_C = 5"], "Steps": [{"Actions": ["Epm_nEng = 10"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}, {"Actions": ["Epm_nEng = 4", "OilSepActr_EngSpdFF_I = 1", "Wait 5"], "Expected Results": ["OilSepActr_flgSpdShdwn = 1"]}, {"Actions": ["Epm_nEng = 10"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}, {"Actions": ["Epm_nEng = 4", "OilSepActr_EngSpdFF_I = 1", "Wait 2"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}], "Detailed Explanation": "2 seconds. This ensures the element behaves correctly at the upper delay limit, covering guideline 5."}, {"Pre-Condition": ["Time_DT = 0", "OilSepActr_nMaxShdwn_C = 5"], "Steps": [{"Actions": ["Epm_nEng = 10"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}, {"Actions": ["Epm_nEng = 4", "OilSepActr_EngSpdFF_I = 1"], "Expected Results": ["OilSepActr_flgSpdShdwn = 1"]}, {"Actions": ["Epm_nEng = 10"], "Expected Results": ["OilSepActr_flgSpdShdwn = 0"]}], "Detailed Explanation": "guideline 6."}]
+2026-07-13 17:14:24,792 INFO    mbd_metric: M3: ===== Structural Validity (raster_time=100000) =====
+2026-07-13 17:14:24,792 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=1 act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC1 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC1 step4 -> wait=0 act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'delayTime': '1', 'signal': '0'}, 4 step(s), explanation='This test case verifies the basic turn-on delay behavior with a nominal delayTim'
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=5 act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC2 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC2 step4 -> wait=2 act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'delayTime': '5', 'signal': '0'}, 4 step(s), explanation='This test case repeats the basic turn-on delay tests with the maximum delayTime '
+2026-07-13 17:14:24,793 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'delayTime': '0', 'signal': '0'}, 3 step(s), explanation='This test case verifies the behavior when delayTime is zero, meaning no delay sh'
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1 explanation check PASS
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S1 action signal=0 numeric check PASS
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S1 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S1 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S2 Wait check FAIL (w=1 not multiple of dT=100000)
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S2 action signal=1 numeric check PASS
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S2 exp OilSepActr_flgSpdShdwn=1 numeric check PASS
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S2 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S3 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-13 17:14:24,794 DEBUG   mbd_metric: M3: TC1.S3 action signal=0 numeric check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC1.S3 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC1.S3 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC1.S4 Wait check PASS (w=0 is multiple of dT=100000)
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC1.S4 action signal=0 numeric check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC1.S4 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC1.S4 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC1 precond/expected-overlap check PASS (no overlap)
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2 explanation check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2.S1 action signal=0 numeric check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2.S1 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2.S1 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2.S2 Wait check FAIL (w=5 not multiple of dT=100000)
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2.S2 action signal=1 numeric check PASS
+2026-07-13 17:14:24,795 DEBUG   mbd_metric: M3: TC2.S2 exp OilSepActr_flgSpdShdwn=1 numeric check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S2 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S3 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S3 action signal=0 numeric check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S3 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S3 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S4 Wait check FAIL (w=2 not multiple of dT=100000)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S4 action signal=0 numeric check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S4 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2.S4 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC2 precond/expected-overlap check PASS (no overlap)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC3 explanation check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC3.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC3.S1 action signal=0 numeric check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC3.S1 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC3.S1 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,796 DEBUG   mbd_metric: M3: TC3.S2 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3.S2 action signal=1 numeric check PASS
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3.S2 exp OilSepActr_flgSpdShdwn=1 numeric check PASS
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3.S2 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3.S3 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3.S3 action signal=0 numeric check PASS
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3.S3 exp OilSepActr_flgSpdShdwn=0 numeric check PASS
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3.S3 act/exp-overlap check PASS (no overlap)
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: M3: TC3 precond/expected-overlap check PASS (no overlap)
+2026-07-13 17:14:24,797 INFO    mbd_metric: M3: RESULT score=0.9302 (40/43 weighted checks passed)
+2026-07-13 17:14:24,797 INFO    mbd_metric: M3: failed checks: TC1.S2: Wait 1 not multiple of dT=100000; TC2.S2: Wait 5 not multiple of dT=100000; TC2.S4: Wait 2 not multiple of dT=100000
+2026-07-13 17:14:24,797 INFO    mbd_metric: M1: ===== I/O Classification =====
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,797 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=1 act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC1 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC1 step4 -> wait=0 act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'delayTime': '1', 'signal': '0'}, 4 step(s), explanation='This test case verifies the basic turn-on delay behavior with a nominal delayTim'
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=5 act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC2 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC2 step4 -> wait=2 act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'delayTime': '5', 'signal': '0'}, 4 step(s), explanation='This test case repeats the basic turn-on delay tests with the maximum delayTime '
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'delayTime': '0', 'signal': '0'}, 3 step(s), explanation='This test case verifies the behavior when delayTime is zero, meaning no delay sh'
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-13 17:14:24,798 DEBUG   mbd_metric: M1: weakspot output signals (required_io KB) = {'OilSepActr_stCoorr'}
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: fixed_vars (SystemConstant/Literal/dT) = {'dT'}
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC1 precond_vars={'delayTime', 'signal'} action_vars={'signal'} expected_vars={'OilSepActr_flgSpdShdwn'}
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC1 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC1 output-verified check FAIL (weighs 1x, expected={'OilSepActr_flgSpdShdwn'})
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC1 output-not-set-as-input check PASS
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC2 precond_vars={'delayTime', 'signal'} action_vars={'signal'} expected_vars={'OilSepActr_flgSpdShdwn'}
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC2 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC2 output-verified check FAIL (weighs 1x, expected={'OilSepActr_flgSpdShdwn'})
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC2 output-not-set-as-input check PASS
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC3 precond_vars={'delayTime', 'signal'} action_vars={'signal'} expected_vars={'OilSepActr_flgSpdShdwn'}
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC3 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC3 output-verified check FAIL (weighs 1x, expected={'OilSepActr_flgSpdShdwn'})
+2026-07-13 17:14:24,799 DEBUG   mbd_metric: M1: TC3 output-not-set-as-input check PASS
+2026-07-13 17:14:24,800 INFO    mbd_metric: M1: RESULT score=0.6667 (6/9 checks passed)
+2026-07-13 17:14:24,800 INFO    mbd_metric: M1: failed checks: TC1: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC2: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC3: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']
+2026-07-13 17:14:24,800 INFO    mbd_metric: M4: ===== Test Coverage (weakspot_op_key=$op187, KB_LOADED=True) =====
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=1 act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC1 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC1 step4 -> wait=0 act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'delayTime': '1', 'signal': '0'}, 4 step(s), explanation='This test case verifies the basic turn-on delay behavior with a nominal delayTim'
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=5 act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC2 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC2 step4 -> wait=2 act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,800 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'delayTime': '5', 'signal': '0'}, 4 step(s), explanation='This test case repeats the basic turn-on delay tests with the maximum delayTime '
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'signal': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=None act={'signal': '0'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'delayTime': '0', 'signal': '0'}, 3 step(s), explanation='This test case verifies the behavior when delayTime is zero, meaning no delay sh'
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: M4: weakspot op_entry function_name/class_method_name/method_name = 'Srv_TrnOnDly_out'
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: M4: resolve_guidelines('Srv_TrnOnDly_out') -> source=newKB block_type='Srv_TrnOnDly' (7 guideline(s))
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: M4: guidelines_text=
+1: Checking the Delay of rising edge — Initialize the Delay parameter and set the input to zero; Set: = desired value; Set: Input = FALSE; Check: Output = Input = FALSE
+2: Checking the delay on rising edge — Given: Output = Input = FALSE; Set: Input = TRUE; Wait: Delay time (XXX_tiYYYDly_C); Check: Output = Input after the delay time
+3: Checking on falling edge — Given: Output = Input = TRUE; Set: Input = FALSE; Check: Output = FALSE immediately
+4: Checking the output when the input is at TRUE for less than the delay time — Given: Output = Input = FALSE; Set: Input = TRUE and then set it to FALSE before the delay time; Check: Output = FALSE - does not change to TRUE
+5: Repeat all the above cases with maximum value for the turn-on delay mentioned in the design
+6: Repeat all the above cases with minimum value for the turn-on delay mentioned in the design
+7: Repeat all the above cases with a value of zero for the turn-on delay and check whether there is no delay between input and output
+2026-07-13 17:14:24,801 DEBUG   mbd_metric: M4: full test-case text for judge=
+TC1:
+  Pre-Condition: {'delayTime': '1', 'signal': '0'}
+  Step 1: Wait=None, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Step 2: Wait=1, Actions={'signal': '1'}, Expected Results={'OilSepActr_flgSpdShdwn': '1'}
+  Step 3: Wait=None, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Step 4: Wait=0, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Explanation: This test case verifies the basic turn-on delay behavior with a nominal delayTime of 1 second. Initially, the input signal is false, and the output must be false immediately, confirming no false positive output. When the input signal transitions to true and remains true for the full delayTime, the output switches to true, validating the delayed rising edge behavior. On the falling edge of the input signal, the output resets immediately to false, confirming immediate response to false input. Finally, when the input signal is true for less than the delayTime (0.5 seconds), the output remains false, ensuring no premature output activation. This test case covers guidelines 1 to 4.
+TC2:
+  Pre-Condition: {'delayTime': '5', 'signal': '0'}
+  Step 1: Wait=None, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Step 2: Wait=5, Actions={'signal': '1'}, Expected Results={'OilSepActr_flgSpdShdwn': '1'}
+  Step 3: Wait=None, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Step 4: Wait=2, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Explanation: This test case repeats the basic turn-on delay tests with the maximum delayTime of 5 seconds. It verifies that the output remains false when the input is false, switches to true only after the full 5-second delay when the input is true, resets immediately on falling edge, and does not switch to true if the input true duration is less than the delay (2 seconds). This ensures the element behaves correctly at the upper delay limit, covering guideline 5.
+TC3:
+  Pre-Condition: {'delayTime': '0', 'signal': '0'}
+  Step 1: Wait=None, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Step 2: Wait=None, Actions={'signal': '1'}, Expected Results={'OilSepActr_flgSpdShdwn': '1'}
+  Step 3: Wait=None, Actions={'signal': '0'}, Expected Results={'OilSepActr_flgSpdShdwn': '0'}
+  Explanation: This test case verifies the behavior when delayTime is zero, meaning no delay should be applied. The output must follow the input immediately: false input results in false output, true input results in true output without waiting, and falling edge resets output immediately. This confirms that the element correctly handles zero delay, covering guideline 7 and effectively the minimum delay scenario (guideline 6).
+2026-07-13 17:14:24,801 INFO    mbd_metric: M4: calling TestCoverageJudge LLM (block_type=Srv_TrnOnDly, 7 guideline(s), 3 test case(s))
+2026-07-13 17:14:24,802 INFO    mbd_metric: M4: judge LM dedicated to azure/gpt-5.2 (independent of the inference LM)
+2026-07-13 17:14:30,994 DEBUG   mbd_metric: M4: judge raw covered_indices='1,2,3,7'
+2026-07-13 17:14:30,997 DEBUG   mbd_metric: M4: judge parsed covered set = {1, 2, 3, 7}
+2026-07-13 17:14:30,998 DEBUG   mbd_metric: M4: judge coverage_reasoning = 1: COVERED — TC1 Step 1 sets delayTime=1 and Input(signal)=0, expects Output(OilSepActr_flgSpdShdwn)=0.
+2: COVERED — TC1 Step 2 applies Input=1 and waits 1s (delayTime), expects Output=1 after the wait.
+3: COVERED — TC1 Step 3 sets Input=0 from previously true state and expects Output=0 immediately (no wait).
+4: NOT COVERED — No step explicitly sets Input=TRUE and then back to FALSE *before* the delay time; would need a sequence like: set Input=1, wait < delayTime, set Input=0, expect Output stays 0 throughout.
+5: NOT COVERED — TC2 uses delayTime=5 and checks delayed turn-on (Step 2) and immediate turn-off (Step 3), but does not include the “true for less than delay” case nor the explicit initial/rising-edge setup as in guidelines 1–4 at max delay; would need to repeat guidelines 1–4 with delayTime=max including the <delay pulse case.
+6: NOT COVERED — “Minimum value mentioned in the design” is not provided/used; TC3 uses delayTime=0 (a separate guideline 7). Would need a test repeating guidelines 1–4 with delayTime set to the specified design minimum (nonzero if applicable).
+7: COVERED — TC3 sets delayTime=0 and toggles Input 0→1→0 with no waits, expecting Output follows immediately (Step 2 expects Output=1 without delay).
+2026-07-13 17:14:30,998 INFO    mbd_metric: M4: RESULT score=0.5714 [newKB:Srv_TrnOnDly] 4/7 covered | missing: "Checking the output when the input is at TRUE for less than ", "Repeat all the above cases with maximum value for the turn-o", "Repeat all the above cases with minimum value for the turn-o"
+    JUDGE REASONING: 1: COVERED — TC1 Step 1 sets delayTime=1 and Input(signal)=0, expects Output(OilSepActr_flgSpdShdwn)=0.
+2: COVERED — TC1 Step 2 applies Input=1 and waits 1s (delayTime), expects Output=1 after the wait.
+3: COVERED — TC1 Step 3 sets Input=0 from previously true state and expects Output=0 immediately (no wait).
+4: NOT COVERED — No step explicitly sets Input=TRUE and then back to FALSE *before* the delay time; would need a sequence like: set Input=1, wait < delayTime, set Input=0, expect Output stays 0 throughout.
+5: NOT COVERED — TC2 uses delayTime=5 and checks delayed turn-on (Step 2) and immediate turn-off (Step 3), but does not include the “true for less than delay” case nor the explicit initial/rising-edge setup as in guidelines 1–4 at max delay; would need to repeat guidelines 1–4 with delayTime=max including the <delay pulse case.
+6: NOT COVERED — “Minimum value mentioned in the design” is not provided/used; TC3 uses delayTime=0 (a separate guideline 7). Would need a test repeating guidelines 1–4 with delayTime set to the specified design minimum (nonzero if applicable).
+7: COVERED — TC3 sets delayTime=0 and toggles Input 0→1→0 with no waits, expecting Output follows immediately (Step 2 expects Output=1 without delay).
+2026-07-13 17:14:30,999 INFO    mbd_metric: M2: ===== Signal Resolution (final JSON) =====
+2026-07-13 17:14:31,000 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-13 17:14:31,000 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,001 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=1 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:31,001 DEBUG   mbd_metric: _normalize_test_cases: TC1 step3 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,001 DEBUG   mbd_metric: _normalize_test_cases: TC1 step4 -> wait=0 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,002 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'Time_DT': '1', 'OilSepActr_nMaxShdwn_C': '5'}, 4 step(s), explanation='0.5 seconds, the output remains false, ensuring no premature output activation. '
+2026-07-13 17:14:31,002 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,003 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=5 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:31,003 DEBUG   mbd_metric: _normalize_test_cases: TC2 step3 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,003 DEBUG   mbd_metric: _normalize_test_cases: TC2 step4 -> wait=2 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,004 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'Time_DT': '5', 'OilSepActr_nMaxShdwn_C': '5'}, 4 step(s), explanation='2 seconds. This ensures the element behaves correctly at the upper delay limit, '
+2026-07-13 17:14:31,004 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,004 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:31,005 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,005 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'Time_DT': '0', 'OilSepActr_nMaxShdwn_C': '5'}, 3 step(s), explanation='guideline 6.'
+2026-07-13 17:14:31,005 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-13 17:14:31,007 DEBUG   mbd_metric: M2: known_names count=70 (signalsheet+model_interface+equation)
+2026-07-13 17:14:31,007 DEBUG   mbd_metric: M2: var='Time_DT' -> RESOLVED (normalized match in namespace)
+2026-07-13 17:14:31,007 DEBUG   mbd_metric: M2: var='OilSepActr_nMaxShdwn_C' -> RESOLVED (normalized match in namespace)
+2026-07-13 17:14:31,007 DEBUG   mbd_metric: M2: var='Epm_nEng' -> RESOLVED (normalized match in namespace)
+2026-07-13 17:14:31,007 DEBUG   mbd_metric: M2: var='OilSepActr_flgSpdShdwn' -> RESOLVED (normalized match in namespace)
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: M2: var='OilSepActr_EngSpdFF_I' -> RESOLVED (normalized match in namespace)
+2026-07-13 17:14:31,008 INFO    mbd_metric: M2: RESULT score=1.0000 (5/5 UNIQUE vars resolved; +completeness)
+2026-07-13 17:14:31,008 INFO    mbd_metric: M7: ===== DLL Pass Rate (using INLINE score from forward()) =====
+2026-07-13 17:14:31,008 INFO    mbd_metric: M7: RESULT score=0.5000 (DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs) [inline, from Prompt 4 retry loop]
+2026-07-13 17:14:31,008 INFO    mbd_metric: M8: ===== Functional Correctness (sequential DLL, final JSON) =====
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=1 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: _normalize_test_cases: TC1 step3 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: _normalize_test_cases: TC1 step4 -> wait=0 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'Time_DT': '1', 'OilSepActr_nMaxShdwn_C': '5'}, 4 step(s), explanation='0.5 seconds, the output remains false, ensuring no premature output activation. '
+2026-07-13 17:14:31,008 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=5 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC2 step3 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC2 step4 -> wait=2 act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'Time_DT': '5', 'OilSepActr_nMaxShdwn_C': '5'}, 4 step(s), explanation='2 seconds. This ensures the element behaves correctly at the upper delay limit, '
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Epm_nEng': '4', 'OilSepActr_EngSpdFF_I': '1'} exp={'OilSepActr_flgSpdShdwn': '1'}
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC3 step3 -> wait=None act={'Epm_nEng': '10'} exp={'OilSepActr_flgSpdShdwn': '0'}
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'Time_DT': '0', 'OilSepActr_nMaxShdwn_C': '5'}, 3 step(s), explanation='guideline 6.'
+2026-07-13 17:14:31,009 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-13 17:14:31,009 INFO    mbd_metric: M8: 3 final test case(s) to verify
+2026-07-13 17:14:31,009 INFO    mbd_metric: M8: GATED to 0.0 (wrong I/O) — verifies no real measurable output | measurable outputs=['oilsepactr_stcoorr']
+2026-07-13 17:14:31,009 INFO    mbd_metric: ======================================================================
+2026-07-13 17:14:31,009 INFO    mbd_metric: _compute_all_components: SUMMARY OF ALL METRIC SCORES
+2026-07-13 17:14:31,009 INFO    mbd_metric:   M1 (I/O Classification,  15%) = 0.6667 | TC1: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC2: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC3: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']
+2026-07-13 17:14:31,010 INFO    mbd_metric:   M2 (Signal Resolution,   15%) = 1.0000 | All signals resolved
+2026-07-13 17:14:31,010 INFO    mbd_metric:   M3 (Structural Validity, 10%) = 0.9302 | TC1.S2: Wait 1 not multiple of dT=100000; TC2.S2: Wait 5 not multiple of dT=100000; TC2.S4: Wait 2 not multiple of dT=100000
+2026-07-13 17:14:31,010 INFO    mbd_metric:   M4 (Test Coverage,       20%) = 0.5714 | [newKB:Srv_TrnOnDly] 4/7 covered | missing: "Checking the output when the input is at TRUE for less than ", "Repeat all the above cases with maximum value for the turn-o", "Repeat all the above cases with minimum value for the turn-o"
+    JUDGE REASONING: 1: COVERED — TC1 Step 1 sets delayTime=1 and Input(signal)=0, expects Output(OilSepActr_flgSpdShdwn)=0.
+2: COVERED — TC1 Step 2 applies Input=1 and waits 1s (delayTime), expects Output=1 after the wait.
+3: COVERED — TC1 Step 3 sets Input=0 from previously true state and expects Output=0 immediately (no wait).
+4: NOT COVERED — No step explicitly sets Input=TRUE and then back to FALSE *before* the delay time; would need a sequence like: set Input=1, wait < delayTime, set Input=0, expect Output stays 0 throughout.
+5: NOT COVERED — TC2 uses delayTime=5 and checks delayed turn-on (Step 2) and immediate turn-off (Step 3), but does not include the “true for less than delay” case nor the explicit initial/rising-edge setup as in guidelines 1–4 at max delay; would need to repeat guidelines 1–4 with delayTime=max including the <delay pulse case.
+6: NOT COVERED — “Minimum value mentioned in the design” is not provided/used; TC3 uses delayTime=0 (a separate guideline 7). Would need a test repeating guidelines 1–4 with delayTime set to the specified design minimum (nonzero if applicable).
+7: COVERED — TC3 sets delayTime=0 and toggles Input 0→1→0 with no waits, expecting Output follows immediately (Step 2 expects Output=1 without delay).
+2026-07-13 17:14:31,010 INFO    mbd_metric:   M7 (DLL Pass Rate,       20%) = 0.5000 | DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs
+2026-07-13 17:14:31,010 INFO    mbd_metric:   M8 (Functional Correct., 20%) = 0.0000 | M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['oilsepactr_stcoorr']
+2026-07-13 17:14:31,010 INFO    mbd_metric: ======================================================================

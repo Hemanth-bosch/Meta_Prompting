@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC2: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC3: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC4: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']; TC5: Expected Results verify no real output ['OilSepActr_stCoorr'] (weighs 1x); got ['OilSepActr_flgSpdShdwn']",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 0.9166666666666666,
+  "m3_details": "TC2.S1: Wait 10 not multiple of dT=100000; TC4.S1: Wait 5 not multiple of dT=100000; TC6.S1: Wait 100 not multiple of dT=100000; TC7.S1: Wait 1 not multiple of dT=100000",
+  "m4": 0.5714285714285714,
+  "m4_details": "[newKB:Srv_TrnOnDly] 4/7 covered | missing: \"Checking the output when the input is at TRUE for less than \", \"Repeat all the above cases with maximum value for the turn-o\", \"Repeat all the above cases with minimum value for the turn-o\"\n    JUDGE REASONING: 1: COVERED — TC1 sets delayTime=10 and signal=0 (FALSE) and expects output=0, confirming output follows FALSE input in steady state.\n2: COVERED — TC2 starts from signal=0 then sets signal=1 and waits 10; expects output=1 after the delay (turn-on delay on rising edge).\n3: COVERED — TC3 sets initial signal=1 then sets signal=0; expects output=0 immediately (no off-delay).\n4: NOT COVERED — TC4 never sets signal=1 then back to 0 before delay; it keeps signal=0. Need a test: set signal=1, wait <delay, set signal=0, expect output stays 0 throughout.\n5: NOT COVERED — TC6 (delayTime=100) covers rising-edge delay and falling-edge, but does not repeat guideline #1 (initial FALSE check) and #4 (pulse shorter than delay) at max delay. Need max-delay versions of #1 and #4.\n6: NOT COVERED — TC7 (delayTime=1) covers rising-edge delay and falling-edge, but does not repeat guideline #1 (initial FALSE check) and #4 (shorter-than-delay TRUE pulse) at min delay. Need min-delay versions of #1 and #4.\n7: COVERED — TC5 uses delayTime=0 and sets signal 0->1 expecting immediate output=1, then 1->0 expecting immediate output=0 (no delay).",
+  "m7": 0.5,
+  "m7_details": "DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['oilsepactr_stcoorr']",
+  "_weighted_composite_pct": 61.01190476190476
+}

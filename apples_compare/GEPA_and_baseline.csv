@@ -1,0 +1,4 @@
+tag,file,baseline,optimized,improvement,seed_retained,cost_usd,source
+7-final-GEPA150,GEPA_final_150call_20260715_run_summary.json,51.42,70.59,19.17,False,1.2848,log/PRESERVED_GEPA/GEPA_final_150call_20260715_run_summary.json
+7-intermediate-GEPA150,GEPA_intermediate_150call_20260715_run_summary.json,60.35,67.6,7.24,False,1.3877,log/PRESERVED_GEPA/GEPA_intermediate_150call_20260715_run_summary.json
+8-true-midas-final,true_midas_baseline_final_20260715_114414.json,,51.5,,,,apples_compare/true_midas_baseline/true_midas_baseline_final_20260715_114414.json

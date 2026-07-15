@@ -1,0 +1,948 @@
+2026-07-14 15:23:40,901 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:23:40,901 INFO    extract_mbd_full: forward(): START — weakspot_op_key=$op124 raster_time=20000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\moftqptdveh_fil\env_libs\moftqptdveh_fil.dll
+2026-07-14 15:23:40,902 DEBUG   extract_mbd_full: forward(): equation_json (len=5860) = {"$op124": {"oid": "17921", "type": "Function", "instance_name": "RampEnhd_Trq", "function_name": "MoFSrv_Lib_RampEnhd_Out", "class_method_name": "Out", "sequence_number": "24", "method_name": "Proc", "decision": null, "condition": [], "arg_names": ["State", "Dir", "TimeDt", "SlopePos", "SlopeNeg", "Target"], "args": ["$op120", "$op119", "$op121", "$op122", "$op123", "$op117"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op125": {"oid": "16153", "type": "Local", "instance_name": "_s32_Tq1", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op124"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op126": {"oid": "16153", "type": "Local", "instance_name": "_s32_Tq1", "function_name": null, "class_method_name": null, "sequence_number": "25", "method_name": "Proc", "decision": null, "condition": [], "arg_names": [], "args": ["$op124"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op120": {"oid": "28879", "type": "Local", "instance_name": "MoFTqPtdVeh_tqWhlXTSOld", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MoFTqPtdVeh_tqWhlXTSOld"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op119": {"oid": "13199", "type": "Local", "instance_name": "MoFTqPtdVeh_stRampDirXTS", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op118"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": [], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-32768.0", "32767.0"]}, "$op121": {"oid": "13174", "type": "Literal", "instance_name": "10000", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op122": {"oid": "28061", "type": "Variable", "instance_name": "MoFTqPtdVeh_dTqRatePtdInc", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdInc", "_s32_dTq"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-3276800.0", "3276799.998474121"]}, "$op123": {"oid": "12929", "type": "Variable", "instance_name": "MoFTqPtdVeh_dTqRatePtdDec", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "_s32_dTq"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-3276800.0", "3276799.998474121"]}, "$op117": {"oid": "13170", "type": "Local", "instance_name": "MoFTqPtdVeh_tqWhlXTSInp", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op116"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MoFTqPtdVeh_tqWhlVMD"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op129": {"oid": "32248", "type": "Variable", "instance_name": "MoFTqPtdVeh_tqWhlXTS", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op128"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTS", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-52428.8", "52427.2"]}}
+2026-07-14 15:23:40,902 DEBUG   extract_mbd_full: forward(): const_values = {"MO_125": 125, "EVTYP_SY": 0, "MO_8192": 8192, "MOFSRV_LIB_RAMP_END": 0, "NrDrvnAxle_SC": 0.0, "dT": "20.0"}
+2026-07-14 15:23:40,902 DEBUG   extract_mbd_full: forward(): weakspot_context (len=979) =    MoFSrv_Lib_RampEnhd
+
+MoFSrv_Lib_RampEnhd
+
+Enhanced ramp functionality with 64-bit precision calculations for slope and time operations.
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| MoFSrv_Lib_RampEnhd | Enhanced ramp functionality that increases or decreases a value with slope * dT depending if State > Target or State < Target. Uses 64-bit arithmetic for precision in slope calculations and includes proper rounding mechanisms. Direction tracking allows immediate response to target changes. |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| Target | Target value for the ramp to reach | sint32 |
+| State | Actual value of the ramp | sint32 * |
+| Dir | Actual direction of the ramp | sint16 * |
+| SlopePos | Positive slope parameter | sint32 |
+| SlopeNeg | Negative slope parameter | sint32 |
+| Dt | Function execution time in micro seconds | sint32 |
+| return | Returns the actual state of the ramp | sint32 |
+2026-07-14 15:23:40,902 DEBUG   extract_mbd_full: forward(): instance_names = MoFTqPtdVeh_tqWhlXTS
+2026-07-14 15:23:40,902 INFO    extract_mbd_full: forward(): KB guidelines resolved (fn=MoFSrv_Lib_RampEnhd_Out, +1303 chars) -> kb_guidelines FIELD on Prompt 1 AND Prompt 2
+2026-07-14 15:23:40,902 INFO    extract_mbd_full: forward(): ----- Prompt 1 (context_extractor) — calling LM -----
+2026-07-14 15:24:08,142 INFO    extract_mbd_full: forward(): Prompt 1 DONE — context_analysis (len=6261)
+2026-07-14 15:24:08,142 DEBUG   extract_mbd_full: forward(): Prompt 1 context_analysis = ### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op124
+- **Instance Name:** RampEnhd_Trq
+- **Function Name:** MoFSrv_Lib_RampEnhd_Out
+- **Role and Working:**
+  The element $op124 implements the enhanced ramp functionality using the function `MoFSrv_Lib_RampEnhd_Out`. This function is designed to smoothly ramp a value (torque in this context) towards a target value by increasing or decreasing the current state based on positive or negative slopes multiplied by the execution time delta (dT). It uses 64-bit precision arithmetic to ensure high accuracy in slope and time calculations and includes rounding mechanisms to maintain precision. The function also tracks the ramp direction to respond immediately to changes in the target value, allowing the ramp to switch between increasing and decreasing states seamlessly.
+
+### 2. Inputs That Can Be Altered
+The weakspot element has the following input parameters and their corresponding references:
+
+| Input Parameter | Reference Key | Type       | Description                          | Notes                          |
+|-----------------|---------------|------------|----------------------------------|--------------------------------|
+| State           | $op120        | Local      | Current ramp state (sint32)       | Writable, can be altered       |
+| Dir             | $op119        | Local      | Current ramp direction (sint16)   | Read-only, but depends on $op118 |
+| TimeDt (dT)     | $op121        | Literal    | Execution time delta (fixed 10000) | Fixed constant, exclude        |
+| SlopePos        | $op122        | Variable   | Positive slope rate (sint32)      | Writable, can be altered       |
+| SlopeNeg        | $op123        | Variable   | Negative slope rate (sint32)      | Writable, can be altered       |
+| Target          | $op117        | Local      | Target value for ramp (sint32)    | Read-only input, can be altered|
+
+- **Exclusion:** The `TimeDt` parameter is a fixed literal (10000) and must not be altered.
+- **Summary:** Inputs that can be altered for testing are State, Dir (indirectly via $op118), SlopePos, SlopeNeg, and Target.
+
+### 3. Outputs That Can Be Checked
+- The output of the weakspot element is the ramped torque value, which is represented by the local variable `$op125` and `$op126` both named `_s32_Tq1`.
+- These outputs directly depend on the computation of $op124.
+- The output is a 32-bit signed integer representing the current ramped torque value.
+- This output is suitable for validation and checking in test scenarios.
+
+### 4. Possible Testcases for Weakspot Element
+Based on the provided KB guidelines and the weakspot context, the minimal set of test cases to validate the weakspot element includes:
+
+| Testcase ID | Description                                                                                  | Purpose                                                                                  |
+|-------------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| TC1         | Initialization Test: Initialize ramp and verify output equals initial state                  | Verify correct initialization of the ramp output                                        |
+| TC2         | Ramp Up Test: Set target higher than state, vary positive slope, verify ramp-up behavior     | Validate ramp-up slope behavior with different positive slopes                          |
+| TC3         | Ramp Down Test: Set target lower than state, vary negative slope, verify ramp-down behavior  | Validate ramp-down slope behavior with different negative slopes                        |
+| TC4         | Ramp Abortion Test: Change target mid-ramp from higher to lower and back, verify ramp adapts| Verify ramp direction switching and correct ramping behavior during target changes      |
+
+These test cases cover initialization, ramping up, ramping down, and dynamic target changes, ensuring full coverage of the ramp functionality.
+
+---
+
+### Detailed Context for Weakspot Element `$op124` (RampEnhd_Trq)
+
+**Functionality:**
+- The `MoFSrv_Lib_RampEnhd_Out` function implements an enhanced ramp algorithm that adjusts a state value towards a target value.
+- It uses 64-bit precision arithmetic to calculate the ramp increments or decrements based on the slope parameters and the execution time delta.
+- The ramp direction (`Dir`) is tracked to allow immediate response to changes in the target, enabling smooth transitions between ramping up and down.
+- The function returns the updated ramp state, which represents the current torque value in this context.
+
+**Inputs:**
+- `State` ($op120): The current ramp value, which is updated each cycle.
+- `Dir` ($op119): The current ramp direction, indicating whether the ramp is increasing or decreasing.
+- `SlopePos` ($op122): The positive slope rate, controlling how fast the ramp increases.
+- `SlopeNeg` ($op123): The negative slope rate, controlling how fast the ramp decreases.
+- `Target` ($op117): The desired target value the ramp should reach.
+- `TimeDt` ($op121): The fixed execution time delta (constant 10000), used internally for time-based ramp calculation.
+
+**Outputs:**
+- The output is the updated ramp state, accessible via `$op125` and `$op126` as `_s32_Tq1`.
+- This output reflects the current torque value after ramping towards the target.
+
+**Test Scenarios:**
+- Initialization: Confirm the ramp starts at the correct initial state.
+- Ramp Up: Validate the ramp increases correctly with various positive slopes.
+- Ramp Down: Validate the ramp decreases correctly with various negative slopes.
+- Ramp Abortion: Test the ramp's ability to switch direction mid-ramp when the target changes.
+
+**Additional Notes:**
+- The ramp uses 64-bit calculations internally for precision but outputs a 32-bit signed integer.
+- The direction tracking ensures the ramp can immediately respond to target changes without delay.
+- The fixed time delta ensures consistent timing for slope calculations.
+
+This context provides a comprehensive understanding of the weakspot element's role, inputs, outputs, and testing requirements, aligned with the Bosch BU test guidelines.
+2026-07-14 15:24:08,142 INFO    extract_mbd_full: forward(): Required-I/O KB PROMPT override (fc=moftqptdveh_fil ws=0) — Expected Results instance_names 'MoFTqPtdVeh_tqWhlXTS' -> '_s32_Tq1'
+2026-07-14 15:24:08,142 INFO    extract_mbd_full: forward(): ----- Prompt 2 (testcase_generator) — calling LM -----
+2026-07-14 15:24:34,439 INFO    extract_mbd_full: forward(): Prompt 2 DONE — test_cases_raw (len=3849)
+2026-07-14 15:24:34,440 DEBUG   extract_mbd_full: forward(): Prompt 2 test_cases_raw = [
+  {
+    "Pre-Condition": [
+      "State = 50000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 50000",
+          "SlopePos = 100000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 50000",
+          "Dir = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes."
+  },
+  {
+    "Pre-Condition": [
+      "State = 40000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 60000",
+          "SlopePos = 200000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 40200",
+          "Dir = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 40400",
+          "Dir = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1."
+  },
+  {
+    "Pre-Condition": [
+      "State = 70000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 50000",
+          "SlopePos = 100000",
+          "SlopeNeg = 150000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 69850",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 69700",
+          "Dir = -1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1."
+  },
+  {
+    "Pre-Condition": [
+      "State = 30000",
+      "Dir = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 50000",
+          "SlopePos = 100000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30200",
+          "Dir = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 20000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30100",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30000",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 40000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30020",
+          "Dir = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."
+  }
+]
+2026-07-14 15:24:34,440 INFO    extract_mbd_full: forward(): ----- Bridge: parsing Prompt 2 JSON output -----
+2026-07-14 15:24:34,440 DEBUG   extract_mbd_full: forward(): bridge — extracted JSON via regex match
+2026-07-14 15:24:34,440 INFO    extract_mbd_full: forward(): bridge — parsed 4 test case(s) from Prompt 2
+2026-07-14 15:24:34,440 DEBUG   extract_mbd_full: forward(): relations (count=6) = {'State': 'Local(MoFTqPtdVeh_tqWhlXTSOld)', 'Dir': 'Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END))', 'TimeDt': 'Literal(10000)', 'SlopePos': 'Variable(MoFTqPtdVeh_dTqRatePtdInc)', 'SlopeNeg': 'Variable(MoFTqPtdVeh_dTqRatePtdDec)', 'Target': 'Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD))'}
+2026-07-14 15:24:34,441 DEBUG   extract_mbd_full: forward(): equation_results_raw — 6 entr(ies)
+2026-07-14 15:24:34,441 DEBUG   extract_mbd_full: forward(): update_test_cases() -> 4 test case(s)
+2026-07-14 15:24:34,442 INFO    extract_mbd_full: forward(): extract_and_replace_equations() -> 6 equation(s) extracted
+2026-07-14 15:24:34,442 DEBUG   extract_mbd_full: forward(): equation_dict[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] = Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)) = 0
+2026-07-14 15:24:34,442 DEBUG   extract_mbd_full: forward(): equation_dict[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 50000
+2026-07-14 15:24:34,442 DEBUG   extract_mbd_full: forward(): equation_dict[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 60000
+2026-07-14 15:24:34,442 DEBUG   extract_mbd_full: forward(): equation_dict[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] = Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)) = 1
+2026-07-14 15:24:34,442 DEBUG   extract_mbd_full: forward(): equation_dict[9cb63251-cbb9-484a-83e7-de920c805905] = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 20000
+2026-07-14 15:24:34,442 DEBUG   extract_mbd_full: forward(): equation_dict[37135618-c15a-49c4-8bef-5e574cc60c02] = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 40000
+2026-07-14 15:24:34,442 DEBUG   extract_mbd_full: forward(): unique_constants referenced = ['MOFSRV_LIB_RAMP_END']
+2026-07-14 15:24:34,443 DEBUG   extract_mbd_full: forward(): filtered_const_values = {'MOFSRV_LIB_RAMP_END': 0}
+2026-07-14 15:24:34,443 INFO    extract_mbd_full: _get_function_caller: cache MISS — dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\moftqptdveh_fil\env_libs\moftqptdveh_fil.dll FCname=moftqptdveh_fil work_dir=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data
+2026-07-14 15:24:34,443 DEBUG   extract_mbd_full: _get_function_caller: signal_sheet_list has 81 row(s)
+2026-07-14 15:24:34,443 DEBUG   extract_mbd_full: _get_function_caller: model_interface_data has 22 row(s)
+2026-07-14 15:24:35,534 INFO    extract_mbd_full: _get_function_caller: FunctionCaller initialized successfully (FCname=moftqptdveh_fil)
+2026-07-14 15:24:35,534 INFO    extract_mbd_full: forward(): function_caller=available (None means DLL verification disabled)
+2026-07-14 15:24:35,535 INFO    extract_mbd_full: forward(): merged_equation_map has 6 entr(ies) (out of 6 equation_dict entries)
+2026-07-14 15:24:35,535 INFO    extract_mbd_full: forward(): ===== Equation 1/6 (uid=2a34540f-5e3a-4b93-b9ef-8e1729e875f0) =====
+2026-07-14 15:24:35,535 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] equation_to_solve = Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)) = 0
+2026-07-14 15:24:35,535 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] original_equation = Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END))
+2026-07-14 15:24:35,535 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] assignment_chain = SystemConstant(MOFSRV_LIB_RAMP_END) → $op118
+2026-07-14 15:24:35,535 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] final_substituted_equation = Local(MoFTqPtdVeh_stRampDirXTS,$op118)
+2026-07-14 15:24:35,535 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] eq_to_solve (reversed assignment_chain, 1 line(s)) = ['SystemConstant(MOFSRV_LIB_RAMP_END) → $op118']
+2026-07-14 15:24:35,535 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] lhs_value (target) = 0
+2026-07-14 15:24:35,535 INFO    extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:24:38,781 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+    "SystemConstant(MOFSRV_LIB_RAMP_END) = 0"
+]
+```
+2026-07-14 15:24:38,782 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] Prompt 4 attempt#1 simulated_response (1 item(s)) = ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']
+2026-07-14 15:24:38,782 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] locked_param_block (after first pass) = ''
+2026-07-14 15:24:38,783 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] attempt#1 final_assignments = ['$op118 = 0']
+2026-07-14 15:24:38,783 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] attempt#1 substitution_dict = {'$op118': '0'}
+2026-07-14 15:24:38,783 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] attempt#1 substituted expression = ['Local(MoFTqPtdVeh_stRampDirXTS,0)']
+2026-07-14 15:24:38,783 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] attempt#1 BODMAS chain (1 step(s)) = ['Local(MoFTqPtdVeh_stRampDirXTS,0) → $op1']
+2026-07-14 15:24:38,784 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] attempt#1 final_check (DLL-resolved) = ['$op1 = 0']
+2026-07-14 15:24:38,784 INFO    extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] attempt#1: expected='0' actual='0' -> PASS
+2026-07-14 15:24:38,784 INFO    extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:24:38,784 DEBUG   extract_mbd_full: forward(): eq[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] updated_dict[2a34540f-5e3a-4b93-b9ef-8e1729e875f0] = ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']
+2026-07-14 15:24:38,784 INFO    extract_mbd_full: forward(): ===== Equation 2/6 (uid=fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2) =====
+2026-07-14 15:24:38,784 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] equation_to_solve = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 50000
+2026-07-14 15:24:38,784 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] original_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD))
+2026-07-14 15:24:38,785 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] assignment_chain = Variable(MoFTqPtdVeh_tqWhlVMD) → $op116
+2026-07-14 15:24:38,785 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] final_substituted_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,$op116)
+2026-07-14 15:24:38,785 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] eq_to_solve (reversed assignment_chain, 1 line(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) → $op116']
+2026-07-14 15:24:38,785 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] lhs_value (target) = 50000
+2026-07-14 15:24:38,785 INFO    extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:24:43,426 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] Prompt 4 attempt#1 raw variable_assignments = [[ ## reasoning ## ]]
+The equation chain is simply Variable(MoFTqPtdVeh_tqWhlVMD) → $op116, which means the output is directly the value of the variable MoFTqPtdVeh_tqWhlVMD.
+
+The target value is 50000, so the variable MoFTqPtdVeh_tqWhlVMD must be assigned the integer value 50000.
+
+No other parameters, system constants, or variables appear in the equation, so no other assignments are needed.
+
+The constant MOFSRV_LIB_RAMP_END is given as 0 but does not appear in the equation, so it is not assigned.
+
+Therefore, the only assignment is Variable(MoFTqPtdVeh_tqWhlVMD) = 50000.
+
+```json
+[
+    "Variable(MoFTqPtdVeh_tqWhlVMD) = 50000"
+]
+```
+[[ ## completed ## ]]
+2026-07-14 15:24:43,427 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] Prompt 4 attempt#1 simulated_response (1 item(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000']
+2026-07-14 15:24:43,427 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] attempt#1 final_assignments = ['$op116 = 50000']
+2026-07-14 15:24:43,427 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] attempt#1 substitution_dict = {'$op116': '50000'}
+2026-07-14 15:24:43,427 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] attempt#1 substituted expression = ['Local(MoFTqPtdVeh_tqWhlXTSInp,50000)']
+2026-07-14 15:24:43,427 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] attempt#1 BODMAS chain (1 step(s)) = ['Local(MoFTqPtdVeh_tqWhlXTSInp,50000) → $op1']
+2026-07-14 15:24:43,428 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] attempt#1 final_check (DLL-resolved) = ['$op1 = 50000']
+2026-07-14 15:24:43,429 INFO    extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] attempt#1: expected='50000' actual='50000' -> PASS
+2026-07-14 15:24:43,429 INFO    extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:24:43,429 DEBUG   extract_mbd_full: forward(): eq[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] updated_dict[fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2] = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000']
+2026-07-14 15:24:43,429 INFO    extract_mbd_full: forward(): ===== Equation 3/6 (uid=fa0a41d5-f289-4feb-b2cc-385ca0e67e81) =====
+2026-07-14 15:24:43,429 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] equation_to_solve = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 60000
+2026-07-14 15:24:43,430 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] original_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD))
+2026-07-14 15:24:43,430 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] assignment_chain = Variable(MoFTqPtdVeh_tqWhlVMD) → $op116
+2026-07-14 15:24:43,430 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] final_substituted_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,$op116)
+2026-07-14 15:24:43,430 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] eq_to_solve (reversed assignment_chain, 1 line(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) → $op116']
+2026-07-14 15:24:43,430 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] lhs_value (target) = 60000
+2026-07-14 15:24:43,430 INFO    extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:24:46,810 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] Prompt 4 attempt#1 raw variable_assignments = [[ ## reasoning ## ]]
+The equation chain is simply Variable(MoFTqPtdVeh_tqWhlVMD) → $op116, which means the output is directly the value of the variable MoFTqPtdVeh_tqWhlVMD.
+
+The target value is 60000, so the variable MoFTqPtdVeh_tqWhlVMD must be assigned the integer value 60000.
+
+No other parameters or system constants appear in the equation, so no other assignments are needed.
+
+The constant MOFSRV_LIB_RAMP_END is given as 0 but does not appear in the equation, so it is not assigned.
+
+Therefore, the only assignment is Variable(MoFTqPtdVeh_tqWhlVMD) = 60000.
+
+```json
+[
+    "Variable(MoFTqPtdVeh_tqWhlVMD) = 60000"
+]
+```
+[[ ## completed ## ]]
+2026-07-14 15:24:46,811 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] Prompt 4 attempt#1 simulated_response (1 item(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 60000']
+2026-07-14 15:24:46,811 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] attempt#1 final_assignments = ['$op116 = 60000']
+2026-07-14 15:24:46,812 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] attempt#1 substitution_dict = {'$op116': '60000'}
+2026-07-14 15:24:46,812 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] attempt#1 substituted expression = ['Local(MoFTqPtdVeh_tqWhlXTSInp,60000)']
+2026-07-14 15:24:46,812 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] attempt#1 BODMAS chain (1 step(s)) = ['Local(MoFTqPtdVeh_tqWhlXTSInp,60000) → $op1']
+2026-07-14 15:24:46,813 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] attempt#1 final_check (DLL-resolved) = ['$op1 = 60000']
+2026-07-14 15:24:46,813 INFO    extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] attempt#1: expected='60000' actual='60000' -> PASS
+2026-07-14 15:24:46,813 INFO    extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:24:46,813 DEBUG   extract_mbd_full: forward(): eq[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] updated_dict[fa0a41d5-f289-4feb-b2cc-385ca0e67e81] = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 60000']
+2026-07-14 15:24:46,813 INFO    extract_mbd_full: forward(): ===== Equation 4/6 (uid=f3ca6358-a47a-4a2f-8f74-928a14bb1c0b) =====
+2026-07-14 15:24:46,813 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] equation_to_solve = Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)) = 1
+2026-07-14 15:24:46,813 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] original_equation = Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END))
+2026-07-14 15:24:46,814 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] assignment_chain = SystemConstant(MOFSRV_LIB_RAMP_END) → $op118
+2026-07-14 15:24:46,814 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] final_substituted_equation = Local(MoFTqPtdVeh_stRampDirXTS,$op118)
+2026-07-14 15:24:46,814 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] eq_to_solve (reversed assignment_chain, 1 line(s)) = ['SystemConstant(MOFSRV_LIB_RAMP_END) → $op118']
+2026-07-14 15:24:46,814 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] lhs_value (target) = 1
+2026-07-14 15:24:46,814 INFO    extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:24:53,685 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+    "SystemConstant(MOFSRV_LIB_RAMP_END) = 0"
+]
+```
+2026-07-14 15:24:53,685 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] Prompt 4 attempt#1 simulated_response (1 item(s)) = ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']
+2026-07-14 15:24:53,686 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] attempt#1 final_assignments = ['$op118 = 0']
+2026-07-14 15:24:53,686 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] attempt#1 substitution_dict = {'$op118': '0'}
+2026-07-14 15:24:53,686 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] attempt#1 substituted expression = ['Local(MoFTqPtdVeh_stRampDirXTS,0)']
+2026-07-14 15:24:53,687 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] attempt#1 BODMAS chain (1 step(s)) = ['Local(MoFTqPtdVeh_stRampDirXTS,0) → $op1']
+2026-07-14 15:24:53,687 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] attempt#1 final_check (DLL-resolved) = ['$op1 = 0']
+2026-07-14 15:24:53,687 INFO    extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] attempt#1: expected='1' actual='0' -> MISMATCH
+2026-07-14 15:24:53,687 INFO    extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='1' actual='0') -----
+2026-07-14 15:24:57,147 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] retry#1 raw variable_assignments = [
+    "SystemConstant(MOFSRV_LIB_RAMP_END) = 1"
+]
+2026-07-14 15:24:57,148 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] retry#1 simulated_response (1 item(s)) = ['SystemConstant(MOFSRV_LIB_RAMP_END) = 1']
+2026-07-14 15:24:57,148 INFO    extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] retry#1: expected='1' actual='1' -> PASS
+2026-07-14 15:24:57,149 INFO    extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] M7 inline score = 0.800 (solved after 1 retry, ref=4)
+2026-07-14 15:24:57,149 DEBUG   extract_mbd_full: forward(): eq[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] updated_dict[f3ca6358-a47a-4a2f-8f74-928a14bb1c0b] = ['SystemConstant(MOFSRV_LIB_RAMP_END) = 1']
+2026-07-14 15:24:57,149 INFO    extract_mbd_full: forward(): ===== Equation 5/6 (uid=9cb63251-cbb9-484a-83e7-de920c805905) =====
+2026-07-14 15:24:57,149 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] equation_to_solve = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 20000
+2026-07-14 15:24:57,149 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] original_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD))
+2026-07-14 15:24:57,149 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] assignment_chain = Variable(MoFTqPtdVeh_tqWhlVMD) → $op116
+2026-07-14 15:24:57,149 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] final_substituted_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,$op116)
+2026-07-14 15:24:57,149 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] eq_to_solve (reversed assignment_chain, 1 line(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) → $op116']
+2026-07-14 15:24:57,150 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] lhs_value (target) = 20000
+2026-07-14 15:24:57,150 INFO    extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:25:00,597 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] Prompt 4 attempt#1 raw variable_assignments = [[ ## reasoning ## ]]
+The equation chain is simply Variable(MoFTqPtdVeh_tqWhlVMD) → $op116, which means the output is directly the value of the variable MoFTqPtdVeh_tqWhlVMD.
+
+The target value is 20000, so the variable MoFTqPtdVeh_tqWhlVMD must be assigned the integer value 20000.
+
+No other parameters, system constants, or variables appear in the equation, so no other assignments are needed.
+
+The constant MOFSRV_LIB_RAMP_END is given as 0 but does not appear in the equation, so it is not assigned.
+
+Therefore, the only assignment is Variable(MoFTqPtdVeh_tqWhlVMD) = 20000.
+
+```json
+[
+    "Variable(MoFTqPtdVeh_tqWhlVMD) = 20000"
+]
+```
+[[ ## completed ## ]]
+2026-07-14 15:25:00,598 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] Prompt 4 attempt#1 simulated_response (1 item(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 20000']
+2026-07-14 15:25:00,599 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] attempt#1 final_assignments = ['$op116 = 20000']
+2026-07-14 15:25:00,599 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] attempt#1 substitution_dict = {'$op116': '20000'}
+2026-07-14 15:25:00,599 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] attempt#1 substituted expression = ['Local(MoFTqPtdVeh_tqWhlXTSInp,20000)']
+2026-07-14 15:25:00,599 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] attempt#1 BODMAS chain (1 step(s)) = ['Local(MoFTqPtdVeh_tqWhlXTSInp,20000) → $op1']
+2026-07-14 15:25:00,600 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] attempt#1 final_check (DLL-resolved) = ['$op1 = 20000']
+2026-07-14 15:25:00,600 INFO    extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] attempt#1: expected='20000' actual='20000' -> PASS
+2026-07-14 15:25:00,600 INFO    extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:25:00,600 DEBUG   extract_mbd_full: forward(): eq[9cb63251-cbb9-484a-83e7-de920c805905] updated_dict[9cb63251-cbb9-484a-83e7-de920c805905] = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 20000']
+2026-07-14 15:25:00,600 INFO    extract_mbd_full: forward(): ===== Equation 6/6 (uid=37135618-c15a-49c4-8bef-5e574cc60c02) =====
+2026-07-14 15:25:00,600 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] equation_to_solve = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD)) = 40000
+2026-07-14 15:25:00,600 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] original_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,Variable(MoFTqPtdVeh_tqWhlVMD))
+2026-07-14 15:25:00,600 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] assignment_chain = Variable(MoFTqPtdVeh_tqWhlVMD) → $op116
+2026-07-14 15:25:00,600 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] final_substituted_equation = Local(MoFTqPtdVeh_tqWhlXTSInp,$op116)
+2026-07-14 15:25:00,600 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] eq_to_solve (reversed assignment_chain, 1 line(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) → $op116']
+2026-07-14 15:25:00,601 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] lhs_value (target) = 40000
+2026-07-14 15:25:00,601 INFO    extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:25:03,516 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] Prompt 4 attempt#1 raw variable_assignments = [[ ## reasoning ## ]]
+The equation chain is simply Variable(MoFTqPtdVeh_tqWhlVMD) → $op116, which means the output is directly the value of the variable MoFTqPtdVeh_tqWhlVMD.
+
+The target value is 40000, so the variable MoFTqPtdVeh_tqWhlVMD must be assigned the integer value 40000.
+
+No other parameters, system constants, or variables appear in the equation, so no other assignments are needed.
+
+The constant MOFSRV_LIB_RAMP_END is given as 0 but does not appear in the equation, so it is not assigned.
+
+Therefore, the only assignment is Variable(MoFTqPtdVeh_tqWhlVMD) = 40000.
+
+```json
+[
+    "Variable(MoFTqPtdVeh_tqWhlVMD) = 40000"
+]
+```
+[[ ## completed ## ]]
+2026-07-14 15:25:03,516 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] Prompt 4 attempt#1 simulated_response (1 item(s)) = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 40000']
+2026-07-14 15:25:03,517 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] attempt#1 final_assignments = ['$op116 = 40000']
+2026-07-14 15:25:03,517 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] attempt#1 substitution_dict = {'$op116': '40000'}
+2026-07-14 15:25:03,517 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] attempt#1 substituted expression = ['Local(MoFTqPtdVeh_tqWhlXTSInp,40000)']
+2026-07-14 15:25:03,517 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] attempt#1 BODMAS chain (1 step(s)) = ['Local(MoFTqPtdVeh_tqWhlXTSInp,40000) → $op1']
+2026-07-14 15:25:03,517 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] attempt#1 final_check (DLL-resolved) = ['$op1 = 40000']
+2026-07-14 15:25:03,518 INFO    extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] attempt#1: expected='40000' actual='40000' -> PASS
+2026-07-14 15:25:03,518 INFO    extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:25:03,518 DEBUG   extract_mbd_full: forward(): eq[37135618-c15a-49c4-8bef-5e574cc60c02] updated_dict[37135618-c15a-49c4-8bef-5e574cc60c02] = ['Variable(MoFTqPtdVeh_tqWhlVMD) = 40000']
+2026-07-14 15:25:03,518 INFO    extract_mbd_full: forward(): M7 INLINE — score=0.9666666666666667 (DLL inline: 5 first-try + 1 retry-pass + 0 fail / 6 eqs)
+2026-07-14 15:25:03,518 INFO    extract_mbd_full: forward(): ----- Post-processing chain -----
+2026-07-14 15:25:03,518 DEBUG   extract_mbd_full: forward(): post-process — update_equation_values() done; equation_dict now = {'2a34540f-5e3a-4b93-b9ef-8e1729e875f0': ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0'], 'fc6207f2-3e0b-4e8c-b1bc-3d9b676c94c2': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000'], 'fa0a41d5-f289-4feb-b2cc-385ca0e67e81': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 60000'], 'f3ca6358-a47a-4a2f-8f74-928a14bb1c0b': ['SystemConstant(MOFSRV_LIB_RAMP_END) = 1'], '9cb63251-cbb9-484a-83e7-de920c805905': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 20000'], '37135618-c15a-49c4-8bef-5e574cc60c02': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 40000']}
+2026-07-14 15:25:03,518 DEBUG   extract_mbd_full: forward(): post-process — map_equations_to_json() -> pre_final = [{'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 50000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000'], 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 50000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 0']}], 'Detailed Explanation': 'This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 40000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 60000'], 'MoFTqPtdVeh_dTqRatePtdInc = 200000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 40200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 40400', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': 'This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 70000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000'], 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 150000'], 'Expected Results': ['_s32_Tq1 = 69850', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 69700', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}], 'Detailed Explanation': 'This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 30000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 1']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000'], 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 30200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 20000']], 'Expected Results': ['_s32_Tq1 = 30100', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 30000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 40000']], 'Expected Results': ['_s32_Tq1 = 30020', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."}]
+2026-07-14 15:25:03,518 DEBUG   extract_mbd_full: forward(): post-process — remove_variable_and_parameter_blocks() -> [{'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 50000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000'], 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 50000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 0']}], 'Detailed Explanation': 'This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 40000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 60000'], 'MoFTqPtdVeh_dTqRatePtdInc = 200000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 40200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 40400', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': 'This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 70000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 0']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000'], 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 150000'], 'Expected Results': ['_s32_Tq1 = 69850', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 69700', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}], 'Detailed Explanation': 'This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 30000', ['SystemConstant(MOFSRV_LIB_RAMP_END) = 1']], 'Steps': [{'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000'], 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 30200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 20000']], 'Expected Results': ['_s32_Tq1 = 30100', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 30000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': [['Variable(MoFTqPtdVeh_tqWhlVMD) = 40000']], 'Expected Results': ['_s32_Tq1 = 30020', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."}]
+2026-07-14 15:25:03,519 DEBUG   extract_mbd_full: forward(): post-process — flatten_precondition_and_actions() -> [{'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 50000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 0'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 50000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 0']}], 'Detailed Explanation': 'This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 40000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 0'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 60000', 'MoFTqPtdVeh_dTqRatePtdInc = 200000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 40200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 40400', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': 'This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 70000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 0'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 150000'], 'Expected Results': ['_s32_Tq1 = 69850', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 69700', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}], 'Detailed Explanation': 'This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 30000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 1'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 30200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 20000'], 'Expected Results': ['_s32_Tq1 = 30100', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 30000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 40000'], 'Expected Results': ['_s32_Tq1 = 30020', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."}]
+2026-07-14 15:25:03,519 DEBUG   extract_mbd_full: forward(): post-process — deduplicate_actions() -> [{'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 50000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 0'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 50000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 0']}], 'Detailed Explanation': 'This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 40000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 0'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 60000', 'MoFTqPtdVeh_dTqRatePtdInc = 200000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 40200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 40400', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': 'This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 70000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 0'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 150000'], 'Expected Results': ['_s32_Tq1 = 69850', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 69700', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}], 'Detailed Explanation': 'This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 30000', 'SystemConstant(MOFSRV_LIB_RAMP_END) = 1'], 'Steps': [{'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 30200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 20000'], 'Expected Results': ['_s32_Tq1 = 30100', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 30000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Variable(MoFTqPtdVeh_tqWhlVMD) = 40000'], 'Expected Results': ['_s32_Tq1 = 30020', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."}]
+2026-07-14 15:25:03,519 DEBUG   extract_mbd_full: forward(): post-process — all_unselected_vars (final) = set()
+2026-07-14 15:25:03,520 DEBUG   extract_mbd_full: forward(): post-process — clean_deduplicated_solution() -> [{'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 50000'], 'Steps': [{'Actions': ['MoFTqPtdVeh_tqWhlVMD = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 50000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 0']}], 'Detailed Explanation': 'This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 40000'], 'Steps': [{'Actions': ['MoFTqPtdVeh_tqWhlVMD = 60000', 'MoFTqPtdVeh_dTqRatePtdInc = 200000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 40200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 40400', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': 'This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 70000'], 'Steps': [{'Actions': ['MoFTqPtdVeh_tqWhlVMD = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 150000'], 'Expected Results': ['_s32_Tq1 = 69850', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 69700', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}], 'Detailed Explanation': 'This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1.'}, {'Pre-Condition': ['MoFTqPtdVeh_tqWhlXTSOld = 30000'], 'Steps': [{'Actions': ['MoFTqPtdVeh_tqWhlVMD = 50000', 'MoFTqPtdVeh_dTqRatePtdInc = 100000', 'MoFTqPtdVeh_dTqRatePtdDec = 100000'], 'Expected Results': ['_s32_Tq1 = 30200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}, {'Actions': ['MoFTqPtdVeh_tqWhlVMD = 20000'], 'Expected Results': ['_s32_Tq1 = 30100', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_s32_Tq1 = 30000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1']}, {'Actions': ['MoFTqPtdVeh_tqWhlVMD = 40000'], 'Expected Results': ['_s32_Tq1 = 30020', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1']}], 'Detailed Explanation': "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."}]
+2026-07-14 15:25:03,520 INFO    extract_mbd_full: forward(): post-process — remove_unselected_mux_actions() -> final_json with 4 test case(s)
+2026-07-14 15:25:03,520 DEBUG   extract_mbd_full: forward(): FINAL JSON = [
+  {
+    "Pre-Condition": [
+      "MoFTqPtdVeh_tqWhlXTSOld = 50000"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "MoFTqPtdVeh_tqWhlVMD = 50000",
+          "MoFTqPtdVeh_dTqRatePtdInc = 100000",
+          "MoFTqPtdVeh_dTqRatePtdDec = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 50000",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes."
+  },
+  {
+    "Pre-Condition": [
+      "MoFTqPtdVeh_tqWhlXTSOld = 40000"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "MoFTqPtdVeh_tqWhlVMD = 60000",
+          "MoFTqPtdVeh_dTqRatePtdInc = 200000",
+          "MoFTqPtdVeh_dTqRatePtdDec = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 40200",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 40400",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1."
+  },
+  {
+    "Pre-Condition": [
+      "MoFTqPtdVeh_tqWhlXTSOld = 70000"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "MoFTqPtdVeh_tqWhlVMD = 50000",
+          "MoFTqPtdVeh_dTqRatePtdInc = 100000",
+          "MoFTqPtdVeh_dTqRatePtdDec = 150000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 69850",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 69700",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1."
+  },
+  {
+    "Pre-Condition": [
+      "MoFTqPtdVeh_tqWhlXTSOld = 30000"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "MoFTqPtdVeh_tqWhlVMD = 50000",
+          "MoFTqPtdVeh_dTqRatePtdInc = 100000",
+          "MoFTqPtdVeh_dTqRatePtdDec = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30200",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "MoFTqPtdVeh_tqWhlVMD = 20000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30100",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30000",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "MoFTqPtdVeh_tqWhlVMD = 40000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30020",
+          "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."
+  }
+]
+2026-07-14 15:25:03,520 INFO    extract_mbd_full: forward(): END — test_cases_pre_postprocess (Prompt2 raw, 3849 chars), final test_cases (3640 chars), m7_inline_score=0.9666666666666667
+2026-07-14 15:25:03,521 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:25:03,527 INFO    mbd_metric: _compute_all_components: required_io KB HIT for moftqptdveh_fil#0 -> {'required_inputs': [], 'required_preconds': [], 'required_outputs': ['_s32_Tq1']}
+2026-07-14 15:25:03,528 INFO    mbd_metric: ======================================================================
+2026-07-14 15:25:03,528 INFO    mbd_metric: _compute_all_components: fc_name=moftqptdveh_fil weakspot_id=0 weakspot_op_key=$op124 raster_time=20000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\moftqptdveh_fil\env_libs\moftqptdveh_fil.dll
+2026-07-14 15:25:03,528 INFO    mbd_metric: _compute_all_components: use_pre_postprocess=True
+2026-07-14 15:25:03,528 DEBUG   mbd_metric: _compute_all_components: pre_tc_str (Prompt 2 raw / M1,M3,M4,M6 input) = [
+  {
+    "Pre-Condition": [
+      "State = 50000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 50000",
+          "SlopePos = 100000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 50000",
+          "Dir = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes."
+  },
+  {
+    "Pre-Condition": [
+      "State = 40000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 60000",
+          "SlopePos = 200000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 40200",
+          "Dir = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 40400",
+          "Dir = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1."
+  },
+  {
+    "Pre-Condition": [
+      "State = 70000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 50000",
+          "SlopePos = 100000",
+          "SlopeNeg = 150000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 69850",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 69700",
+          "Dir = -1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1."
+  },
+  {
+    "Pre-Condition": [
+      "State = 30000",
+      "Dir = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 50000",
+          "SlopePos = 100000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30200",
+          "Dir = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 20000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30100",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30000",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 40000"
+        ],
+        "Expected Results": [
+          "_s32_Tq1 = 30020",
+          "Dir = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."
+  }
+]
+2026-07-14 15:25:03,528 DEBUG   mbd_metric: _compute_all_components: final_tc_str (final JSON / M2,M7,M8 input) = [{"Pre-Condition": ["MoFTqPtdVeh_tqWhlXTSOld = 50000"], "Steps": [{"Actions": ["MoFTqPtdVeh_tqWhlVMD = 50000", "MoFTqPtdVeh_dTqRatePtdInc = 100000", "MoFTqPtdVeh_dTqRatePtdDec = 100000"], "Expected Results": ["_s32_Tq1 = 50000", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 0"]}], "Detailed Explanation": "This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes."}, {"Pre-Condition": ["MoFTqPtdVeh_tqWhlXTSOld = 40000"], "Steps": [{"Actions": ["MoFTqPtdVeh_tqWhlVMD = 60000", "MoFTqPtdVeh_dTqRatePtdInc = 200000", "MoFTqPtdVeh_dTqRatePtdDec = 100000"], "Expected Results": ["_s32_Tq1 = 40200", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_s32_Tq1 = 40400", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"]}], "Detailed Explanation": "This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1."}, {"Pre-Condition": ["MoFTqPtdVeh_tqWhlXTSOld = 70000"], "Steps": [{"Actions": ["MoFTqPtdVeh_tqWhlVMD = 50000", "MoFTqPtdVeh_dTqRatePtdInc = 100000", "MoFTqPtdVeh_dTqRatePtdDec = 150000"], "Expected Results": ["_s32_Tq1 = 69850", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_s32_Tq1 = 69700", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"]}], "Detailed Explanation": "This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1."}, {"Pre-Condition": ["MoFTqPtdVeh_tqWhlXTSOld = 30000"], "Steps": [{"Actions": ["MoFTqPtdVeh_tqWhlVMD = 50000", "MoFTqPtdVeh_dTqRatePtdInc = 100000", "MoFTqPtdVeh_dTqRatePtdDec = 100000"], "Expected Results": ["_s32_Tq1 = 30200", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"]}, {"Actions": ["MoFTqPtdVeh_tqWhlVMD = 20000"], "Expected Results": ["_s32_Tq1 = 30100", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_s32_Tq1 = 30000", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = -1"]}, {"Actions": ["MoFTqPtdVeh_tqWhlVMD = 40000"], "Expected Results": ["_s32_Tq1 = 30020", "MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END) = 1"]}], "Detailed Explanation": "This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes."}]
+2026-07-14 15:25:03,529 INFO    mbd_metric: M3: ===== Structural Validity (raster_time=20000) =====
+2026-07-14 15:25:03,529 DEBUG   mbd_metric: _normalize_test_cases: parsed 4 raw test case(s) from input
+2026-07-14 15:25:03,529 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '50000', 'Dir': '0'}
+2026-07-14 15:25:03,529 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'State': '50000', 'Dir': '0'}, 1 step(s), explanation='This test case verifies the initialization behavior of the ramp. The initial sta'
+2026-07-14 15:25:03,529 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Target': '60000', 'SlopePos': '200000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '40200', 'Dir': '1'}
+2026-07-14 15:25:03,529 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_s32_Tq1': '40400', 'Dir': '1'}
+2026-07-14 15:25:03,529 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'State': '40000', 'Dir': '0'}, 2 step(s), explanation='This test case validates the ramp-up behavior. The target is higher than the cur'
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '150000'} exp={'_s32_Tq1': '69850', 'Dir': '-1'}
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_s32_Tq1': '69700', 'Dir': '-1'}
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'State': '70000', 'Dir': '0'}, 2 step(s), explanation='This test case validates the ramp-down behavior. The target is lower than the cu'
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '30200', 'Dir': '1'}
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=None act={'Target': '20000'} exp={'_s32_Tq1': '30100', 'Dir': '-1'}
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=10000 act={} exp={'_s32_Tq1': '30000', 'Dir': '-1'}
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=None act={'Target': '40000'} exp={'_s32_Tq1': '30020', 'Dir': '1'}
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'State': '30000', 'Dir': '1'}, 4 step(s), explanation='This test case verifies the ramp abortion and direction switching behavior. Init'
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: _normalize_test_cases: produced 4 canonical test case(s)
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: M3: TC1 explanation check PASS
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: M3: TC1.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: M3: TC1.S1 action Target=50000 numeric check PASS
+2026-07-14 15:25:03,530 DEBUG   mbd_metric: M3: TC1.S1 action SlopePos=100000 numeric check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC1.S1 action SlopeNeg=100000 numeric check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC1.S1 exp _s32_Tq1=50000 numeric check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC1.S1 exp Dir=0 numeric check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC1.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC1 precond/expected-overlap check FAIL (weighs 2x): {'Dir'}
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC2 explanation check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC2.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC2.S1 action Target=60000 numeric check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC2.S1 action SlopePos=200000 numeric check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC2.S1 action SlopeNeg=100000 numeric check PASS
+2026-07-14 15:25:03,531 DEBUG   mbd_metric: M3: TC2.S1 exp _s32_Tq1=40200 numeric check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC2.S1 exp Dir=1 numeric check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC2.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC2.S2 Wait check FAIL (w=10000 not multiple of dT=20000)
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC2.S2 exp _s32_Tq1=40400 numeric check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC2.S2 exp Dir=1 numeric check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC2.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC2 precond/expected-overlap check FAIL (weighs 2x): {'Dir'}
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC3 explanation check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC3.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC3.S1 action Target=50000 numeric check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC3.S1 action SlopePos=100000 numeric check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC3.S1 action SlopeNeg=150000 numeric check PASS
+2026-07-14 15:25:03,532 DEBUG   mbd_metric: M3: TC3.S1 exp _s32_Tq1=69850 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC3.S1 exp Dir=-1 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC3.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC3.S2 Wait check FAIL (w=10000 not multiple of dT=20000)
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC3.S2 exp _s32_Tq1=69700 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC3.S2 exp Dir=-1 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC3.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC3 precond/expected-overlap check FAIL (weighs 2x): {'Dir'}
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC4 explanation check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC4.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC4.S1 action Target=50000 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC4.S1 action SlopePos=100000 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC4.S1 action SlopeNeg=100000 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC4.S1 exp _s32_Tq1=30200 numeric check PASS
+2026-07-14 15:25:03,533 DEBUG   mbd_metric: M3: TC4.S1 exp Dir=1 numeric check PASS
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S2 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S2 action Target=20000 numeric check PASS
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S2 exp _s32_Tq1=30100 numeric check PASS
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S2 exp Dir=-1 numeric check PASS
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S3 Wait check FAIL (w=10000 not multiple of dT=20000)
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S3 exp _s32_Tq1=30000 numeric check PASS
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S3 exp Dir=-1 numeric check PASS
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S3 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,534 DEBUG   mbd_metric: M3: TC4.S4 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:25:03,535 DEBUG   mbd_metric: M3: TC4.S4 action Target=40000 numeric check PASS
+2026-07-14 15:25:03,535 DEBUG   mbd_metric: M3: TC4.S4 exp _s32_Tq1=30020 numeric check PASS
+2026-07-14 15:25:03,535 DEBUG   mbd_metric: M3: TC4.S4 exp Dir=1 numeric check PASS
+2026-07-14 15:25:03,535 DEBUG   mbd_metric: M3: TC4.S4 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:25:03,535 DEBUG   mbd_metric: M3: TC4 precond/expected-overlap check FAIL (weighs 2x): {'Dir'}
+2026-07-14 15:25:03,535 INFO    mbd_metric: M3: OUTPUT-PINNED-AS-PRECONDITION: 4 TC(s), each weighed 2x a normal check
+2026-07-14 15:25:03,535 INFO    mbd_metric: M3: RESULT score=0.8036 (45/56 weighted checks passed)
+2026-07-14 15:25:03,535 INFO    mbd_metric: M3: failed checks: TC1: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']; TC2.S2: Wait 10000 not multiple of dT=20000; TC2: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']; TC3.S2: Wait 10000 not multiple of dT=20000; TC3: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']; TC4.S3: Wait 10000 not multiple of dT=20000; TC4: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']
+2026-07-14 15:25:03,535 INFO    mbd_metric: M1: ===== I/O Classification =====
+2026-07-14 15:25:03,535 DEBUG   mbd_metric: _normalize_test_cases: parsed 4 raw test case(s) from input
+2026-07-14 15:25:03,535 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '50000', 'Dir': '0'}
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'State': '50000', 'Dir': '0'}, 1 step(s), explanation='This test case verifies the initialization behavior of the ramp. The initial sta'
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Target': '60000', 'SlopePos': '200000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '40200', 'Dir': '1'}
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_s32_Tq1': '40400', 'Dir': '1'}
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'State': '40000', 'Dir': '0'}, 2 step(s), explanation='This test case validates the ramp-up behavior. The target is higher than the cur'
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '150000'} exp={'_s32_Tq1': '69850', 'Dir': '-1'}
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_s32_Tq1': '69700', 'Dir': '-1'}
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'State': '70000', 'Dir': '0'}, 2 step(s), explanation='This test case validates the ramp-down behavior. The target is lower than the cu'
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '30200', 'Dir': '1'}
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=None act={'Target': '20000'} exp={'_s32_Tq1': '30100', 'Dir': '-1'}
+2026-07-14 15:25:03,536 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=10000 act={} exp={'_s32_Tq1': '30000', 'Dir': '-1'}
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=None act={'Target': '40000'} exp={'_s32_Tq1': '30020', 'Dir': '1'}
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'State': '30000', 'Dir': '1'}, 4 step(s), explanation='This test case verifies the ramp abortion and direction switching behavior. Init'
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: _normalize_test_cases: produced 4 canonical test case(s)
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: M1: weakspot output signals (required_io KB) = {'_s32_Tq1'}
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: M1: fixed_vars (SystemConstant/Literal/dT) = {'10000'}
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: M1: TC1 precond_vars={'State', 'Dir'} action_vars={'SlopeNeg', 'Target', 'SlopePos'} expected_vars={'_s32_Tq1', 'Dir'}
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: M1: TC1 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: M1: TC1 output-verified check PASS
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: M1: TC1 output-not-set-as-input check PASS
+2026-07-14 15:25:03,537 DEBUG   mbd_metric: M1: TC2 precond_vars={'State', 'Dir'} action_vars={'SlopeNeg', 'Target', 'SlopePos'} expected_vars={'_s32_Tq1', 'Dir'}
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC2 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC2 output-verified check PASS
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC2 output-not-set-as-input check PASS
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC3 precond_vars={'State', 'Dir'} action_vars={'SlopeNeg', 'Target', 'SlopePos'} expected_vars={'_s32_Tq1', 'Dir'}
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC3 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC3 output-verified check PASS
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC3 output-not-set-as-input check PASS
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC4 precond_vars={'State', 'Dir'} action_vars={'SlopeNeg', 'Target', 'SlopePos'} expected_vars={'_s32_Tq1', 'Dir'}
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC4 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC4 output-verified check PASS
+2026-07-14 15:25:03,538 DEBUG   mbd_metric: M1: TC4 output-not-set-as-input check PASS
+2026-07-14 15:25:03,538 INFO    mbd_metric: M1: RESULT score=1.0000 (12/12 checks passed)
+2026-07-14 15:25:03,538 INFO    mbd_metric: M4: ===== Test Coverage (weakspot_op_key=$op124, KB_LOADED=True) =====
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: parsed 4 raw test case(s) from input
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '50000', 'Dir': '0'}
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'State': '50000', 'Dir': '0'}, 1 step(s), explanation='This test case verifies the initialization behavior of the ramp. The initial sta'
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Target': '60000', 'SlopePos': '200000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '40200', 'Dir': '1'}
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_s32_Tq1': '40400', 'Dir': '1'}
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'State': '40000', 'Dir': '0'}, 2 step(s), explanation='This test case validates the ramp-up behavior. The target is higher than the cur'
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '150000'} exp={'_s32_Tq1': '69850', 'Dir': '-1'}
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_s32_Tq1': '69700', 'Dir': '-1'}
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'State': '70000', 'Dir': '0'}, 2 step(s), explanation='This test case validates the ramp-down behavior. The target is lower than the cu'
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'} exp={'_s32_Tq1': '30200', 'Dir': '1'}
+2026-07-14 15:25:03,539 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=None act={'Target': '20000'} exp={'_s32_Tq1': '30100', 'Dir': '-1'}
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=10000 act={} exp={'_s32_Tq1': '30000', 'Dir': '-1'}
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=None act={'Target': '40000'} exp={'_s32_Tq1': '30020', 'Dir': '1'}
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'State': '30000', 'Dir': '1'}, 4 step(s), explanation='This test case verifies the ramp abortion and direction switching behavior. Init'
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: _normalize_test_cases: produced 4 canonical test case(s)
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: M4: weakspot op_entry function_name/class_method_name/method_name = 'MoFSrv_Lib_RampEnhd_Out'
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: M4: resolve_guidelines('MoFSrv_Lib_RampEnhd_Out') -> source=newKB block_type='MoFSrv_Lib_RampEnhd_Out' (4 guideline(s))
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: M4: guidelines_text=
+1: Checking the correct initialization of the ramp — Initialize the Ramp; Check: Output = initialization value
+2: Checking the slope up (with several SLOPE UP between null and MAX) — Set the input value to a defined value; Wait: Output value = Input value; Change the input value to a higher value; Check: Output value = Output value ramps from start value to end value with the correct SLOPE UP; Wait: Output value = Input value
+3: Checking the slope down (with several SLOPE DOWN between null and MAX) — Change the input value to a lower value; Check: Output value = Output value ramps from start value to end value with the correct SLOPE DOWN; Wait: Output value = Input value
+4: Checking the ramp in case of abortion — Change the input value to a higher value; Check: Output value = Output value ramps from start value with the correct SLOPE UP; Change the input value to a lower value before output value reaches the end of the ramp; Check: Output value = Output value ramps from intermediate value with the correct SLOPE DOWN; Change the input value to a higher value before output value reaches the end of the ramp; Check: Output value = Output value ramps from intermediate value with the correct SLOPE UP
+2026-07-14 15:25:03,540 DEBUG   mbd_metric: M4: full test-case text for judge=
+TC1:
+  Pre-Condition: {'State': '50000', 'Dir': '0'}
+  Step 1: Wait=None, Actions={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'}, Expected Results={'_s32_Tq1': '50000', 'Dir': '0'}
+  Explanation: This test case verifies the initialization behavior of the ramp. The initial state and target are set to the same value, so no ramping should occur. The output _s32_Tq1 should equal the initial state, and the direction should remain zero, indicating no ramp movement. This confirms that the ramp starts correctly without unintended changes.
+TC2:
+  Pre-Condition: {'State': '40000', 'Dir': '0'}
+  Step 1: Wait=None, Actions={'Target': '60000', 'SlopePos': '200000', 'SlopeNeg': '100000'}, Expected Results={'_s32_Tq1': '40200', 'Dir': '1'}
+  Step 2: Wait=10000, Actions={}, Expected Results={'_s32_Tq1': '40400', 'Dir': '1'}
+  Explanation: This test case validates the ramp-up behavior. The target is higher than the current state, and a positive slope of 200000 is set. The ramp should increase the output by slope * dT / 1000000 = 200000 * 10000 / 1000000 = 200 per step. The first step output is 40200, and after waiting one dT, the output increments to 40400, confirming correct ramp-up increments and direction set to 1.
+TC3:
+  Pre-Condition: {'State': '70000', 'Dir': '0'}
+  Step 1: Wait=None, Actions={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '150000'}, Expected Results={'_s32_Tq1': '69850', 'Dir': '-1'}
+  Step 2: Wait=10000, Actions={}, Expected Results={'_s32_Tq1': '69700', 'Dir': '-1'}
+  Explanation: This test case validates the ramp-down behavior. The target is lower than the current state, and a negative slope of 150000 is set. The ramp should decrease the output by slope * dT / 1000000 = 150000 * 10000 / 1000000 = 150 per step. The first step output is 69850, and after waiting one dT, the output decreases to 69700, confirming correct ramp-down decrements and direction set to -1.
+TC4:
+  Pre-Condition: {'State': '30000', 'Dir': '1'}
+  Step 1: Wait=None, Actions={'Target': '50000', 'SlopePos': '100000', 'SlopeNeg': '100000'}, Expected Results={'_s32_Tq1': '30200', 'Dir': '1'}
+  Step 2: Wait=None, Actions={'Target': '20000'}, Expected Results={'_s32_Tq1': '30100', 'Dir': '-1'}
+  Step 3: Wait=10000, Actions={}, Expected Results={'_s32_Tq1': '30000', 'Dir': '-1'}
+  Step 4: Wait=None, Actions={'Target': '40000'}, Expected Results={'_s32_Tq1': '30020', 'Dir': '1'}
+  Explanation: This test case verifies the ramp abortion and direction switching behavior. Initially, the ramp is increasing towards a higher target. Midway, the target changes to a lower value, causing the ramp to switch direction and ramp down. After waiting one dT, the output decreases accordingly. Then, the target changes back to a higher value, and the ramp switches direction again to ramp up. This confirms the ramp's ability to adapt direction and ramp correctly during target changes.
+2026-07-14 15:25:03,540 INFO    mbd_metric: M4: calling TestCoverageJudge LLM (block_type=MoFSrv_Lib_RampEnhd_Out, 4 guideline(s), 4 test case(s))
+2026-07-14 15:25:03,540 INFO    mbd_metric: M4: judge LM dedicated to azure/gpt-5.2 (independent of the inference LM)
+2026-07-14 15:25:10,847 DEBUG   mbd_metric: M4: judge raw covered_indices='1,4'
+2026-07-14 15:25:10,848 DEBUG   mbd_metric: M4: judge parsed covered set = {1, 4}
+2026-07-14 15:25:10,848 DEBUG   mbd_metric: M4: judge coverage_reasoning = 1: COVERED — TC1 sets State=50000 and Target=50000 (init/no ramp) and expects _s32_Tq1=50000, Dir=0.
+2: NOT COVERED — TC2 shows ramp-up increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE UP between null and MAX”; need a TC that tries multiple SlopePos values (incl. 0 and near/max) and waits until _s32_Tq1==Target.
+3: NOT COVERED — TC3 shows ramp-down increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE DOWN between null and MAX”; need a TC with multiple SlopeNeg values (incl. 0 and near/max) and wait until _s32_Tq1==Target.
+4: COVERED — TC4 ramps up (Target 50000; expects _s32_Tq1 increases), then changes Target to 20000 before reaching it and expects ramp-down from intermediate value (_s32_Tq1=30100, Dir=-1), then changes Target to 40000 before reaching 20000 and expects ramp-up from intermediate value (_s32_Tq1=30020, Dir=1).
+2026-07-14 15:25:10,848 INFO    mbd_metric: M4: RESULT score=0.5000 [newKB:MoFSrv_Lib_RampEnhd_Out] 2/4 covered | missing: "Checking the slope up (with several SLOPE UP between null an", "Checking the slope down (with several SLOPE DOWN between nul"
+    JUDGE REASONING: 1: COVERED — TC1 sets State=50000 and Target=50000 (init/no ramp) and expects _s32_Tq1=50000, Dir=0.
+2: NOT COVERED — TC2 shows ramp-up increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE UP between null and MAX”; need a TC that tries multiple SlopePos values (incl. 0 and near/max) and waits until _s32_Tq1==Target.
+3: NOT COVERED — TC3 shows ramp-down increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE DOWN between null and MAX”; need a TC with multiple SlopeNeg values (incl. 0 and near/max) and wait until _s32_Tq1==Target.
+4: COVERED — TC4 ramps up (Target 50000; expects _s32_Tq1 increases), then changes Target to 20000 before reaching it and expects ramp-down from intermediate value (_s32_Tq1=30100, Dir=-1), then changes Target to 40000 before reaching 20000 and expects ramp-up from intermediate value (_s32_Tq1=30020, Dir=1).
+2026-07-14 15:25:10,848 INFO    mbd_metric: M2: ===== Signal Resolution (final JSON) =====
+2026-07-14 15:25:10,848 DEBUG   mbd_metric: _normalize_test_cases: parsed 4 raw test case(s) from input
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '50000', 'MoFTqPtdVeh_dTqRatePtdInc': '100000', 'MoFTqPtdVeh_dTqRatePtdDec': '100000'} exp={'_s32_Tq1': '50000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '0'}
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '50000'}, 1 step(s), explanation='This test case verifies the initialization behavior of the ramp. The initial sta'
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '60000', 'MoFTqPtdVeh_dTqRatePtdInc': '200000', 'MoFTqPtdVeh_dTqRatePtdDec': '100000'} exp={'_s32_Tq1': '40200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_s32_Tq1': '40400', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '40000'}, 2 step(s), explanation='This test case validates the ramp-up behavior. The target is higher than the cur'
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '50000', 'MoFTqPtdVeh_dTqRatePtdInc': '100000', 'MoFTqPtdVeh_dTqRatePtdDec': '150000'} exp={'_s32_Tq1': '69850', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_s32_Tq1': '69700', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '70000'}, 2 step(s), explanation='This test case validates the ramp-down behavior. The target is lower than the cu'
+2026-07-14 15:25:10,849 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '50000', 'MoFTqPtdVeh_dTqRatePtdInc': '100000', 'MoFTqPtdVeh_dTqRatePtdDec': '100000'} exp={'_s32_Tq1': '30200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,850 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '20000'} exp={'_s32_Tq1': '30100', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,850 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=10000 act={} exp={'_s32_Tq1': '30000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,850 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '40000'} exp={'_s32_Tq1': '30020', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,850 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '30000'}, 4 step(s), explanation='This test case verifies the ramp abortion and direction switching behavior. Init'
+2026-07-14 15:25:10,850 DEBUG   mbd_metric: _normalize_test_cases: produced 4 canonical test case(s)
+2026-07-14 15:25:10,851 DEBUG   mbd_metric: M2: known_names count=82 (signalsheet+model_interface+equation)
+2026-07-14 15:25:10,851 DEBUG   mbd_metric: M2: var='MoFTqPtdVeh_tqWhlXTSOld' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:25:10,851 DEBUG   mbd_metric: M2: var='MoFTqPtdVeh_tqWhlVMD' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:25:10,851 DEBUG   mbd_metric: M2: var='MoFTqPtdVeh_dTqRatePtdInc' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:25:10,851 DEBUG   mbd_metric: M2: var='MoFTqPtdVeh_dTqRatePtdDec' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:25:10,852 DEBUG   mbd_metric: M2: var='_s32_Tq1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:25:10,852 DEBUG   mbd_metric: M2: var='MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)' -> UNKNOWN (not in signalsheet/model_interface/equation)
+2026-07-14 15:25:10,852 INFO    mbd_metric: M2: RESULT score=0.8333 (5/6 UNIQUE vars resolved)
+2026-07-14 15:25:10,852 INFO    mbd_metric: M2: unresolved/abstract/missing: Unknown: MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)
+2026-07-14 15:25:10,852 INFO    mbd_metric: M7: ===== DLL Pass Rate (using INLINE score from forward()) =====
+2026-07-14 15:25:10,852 INFO    mbd_metric: M7: RESULT score=0.9667 (DLL inline: 5 first-try + 1 retry-pass + 0 fail / 6 eqs) [inline, from Prompt 4 retry loop]
+2026-07-14 15:25:10,852 INFO    mbd_metric: M8: ===== Functional Correctness (sequential DLL, final JSON) =====
+2026-07-14 15:25:10,852 DEBUG   mbd_metric: _normalize_test_cases: parsed 4 raw test case(s) from input
+2026-07-14 15:25:10,852 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '50000', 'MoFTqPtdVeh_dTqRatePtdInc': '100000', 'MoFTqPtdVeh_dTqRatePtdDec': '100000'} exp={'_s32_Tq1': '50000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '0'}
+2026-07-14 15:25:10,852 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '50000'}, 1 step(s), explanation='This test case verifies the initialization behavior of the ramp. The initial sta'
+2026-07-14 15:25:10,852 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '60000', 'MoFTqPtdVeh_dTqRatePtdInc': '200000', 'MoFTqPtdVeh_dTqRatePtdDec': '100000'} exp={'_s32_Tq1': '40200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_s32_Tq1': '40400', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '40000'}, 2 step(s), explanation='This test case validates the ramp-up behavior. The target is higher than the cur'
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '50000', 'MoFTqPtdVeh_dTqRatePtdInc': '100000', 'MoFTqPtdVeh_dTqRatePtdDec': '150000'} exp={'_s32_Tq1': '69850', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_s32_Tq1': '69700', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '70000'}, 2 step(s), explanation='This test case validates the ramp-down behavior. The target is lower than the cu'
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '50000', 'MoFTqPtdVeh_dTqRatePtdInc': '100000', 'MoFTqPtdVeh_dTqRatePtdDec': '100000'} exp={'_s32_Tq1': '30200', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '20000'} exp={'_s32_Tq1': '30100', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=10000 act={} exp={'_s32_Tq1': '30000', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '-1'}
+2026-07-14 15:25:10,853 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=None act={'MoFTqPtdVeh_tqWhlVMD': '40000'} exp={'_s32_Tq1': '30020', 'MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)': '1'}
+2026-07-14 15:25:10,854 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'MoFTqPtdVeh_tqWhlXTSOld': '30000'}, 4 step(s), explanation='This test case verifies the ramp abortion and direction switching behavior. Init'
+2026-07-14 15:25:10,854 DEBUG   mbd_metric: _normalize_test_cases: produced 4 canonical test case(s)
+2026-07-14 15:25:10,854 INFO    mbd_metric: M8: 4 final test case(s) to verify
+2026-07-14 15:25:10,854 DEBUG   mbd_metric: M8: main_entry.original_equation=Local(MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END))
+2026-07-14 15:25:10,854 DEBUG   mbd_metric: M8: main_entry.assignment_chain=
+SystemConstant(MOFSRV_LIB_RAMP_END) → $op118
+2026-07-14 15:25:10,854 DEBUG   mbd_metric: M8: main_entry.final_substituted_equation=Local(MoFTqPtdVeh_stRampDirXTS,$op118)
+2026-07-14 15:25:10,855 INFO    mbd_metric: M8: initializing FunctionCaller FCname=moftqptdveh_fil work_dir=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data
+2026-07-14 15:25:11,254 INFO    mbd_metric: M8: FunctionCaller initialized successfully
+2026-07-14 15:25:11,254 INFO    mbd_metric: M8: FULL_RESOLVE ON — inst_to_type widened by 2 chain-leaf signal(s) -> 11 total (physical inputs now recognised)
+2026-07-14 15:25:11,254 INFO    mbd_metric: M8: weakspot_op_key=$op124 ws_fn_name='MoFSrv_Lib_RampEnhd_Out' ws_instance='RampEnhd_Trq' ws_arg_names=['State', 'Dir', 'TimeDt', 'SlopePos', 'SlopeNeg', 'Target'] ws_args=['$op120', '$op119', '$op121', '$op122', '$op123', '$op117'] -> _is_fn_call_ws=True
+2026-07-14 15:25:11,255 INFO    mbd_metric: M8: weakspot fn 'MoFSrv_Lib_RampEnhd_Out' NOT exported in DLL/Python lib (is_function_available=NA) -> M8=0 (unverifiable)
+2026-07-14 15:25:11,255 INFO    mbd_metric: ======================================================================
+2026-07-14 15:25:11,255 INFO    mbd_metric: _compute_all_components: SUMMARY OF ALL METRIC SCORES
+2026-07-14 15:25:11,255 INFO    mbd_metric:   M1 (I/O Classification,  15%) = 1.0000 | I/O classification correct
+2026-07-14 15:25:11,255 INFO    mbd_metric:   M2 (Signal Resolution,   15%) = 0.8333 | Unknown: MoFTqPtdVeh_stRampDirXTS,SystemConstant(MOFSRV_LIB_RAMP_END)
+2026-07-14 15:25:11,255 INFO    mbd_metric:   M3 (Structural Validity, 10%) = 0.8036 | TC1: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']; TC2.S2: Wait 10000 not multiple of dT=20000; TC2: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']; TC3.S2: Wait 10000 not multiple of dT=20000; TC3: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']; TC4.S3: Wait 10000 not multiple of dT=20000; TC4: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['Dir']
+2026-07-14 15:25:11,255 INFO    mbd_metric:   M4 (Test Coverage,       20%) = 0.5000 | [newKB:MoFSrv_Lib_RampEnhd_Out] 2/4 covered | missing: "Checking the slope up (with several SLOPE UP between null an", "Checking the slope down (with several SLOPE DOWN between nul"
+    JUDGE REASONING: 1: COVERED — TC1 sets State=50000 and Target=50000 (init/no ramp) and expects _s32_Tq1=50000, Dir=0.
+2: NOT COVERED — TC2 shows ramp-up increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE UP between null and MAX”; need a TC that tries multiple SlopePos values (incl. 0 and near/max) and waits until _s32_Tq1==Target.
+3: NOT COVERED — TC3 shows ramp-down increments but does not include the required “wait until Output value = Input value (reaches target)” nor “several SLOPE DOWN between null and MAX”; need a TC with multiple SlopeNeg values (incl. 0 and near/max) and wait until _s32_Tq1==Target.
+4: COVERED — TC4 ramps up (Target 50000; expects _s32_Tq1 increases), then changes Target to 20000 before reaching it and expects ramp-down from intermediate value (_s32_Tq1=30100, Dir=-1), then changes Target to 40000 before reaching 20000 and expects ramp-up from intermediate value (_s32_Tq1=30020, Dir=1).
+2026-07-14 15:25:11,256 INFO    mbd_metric:   M7 (DLL Pass Rate,       20%) = 0.9667 | DLL inline: 5 first-try + 1 retry-pass + 0 fail / 6 eqs
+2026-07-14 15:25:11,256 INFO    mbd_metric:   M8 (Functional Correct., 20%) = 0.0000 | M8=0: weakspot function 'MoFSrv_Lib_RampEnhd_Out' not exported in the DLL/Python library (unverifiable)
+2026-07-14 15:25:11,256 INFO    mbd_metric: ======================================================================

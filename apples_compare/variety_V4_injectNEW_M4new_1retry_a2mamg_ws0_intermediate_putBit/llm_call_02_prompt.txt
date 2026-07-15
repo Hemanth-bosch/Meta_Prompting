@@ -1,0 +1,251 @@
+================ role: system ================
+Your input fields are:
+1. `context_analysis` (str): 
+2. `equation_json` (str): 
+3. `const_values` (str): 
+4. `weakspot_operation` (str): 
+5. `instance_names` (str): 
+6. `example_explanation_output` (str): 
+7. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, the test cases you generate MUST satisfy EVERY guideline listed here: at minimum each guideline must be exercised by at least one test case, and NONE may be skipped — treat them as hard BU requirements (extra cases are fine). If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `test_cases` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## instance_names ## ]]
+{instance_names}
+
+[[ ## example_explanation_output ## ]]
+{example_explanation_output}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Generate **test cases** for the identified weakspot.
+        
+        ### Output Requirements:
+        First give the "Detailed Explanation" of the testcase.
+        The output should have single JSON for all the test cases and should have the following structure:
+        ```json
+        [
+            {
+                "Pre-Condition": ["...", "...", ...],
+                "Steps": [
+                    {
+                        "Actions": ["...", "...", ...],
+                        "Expected Results": ["...", "...", ...]
+                    },
+                    ...
+                ],
+                "Detailed Explanation": "..."
+            },
+            ...
+        ]
+        ```
+        
+        ### Formatting Guidelines:
+        1. **Detailed Explanation**:
+           - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+        
+        2. **Pre-Condition**:
+           - Only include value assignments in the format: "<value_name> = <value>".
+           - Do not include any variables which are part of present in Action.
+        
+        3. **Steps**:
+           - Each step should consist of:
+             - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+             - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+        
+        4. **String Types**:
+           - Only use the following types of strings in the output:
+             - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+             - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+             - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+        
+        ### Additional Constraints:
+        - **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+        - **NOTE** Pre-Condition and Actions **cannot be same variables**
+        - Do not add new constant values that are not part of the provided input.
+        - DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+        - Ensure all steps are logically consistent with the input equation and constants.
+        - Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+        
+        EXAMPLE:
+        (An example test-case in the exact expected format is provided in the `example_explanation_output` input field.)
+        
+        ### Input Details:
+        
+        **Constant Values**: provided in the `const_values` input field
+        **Weakspot Operation**: provided in the `weakspot_operation` input field
+        **Weakspot Context**: provided in the `context_analysis` input field
+        **use this Expected Results**: provided in the `instance_names` input field
+        
+        From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+        Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+        **DO NOT** generate values for dT in the testcases.
+        
+        Using the provided JSON data, generate the test cases as specified.
+        
+        (The equation JSON is provided in the `equation_json` input field.)
+        
+        ### Task:
+        Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+        Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+        Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+        
+        Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+        The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+================ role: user ================
+[[ ## context_analysis ## ]]
+The weakspot element identified is "$op5", which corresponds to the function "putBit_unsigned_putBit" with the instance name "putBit_unsigned". This function is designed to set a specific bit at a given position within an unsigned input value to a specified bit value (TRUE or FALSE). The operation is fundamental in bit manipulation tasks, often used in embedded systems and control software to modify flags or status bits efficiently.
+
+The inputs to this function are:
+- "bitLeiste": the unsigned input value whose bit is to be modified.
+- "bitValue": the bit value to set (TRUE or FALSE).
+- "bitPosition": the position of the bit to be set.
+
+From the equation JSON, these inputs correspond to:
+- "bitLeiste" → "$op2" (Variable "PT_stTraShftOp", uint8)
+- "bitValue" → "$op3" (Variable "B_gsch_msg", bit)
+- "bitPosition" → "$op4" (Literal "0")
+
+The literal "bitPosition" is fixed at 0 in this context, so it is excluded from alterable inputs.
+
+The output of this function is the resultant unsigned value after the bit has been set, which is then assigned back to the variable "PT_stTraShftOp" (referenced by "$op6"). This variable is of type uint8 and represents the modified value after the bit operation.
+
+The test guideline mandates validating the bit operation by setting a bit at a specified position to TRUE and verifying that the output reflects this change correctly. This involves:
+- Initializing the input variable with a known value.
+- Setting the bit at the specified position to TRUE.
+- Checking that the output variable has the bit set as expected.
+
+This ensures the correctness of the bit manipulation logic.
+
+### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op5
+- **Instance Name:** putBit_unsigned
+- **Function Name:** putBit_unsigned_putBit
+- **Role and Working:**
+  - The function "putBit_unsigned" sets a bit at a specified position within an unsigned integer input to a given bit value (TRUE or FALSE).
+  - It takes three inputs: the unsigned input value ("bitLeiste"), the bit value to set ("bitValue"), and the bit position ("bitPosition").
+  - The function returns the modified unsigned value with the bit set accordingly.
+  - In this context, it is used to modify the variable "PT_stTraShftOp" by setting one of its bits based on the boolean input "B_gsch_msg".
+
+### 2. Inputs That Can Be Altered
+| Parameter Name | Reference Key | Type Information | Notes |
+|----------------|---------------|------------------|-------|
+| bitLeiste      | $op2          | Variable "PT_stTraShftOp", uint8 | Alterable input variable |
+| bitValue       | $op3          | Variable "B_gsch_msg", bit (logical) | Alterable input variable |
+| bitPosition    | $op4          | Literal "0"      | Fixed literal, excluded from alteration |
+
+- The sample time parameter "dT" is not part of this function and thus not considered.
+- Only "bitLeiste" and "bitValue" are alterable inputs for testing.
+
+### 3. Outputs That Can Be Checked
+- The output is the modified unsigned value after the bit set operation.
+- This output is assigned to the variable "PT_stTraShftOp" (referenced by "$op6").
+- "PT_stTraShftOp" is a local variable of type uint8 and can be checked to verify the correctness of the bit operation.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1: Set Bit at Position 0 to TRUE**
+  - Input: "PT_stTraShftOp" initialized to a known value (e.g., 0x00).
+  - "bitValue" set to TRUE (1).
+  - "bitPosition" fixed at 0.
+  - Expected Output: "PT_stTraShftOp" should have bit 0 set (e.g., 0x01).
+
+- **Testcase 2: Set Bit at Position 0 to FALSE**
+  - Input: "PT_stTraShftOp" initialized with bit 0 set (e.g., 0x01).
+  - "bitValue" set to FALSE (0).
+  - "bitPosition" fixed at 0.
+  - Expected Output: "PT_stTraShftOp" should have bit 0 cleared (e.g., 0x00).
+
+- These two testcases cover the fundamental behavior of setting and clearing a bit at the specified position.
+
+- Additional testcases could involve varying the initial value of "PT_stTraShftOp" to ensure no unintended bits are altered.
+
+- Since "bitPosition" is fixed at 0 in this context, tests for other bit positions are not applicable here.
+
+- The test guideline emphasizes verifying that the bit at the specified position is correctly set to TRUE, which is covered by Testcase 1.
+
+[[ ## equation_json ## ]]
+{"$op5": {"oid": "451", "type": "Function", "instance_name": "putBit_unsigned", "function_name": "putBit_unsigned_putBit", "class_method_name": "putBit", "sequence_number": "2", "method_name": "Proc_10ms", "decision": null, "condition": [], "arg_names": ["bitLeiste", "bitValue", "bitPosition"], "args": ["$op2", "$op3", "$op4"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["PT_stTraShftOp", "B_gsch_msg"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [null, null]}, "$op6": {"oid": "478", "type": "Variable", "instance_name": "PT_stTraShftOp", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op5"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint8", "unique_variables": ["PT_stTraShftOp", "B_gsch_msg"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op2": {"oid": "478", "type": "Variable", "instance_name": "PT_stTraShftOp", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "uint8", "unique_variables": ["B_gsch_msg", "PT_stTraShftOp"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op3": {"oid": "459", "type": "Variable", "instance_name": "B_gsch_msg", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "log", "data_type": "bit", "unique_variables": ["B_gsch_msg"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 1.0]}, "$op4": {"oid": "471", "type": "Literal", "instance_name": "0", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}}
+
+[[ ## const_values ## ]]
+{"dT": "10000.0", "SY_TWAN": 1, "SY_ZWP": 1}
+
+[[ ## weakspot_operation ## ]]
+$op5
+
+[[ ## instance_names ## ]]
+putBit_unsigned
+
+[[ ## example_explanation_output ## ]]
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#     {
+#         "Pre-Condition": [],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                    "signal = 10",
+# 				   "bit position = 5",
+#                    "value = 1"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 42"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 25",
+# 					"bit position = 3",
+#                     "value = 0"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 17"
+#                 ]
+#             },
+# 			 {
+#                 "Actions": [
+#                     "signal = 50",
+# 					"bit position = 0",
+#                     "value = 1"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 51"
+#                 ]
+#             }
+#         ]
+#     }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+[[ ## kb_guidelines ## ]]
+## Validated test guidelines for putBit_unsigned_putBit (newKB) — cover these scenarios:
+1. Checking the Bit Operation : SetBit — Set: Set the input variable X = xxxxxxxx (data size may be 8-bit,16-bit or 32-bit); Set: Give the Position number to be set to TRUE; Check: Output = Logical status of the position Number is set to TRUE
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## test_cases ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

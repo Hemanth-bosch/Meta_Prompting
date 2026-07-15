@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: Expected Results verify no real output ['EGSPrepn_ratLamSymcS1B1', 'EGSPrepn_ratLamSymcS1B2'] (weighs 1x); got ['_ratLamTiConAdpn']; TC2: Expected Results verify no real output ['EGSPrepn_ratLamSymcS1B1', 'EGSPrepn_ratLamSymcS1B2'] (weighs 1x); got ['_ratLamTiConAdpn']; TC3: Expected Results verify no real output ['EGSPrepn_ratLamSymcS1B1', 'EGSPrepn_ratLamSymcS1B2'] (weighs 1x); got ['_ratLamTiConAdpn']",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 1.0,
+  "m3_details": "All structural checks passed",
+  "m4": 0.875,
+  "m4_details": "[KB:LowpassT] 7/8 covered | missing: \"Check the maximum relative deviation of the output\"\n    JUDGE REASONING: 1: COVERED — TC1 Step 1→2 applies a small input increase 5→5.5 and expects filtered output 5→5.25 after one raster.\n2: COVERED — TC2 Step 1→2 applies a large input increase 3→10 and expects output 3→6.5 after one raster (T=1).\n3: COVERED — TC1 Step 2→3 applies a small input decrease 5.5→5.2 and expects output 5.25→5.225 after one raster.\n4: COVERED — TC2 Step 2→3/4 includes large input decreases 10→1 (and 1→0) and expects output to decrease gradually (6.5→5.7→4.56) with T=5.\n5: NOT COVERED — no test explicitly computes/compares “maximum relative deviation” (e.g., asserts |y−u|/|u| ≤ limit over time or identifies worst-case deviation); would need a test that measures relative deviation and checks it against a stated max criterion.\n6: COVERED — TC2 varies the effective filter gain via time constant changes (T=1 then T=5) and checks changed output response (6.5 then 5.7/4.56).\n7: COVERED — TC3 uses min/max style values: min input 0 (precondition), max-ish input 15.999755859375 (Step 3), and min/max time constant behavior via T=1, T=10, and T=0; expected outputs are specified (0, 7.5, 8.25, 10).\n8: COVERED — TC3 Step 4 sets T=0 (disabled) with input 10 and expects output immediately equals input (10).",
+  "m7": 0.41428571428571426,
+  "m7_details": "DLL inline: 5 first-try + 1 retry-pass + 8 fail / 14 eqs",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['egsprepn_ratlamsymcs1b1', 'egsprepn_ratlamsymcs1b2']",
+  "_weighted_composite_pct": 67.04761904761905
+}

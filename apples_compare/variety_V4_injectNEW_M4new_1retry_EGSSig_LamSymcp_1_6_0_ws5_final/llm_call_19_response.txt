@@ -1,0 +1,65 @@
+[[ ## reasoning ## ]]
+The final output is 0, which corresponds to the value of $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam, which is the result of an IfThenElse operation on $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam.
+
+$op2 is the result of an Or operation between $op18 and $op21.
+
+$op18 is a MUX operation controlled by $op8, selecting between $op16 and $op17.
+
+$op21 is a MUX operation controlled by $op8, selecting between $op19 and $op20.
+
+$op8 is the result of NotEqual between $op6 and $op7.
+
+Given:
+
+- $op6 = SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1 (from const_values)
+- $op7 = Literal(0)
+
+So, $op8 = NotEqual(1,0) = True (1).
+
+Since $op8 = 1 (True), the MUX operations select the second argument:
+
+- $op21 = $op19 (Variable(EGSDO2_flgDynAdpnRtlS1B1))
+- $op18 = $op16 (Variable(EGSDO2_flgDynAdpnLtrS1B1))
+
+Then, $op2 = Or($op18, $op21) = Or($op16, $op19).
+
+The Or operation outputs 0 only if both inputs are 0.
+
+The target value is 0, so:
+
+Or($op16, $op19) = 0 → $op16 = 0 and $op19 = 0.
+
+Therefore, assign:
+
+- Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0
+- Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0
+
+Other variables appearing in the equation are:
+
+- Variable(EGSPrepn_ratLamS1B1) → $op12 (not used in final calculation)
+- Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20 (not selected because $op8=1)
+- Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17 (not selected because $op8=1)
+
+No need to assign values to these as they do not affect the final output.
+
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) must be assigned 1 as per const_values.
+
+Literal(0) is not assigned.
+
+Hence, final assignments are:
+
+- SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1
+- Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0
+- Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0
+
+No parameters to assign.
+
+[[ ## variable_assignments ## ]]
+```json
+[
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0"
+]
+```
+[[ ## completed ## ]]

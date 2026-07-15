@@ -1,0 +1,14 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=moftqptdveh_fil ws=0 fn=MoFSrv_Lib_RampEnhd_Out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 7
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 1303 chars
+  METRICS: M1=1.0  M2=0.8333333333333334  M3=0.7241379310344828  M4=0.5  M7=1.0  M8=0.0
+  weighted composite = 68.4%
+  M4 detail: [newKB:MoFSrv_Lib_RampEnhd_Out] 2/4 covered | missing: "Checking the slope up (with several SLOPE UP between null an", "Checking the slope down (with several SLOPE DOWN between nul"
+    JUDGE REASONING: 1: COVERED — TC1: Initializes with State=Target=100000; after Wait=10000 expects output MoFTqPtdVeh_tqWhlXTS=100000 and Dir=0 (no ramping), matching “Output = initialization value”.
+2: NOT COVERED — TC2 ramps up but never includes the required “Wait: Output value = Input value” at the initial defined value, nor a final wait showing output reaches the new target (200000); also not “several SLOPE UP between null and MAX” (only one slope). Need a TC that (a) holds Target=State and checks output equals it, (b) changes to higher target, verifies ramp with at least multiple SlopePos values (incl. >0 and possibly near-max), and (c) waits until output equals target.
+3: NOT COVERED — TC3 ramps down but does not include a final wait until output equals the lowered target (100000), and does not use “several SLOPE DOWN between null and MAX” (only one slope). Need a TC that changes to lower target, verifies ramp-down rate for multiple SlopeNeg values, and waits to completion where output=target.
+4: COVERED — TC4: Step1 sets Target 200000 and expects ramp-up (output 102000, Dir=1); Step2 changes Target to 50000 before reaching 200000 and expects ramp-down from intermediate (output 100000, Dir=-1); Step3 changes Target to 150000 before reaching 50000 and expects ramp-up from intermediate (output 102000, Dir=1).
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

@@ -1,0 +1,15 @@
+{
+  "m1": 1.0,
+  "m1_details": "I/O classification correct",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 0.7755102040816326,
+  "m3_details": "TC1.S1: Wait 1 not multiple of dT=20000; TC2.S1: Wait 1 not multiple of dT=20000; TC2.S2: Wait 10 not multiple of dT=20000; TC3.S1: Wait 1 not multiple of dT=20000; TC3.S2: Wait 5 not multiple of dT=20000; TC3.S3: Wait 5 not multiple of dT=20000; TC4.S1: Wait 1 not multiple of dT=20000; TC4.S2: Wait 10 not multiple of dT=20000",
+  "m4": 1.0,
+  "m4_details": "[newKB:Srv_Debounce] 5/5 covered | missing: none\n    JUDGE REASONING: 1: COVERED — TC1 initializes with X=0 and after 1 tick expects GbxFan_st=0 (init value/output state verified).\n2: COVERED — TC2 drives X 0→1, expects output stays 0 during debounce (Step1), then after waiting 10 expects output=1 (Step2).\n3: COVERED — TC3 drives X 1→0 then back to 1 before debounce expires (Wait 5), expects output remains 1 throughout and after total debounce window (final Step3 expects 1).\n4: COVERED — TC4 drives X 1→0, expects output stays 1 during debounce (Step1) then after waiting 10 expects output=0 (Step2).\n5: COVERED — TC5 drives X 0→1 then back to 0 before debounce expires (Wait 5), expects output remains 0 throughout and after total debounce window (final Step3 expects 0).",
+  "m7": 0.5,
+  "m7_details": "DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs",
+  "m8": 0.0,
+  "m8_details": "M8=0 (constant DLL output 0 across 11 checked steps — test under-stimulates the weakspot; 6/11 passes coincidental)",
+  "_weighted_composite_pct": 74.1326530612245
+}

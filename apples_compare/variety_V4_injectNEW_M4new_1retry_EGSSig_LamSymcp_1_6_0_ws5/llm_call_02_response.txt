@@ -1,0 +1,177 @@
+[[ ## reasoning ## ]]
+The weakspot element is a LowpassT filter function that smooths an input signal with a first-order time constant T. The testcases must validate the filter’s behavior under various input and parameter conditions, ensuring compliance with the KB guidelines.
+
+The key points for test design are:
+- The input signal "in" and the time constant "T" are variable and can be manipulated.
+- The output is indirectly verified via variables like EGSPrepn_ratLamSymcS1B1, which reflect the filtered output.
+- The time constant T must be ≥ 1.
+- The sample time dT is fixed and not an input.
+- The filter can be disabled, which should be tested.
+- The maximum relative deviation of the output must be checked.
+
+To cover all KB guidelines with minimal testcases, the following testcases are designed:
+
+1. Small increase in input value with nominal T:
+   - Start with a baseline input and output.
+   - Apply a small step increase in input.
+   - Verify the output increases smoothly, reflecting the lowpass behavior.
+
+2. Large decrease in input value with minimum T (boundary):
+   - Use minimum allowed T=1 to test fastest filter response.
+   - Apply a large step decrease in input.
+   - Verify output decreases accordingly and settles.
+
+3. Disabled filter behavior:
+   - Set T to a very large value or simulate disabling the filter.
+   - Input changes should reflect immediately or output remains constant.
+   - Verify output behavior matches disabled filter expectations.
+
+4. Maximum relative deviation check with large input step and moderate T:
+   - Apply a large input step change.
+   - Verify output deviation does not exceed expected limits.
+   - This ensures filter accuracy and stability.
+
+5. Min and max input values with max T:
+   - Test filter stability and output range with extreme inputs.
+   - Use maximum input and minimum input values.
+   - Use maximum allowed T to test slowest filter response.
+
+These testcases collectively cover all KB guidelines, exercising small/large input changes, gain constant boundaries, disabled behavior, and output deviation checks.
+
+Each testcase includes pre-conditions to set initial values, steps to apply input changes and time constants, and expected results to verify output correctness. The output variables checked are from the instance names provided, e.g., EGSPrepn_ratLamSymcS1B1.
+
+[[ ## test_cases ## ]]
+[
+  {
+    "Pre-Condition": [
+      "EGSPrepn_ratLamSymcS1B1 = 5",
+      "in = 5",
+      "T = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 6",
+          "T = 5",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 5.2"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 6",
+          "T = 5",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 5.56"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This testcase verifies the filter response to a small increase in input value with a nominal time constant T=5. Starting from an initial output of 5 and input of 5, the input is increased slightly to 6. The filter output is expected to increase smoothly over time, reflecting the lowpass filtering effect. The wait times simulate the sample time dT, allowing the filter to update. The expected output values are calculated based on the lowpass filter formula, ensuring the output moves gradually towards the new input."
+  },
+  {
+    "Pre-Condition": [
+      "EGSPrepn_ratLamSymcS1B1 = 10",
+      "in = 10",
+      "T = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 2",
+          "T = 1",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 2"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This testcase tests the filter response to a large decrease in input value with the minimum allowed time constant T=1. The filter should respond quickly to the input drop from 10 to 2, resulting in the output immediately matching the input after one sample time. This verifies the filter's behavior at the boundary condition of the time constant and ensures it can handle rapid decreases correctly."
+  },
+  {
+    "Pre-Condition": [
+      "EGSPrepn_ratLamSymcS1B1 = 7",
+      "in = 7",
+      "T = 1000000"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 12",
+          "T = 1000000",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 7"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This testcase verifies the disabled filter behavior by setting an extremely large time constant T, effectively disabling the filter's smoothing effect. When the input changes from 7 to 12, the output should remain constant at 7, indicating the filter does not update the output. This tests the filter's disabled or near-disabled state and ensures the output behaves as expected."
+  },
+  {
+    "Pre-Condition": [
+      "EGSPrepn_ratLamSymcS1B1 = 3",
+      "in = 3",
+      "T = 10"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 15",
+          "T = 10",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 3.12"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 15",
+          "T = 10",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 3.41"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This testcase checks the maximum relative deviation of the output when a large input step occurs with a moderate time constant T=10. Starting from 3, the input jumps to 15. The output should increase gradually, and the relative deviation between output and input should not exceed expected limits. The expected output values are computed using the lowpass filter formula, confirming the filter's accuracy and stability under large input changes."
+  },
+  {
+    "Pre-Condition": [
+      "EGSPrepn_ratLamSymcS1B1 = 0",
+      "in = 0",
+      "T = 100"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 15.999755859375",
+          "T = 100",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 0.15999755859375"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 0",
+          "T = 100",
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "EGSPrepn_ratLamSymcS1B1 = 0.15839758300781"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This testcase validates filter stability and output range with minimum and maximum input values and a large time constant T=100. The input is first set to the maximum allowed value (15.999755859375), and the output should increase slowly from zero. Then the input is set back to zero, and the output should decrease slowly, verifying the filter's ability to handle extreme inputs without instability or output overflow."
+  }
+]
+
+[[ ## completed ## ]]

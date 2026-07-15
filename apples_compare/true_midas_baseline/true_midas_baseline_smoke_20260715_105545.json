@@ -1,0 +1,85 @@
+{
+ "config": {
+  "repeats": 1,
+  "gen_model": "gpt-4.1-mini",
+  "split": "val",
+  "limit": 1,
+  "max_retries": 2,
+  "rules": {
+   "composite_weights": {
+    "m1": 0.2,
+    "m2": 0.15,
+    "m3": 0.15,
+    "m4": 0.2,
+    "m7": 0.15,
+    "m8": 0.15
+   },
+   "M1_IO_CHECK_WEIGHT": 1,
+   "M3_OVERLAP_WEIGHT": 2,
+   "M8_GATE_ON_WRONG_IO": true,
+   "m7_reference_retries": 4,
+   "max_retries": 2,
+   "gen_model": "gpt-4.1-mini",
+   "M4_judge_model": "azure/gpt-5.2",
+   "M8_FULL_RESOLVE": true,
+   "required_io_path": "utils/required_io.json",
+   "temperature": "0.0 (run.py hardcoded)",
+   "transport": "run.py llm_client.call_llm (system=SYSTEM_PROMPT_TESTCASE)",
+   "repeats": 1,
+   "judge_cache_off": false,
+   "inject_kb": false,
+   "required_io_output_override": false,
+   "solver_json": "run.py fence-only"
+  }
+ },
+ "report": {
+  "m1": {
+   "mean": 0.6666666666666666,
+   "std": 0.0
+  },
+  "m2": {
+   "mean": 1.0,
+   "std": 0.0
+  },
+  "m3": {
+   "mean": 0.6666666666666666,
+   "std": 0.0
+  },
+  "m4": {
+   "mean": 0.0,
+   "std": 0.0
+  },
+  "m7": {
+   "mean": 0.5,
+   "std": 0.0
+  },
+  "m8": {
+   "mean": 0.0,
+   "std": 0.0
+  },
+  "composite": {
+   "mean": 45.83333333333333,
+   "std": 0.0
+  }
+ },
+ "per_example_composite": {
+  "GearLvrPosn_Vd#0": [
+   45.83
+  ]
+ },
+ "raw_per_repeat": [
+  {
+   "m1": 0.6666666666666666,
+   "m2": 1.0,
+   "m3": 0.6666666666666666,
+   "m4": 0.0,
+   "m7": 0.5,
+   "m8": 0.0,
+   "composite": 45.83333333333333
+  }
+ ],
+ "val_examples": [
+  "GearLvrPosn_Vd#0"
+ ],
+ "fail_count": 0
+}

@@ -1,0 +1,149 @@
+[[ ## reasoning ## ]]
+The weakspot element $op124 implements an enhanced ramp function for torque control, which smoothly transitions the current state towards a target value using positive and negative slopes multiplied by a fixed time delta. The key inputs that can be altered are the current state, ramp direction, positive slope, negative slope, and target value. The output is the ramped torque value.
+
+The KB guidelines require validation of four main scenarios:
+1. Initialization: Confirm output equals the initial state.
+2. Ramp-Up: Confirm output ramps up correctly with varying positive slopes.
+3. Ramp-Down: Confirm output ramps down correctly with varying negative slopes.
+4. Ramp Abortion and Direction Change: Confirm output correctly handles target changes and direction switching.
+
+To cover these, I will generate four test cases:
+
+1. Initialization Test: Set initial state and direction, target equals state, slopes non-zero, verify output equals initial state and direction remains zero (no ramping).
+2. Ramp-Up Test: Start with a lower state, target higher, positive slope non-zero, negative slope zero, verify output increments by slope * dT until target reached, direction set to 1.
+3. Ramp-Down Test: Start with a higher state, target lower, negative slope non-zero, positive slope zero, verify output decrements by slope * dT until target reached, direction set to -1.
+4. Ramp Abortion and Direction Change Test: Start ramping up, before reaching target change target to lower value, verify ramp switches to ramp-down with correct slope and direction, then before reaching new target change target back to higher value, verify ramp switches back to ramp-up correctly.
+
+Each test case will have clear pre-conditions, actions, and expected results with explicit numeric values. The time delta (dT) is fixed at 20.0 and the literal TimeDt is 10000 (not modifiable). The slope values and state values are chosen to produce clear increments/decrements within the 32-bit signed integer range.
+
+This set of test cases ensures full coverage of the ramp enhanced functionality as per the KB guidelines and the weakspot context.
+
+[[ ## test_cases ## ]]
+[
+  {
+    "Pre-Condition": [
+      "State = 100000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 100000",
+          "SlopePos = 50000",
+          "SlopeNeg = 50000"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 100000",
+          "Dir = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the initialization behavior of the ramp function. The initial state and target are equal, so no ramping should occur. Both positive and negative slopes are set to non-zero values to confirm that the function does not ramp unnecessarily. The output torque should equal the initial state, and the direction should remain zero, indicating no ramp movement."
+  },
+  {
+    "Pre-Condition": [
+      "State = 80000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 100000",
+          "SlopePos = 100000",
+          "SlopeNeg = 0"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 80020",
+          "Dir = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 100000",
+          "SlopePos = 100000",
+          "SlopeNeg = 0"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 80040",
+          "Dir = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-up behavior. Starting from a state of 80000 with direction zero, the target is set higher at 100000. The positive slope is set to 100000, and negative slope is zero to prevent ramp-down. Each step simulates a time delta of 20.0 units, so the output should increase by slope * dT = 100000 * 20 / 1000000 = 2 units per step (scaled appropriately). The output torque increments by 20 units per step (assuming slope units are per microsecond and dT is 20 microseconds), and the direction is set to 1 indicating ramp-up. This confirms correct ramp-up slope application and direction tracking."
+  },
+  {
+    "Pre-Condition": [
+      "State = 120000",
+      "Dir = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 100000",
+          "SlopePos = 0",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 11980",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 100000",
+          "SlopePos = 0",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 11960",
+          "Dir = -1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case validates the ramp-down behavior. Starting from a state of 120000 with direction zero, the target is set lower at 100000. The negative slope is set to 100000, and positive slope is zero to prevent ramp-up. Each step simulates a time delta of 20.0 units, so the output should decrease by slope * dT = 100000 * 20 / 1000000 = 2 units per step (scaled appropriately). The output torque decrements by 20 units per step, and the direction is set to -1 indicating ramp-down. This confirms correct ramp-down slope application and direction tracking."
+  },
+  {
+    "Pre-Condition": [
+      "State = 90000",
+      "Dir = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Target = 110000",
+          "SlopePos = 100000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 90020",
+          "Dir = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 80000",
+          "SlopePos = 100000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 90000",
+          "Dir = -1"
+        ]
+      },
+      {
+        "Actions": [
+          "Target = 110000",
+          "SlopePos = 100000",
+          "SlopeNeg = 100000"
+        ],
+        "Expected Results": [
+          "MoFTqPtdVeh_tqWhlXTS = 89980",
+          "Dir = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the ramp abortion and direction change behavior. Starting ramp-up from 90000 towards 110000 with positive and negative slopes set to 100000, the output ramps up by 20 units (slope * dT) and direction is 1. Before reaching the target, the target is changed to 80000, which is lower than the current output, causing the ramp to abort and switch direction to ramp-down. The output remains at 90000 initially, then ramps down in subsequent steps. Before reaching the lower target, the target is changed back to 110000, causing the ramp to switch direction again to ramp-up. This confirms the function's ability to immediately respond to target changes and correctly track ramp direction."
+  }
+]
+
+[[ ## completed ## ]]

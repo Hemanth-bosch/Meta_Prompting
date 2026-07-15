@@ -1,0 +1,17 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=InjRly_PwrCtrl_1_1_0 ws=0 fn=Srv_TrnOffDly_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 2
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 1081 chars
+  METRICS: M1=0.6666666666666666  M2=0.5833333333333333  M3=1.0  M4=0.7142857142857143  M7=0.5  M8=0.0
+  weighted composite = 58.9%
+  M4 detail: [newKB:Srv_TrnOffDly] 5/7 covered | missing: "Repeat all the above cases with maximum value for the turn o", "Repeat all the above cases with minimum value for the turn-o"
+    JUDGE REASONING: 1: COVERED — TC1 sets delayTime=40000 and sets input signal=0 (FALSE) with expected output _flgDlydlnPostDrive=0 (FALSE).
+2: COVERED — TC2 Step 1 has input FALSE/output FALSE, then Step 2 sets signal=1 with expected _flgDlydlnPostDrive=1 immediately.
+3: COVERED — TC2 Step 3 sets signal=0 then (within 20000 < delayTime 40000) Step 4 sets signal=1; expected output stays 1 throughout (no fall).
+4: COVERED — TC3 Step 3 sets signal=0 with delayTime=20000 and output expected to remain 1, then Step 4 waits 20000 and expects output 0 (falls after delay).
+5: NOT COVERED — no evidence that “maximum value mentioned in the design” is used for repeating cases 1–4; TC3 uses 1000000 as “large maximum” but not tied to the design max nor repeats all cases at max. Need tests repeating 1–4 explicitly with design-specified max delay.
+6: NOT COVERED — no evidence that “minimum value mentioned in the design” is used for repeating cases 1–4; TC3 uses 0 but that corresponds to guideline 7, not “design min” (if different) nor repeats all cases. Need tests repeating 1–4 with design-specified minimum delay (nonzero if applicable).
+7: COVERED — TC3 Step 1 sets delayTime=0 and signal=0 with expected output immediately 0 (no delay between input and output on falling edge).
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

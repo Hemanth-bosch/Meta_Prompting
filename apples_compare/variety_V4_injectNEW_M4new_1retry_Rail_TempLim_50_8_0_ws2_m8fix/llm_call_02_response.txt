@@ -1,0 +1,176 @@
+[[ ## reasoning ## ]]
+The weakspot element $op39 implements a ramp switching function that smoothly transitions an output between two target values (Xa and Xb) based on a binary switch input (Swtch). The ramping behavior depends on the switch state and the ramp parameters (Param) defining the ramp slopes for ramp up and ramp down. The output is observable via $op40 (Rail_trqFlTempLim).
+
+The Bosch BU test guidelines require coverage of four key scenarios:
+
+1. Initialization: Verify that the ramp output initializes correctly to the target corresponding to the switch state.
+2. Ramp Up: Verify that when the switch changes to ramp up (Swtch=0), the output ramps from the current value to the higher target with the correct positive slope.
+3. Ramp Down: Verify that when the switch changes to ramp down (Swtch=1), the output ramps from the current value to the lower target with the correct negative slope.
+4. Ramp Abortion: Verify that if the switch changes during ramping, the ramp correctly aborts the current ramp and reverses direction with the correct slope from the intermediate value.
+
+To satisfy these guidelines, three test cases are designed:
+
+- Test Case 1: Initialization Test
+  - Initialize with Swtch=0 and verify output equals Xa.
+  - Initialize with Swtch=1 and verify output equals Xb.
+  This confirms correct ramp initialization.
+
+- Test Case 2: Ramp Up Test
+  - Start with Swtch=1 (output at Xb).
+  - Change Swtch to 0 to ramp up from Xb to Xa.
+  - Wait for ramp completion and verify output ramps correctly with positive slope.
+  This confirms ramp up behavior.
+
+- Test Case 3: Ramp Down and Abortion Test
+  - Start with Swtch=0 (output at Xa).
+  - Change Swtch to 1 to ramp down from Xa to Xb.
+  - Before ramp completes, change Swtch back to 0 to abort and ramp up from intermediate value.
+  - Wait for ramp completion and verify output ramps correctly with negative and then positive slope.
+  This confirms ramp down and ramp abortion behavior.
+
+Each test case uses value assignments and wait times consistent with the sample time dT=20000.0 (20 ms) and checks output values at expected ramp progress points. The tests ensure the ramp switch function behaves correctly under all required scenarios.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [
+            "Xa = 1500",
+            "Xb = 1000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Swtch = 0"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1500"
+                ]
+            },
+            {
+                "Actions": [
+                    "Swtch = 1"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1000"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the correct initialization of the ramp output based on the switch input. When Swtch is 0, the output should initialize to target Xa (1500). When Swtch is 1, the output should initialize to target Xb (1000). This confirms that the ramp starts at the correct target value corresponding to the switch state."
+    },
+    {
+        "Pre-Condition": [
+            "Xa = 2000",
+            "Xb = 1000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Swtch = 1"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1000"
+                ]
+            },
+            {
+                "Actions": [
+                    "Swtch = 0"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1000"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait @"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1020"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 9*@"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1200"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 40*@"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 2000"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the ramp up behavior. Starting with Swtch=1, the output initializes at Xb=1000. Changing Swtch to 0 triggers a ramp up from 1000 to Xa=2000. The output is checked immediately after switch change (should still be 1000), then after one raster (expected to increase by slope up * dT), after 10 rasters (partial ramp), and finally after sufficient time to reach the target (2000). This confirms the ramp up slope and correct ramping behavior."
+    },
+    {
+        "Pre-Condition": [
+            "Xa = 2000",
+            "Xb = 1000"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Swtch = 0"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 2000"
+                ]
+            },
+            {
+                "Actions": [
+                    "Swtch = 1"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 2000"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait @"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1980"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 4*@"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1920"
+                ]
+            },
+            {
+                "Actions": [
+                    "Swtch = 0"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1920"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait @"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 1940"
+                ]
+            },
+            {
+                "Actions": [
+                    "Wait 10*@"
+                ],
+                "Expected Results": [
+                    "Rail_trqFlTempLim = 2000"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies ramp down and ramp abortion behavior. Starting with Swtch=0, output initializes at Xa=2000. Changing Swtch to 1 triggers ramp down towards Xb=1000. After some ramping time (5 rasters), the switch changes back to 0 before ramp completion, aborting the ramp down and starting ramp up from the intermediate value (~1920). The output is checked immediately after switch changes and after waiting for ramp completion. This confirms correct handling of ramp direction changes and intermediate ramping."
+    }
+]
+
+[[ ## completed ## ]]

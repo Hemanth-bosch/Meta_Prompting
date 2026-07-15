@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: output signal set as input (weighs 1x): ['PT_stTraShftOp']; TC2: output signal set as input (weighs 1x): ['PT_stTraShftOp']",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 0.6666666666666666,
+  "m3_details": "TC1: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['PT_stTraShftOp']; TC2: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['PT_stTraShftOp']",
+  "m4": 0.0,
+  "m4_details": "[newKB:putBit_unsigned_putBit] 0/1 covered | missing: \"Checking the Bit Operation : SetBit — Set: Set the input var\"\n    JUDGE REASONING: 1: NOT COVERED — No test case explicitly provides (a) an input X in the “xxxxxxxx” form with a specified bit *position number* to set TRUE and (b) checks that the output’s logical status at that specified position is TRUE. TC1/TC2 toggle inputs but do not specify the bit position parameter nor verify the “logical status of the position” as the expected result; a needed TC would set X to a defined pattern, apply putBit with an explicit Position=k and Value=TRUE, and expect bit(k)=1 (and optionally unchanged other bits).",
+  "m7": 0.5,
+  "m7_details": "N/A — function-call weakspot (putBit_unsigned_putBit); see M8 for functional correctness",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): output signal driven as input: ['pt_sttrashftop']; measurable output(s)=['pt_sttrashftop']",
+  "_weighted_composite_pct": 45.83333333333333
+}

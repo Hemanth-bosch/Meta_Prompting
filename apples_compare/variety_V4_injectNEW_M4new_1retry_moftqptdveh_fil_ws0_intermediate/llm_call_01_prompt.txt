@@ -1,0 +1,131 @@
+================ role: system ================
+Your input fields are:
+1. `equation_json` (str): 
+2. `const_values` (str): 
+3. `weakspot_operation` (str): 
+4. `weakspot_context` (str): 
+5. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, your context analysis and the test scenarios you identify MUST reflect and require EVERY guideline listed here — treat them as hard, non-negotiable BU requirements; none may be skipped. If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `context_analysis` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## weakspot_context ## ]]
+{weakspot_context}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        You are provided with the following information (supplied in the input fields below):
+        
+        Below is the data you should use:
+        - **Equation JSON**: provided in the `equation_json` input field
+        - **Constant Values**: provided in the `const_values` input field
+        - **Weakspot Element**: provided in the `weakspot_operation` input field
+        - **Weakspot Context**: provided in the `weakspot_context` input field
+        
+        ### 1. Equation JSON
+        This JSON describes a complex equation broken down into multiple elements. Each element is identified by a unique key and includes properties such as:
+        - **instance_name** -- the name of the variable or component represented by the element.
+        - **function_name** -- the function or operation that this element performs.
+        - **arg_names** -- a list of names for the input arguments used by the element.
+        - **args** -- a list of references (by key) to other elements that supply the input values for this element.
+        
+        ### 2. Constant Values
+        A dictionary of constant values that are used within the equation.
+        
+        ### 3. Weakspot Information
+        - **Weakspot Element**: This is the unique key of the weakspot element in the equation.
+        - **Weakspot Context**: A text description providing details on how the weakspot element is intended to work (its behavior, role, and impact).
+        
+        **Note:** The parameter representing the raster sample time (e.g. "dT") should be considered fixed and must not be listed among the inputs that can be altered.
+        ---
+        
+        ### Task:
+        Using the provided data, generate a detailed context for the identified weakspot element. Your response should include:
+        
+        1. **Overview of the Weakspot Element:**
+           - Identify the weakspot element by its unique key.
+           - Describe its role using its "instance_name" and "function_name".
+           - Describe in full detail, the working of the weakspot element.
+        
+        2. **Inputs That Can Be Altered:**
+           - Extract and list the names of the input parameters for the weakspot element (from its "arg_names" field).
+           - For each input, specify the corresponding reference from the "args" list that provides its value.
+           - Get the type information about these input operations from the equations json dictionary.
+           - **Exclude** any parameter that is fixed (for example, the sample time parameter or Literals or System Constants).
+        
+        3. **Outputs That Can Be Checked:**
+           - Identify any output variables that are directly produced by or depend on the weakspot element.
+           - Describe how these outputs are connected to the weakspot element.
+           - Only Local or Variable type output values can be checked.
+        
+        4. **Possible Testcases for Weakspot Element:**
+           - Provide a brief overview of the types of test cases that can be generated for the weakspot element.
+           - Include any specific conditions or scenarios that should be tested to validate the weakspot element.
+           - Keep the number of testcases to a minimum, checking the full working with the least number of testcases.
+        
+        Your answer should be clear and well organized, using headings, bullet points, and tables as needed. Generate the detailed context now.
+
+================ role: user ================
+[[ ## equation_json ## ]]
+{"$op124": {"oid": "17921", "type": "Function", "instance_name": "RampEnhd_Trq", "function_name": "MoFSrv_Lib_RampEnhd_Out", "class_method_name": "Out", "sequence_number": "24", "method_name": "Proc", "decision": null, "condition": [], "arg_names": ["State", "Dir", "TimeDt", "SlopePos", "SlopeNeg", "Target"], "args": ["$op120", "$op119", "$op121", "$op122", "$op123", "$op117"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op125": {"oid": "16153", "type": "Local", "instance_name": "_s32_Tq1", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op124"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op126": {"oid": "16153", "type": "Local", "instance_name": "_s32_Tq1", "function_name": null, "class_method_name": null, "sequence_number": "25", "method_name": "Proc", "decision": null, "condition": [], "arg_names": [], "args": ["$op124"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op120": {"oid": "28879", "type": "Local", "instance_name": "MoFTqPtdVeh_tqWhlXTSOld", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MoFTqPtdVeh_tqWhlXTSOld"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op119": {"oid": "13199", "type": "Local", "instance_name": "MoFTqPtdVeh_stRampDirXTS", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op118"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": [], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-32768.0", "32767.0"]}, "$op121": {"oid": "13174", "type": "Literal", "instance_name": "10000", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op122": {"oid": "28061", "type": "Variable", "instance_name": "MoFTqPtdVeh_dTqRatePtdInc", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdInc", "_s32_dTq"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-3276800.0", "3276799.998474121"]}, "$op123": {"oid": "12929", "type": "Variable", "instance_name": "MoFTqPtdVeh_dTqRatePtdDec", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "_s32_dTq"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-3276800.0", "3276799.998474121"]}, "$op117": {"oid": "13170", "type": "Local", "instance_name": "MoFTqPtdVeh_tqWhlXTSInp", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op116"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": ["MoFTqPtdVeh_tqWhlVMD"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-214748364.8", "214748364.7"]}, "$op129": {"oid": "32248", "type": "Variable", "instance_name": "MoFTqPtdVeh_tqWhlXTS", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op128"], "read": true, "write": false, "physical_type": "real64", "data_type": "sint16", "unique_variables": ["MO_125", "MO_8192", "MoFTqPtdVeh_dTqRatePtdDec", "MoFTqPtdVeh_dTqRatePtdInc", "MoFTqPtdVeh_tqWhlVMD", "MoFTqPtdVeh_tqWhlXTS", "MoFTqPtdVeh_tqWhlXTSOld", "_s32_dTq"], "unique_params": [], "unique_consts": ["MOFSRV_LIB_RAMP_END"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-52428.8", "52427.2"]}}
+
+[[ ## const_values ## ]]
+{"MO_125": 125, "EVTYP_SY": 0, "MO_8192": 8192, "MOFSRV_LIB_RAMP_END": 0, "NrDrvnAxle_SC": 0.0, "dT": "20.0"}
+
+[[ ## weakspot_operation ## ]]
+$op124
+
+[[ ## weakspot_context ## ]]
+   MoFSrv_Lib_RampEnhd
+
+MoFSrv_Lib_RampEnhd
+
+Enhanced ramp functionality with 64-bit precision calculations for slope and time operations.
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| MoFSrv_Lib_RampEnhd | Enhanced ramp functionality that increases or decreases a value with slope * dT depending if State > Target or State < Target. Uses 64-bit arithmetic for precision in slope calculations and includes proper rounding mechanisms. Direction tracking allows immediate response to target changes. |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| Target | Target value for the ramp to reach | sint32 |
+| State | Actual value of the ramp | sint32 * |
+| Dir | Actual direction of the ramp | sint16 * |
+| SlopePos | Positive slope parameter | sint32 |
+| SlopeNeg | Negative slope parameter | sint32 |
+| Dt | Function execution time in micro seconds | sint32 |
+| return | Returns the actual state of the ramp | sint32 |
+
+[[ ## kb_guidelines ## ]]
+## Validated test guidelines for MoFSrv_Lib_RampEnhd_Out (newKB) — cover these scenarios:
+1. Checking the correct initialization of the ramp — Initialize the Ramp; Check: Output = initialization value
+2. Checking the slope up (with several SLOPE UP between null and MAX) — Set the input value to a defined value; Wait: Output value = Input value; Change the input value to a higher value; Check: Output value = Output value ramps from start value to end value with the correct SLOPE UP; Wait: Output value = Input value
+3. Checking the slope down (with several SLOPE DOWN between null and MAX) — Change the input value to a lower value; Check: Output value = Output value ramps from start value to end value with the correct SLOPE DOWN; Wait: Output value = Input value
+4. Checking the ramp in case of abortion — Change the input value to a higher value; Check: Output value = Output value ramps from start value with the correct SLOPE UP; Change the input value to a lower value before output value reaches the end of the ramp; Check: Output value = Output value ramps from intermediate value with the correct SLOPE DOWN; Change the input value to a higher value before output value reaches the end of the ramp; Check: Output value = Output value ramps from intermediate value with the correct SLOPE UP
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## context_analysis ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

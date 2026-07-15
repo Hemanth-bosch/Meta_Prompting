@@ -1,0 +1,108 @@
+================ role: system ================
+Your input fields are:
+1. `block_type` (str): ASCET block type name (e.g., 'Srv_Debounce', 'Srv_RampSwitch', 'LowpassT')
+2. `guidelines` (str): Numbered list of required test guidelines for this block type. Format: '1: <guideline text>\n2: <guideline text>\n...'
+3. `test_cases` (str): The full generated test cases to judge. Each test case includes its Pre-Conditions, its ordered Steps (Actions / Wait / Expected Results), and a Detailed Explanation. Format: 'TC1:\n  Pre-Condition: ...\n  Step 1: Actions=..., Expected Results=...\n  Explanation: ...\nTC2: ...'
+Your output fields are:
+1. `covered_indices` (str): Comma-separated list of guideline numbers that are covered by at least one test case. Example: '1,3,4' or '1,2,3,4,5'. Empty string '' if no guidelines are covered. Only output the numbers, nothing else.
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## block_type ## ]]
+{block_type}
+
+[[ ## guidelines ## ]]
+{guidelines}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## covered_indices ## ]]
+{covered_indices}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Rigorously judge which required testing guidelines are ACTUALLY exercised by the generated
+        MBD test cases for a specific ASCET block type.
+        
+        You are given the FULL generated test cases — each with its Pre-Conditions, ordered Steps
+        (Actions / Wait / Expected Results) and a Detailed Explanation. Judge each numbered guideline
+        INDEPENDENTLY and STRICTLY against the ACTUAL test-case content (the concrete input values,
+        preconditions, steps and Expected Results), not merely the prose explanation. A guideline counts
+        as COVERED only if at least one test case EXPLICITLY exercises that exact scenario — i.e. it
+        provides BOTH (a) the concrete stimulus the guideline calls for (the specific input value / edge /
+        state / boundary / branch / parameter setting, visible in its Pre-Conditions/Actions) AND (b) the
+        expected resulting behavior or output for that scenario (visible in its Expected Results and/or
+        explanation). Be conservative:
+          • Merely naming the block, or generically "testing"/"reading"/"using" it, does NOT count.
+          • Partial, tangential, implied, or restated-guideline mentions do NOT count.
+          • A scenario without a concrete stimulus AND an expected result does NOT count.
+          • When in doubt, mark it NOT covered.
+        One test case may cover several guidelines only if it genuinely exercises each distinct scenario.
+        Distinct scenarios must be distinguished — do not mark two different guidelines covered from a
+        single generic test case that fits neither specifically.
+
+================ role: user ================
+[[ ## block_type ## ]]
+LowpassT
+
+[[ ## guidelines ## ]]
+1: Test with small increase in value of input
+2: Test with larger increase in value of  input
+3: Test with small decrease in value of input
+4: Test with larger decrease in value of  input
+5: Check the maximum relative deviation of the output
+6: Test with different gain constant
+7: Test with min-max input and min - max time constant
+8: Test the disabled behavior of the filter
+
+[[ ## test_cases ## ]]
+TC1:
+  Pre-Condition: {'initValue': '5', 'T': '10'}
+  Step 1: Wait=None, Actions={'initValue': '5'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '5'}
+  Step 2: Wait=10000, Actions={'initValue': '6'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '5.1'}
+  Step 3: Wait=10000, Actions={'initValue': '6.5'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '5.19'}
+  Explanation: This test case verifies the filter's response to a small increase in input value. Starting from an initial value of 5 and a time constant T=10, the input is increased slightly to 6 and then 6.5. The expected output should increase smoothly and gradually, demonstrating the lowpass filter's smoothing effect on small input changes.
+TC2:
+  Pre-Condition: {'initValue': '2', 'T': '5'}
+  Step 1: Wait=None, Actions={'initValue': '2'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '2'}
+  Step 2: Wait=10000, Actions={'initValue': '10'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '3.6'}
+  Step 3: Wait=10000, Actions={'initValue': '15'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '6.48'}
+  Explanation: This test case checks the filter's behavior with a larger increase in input value. With a smaller time constant T=5, the filter should respond faster to the step increase from 2 to 10 and then 15. The output values show a smooth but quicker rise, confirming the filter's gain constant effect on response speed.
+TC3:
+  Pre-Condition: {'initValue': '8', 'T': '8'}
+  Step 1: Wait=None, Actions={'initValue': '8'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '8'}
+  Step 2: Wait=10000, Actions={'initValue': '7.5'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '7.94'}
+  Step 3: Wait=10000, Actions={'initValue': '7'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '7.85'}
+  Explanation: This test case validates the filter's response to a small decrease in input value. Starting at 8, the input decreases slightly to 7.5 and then 7. The output should decrease smoothly and gradually, showing the filter's ability to smooth small downward changes.
+TC4:
+  Pre-Condition: {'initValue': '12', 'T': '3'}
+  Step 1: Wait=None, Actions={'initValue': '12'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '12'}
+  Step 2: Wait=10000, Actions={'initValue': '5'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '8.75'}
+  Step 3: Wait=10000, Actions={'initValue': '2'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '5.31'}
+  Explanation: This test case examines the filter's response to a larger decrease in input value. With a smaller time constant T=3, the filter should respond relatively quickly to the step down from 12 to 5 and then 2. The output values demonstrate a smooth but faster decrease, confirming the filter's behavior with large downward steps.
+TC5:
+  Pre-Condition: {'initValue': '4', 'T': '1'}
+  Step 1: Wait=None, Actions={'initValue': '4'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '4'}
+  Step 2: Wait=10000, Actions={'initValue': '8'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '6'}
+  Step 3: Wait=10000, Actions={'initValue': '0'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '3'}
+  Explanation: This test case tests the filter with the minimum allowed gain constant T=1, which should produce the fastest response. The input steps from 4 to 8 and then down to 0 test the filter's ability to quickly follow input changes with minimal smoothing.
+TC6:
+  Pre-Condition: {'initValue': '0', 'T': '100'}
+  Step 1: Wait=None, Actions={'initValue': '0'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '0'}
+  Step 2: Wait=10000, Actions={'initValue': '15.999755859375'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '1.6'}
+  Step 3: Wait=10000, Actions={'initValue': '15.999755859375'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '3.04'}
+  Explanation: This test case uses a very large time constant T=100 and maximum input value to test the filter's slowest response and boundary input handling. The output should increase very slowly, demonstrating the filter's robustness at extreme parameter values.
+TC7:
+  Pre-Condition: {'initValue': '7', 'T': '10'}
+  Step 1: Wait=None, Actions={'initValue': '7'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '7'}
+  Step 2: Wait=10000, Actions={'initValue': '14'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '7.7'}
+  Step 3: Wait=10000, Actions={'initValue': '14'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '8.43'}
+  Explanation: This test case checks the maximum relative deviation of the output compared to input changes. Starting from 7, the input doubles to 14. The output should increase smoothly but remain within expected deviation limits, verifying filter accuracy and stability.
+TC8:
+  Pre-Condition: {'initValue': '5', 'T': '1000000'}
+  Step 1: Wait=None, Actions={'initValue': '5'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '5'}
+  Step 2: Wait=10000, Actions={'initValue': '10'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '5'}
+  Step 3: Wait=10000, Actions={'initValue': '10'}, Expected Results={'EGSPrepn_ratLamSymcS1B1': '5'}
+  Explanation: This test case simulates the disabled filter behavior by setting an extremely large time constant T, effectively bypassing the filter. The output should remain constant at the initial value despite changes in input, confirming the filter's disabled or bypassed state.
+
+Respond with the corresponding output fields, starting with the field `[[ ## covered_indices ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

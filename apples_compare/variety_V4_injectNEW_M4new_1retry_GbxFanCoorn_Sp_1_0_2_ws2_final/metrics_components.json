@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: Expected Results verify no real output ['GbxFan_r'] (weighs 1x); got ['GbxFan_st']; TC2: Expected Results verify no real output ['GbxFan_r'] (weighs 1x); got ['GbxFan_st']; TC3: Expected Results verify no real output ['GbxFan_r'] (weighs 1x); got ['GbxFan_st']; TC4: Expected Results verify no real output ['GbxFan_r'] (weighs 1x); got ['GbxFan_st']; TC5: Expected Results verify no real output ['GbxFan_r'] (weighs 1x); got ['GbxFan_st']",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 0.8620689655172413,
+  "m3_details": "TC2.S1: Wait 20 not multiple of dT=20000; TC3.S1: Wait 20 not multiple of dT=20000; TC4.S1: Wait 20 not multiple of dT=20000; TC5.S1: Wait 20 not multiple of dT=20000",
+  "m4": 0.2,
+  "m4_details": "[newKB:Srv_Debounce] 1/5 covered | missing: \"Checking the delay on rising edge — Set: Input = FALSE; Wait\", \"Checking the suppressing on falling signal change smaller th\", \"Checking the delay on falling edge — Change the input from T\" …\n    JUDGE REASONING: 1: COVERED — TC1 initializes with X=0 and checks immediate output GbxFan_st=0 (initialization value).\n2: NOT COVERED — TC2 does not show initial “wait output still FALSE” before the rise, and it applies X=1 and waits 20 in the same step without demonstrating output remains FALSE during debounce; need a test with: start X=0 confirm output=0, then set X=1, check output still 0 before 20, then after 20 check output=1.\n3: NOT COVERED — TC3 never applies the required glitch (TRUE→FALSE then back TRUE before debounce); Actions keep X=1 only. Need explicit steps toggling X to 0 then back to 1 within <DEBOUNCE and final expected output stays 1.\n4: NOT COVERED — TC4 changes X=0 and waits 20 but does not show output remains TRUE during debounce prior to expiry (no intermediate check). Need: start X=1 confirm output=1, set X=0, check output still 1 before 20, then after 20 check output=0.\n5: NOT COVERED — TC5 never applies the required glitch (FALSE→TRUE then back FALSE before debounce); Actions keep X=0 only. Need explicit steps toggling X to 1 then back to 0 within <DEBOUNCE and final expected output stays 0.",
+  "m7": 0.5,
+  "m7_details": "DLL inline: 1 first-try + 0 retry-pass + 1 fail / 2 eqs",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['gbxfan_r']",
+  "_weighted_composite_pct": 52.76436781609195
+}

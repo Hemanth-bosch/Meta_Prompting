@@ -1,0 +1,17 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=oilsepactr_coorr ws=20 fn=Srv_TrnOnDly_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 5
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 1077 chars
+  METRICS: M1=0.6666666666666666  M2=1.0  M3=0.9166666666666666  M4=0.5714285714285714  M7=0.5  M8=0.0
+  weighted composite = 61.0%
+  M4 detail: [newKB:Srv_TrnOnDly] 4/7 covered | missing: "Checking the output when the input is at TRUE for less than ", "Repeat all the above cases with maximum value for the turn-o", "Repeat all the above cases with minimum value for the turn-o"
+    JUDGE REASONING: 1: COVERED — TC1 sets delayTime=10 and signal=0 (FALSE) and expects output=0, confirming output follows FALSE input in steady state.
+2: COVERED — TC2 starts from signal=0 then sets signal=1 and waits 10; expects output=1 after the delay (turn-on delay on rising edge).
+3: COVERED — TC3 sets initial signal=1 then sets signal=0; expects output=0 immediately (no off-delay).
+4: NOT COVERED — TC4 never sets signal=1 then back to 0 before delay; it keeps signal=0. Need a test: set signal=1, wait <delay, set signal=0, expect output stays 0 throughout.
+5: NOT COVERED — TC6 (delayTime=100) covers rising-edge delay and falling-edge, but does not repeat guideline #1 (initial FALSE check) and #4 (pulse shorter than delay) at max delay. Need max-delay versions of #1 and #4.
+6: NOT COVERED — TC7 (delayTime=1) covers rising-edge delay and falling-edge, but does not repeat guideline #1 (initial FALSE check) and #4 (shorter-than-delay TRUE pulse) at min delay. Need min-delay versions of #1 and #4.
+7: COVERED — TC5 uses delayTime=0 and sets signal 0->1 expecting immediate output=1, then 1->0 expecting immediate output=0 (no delay).
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

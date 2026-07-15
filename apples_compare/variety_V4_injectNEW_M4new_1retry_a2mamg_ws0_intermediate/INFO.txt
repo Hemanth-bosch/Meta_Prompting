@@ -1,0 +1,11 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=a2mamg ws=0 fn=getBit_unsigned_getBit
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 2
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 335 chars
+  METRICS: M1=1.0  M2=1.0  M3=1.0  M4=0.0  M7=0.5  M8=0.0
+  weighted composite = 57.5%
+  M4 detail: [newKB:getBit_unsigned_getBit] 0/1 covered | missing: "Checking the Bit Operation : GetBit — Set: Set the input var"
+    JUDGE REASONING: 1: NOT COVERED — TC1–TC3 set X and check output for bit position 0 only; none of the test cases explicitly *sets/provides a Position number* as an input stimulus and verifies output for varying positions. Needed: a test that drives both X and Position (e.g., X=0b00010000, Position=4 => Output=1; Position=3 => Output=0).
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

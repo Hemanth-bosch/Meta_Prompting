@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: Expected Results verify no real output ['ratLamAdpn_LT_I'] (weighs 1x); got ['out']; TC2: Expected Results verify no real output ['ratLamAdpn_LT_I'] (weighs 1x); got ['out']; TC3: Expected Results verify no real output ['ratLamAdpn_LT_I'] (weighs 1x); got ['out']; TC4: Expected Results verify no real output ['ratLamAdpn_LT_I'] (weighs 1x); got ['out']",
+  "m2": 0.3333333333333333,
+  "m2_details": "Abstract: input; Abstract: out",
+  "m3": 1.0,
+  "m3_details": "All structural checks passed",
+  "m4": 0.625,
+  "m4_details": "[KB:LowpassT] 5/8 covered | missing: \"Test with larger increase in value of  input\", \"Test with small decrease in value of input\", \"Check the maximum relative deviation of the output\"\n    JUDGE REASONING: 1: COVERED — TC1 steps input 5→6 (small increase) with expected out 5→5.1 after 10000.\n2: NOT COVERED — need a test with an explicitly *large* positive step (e.g., 0→50) and expected filtered output progression.\n3: NOT COVERED — need a test with an explicitly *small* negative step (e.g., 10→9.5) and expected slight output decrease.\n4: COVERED — TC2 steps input 10→7→5 (large decrease) with expected out decreasing 10→9.7→9.03.\n5: NOT COVERED — no test computes/checks a “maximum relative deviation” bound/limit; would need explicit criterion (e.g., |out-ideal|/ideal ≤ X%) and verification.\n6: COVERED — TC3 changes the time constant/gain constant T from 1 to 100 and checks different output response (10 then 10.1 for a 10→20 step).\n7: COVERED — TC3 uses T=1 (min) and TC4 uses T=1000000 (max-like); inputs include 0/10/20 and 10, but no explicit min/max input values are defined/used—still partially; to be fully compliant would need explicit min input and max input values with explicit min T and max T in same guideline check.\n8: COVERED — TC4 sets T extremely large and expects output to remain at initValue=5 despite input=10, demonstrating disabled/bypassed behavior.",
+  "m7": 0.6,
+  "m7_details": "DLL inline: 1 first-try + 1 retry-pass + 1 fail / 3 eqs",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['ratlamadpn_lt_i']",
+  "_weighted_composite_pct": 54.833333333333336
+}

@@ -1,0 +1,106 @@
+[[ ## reasoning ## ]]
+The weakspot operation `$op4` implements the `getBit` function for an unsigned 8-bit integer input (`CNFMDWAN`). The bit position to extract is fixed at 0 (least significant bit). The test cases must verify that the function correctly extracts the bit at position 0 from various input values. 
+
+Given the guidelines, the test cases should:
+- Set the input parameter `CNFMDWAN` to specific 8-bit values.
+- Since the bit position is fixed at 0, no changes to it are possible.
+- Check that the output bit value matches the expected logical bit at position 0.
+
+The test cases will cover:
+1. All bits set (0xFF) to verify the output is 1.
+2. All bits cleared (0x00) to verify the output is 0.
+3. A value with bit 0 cleared but other bits set (0x02) to verify output is 0.
+4. A value with only bit 0 set (0x01) to verify output is 1.
+5. A value with a random pattern where bit 0 is 0 (e.g., 0xFE) to verify output is 0.
+
+These test cases ensure the function correctly extracts the least significant bit under various input conditions, fulfilling the guideline to check the bit operation for the given position.
+
+The pre-conditions will assign the input parameter `CNFMDWAN` to a known value before the steps. The steps will assign the input value and check the output bit value. Since the bit position is fixed and not alterable, it is not included in the actions.
+
+The output bit value is the direct output of `$op4` and will be checked accordingly.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 255"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 255"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets the input CNFMDWAN to 255 (binary 11111111), where all bits are set. Since the bit position is fixed at 0, the least significant bit is 1. The test verifies that the getBit function correctly extracts this bit and returns 1."
+    },
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 0"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets CNFMDWAN to 0 (binary 00000000), where no bits are set. The bit at position 0 is 0, so the function should return 0. This verifies correct behavior when the input has no bits set."
+    },
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 2"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 2"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "Here, CNFMDWAN is set to 2 (binary 00000010). The least significant bit (bit 0) is 0, even though other bits are set. This test ensures the function correctly extracts only the specified bit and returns 0."
+    },
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 1"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets CNFMDWAN to 1 (binary 00000001), where only the least significant bit is set. The function should return 1, confirming correct extraction of bit 0 when it is set alone."
+    },
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 254"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 254"
+                ],
+                "Expected Results": [
+                    "getBit_unsigned_U8 = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "In this case, CNFMDWAN is 254 (binary 11111110), where all bits except bit 0 are set. The function should return 0, verifying that it correctly identifies the least significant bit as cleared even when other bits are set."
+    }
+]
+
+[[ ## completed ## ]]

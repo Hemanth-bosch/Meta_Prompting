@@ -1,78 +1,56 @@
 """
-extract_dca.py — Single-run DCA Prompt Optimization
-====================================================
+DCA (Document Change Analysis) Prompt Optimization Pipeline
+============================================================
 
-PIPELINE OVERVIEW (what this script does end-to-end)
------------------------------------------------------
-  1. Parse CLI args → read env vars
-  2. Set up TeeLogger (all output → terminal + log file simultaneously)
-  3. Load dataset (~376 labelled image pairs from disk)
-  4. Stratified train/val/test split (60/20/20, seed=42)
-  5. Build the DSPy comparator module (Predict or ChainOfThought)
-  6. Optionally load a previously saved extractor (warm-start optimization)
-  7. Optionally inject a human-written instruction from a .md/.txt file
-  8. Save the "seed state" (prompt before optimization) to log/
-  9. Run the selected optimizer(s) via OptimizationRunner
-  10. Save the "optimized state" + final model .json to .cache/
-  11. Rename log + state files to share the model's base name for traceability
+Compares original document images against re-imaged versions and classifies
+each pair as:
+  discard_image = "true"  -- images are identical or differences are trivial
+  discard_image = "false" -- meaningful changes exist
 
-TASK DESCRIPTION (what the comparator does)
--------------------------------------------
-Given two document images (original vs. re-imaged version), classify:
-  discard_image = "true"   → images are identical / differences are trivial
-  discard_image = "false"  → meaningful changes exist
+Also provides a change summary describing what changed between the two images.
+1. If there's only one image and : it is informational: "NoMatchFound" - discard - false
+2. If there's only one image and : it is non informational: "Only one image and it is non informational" - discard - true
 
-And produce a change summary.  Special-case rules:
-  A1: single non-informational image → discard=true, changes="Only one image and it is non informational"
-  A2: single informational image     → discard=false, changes="NoMatchFound"
-  B3: both non-informational         → discard=true,  changes="Both images are non informational..."
-  B5a: trivially identical           → discard=true,  changes="Images are identical - no changes"
-  B5b: meaningfully different        → discard=false,  changes=<detailed description>
-  Special: crossed-out               → discard=false, changes="Image has been crossed out"
-  Special: corrupted/unreadable      → discard=false, changes="Could not infer"
+3. If there are two images and they are both non informational: "Both images are non informational and contain only logo/watermark etc. no meaningful content"
+4. They are visually identical/trivial changes: "Images are identical - no changes"
+In these cases - discard - true
 
-OPTIMIZERS (select via --optimizer)
------------------------------------
-  bootstrap   BootstrapFewShotWithRandomSearch  — demo selection
-  miprov2     MIPROv2  — Bayesian instruction + demo search (recommended)
-  gepa        GEPA     — reflection-LM guided prompt improvement
-  simba       SimBA    — iterative prompt refinement on train set only
-  all         Run all four in sequence
+5. If there are meaningful differences, describe the specific changes - discard - false
 
-DATASET
+Other cases:
+1. When one of the images is completely crossed out - "Image has been crossed out"
+2. One of the images is tiny/corrupted/unreadable - "Could not infer"
+
+
+This script uses DSPy prompt optimization to improve the accuracy of both the
+classification decision and the change summary.  Four optimization strategies
+are supported via --optimizer (or run all four with "all"):
+
+  bootstrap   BootstrapFewShotWithRandomSearch
+  miprov2     MIPROv2 (Bayesian instruction + demo search)
+  gepa        GEPA (reflection-LM guided prompt improvement)
+  simba       SIMBA (iterative prompt refinement on train set only)
+
+Dataset
 -------
-  ~376 human-labelled image pairs: data/dca_data/image_pairs/
-  Ground truth JSONs:               data/dca_data/image_pairs_llm_output_exp1/
-  Split (seed=42, stratified by discard_image + category + doubt):
-    train 60%  |  val 20%  |  test 20%
+~376 human-labelled image pairs from data/dca_data/image_pairs/.
+Ground truth in data/dca_data/image_pairs_llm_output_exp1/.
 
-USAGE EXAMPLES
---------------
-    # Quick run with default MIPROv2 medium
-    $env:PYTHONIOENCODING="utf-8"; uv run python extract_dca.py
+Split (seed=42, stratified on discard_image + category + doubt):
+  train 60%  |  val 20%  |  test 20%
 
-    # Heavy MIPROv2 optimization
+Usage
+-----
+    uv run python extract_dca.py
     uv run python extract_dca.py --optimizer miprov2 --miprov2-auto heavy
-
-    # Run all four optimizers
     uv run python extract_dca.py --optimizer all
-
-    # Use a different model
     uv run python extract_dca.py --model-name azure/gpt-4o --optimizer gepa
 
-    # Start from a human-written prompt file
-    uv run python extract_dca.py --initial-instruction-file human_prompts/v1_prompt_midas.md
+On Windows, set PYTHONIOENCODING first to avoid Unicode issues:
+    $env:PYTHONIOENCODING="utf-8"; uv run python extract_dca.py
 
-OUTPUT FILES (all in .cache/ and log/)
----------------------------------------
-  {prefix}_seed_state.json       — DSPy state before optimization
-  {prefix}_optimized_state.json  — DSPy state after optimization
-  {prefix}.json                  — Final saved model (same as optimized_state, renamed)
-  {prefix}.log                   — Full console output for this run
-  {prefix}_run_summary.json      — Timing, scores, paths, best strategy
-
-ENVIRONMENT VARIABLES (.env, overridden by CLI flags)
------------------------------------------------------
+Environment Variables (CLI flags take priority)
+-----------------------------------------------
   MODEL_NAME              Student LM (e.g. azure/gpt-4o-mini)
   REFLECTION_LM_NAME      Reflection LM for GEPA (e.g. azure/gpt-5)
   DCA_IMAGE_PAIRS_DIR     Image pairs directory
@@ -99,7 +77,6 @@ from config import reconfigure_lm, reflectin_lm
 from signatures.dca import DCAImageComparison
 from utils import load_dca_dataset, stratified_split_dca_dataset
 from evaluation.dca_metric import dca_comparison_metric, dca_comparison_metric_with_feedback
-from dca_tournaments.tour_utils import normalize_demos, save_candidate, load_candidate
 from optimization import (
     OptimizationRunner,
     create_bootstrap_strategy,
@@ -110,10 +87,6 @@ from optimization import (
 
 
 def _quote_cli_arg(value: str) -> str:
-    """Shell-quote a CLI argument value so it is safe to paste into a terminal.
-
-    Example: _quote_cli_arg("hello world") -> '"hello world"'
-    """
     text = str(value)
     if not text:
         return '""'
@@ -123,16 +96,6 @@ def _quote_cli_arg(value: str) -> str:
 
 
 def _build_rerun_from_seed_command(seed_state_path: str) -> str:
-    """Build the CLI command needed to re-run this exact job from the saved seed state.
-
-    Useful when optimization fails mid-run: the seed (pre-optimization) state
-    is already on disk and this command lets you resume from that checkpoint
-    rather than regenerating the seed from scratch.
-
-    Strips ``--load-extractor`` and ``--skip-load`` from the original argv,
-    then appends ``--load-extractor <seed_state_path>`` so the next run
-    picks up from the saved seed prompt.
-    """
     forwarded_args: list[str] = []
     skip_next = False
     for arg in sys.argv[1:]:
@@ -212,11 +175,6 @@ _split_stratify_by = ["expected_discard_image", "expected_human_label_category",
 
 
 def _slug_token(value: str | None, default: str = "na") -> str:
-    """Convert any string to a safe filesystem/filename token.
-
-    Replaces non-alphanumeric chars with underscores and collapses doubles.
-    Example: _slug_token("azure/gpt-4.1 mini") -> "azure_gpt_4_1_mini"
-    """
     text = str(value or "").strip().lower()
     cleaned = [ch if ch.isalnum() else "_" for ch in text]
     slug = "".join(cleaned).strip("_")
@@ -226,22 +184,11 @@ def _slug_token(value: str | None, default: str = "na") -> str:
 
 
 def _short_hash(*parts: object, length: int = 10) -> str:
-    """Return a short deterministic hex hash of the given parts (JSON-serialised).
-
-    Used to fingerprint split configurations so that re-running with the same
-    dataset paths and ratios always maps to the same cached split manifest.
-    """
     payload = json.dumps(parts, ensure_ascii=False, sort_keys=True, default=str)
     return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:length]
 
 
 def _build_split_cache_path() -> str:
-    """Return a fingerprinted path for the split manifest JSON.
-
-    The path encodes the dataset name, ratios, and a content hash so that
-    different dataset/split configurations never collide on disk.
-    Example output: .cache/splits/dca_split_seed42_image_pairs_..._tr60va20te20_<hash>.json
-    """
     pairs_tag = _slug_token(Path(os.path.abspath(pairs_dir)).name)[:24]
     gt_tag = _slug_token(Path(os.path.abspath(gt_dir)).name)[:24]
     ratios_tag = (
@@ -264,16 +211,11 @@ def _build_split_cache_path() -> str:
 
 
 def _build_dataset_cache_tag() -> str:
-    """Short tag that uniquely identifies the dataset (folder name + content hash).
-
-    Embedded in model filenames so saved models are traceable to their dataset.
-    """
     dataset_name = _slug_token(Path(os.path.abspath(pairs_dir)).name)[:18]
     return f"{dataset_name}_{_short_hash(os.path.abspath(pairs_dir), os.path.abspath(gt_dir))}"
 
 
 def _format_demo_tag(max_labeled_demos, max_bootstrapped_demos) -> str:
-    """Build a compact demo-count tag for filenames, e.g. 'd3b5' = 3 labeled, 5 bootstrapped."""
     labeled = "na" if max_labeled_demos is None else str(max_labeled_demos)
     boot = "na" if max_bootstrapped_demos is None else str(max_bootstrapped_demos)
     return f"d{labeled}b{boot}"
@@ -309,12 +251,6 @@ def _find_matching_cached_extractor(
     dataset_tag: str,
     split_seed_value: int,
 ) -> str | None:
-    """Find the most-recently modified extractor in cache_root matching all tags.
-
-    Used for ``--auto-load-compatible-cache``: avoids re-running a slow
-    optimization if a compatible cached model already exists on disk.
-    Returns None when nothing matches.
-    """
     root = Path(cache_root)
     if not root.exists() or not root.is_dir():
         return None
@@ -566,15 +502,11 @@ print(f"  train: {len(train_set)}  |  val: {len(val_set)}  |  test: {len(test_se
 
 # ── Create Extractor ─────────────────────────────────────────────
 # ChainOfThought: LM reasons step-by-step before answering (more accurate,
-#                 more tokens).  Produced by dspy.ChainOfThought.
-# Predict (--no-cot): LM answers directly (faster, cheaper).  Use this to
-#                     test whether chain-of-thought reasoning is actually
-#                     needed for the task.
-#
-# The comparator wraps the DCAImageComparison signature (defined in
-# signatures/dca.py) which lists the input fields (images, metadata) and
-# output fields (discard_image, changes).  optimizer.compile() mutates
-# this object in-place; the result can be re-loaded with comparator.load().
+#                 more tokens).
+# Predict (--no-cot): LM answers directly (faster, cheaper; test whether
+#                     reasoning is actually needed for this task).
+# optimizer.compile() mutates this object; the result can be serialized
+# with comparator.save(<path>).
 if args.no_cot:
     comparator = dspy.Predict(DCAImageComparison)
 else:
@@ -602,7 +534,7 @@ if not args.skip_load:
     if cached_extractor_path and os.path.exists(cached_extractor_path) and os.path.isfile(cached_extractor_path):
         load_source = "explicit path" if explicit_cached_extractor else "auto-matched cache"
         print(f"Loading cached extractor from ({load_source}): {cached_extractor_path}")
-        comparator = load_candidate(cached_extractor_path, use_cot=(not args.no_cot))
+        comparator.load(cached_extractor_path)
         print("Extractor loaded successfully\n")
     else:
         if explicit_cached_extractor is None and not args.auto_load_compatible_cache:
@@ -661,11 +593,7 @@ if args.initial_instruction_file:
     else:
         print("[OK] Seed instruction verified: live signature matches the instruction file exactly.\n")
 
-# ── Save seed state (DSPy's own dump_state — same format as .save()) ─────────────
-# Normalize expected_* demo keys so labeled demos survive save/load
-_n_fixed = normalize_demos(comparator)
-if _n_fixed:
-    print(f"[demo-fix] Normalized {_n_fixed} seed demo(s) with expected_* keys")
+# ── Save seed state (DSPy's own dump_state — same format as .save()) ─────────
 _seed_prompt_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}_seed_state.json")
 with open(_seed_prompt_path, "w", encoding="utf-8") as _fp:
     json.dump(comparator.dump_state(), _fp, indent=2, ensure_ascii=False)
@@ -673,11 +601,9 @@ print(f"Seed state saved   -> {_seed_prompt_path}\n")
 
 
 # ── Evaluation Setup ─────────────────────────────────────────────
-# dca_comparison_metric returns a weighted float in [0, 1]:
-#   0.6 * classification_score + 0.4 * change_summary_score
-# dspy.Evaluate wraps this and reports on a 0-100 scale in its table.
-# num_threads=4 evaluates 4 examples concurrently to speed up scoring.
-# devset=None here because the runner passes val_set at compile time.
+# dca_comparison_metric returns a weighted float 0-1:
+#   0.6 * classification_score + 0.4 * change_score
+# dspy.Evaluate reports scores on a 0-100 scale.
 evaluate = dspy.Evaluate(
     devset=None,
     metric=dca_comparison_metric,
@@ -688,23 +614,11 @@ evaluate = dspy.Evaluate(
 
 
 # ── Optimization Strategies ──────────────────────────────────────
-# Each strategy is a named config object consumed by OptimizationRunner.
-# _register_strategy() adds it to both the ordered list (custom_strategies)
-# and the by-name lookup dict (strategy_by_name) used when saving the model.
-#
-# Strategy selection logic:
-#   --optimizer bootstrap   → only Bootstrap
-#   --optimizer miprov2     → only MIPROv2
-#   --optimizer gepa        → only GEPA
-#   --optimizer simba       → only SimBA
-#   --optimizer all         → all four run sequentially
-#
-# Each optimizer.compile() call starts from the SAME seed comparator and
-# competes on the val set.  The one with the highest val score is saved.
-custom_strategies: list = []
-strategy_by_name: dict = {}
+custom_strategies = []
+strategy_by_name = {}
 
-def _register_strategy(strategy) -> None:
+
+def _register_strategy(strategy):
     custom_strategies.append(strategy)
     strategy_by_name[strategy.name] = strategy
 
@@ -855,10 +769,6 @@ print(_opt_instruction or "<could not retrieve>")
 print(f"{'='*80}\n")
 
 # ── Save optimized state (DSPy's own dump_state — same format as .save()) ────
-# Normalize expected_* demo keys so labeled demos survive save/load
-_n_fixed = normalize_demos(optimized_comparator)
-if _n_fixed:
-    print(f"[demo-fix] Normalized {_n_fixed} optimized demo(s) with expected_* keys")
 _opt_prompt_path = os.path.join(_log_dir, f"{_log_prefix}_dca_run_{current_time}_optimized_state.json")
 with open(_opt_prompt_path, "w", encoding="utf-8") as _fp:
     json.dump(optimized_comparator.dump_state(), _fp, indent=2, ensure_ascii=False)
@@ -889,7 +799,7 @@ model_path = os.path.join(
     cache_dir,
     f"{model_name}_{best_strategy_slug}_{cot_tag}{re_tag}_dca_optimized_{demo_tag}{instr_tag}{cfd_tag}_ds{_dataset_tag}_sp{split_seed}_{current_time}.json",
 )
-save_candidate(optimized_comparator, model_path)
+optimized_comparator.save(model_path)
 print(f"\nSaved optimized model to: {model_path}")
 
 print(f"\n{'='*80}")

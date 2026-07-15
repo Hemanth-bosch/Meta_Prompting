@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['getBit_unsigned_U8']; TC2: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['getBit_unsigned_U8']; TC3: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['getBit_unsigned_U8']; TC4: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['getBit_unsigned_U8']",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 1.0,
+  "m3_details": "All structural checks passed",
+  "m4": 1.0,
+  "m4_details": "[newKB:getBit_unsigned_getBit] 1/1 covered | missing: none\n    JUDGE REASONING: 1: COVERED — TC1 sets X=0 (00000000) and expects output 0 for bit position 2; TC2 sets X=4 (00000100) and expects output 1 for bit position 2 (bit logical status check is explicit in Actions+Expected Results). TC3/TC4 further exercise bit2 = 1 and bit2 = 0 with other bits set.",
+  "m7": 0.5,
+  "m7_details": "N/A — function-call weakspot (getBit_unsigned_getBit); see M8 for functional correctness",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['gbx_sttrsmneutobd']",
+  "_weighted_composite_pct": 70.83333333333334
+}

@@ -112,6 +112,7 @@ DEFAULT_TEMPERATURE = 0.1
 #     reasoning_effort = None | "low" | "medium" | "high"  (for o-series / gpt-5.x)
 # )
 # ---------------------------------------------------------------------------
+
 @dataclass
 class RunConfig:
     prompt_file:      str
@@ -122,8 +123,8 @@ class RunConfig:
 
 RUNS: dict[str, RunConfig] = {
     # ── v5 prompt (midas) ────────────────────────────────────────────
-    "v5_gpt41mini": RunConfig("v5_prompt_cr.md", "azure/gpt-4.1-mini", True, None),
-    "v5_gpt41":     RunConfig("v5_prompt_cr.md", "azure/gpt-4.1", True, None),
+    "v1_gpt41mini": RunConfig("v1_prompt_midas.md", "azure/gpt-4.1-mini", True, None),
+    # "v5_gpt41":     RunConfig("v5_prompt_cr.md", "azure/gpt-4.1", True, None),
     # "v5_gpt5mini":  RunConfig("v5_gepa_0.9_opt_cr.md", "azure/gpt-5-mini", True, "low"),
     # "v5_gpt52":     RunConfig("v5_gepa_0.9_opt_cr.md", "azure/gpt-5.2", True, "low"),
 

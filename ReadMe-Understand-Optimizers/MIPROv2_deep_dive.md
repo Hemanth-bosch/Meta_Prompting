@@ -99,6 +99,40 @@ class MyRAGProgram(dspy.Module):
         return dspy.Prediction(answer=answer, verdict=verdict)
 ```
 
+```python
+class MyRAGProgram(dspy.Module):
+    def __init__(self):
+        self.context = dspy.Predict(               # ← Predictor 0, name="generate"
+            "context, question -> answer"
+        )
+        self.generation1 = dspy.Predict(           # ← Predictor 1, name="judge" -> We generated 10 test cases
+            "answer -> verdict"
+        )
+        self.judge1 = dspy.Predict(           # ← Predictor 1, name="judge" _. only 4 are correct.
+            "answer -> verdict"
+        )
+        self.generation2 = dspy.Predict(           # ← Predictor 1, name="judge" -> incorrect 6 to next and generate them again
+            "answer -> verdict"
+        )
+        self.judge2 = dspy.Predict(           # ← Predictor 1, name="judge" -> judge those 6. incorrect 1 only
+            "answer -> verdict"
+        )
+        self.generation3 = dspy.Predict(           # ← Predictor 1, name="judge" _. 1 to again generate
+            "answer -> verdict"
+        )
+        self.judge3 = dspy.Predict(           # ← Predictor 1, name="judge"   correct, stop
+            "answer -> verdict"
+        )
+
+
+
+    def forward(self, question):
+        context = self.retrieve(question).passages
+        answer  = self.generate(context=context, question=question).answer
+        verdict = self.judge(answer=answer).verdict
+        return dspy.Prediction(answer=answer, verdict=verdict)
+```
+
 **How DSPy discovers predictors** — `module.py L87-L93`:
 ```python
 def named_predictors(self):

@@ -1,0 +1,18 @@
+[[ ## reasoning ## ]]
+The equation is simply SystemConstant(MOFSRV_LIB_RAMP_END) → $op118, and the target value is 1. The constant value for MOFSRV_LIB_RAMP_END is given as 0. Since the system constant appears in the equation, we must assign it the given value 0. However, the target value is 1, which means the output $op118 is 1, but the system constant is 0. Since the equation is just the system constant, the only way to satisfy the equation is to assign the system constant the value 1 to match the target value. But the problem states to use the exact numeric value from the const_values dictionary for any system constant that appears in the equation. Therefore, we must assign MOFSRV_LIB_RAMP_END = 0.
+
+Given this, the output $op118 would be 0, which contradicts the target value 1. This suggests that the target value 1 cannot be achieved with the given constant value 0 for MOFSRV_LIB_RAMP_END.
+
+However, the instructions say to assign the system constant the exact value from the dictionary if it appears in the equation. So we must assign MOFSRV_LIB_RAMP_END = 0.
+
+No variables or parameters appear in the equation, so no other assignments are needed.
+
+Therefore, the only assignment is SystemConstant(MOFSRV_LIB_RAMP_END) = 0.
+
+[[ ## variable_assignments ## ]]
+```json
+[
+    "SystemConstant(MOFSRV_LIB_RAMP_END) = 0"
+]
+```
+[[ ## completed ## ]]

@@ -1,0 +1,15 @@
+{
+  "m1": 1.0,
+  "m1_details": "I/O classification correct",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 1.0,
+  "m3_details": "All structural checks passed",
+  "m4": 0.0,
+  "m4_details": "[newKB:getBit_unsigned_getBit] 0/1 covered | missing: \"Checking the Bit Operation : GetBit — Set: Set the input var\"\n    JUDGE REASONING: 1: NOT COVERED — TC1–TC3 set X and check output for bit position 0 only; none of the test cases explicitly *sets/provides a Position number* as an input stimulus and verifies output for varying positions. Needed: a test that drives both X and Position (e.g., X=0b00010000, Position=4 => Output=1; Position=3 => Output=0).",
+  "m7": 0.5,
+  "m7_details": "N/A — function-call weakspot (getBit_unsigned_getBit); see M8 for functional correctness",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['b_creepact_msg', 'mdwancan_msg']",
+  "_weighted_composite_pct": 57.49999999999999
+}

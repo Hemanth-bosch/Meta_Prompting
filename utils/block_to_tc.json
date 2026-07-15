@@ -1,0 +1,11 @@
+{
+  "_about": "Maps an ASCET block name (the key find_block_type() resolves a weakspot function_name to) -> a TC_xx sheet in the BU new_knowledge_base Excel (TDI-mapped-FCI-Lib-Dynamic_Elements). generate_new_kb_json.py joins this with the per-Case guidelines extracted from each TC sheet to produce utils/new_weakspot_guidelines.json (block-keyed, same shape as the old KB). ONLY STRONG matches are listed; any block NOT here falls back to the old KB automatically (new-only 'replace' policy). LowpassT is intentionally NOT mapped (its only new match, TC_13 'PT1', is weaker than its 8 specific old-KB guidelines).",
+  "_tier": "Tier-1 = the 5 dataset gap blocks (no old-KB entry) + 2 direct overlap matches. Verified: find_block_type(function_name) resolves each dataset fn to the key below.",
+  "Srv_TrnOffDly": "TC_19",
+  "Srv_TrnOnDly": "TC_18",
+  "Srv_RampSwitch": "TC_09",
+  "Srv_Debounce": "TC_28",
+  "getBit_unsigned_getBit": "TC_06",
+  "putBit_unsigned_putBit": "TC_07",
+  "MoFSrv_Lib_RampEnhd_Out": "TC_05"
+}

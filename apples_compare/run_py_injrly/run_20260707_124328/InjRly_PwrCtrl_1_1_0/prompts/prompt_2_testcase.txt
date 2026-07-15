@@ -1,0 +1,229 @@
+Generate **test cases** for the identified weakspot.
+
+### Output Requirements:
+First give the "Detailed Explanation" of the testcase.
+The output should have single JSON for all the test cases and should have the following structure:
+```json
+[
+    {
+        "Pre-Condition": ["...", "...", ...],
+        "Steps": [
+            {
+                "Actions": ["...", "...", ...],
+                "Expected Results": ["...", "...", ...]
+            },
+            ...
+        ],
+        "Detailed Explanation": "..."
+    },
+    ...
+]
+```
+
+### Formatting Guidelines:
+1. **Detailed Explanation**:
+   - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+
+2. **Pre-Condition**:
+   - Only include value assignments in the format: "<value_name> = <value>".
+   - Do not include any variables which are part of present in Action.
+
+3. **Steps**:
+   - Each step should consist of:
+     - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+     - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+
+4. **String Types**:
+   - Only use the following types of strings in the output:
+     - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+     - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+     - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+
+### Additional Constraints:
+- **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+- **NOTE** Pre-Condition and Actions **cannot be same variables**
+- Do not add new constant values that are not part of the provided input.
+- DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+- Ensure all steps are logically consistent with the input equation and constants.
+- Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+
+EXAMPLE:
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#     {
+#         "Pre-Condition": [
+#             "delayTime = 5000"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "signal = 1"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 0",
+#                     "Wait delayTime"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             }
+#         ]
+#     },
+#     {
+#         "Pre-Condition": [
+#             "delayTime = 3000"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "signal = 0",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 1",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 0",
+#                     "Wait delayTime"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             }
+#         ]
+#     }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+### Input Details:
+
+**Constant Values**: {'THS_EMWPAVL_SC': 1, 'WTRPMP_CTRLSRC3_SC': 2, 'PRC_100': 0.0, 'dT': '20000.0', 'PRC_ZERO': 0.0}
+**Weakspot Operation**: $op4
+**Weakspot Context**:
+### 1. Overview of the Weakspot Element
+
+- **Weakspot Element Key:** `$op4`
+- **Instance Name:** `InjRly_T15TOffD_I`
+- **Function Name:** `Srv_TrnOffDly_out`
+
+**Role and Working:**
+
+The weakspot element `$op4` represents a function call to the method `out` of the class/function `Srv_TrnOffDly`. This element implements a turn-off delay debounce logic for a boolean signal. Its main purpose is to debounce the transition of an input signal from true to false by introducing a delay before the output switches to false.
+
+- When the input signal is **true**, the output is set to **true immediately**.
+- When the input signal becomes **false**, the output remains **true** until the specified delay time has elapsed.
+- After the delay time has elapsed with the input being false, the output switches to **false**.
+
+Additional details from the context:
+
+- The internal timer is held in a static element initialized to a maximum value (MAXSINT32) to avoid false immediate false output after power-on reset.
+- Each call to the `out` method updates the internal timer, so it is critical to call this function exactly once per process step to avoid timing errors.
+- The output of this element should be connected to a local or static variable to prevent multiple recalculations and timing inconsistencies.
+- The delay time and sample time parameters control the timing behavior of the debounce.
+
+---
+
+### 2. Inputs That Can Be Altered
+
+| Input Parameter | Reference in `args` | Referenced Element Type | Instance Name | Notes |
+|-----------------|--------------------|------------------------|---------------|-------|
+| `signal`        | `$op0`             | Variable               | `T15_st`      | Logical input signal (uint8) |
+| `delayTime`     | `$op2`             | ImplementationCast     | `impl_cast`   | Casted delay time parameter (sint32) |
+| `Dt`            | `$op3`             | Variable               | `dT`          | Sample time (sint32), **fixed parameter, exclude** |
+
+**Exclusion:**
+
+- `Dt` (`$op3`) is the sample time parameter and must be considered fixed; it is excluded from alterable inputs.
+
+**Summary of Alterable Inputs:**
+
+- `signal` (input boolean signal)
+- `delayTime` (delay time parameter)
+
+---
+
+### 3. Outputs That Can Be Checked
+
+| Output Variable Key | Type   | Instance Name           | Connection to Weakspot Element |
+|---------------------|--------|------------------------|--------------------------------|
+| `$op5`              | Local  | `_flgDlydlnPostDrive`  | Reads the output of `$op4`     |
+
+**Details:**
+
+- The output of the weakspot element `$op4` is connected as input to the local variable `$op5` (`_flgDlydlnPostDrive`).
+- This local variable holds the delayed boolean output after the turn-off delay logic.
+- Since `$op5` is a local boolean variable, it can be checked to verify the correctness of the weakspot element's output.
+
+---
+
+### 4. Possible Testcases for Weakspot Element
+
+| Testcase Description                                      | Purpose / Condition Tested                                                                                   |
+|-----------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| 1. **Immediate True Output on True Input**                | Verify that when `signal` is true, the output is immediately true regardless of delay time.                   |
+| 2. **Delayed False Output on False Input**                 | Verify that when `signal` transitions to false, the output remains true for the specified `delayTime` period, then switches to false. |
+| 3. **Initialization Behavior**                             | Verify that after initialization (internal timer set to MAXSINT32), the output behaves as expected (true until delay elapsed). |
+| 4. **Single Calculation per Process Step**                 | Verify that multiple calls to the `out` method in one process step do not cause the delay timer to run too fast (simulate multiple calls and check output consistency). |
+
+**Notes:**
+
+- The sample time `Dt` is fixed and should not be altered.
+- The delay time parameter should be tested with typical values (e.g., zero delay, nominal delay, and large delay).
+- The input signal should be toggled between true and false to test the debounce behavior.
+- Initialization test ensures the internal timer is correctly set to avoid false outputs after reset.
+- The test for multiple calls ensures the element is used correctly in the system to avoid timing errors.
+
+---
+
+# Summary Table
+
+| Aspect                      | Details                                                                                  |
+|-----------------------------|------------------------------------------------------------------------------------------|
+| Weakspot Element            | `$op4` - `InjRly_T15TOffD_I` with function `Srv_TrnOffDly_out`                           |
+| Role                       | Implements turn-off delay debounce: immediate true output, delayed false output          |
+| Alterable Inputs            | `signal` (`$op0` - Variable `T15_st`), `delayTime` (`$op2` - ImplementationCast `impl_cast`) |
+| Fixed Input (excluded)      | `Dt` (`$op3` - Variable `dT`)                                                           |
+| Output to Check             | `$op5` - Local `_flgDlydlnPostDrive` reading output of `$op4`                           |
+| Key Testcases               | Immediate true output, delayed false output, initialization behavior, single calculation per step |
+
+This detailed context provides a comprehensive understanding of the weakspot element `$op4` and guides the generation of effective testcases.
+**use this Expected Results**:
+['InjPwrRly_r']
+
+From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+**DO NOT** generate values for dT in the testcases.
+
+Using the provided JSON data, generate the test cases as specified.
+
+{'const_values': {'THS_EMWPAVL_SC': 1, 'WTRPMP_CTRLSRC3_SC': 2, 'PRC_100': 0.0, 'dT': '20000.0', 'PRC_ZERO': 0.0}, 'weakspot_operation': '$op4', 'equation': {'$op4': {'oid': '52', 'type': 'Function', 'instance_name': 'InjRly_T15TOffD_I', 'function_name': 'Srv_TrnOffDly_out', 'class_method_name': 'out', 'sequence_number': '1', 'method_name': 'Proc_20ms', 'decision': None, 'condition': [], 'arg_names': ['signal', 'delayTime', 'Dt'], 'args': ['$op0', '$op2', '$op3'], 'read': True, 'write': False, 'physical_type': '', 'data_type': '', 'unique_variables': ['T15_st'], 'unique_params': ['dT', 'InjRly_tiOffDly_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [None, None]}, '$op5': {'oid': '11', 'type': 'Local', 'instance_name': '_flgDlydlnPostDrive', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op4'], 'read': True, 'write': False, 'physical_type': 'log', 'data_type': 'bool', 'unique_variables': ['T15_st'], 'unique_params': ['dT', 'InjRly_tiOffDly_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 1.0]}, '$op0': {'oid': '18', 'type': 'Variable', 'instance_name': 'T15_st', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': [], 'read': True, 'write': True, 'physical_type': 'log', 'data_type': 'uint8', 'unique_variables': ['T15_st'], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 1.0]}, '$op2': {'oid': '36', 'type': 'ImplementationCast', 'instance_name': 'impl_cast', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op1'], 'read': False, 'write': False, 'physical_type': 'real64', 'data_type': 'sint32', 'unique_variables': [], 'unique_params': ['InjRly_tiOffDly_C'], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [-2147.483648, 2147.483647]}, '$op3': {'oid': '30', 'type': 'Variable', 'instance_name': 'dT', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': [], 'read': True, 'write': True, 'physical_type': 'real64', 'data_type': 'sint32', 'unique_params': ['dT'], 'unique_variables': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [-2147483648.0, 2147483647.0]}, '$op27': {'oid': '31', 'type': 'Variable', 'instance_name': 'InjPwrRly_r', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op26'], 'read': True, 'write': False, 'physical_type': 'real64', 'data_type': 'sint16', 'unique_variables': ['WtrPmp3_flgAftRunReq', 'T15_st', 'Emwp_swtActv', 'InjRly_flgDDEWakup'], 'unique_params': ['dT', 'InjRly_tiOffDly_C'], 'unique_consts': ['THS_EMWPAVL_SC', 'PRC_ZERO', 'WTRPMP_CTRLSRC3_SC'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [-400.0, 399.98779296875]}}}
+
+### Task:
+Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+
+Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+---

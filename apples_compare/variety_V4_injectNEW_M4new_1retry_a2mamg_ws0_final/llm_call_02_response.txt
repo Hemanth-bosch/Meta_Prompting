@@ -1,0 +1,99 @@
+[[ ## reasoning ## ]]
+The weakspot operation $op4 implements a bit extraction function that returns the logical value of a bit at a fixed position 0 from an 8-bit unsigned input parameter CNFMDWAN. The critical aspect to test is whether the function correctly extracts the bit at position 0 for various input values, including when the bit is set (1) and cleared (0). Since the bit position is fixed and cannot be altered, the only input that can be changed is CNFMDWAN.
+
+To validate the correctness of the bit extraction, the test cases must:
+- Set CNFMDWAN to values where the least significant bit (bit 0) is set (1).
+- Set CNFMDWAN to values where the least significant bit is cleared (0).
+- Use different patterns to ensure no interference from other bits affects the extraction.
+- Check the output bit value matches the expected logical bit at position 0.
+
+Following the KB guideline, the test cases will:
+- Assign CNFMDWAN with specific 8-bit values.
+- Verify the output bit value equals the logical status of bit 0.
+- Use only value assignments and checks as per formatting rules.
+- Avoid duplicating the example test cases provided in the context.
+
+The test cases below cover:
+1. CNFMDWAN with bit 0 set (e.g., 1, 255).
+2. CNFMDWAN with bit 0 cleared (e.g., 0, 254).
+3. CNFMDWAN with alternating bits to confirm only bit 0 is extracted.
+
+This minimal set ensures the bit extraction function is thoroughly validated for the fixed bit position 0.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 1"
+                ],
+                "Expected Results": [
+                    "bitValue = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "CNFMDWAN = 255"
+                ],
+                "Expected Results": [
+                    "bitValue = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies that when the least significant bit (bit 0) of CNFMDWAN is set to 1, the getBit function correctly returns 1. The first step sets CNFMDWAN to 1 (binary 00000001), where only bit 0 is set. The second step sets CNFMDWAN to 255 (binary 11111111), where all bits including bit 0 are set. Both steps confirm that the function correctly identifies the bit at position 0 as set."
+    },
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 255"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 0"
+                ],
+                "Expected Results": [
+                    "bitValue = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "CNFMDWAN = 254"
+                ],
+                "Expected Results": [
+                    "bitValue = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies that when the least significant bit (bit 0) of CNFMDWAN is cleared to 0, the getBit function correctly returns 0. The first step sets CNFMDWAN to 0 (binary 00000000), where no bits are set. The second step sets CNFMDWAN to 254 (binary 11111110), where all bits except bit 0 are set. Both steps confirm that the function correctly identifies the bit at position 0 as cleared."
+    },
+    {
+        "Pre-Condition": [
+            "CNFMDWAN = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "CNFMDWAN = 170"
+                ],
+                "Expected Results": [
+                    "bitValue = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "CNFMDWAN = 171"
+                ],
+                "Expected Results": [
+                    "bitValue = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case uses alternating bit patterns to ensure the getBit function extracts only the bit at position 0. CNFMDWAN is set to 170 (binary 10101010), where bit 0 is 0, expecting output 0. Then CNFMDWAN is set to 171 (binary 10101011), where bit 0 is 1, expecting output 1. This confirms the function's accuracy in isolating the correct bit regardless of other bits."
+    }
+]
+
+[[ ## completed ## ]]

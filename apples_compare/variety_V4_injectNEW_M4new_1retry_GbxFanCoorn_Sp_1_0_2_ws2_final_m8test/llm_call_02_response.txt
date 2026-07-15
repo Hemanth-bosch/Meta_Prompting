@@ -1,0 +1,144 @@
+[[ ## reasoning ## ]]
+The weakspot element $op19 implements a debounce function that filters a boolean input signal to avoid rapid toggling by applying separate debounce times for rising and falling edges. The key inputs that can be manipulated for testing are the boolean input signal "X" (represented by $op16) and the debounce parameter structure "Param" (represented by $op17). The sample time "Dt" is fixed and should not be altered.
+
+The output to verify is the debounced boolean output "GbxFan_st" ($op20), which reflects the stable state of the input signal after debounce filtering.
+
+The Bosch BU test guidelines specify five critical scenarios to validate the debounce function:
+
+1. Initialization: Confirm the output initializes correctly (usually FALSE).
+2. Rising edge delay: Output changes to TRUE only after the input has been TRUE for the debounce time.
+3. Suppression of falling edge shorter than debounce time: Brief FALSE input does not cause output to change.
+4. Falling edge delay: Output changes to FALSE only after the input has been FALSE for the debounce time.
+5. Suppression of rising edge shorter than debounce time: Brief TRUE input does not cause output to change.
+
+Each test case will be designed to exercise one of these scenarios. The debounce times (rising and falling) are assumed to be part of the "Param" structure and will be represented by integer values in multiples of the sample time dT=20000.0. For simplicity, the debounce times will be set to 3 units (i.e., 3 * dT = 60000 time units) in the test cases to allow clear timing control.
+
+The test cases will use value assignments for the input signal "X" and wait times in multiples of dT to simulate the passage of time. The expected results will verify the output "GbxFan_st" equals the expected stable state after the debounce logic has been applied.
+
+The test cases will avoid overlapping variable names between pre-conditions, actions, and expected results, and will strictly follow the formatting and content guidelines provided.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the initialization of the debounce function. The input signal X is set to FALSE (0) before starting. After waiting one sample time unit, the output GbxFan_st is checked to ensure it initializes to FALSE, confirming the debounce output starts in a known stable state."
+    },
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 1"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "X = 1",
+                    "Wait 3"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case validates the rising edge debounce delay. Starting with input X FALSE and output FALSE, the input is changed to TRUE. The test waits for the debounce time (3 units) before checking that the output GbxFan_st changes to TRUE. This confirms the output only changes after the input has been stable for the debounce period."
+    },
+    {
+        "Pre-Condition": [
+            "X = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 3"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "X = 0",
+                    "Wait 1",
+                    "X = 1",
+                    "Wait 2"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case checks suppression of a falling edge shorter than the debounce time. The input starts TRUE and output TRUE. The input briefly falls to FALSE for 1 unit, then returns to TRUE before the debounce time (3 units) expires. After waiting the remaining time, the output remains TRUE, confirming the debounce function suppresses short false pulses."
+    },
+    {
+        "Pre-Condition": [
+            "X = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 3"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "X = 0",
+                    "Wait 3"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the falling edge debounce delay. Starting with input and output TRUE, the input changes to FALSE. After waiting the debounce time (3 units), the output changes to FALSE. This confirms the output only changes after the input has been stable low for the debounce period."
+    },
+    {
+        "Pre-Condition": [
+            "X = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Wait 3"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "X = 1",
+                    "Wait 1",
+                    "X = 0",
+                    "Wait 2"
+                ],
+                "Expected Results": [
+                    "GbxFan_st = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case checks suppression of a rising edge shorter than the debounce time. The input starts FALSE and output FALSE. The input briefly rises to TRUE for 1 unit, then returns to FALSE before the debounce time expires. After waiting the remaining time, the output remains FALSE, confirming the debounce function suppresses short true pulses."
+    }
+]
+
+[[ ## completed ## ]]

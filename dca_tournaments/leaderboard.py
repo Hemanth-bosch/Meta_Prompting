@@ -1,46 +1,8 @@
-"""OptimizationLeaderboard \u2014 tracks all candidate programs across stages.
+"""OptimizationLeaderboard — tracks all candidate programs across stages.
 
-ROLE IN THE PIPELINE
---------------------
-The leaderboard is the central registry of every prompt candidate produced
-during a tournament run.  It is:
-  - Created once in run_tournament.py and passed to every StageRunner
-  - Thread-safe: guarded by a reentrant lock (multiple eval threads can add
-    entries concurrently during a stage)
-  - Auto-saved to leaderboard.json after every insertion so progress is never
-    lost on crash / Ctrl+C
-  - Reloaded from disk when resuming an interrupted run
-
-WHAT IS STORED (CandidateEntry)
---------------------------------
-For every compiled program produced by an optimizer:
-  - Path to the saved .json program on disk
-  - Stage name and config name (e.g. \"miprov2_medium_gpt-4.1-mini_d3b5\")
-  - Val set scores: total, cls, change, per-category
-  - Token usage stats: avg input/output/reasoning tokens per sample
-  - Metadata: model name, timestamps, optimizer params
-
-SELECTION CRITERIA
-------------------
-  score_only   \u2014 rank by val_total_score descending (default)
-  pareto       \u2014 Pareto-optimal front (maximize score, minimize tokens),
-                 then fill with next-best by score
-  tokens_only  \u2014 rank by val_avg_total_tokens ascending (cheapest first)
-
-CROSS-STAGE SELECTION (--cross-stage-selection)
-------------------------------------------------
-  When enabled, top_k() draws from ALL stages combined, not just the last.
-  This means a bootstrap result can \"seed\" GEPA even after MIPROv2 if the
-  bootstrap score is still higher than any MIPROv2 output.
-
-EXAMPLE USAGE
--------------
-  lb = OptimizationLeaderboard(save_path=\".cache/tournament/t_1/leaderboard.json\")
-  lb.add(entry)             # inserts, re-sorts, auto-saves
-  best = lb.best()          # top entry by score
-  top2 = lb.top_k(2)        # top-2 entries
-  lb.print_table()          # console table
-  lb.export_to_excel(path)  # Excel file for offline analysis
+Maintains a sorted list of ``CandidateEntry`` objects, auto-saves after
+every insertion, and provides stage summaries, top-K selection, and export
+to Excel / formatted console table.
 """
 
 from __future__ import annotations
@@ -48,7 +10,7 @@ from __future__ import annotations
 import json
 import math
 import threading
-from dataclasses import dataclass, field, asdict, fields
+from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Optional, List
 
@@ -62,27 +24,7 @@ _CANONICAL_STAGE_ORDER = (
 
 @dataclass
 class CandidateEntry:
-    """A single candidate program and all its evaluation results.
-
-    Created by StageRunner after each optimizer subprocess completes and its
-    output is evaluated on mini_val.  Also created by SeedPromptGenerator
-    (stage 0) and by run_tournament.py for the seed-from-file path.
-
-    Fields
-    ------
-    program_path          Path to the saved DSPy .json state on disk.
-    stage                 Which pipeline stage produced this:
-                          seed / bootstrap / miprov2 / gepa
-    config_name           Human-readable name encoding stage + model + demo
-                          counts, e.g. \"miprov2_medium_gpt-4.1-mini_d3b5_from_seed_candidate_0\"
-    parent_path           program_path of the seed that was optimized to
-                          produce this entry.  None for Stage-0 seeds.
-    val_total_score       0.6*cls + 0.4*change on mini_val.
-                          Updated to full-val score during final re-evaluation.
-    val_avg_total_tokens  Average (input+output) tokens per val sample.
-                          Used for Pareto/token selection and pareto_plot.png.
-    metadata              Dict with optimizer params, model name, timestamps.
-    """
+    """A single candidate program and its evaluation results."""
 
     program_path: str  # path to saved .json (dump_state)
     stage: str  # "seed" / "bootstrap" / "miprov2" / "gepa"
@@ -113,38 +55,9 @@ class CandidateEntry:
         parent = Path(self.parent_path).stem if self.parent_path else "—"
         return f"[{self.stage}] {self.config_name}  from={parent}"
 
-    @classmethod
-    def from_dict(cls, d: dict) -> "CandidateEntry":
-        """Construct from a dict, ignoring unknown keys (Layer 2).
-
-        This replaces raw ``CandidateEntry(**d)`` which crashes on extra keys
-        (e.g. 'rank' written for display but not part of the dataclass).
-        """
-        _known = {f.name for f in fields(cls)}
-        return cls(**{k: v for k, v in d.items() if k in _known})
-
 
 class OptimizationLeaderboard:
-    """Thread-safe, auto-persisting registry of candidate programs.
-
-    Maintains all candidates sorted by ``val_total_score`` descending.  After
-    every insertion the registry is serialised to JSON at ``save_path`` so
-    that a crashed run can be resumed by calling ``from_file()``.
-
-    Thread safety
-    -------------
-    An ``RLock`` (reentrant lock) guards all mutations and complex queries.
-    Methods like ``top_k`` can internally call ``pareto_front`` which also
-    acquires the lock — the reentrant lock prevents deadlock.
-
-    Typical usage
-    -------------
-    >>> lb = OptimizationLeaderboard(save_path=".cache/tournament/t_001/leaderboard.json")
-    >>> lb.add(entry)                 # inserts, sorts, saves
-    >>> seeds = lb.top_k(2)           # [best, 2nd-best]
-    >>> pareto = lb.pareto_front()    # Pareto-optimal (score, tokens)
-    >>> lb.export_to_excel("out.xlsx")
-    """
+    """Sorted collection of CandidateEntry objects with persistence."""
 
     def __init__(self, save_path: str | Path = ""):
         self.save_path = Path(save_path) if save_path else None
@@ -159,13 +72,6 @@ class OptimizationLeaderboard:
         Thread-safe — guarded by an internal lock.
         """
         with self._lock:
-            # Idempotent: update existing entry with same config_name (Layer 4)
-            for i, existing in enumerate(self.entries):
-                if existing.config_name == entry.config_name:
-                    self.entries[i] = entry
-                    self.entries.sort(key=lambda e: e.val_total_score, reverse=True)
-                    self.save()
-                    return
             self.entries.append(entry)
             self.entries.sort(key=lambda e: e.val_total_score, reverse=True)
             self.save()
@@ -234,15 +140,6 @@ class OptimizationLeaderboard:
             )
 
     def pareto_front(self, pool: List[CandidateEntry] | None = None) -> List[CandidateEntry]:
-        """Return the Pareto-optimal subset of *pool* (or all entries).
-
-        An entry A dominates B when:
-          A.val_total_score  >= B.val_total_score   (higher is better)
-          A.val_avg_total_tokens <= B.val_avg_total_tokens  (lower is better)
-          at least one of the inequalities is strict.
-
-        Returns entries sorted by (score DESC, tokens ASC) for readability.
-        """
         with self._lock:
             entries = list(pool) if pool is not None else list(self.entries)
 
@@ -329,7 +226,6 @@ class OptimizationLeaderboard:
     def best(self, stage: str | None = None,
              criteria: str = "score_only",
              exclude_stages: list | None = None) -> Optional[CandidateEntry]:
-        """Return the single best entry, or None if the leaderboard is empty."""
         top = self.top_k(1, stage=stage, criteria=criteria, exclude_stages=exclude_stages)
         return top[0] if top else None
 
@@ -352,7 +248,6 @@ class OptimizationLeaderboard:
         return ordered
 
     def stage_entries(self, stage: str) -> List[CandidateEntry]:
-        """All entries produced by *stage*, sorted by score descending."""
         return [e for e in self.entries if e.stage == stage]
 
     # ── Summaries ───────────────────────────────────────────────────
@@ -479,11 +374,6 @@ class OptimizationLeaderboard:
     # ── Persistence ────────────────────────────────────────────────
 
     def save(self, path: str | Path | None = None):
-        """Serialise all entries to JSON.  Called automatically after every add().
-
-        Writes to *path* if given, otherwise to ``self.save_path``.
-        Silently skips when no path is configured (in-memory-only mode).
-        """
         path = Path(path) if path else self.save_path
         if not path:
             return  # no save_path configured — skip silently
@@ -496,21 +386,12 @@ class OptimizationLeaderboard:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
     def load(self, path: str | Path | None = None) -> "OptimizationLeaderboard":
-        """Load entries from JSON on disk, replacing in-memory state.
-
-        Returns *self* for chaining.  Used by ``from_file()`` and internally
-        when resuming an interrupted tournament run.
-        """
         path = Path(path) if path else self.save_path
         if not path or not path.exists():
             return self
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        _known = {f.name for f in fields(CandidateEntry)}
-        self.entries = [
-            CandidateEntry.from_dict(e)
-            for e in data.get("entries", [])
-        ]
+        self.entries = [CandidateEntry(**e) for e in data.get("entries", [])]
         self.entries.sort(key=lambda e: e.val_total_score, reverse=True)
         return self
 

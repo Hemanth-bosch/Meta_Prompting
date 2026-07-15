@@ -1,0 +1,18 @@
+weakspot : EGSSig_LamSymcp_1_6_0 ws=2
+model    : azure/gpt-4.1-mini
+inject_kb_guidelines: False (== run.py)
+max_retries: 1 (== run.py)
+LLM calls captured: 7
+
+Expected call order:
+  call 1  = PROMPT 1 (context_extractor)
+  call 2  = PROMPT 2 (testcase_generator)
+  call 3+ = PROMPT 4 (equation_solver_dll) per equation, each optionally + 1 retry
+
+llm_call_01: prompt=16768 chars, response=5013 chars
+llm_call_02: prompt=22404 chars, response=5244 chars
+llm_call_03: prompt=5243 chars, response=2315 chars
+llm_call_04: prompt=7718 chars, response=1648 chars
+llm_call_05: prompt=5243 chars, response=1933 chars
+llm_call_06: prompt=5244 chars, response=2254 chars
+llm_call_07: prompt=7718 chars, response=1691 chars

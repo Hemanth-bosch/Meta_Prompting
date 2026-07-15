@@ -1,0 +1,14 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=Rail_TempLim_50.8.0 ws=2 fn=Srv_RampSwitch_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 14
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 1390 chars
+  METRICS: M1=1.0  M2=0.5  M3=1.0  M4=0.75  M7=0.2857142857142857  M8=0.0
+  weighted composite = 61.8%
+  M4 detail: [newKB:Srv_RampSwitch] 3/4 covered | missing: "Checking the slope down (with several SLOPE DOWN between nul"
+    JUDGE REASONING: 1: COVERED — TC1 Step 1 sets Swtch=1 with Xa=1500/Xb=1000 and expects output Rail_trqFlTempLim=1500 immediately (initialization to selected target).
+2: COVERED — TC2 ramps up: Step 2 toggles Swtch 0→1 with Xa=2000/Xb=1000; Step 3 wait 1 expects 1200 ( +200 slope); Step 4 wait 4 expects 2000 (reaches input/target).
+3: NOT COVERED — TC3 intends “slope down” but stimulus/expected results are inconsistent (switch to 0 selects Xb=2000 which is higher than 1000, yet expected result at Step 3 is 700 and Step 4 is 2000 after “decreasing”), so no explicit valid lower-target ramp-down with correct expected values is present. Need a test where target changes to a lower value (e.g., 2000→1000) and expected output decreases per SlopeNegVal until reaching the lower target.
+4: COVERED — TC4 performs mid-ramp reversals: Step 2 starts ramp up (0→1), Step 3 expects intermediate 1300; Step 4 switches back (1→0) before completion and expects hold 1300 then Step 5 expects ramp down to 1100; Step 6 switches again (0→1) before completion and expects hold 1100 then Step 7 expects ramp up to 1500.
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

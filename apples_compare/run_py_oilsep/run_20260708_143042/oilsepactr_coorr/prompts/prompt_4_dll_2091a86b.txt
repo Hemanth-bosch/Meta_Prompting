@@ -1,0 +1,65 @@
+## Locked parameter values -- do not change on retry:
+Parameter(OilSepActr_nMaxShdwn_C) = 10
+
+
+You are provided with a nested equation representation that computes an output value. The equation is given below:
+
+    ['Variable(Epm_nEng) → $op150', 'Local(OilSepActr_flgNormActv) → $op185', 'Parameter(OilSepActr_nMaxShdwn_C) → $op172', 'Function(RSFlipFlop_q,OilSepActr_EngSpdFF_I) → $op179', 'Operation(Smaller,$op150,$op172) → $op184', 'Local(OilSepActr_flgEngSpd,$op179) → $op180']
+
+This expression involves various components such as parameters, system constants, and variables. The nested structure may include constructs like Variable(...), Operation(...), Local(...), Parameter(...), and SystemConstant(...), which combine in different ways to produce the final output.
+
+Assume the final output value (LHS) is known to be 1.
+
+Additionally, you have the following constant values (dictionary):
+{}
+
+- If a system constant from this dictionary appears in the equation, **use that exact numeric value** as the assignment.
+- If a system constant does **not** appear in the equation, do not assign it.
+
+Your task is:
+
+1. **Only** assign **integer** numeric values to all direct inputs of the system:
+   - Variable(...)
+   - Parameter(...)
+   - SystemConstant(...)
+
+   and **never** assign values to Local(...), Operation(...), or Function(...).
+   If you need a numeric value for something inside an Operation(...), break it down into separate lines
+   that assign numeric values to the underlying Variable(...), Parameter(...), or SystemConstant(...).
+
+2. Assign **always same values** to the Parameter(...) for every call - use same value only **not different values**.
+
+3. **Ensure** all Variable(...), SystemConstant(...), and Parameter(...) that appear anywhere in the equation
+   (even inside nested Operation(...)) are assigned a numeric value:
+   - No direct input should be omitted. For instance, if SystemConstant(DSMGENN_SC) is present, it must be assigned.
+   - Do not add any system constant from the dictionary if it isn't actually in the equation.
+
+4. **MOST IMPORTANT**: You MUST format your output exactly as shown below:
+   - First provide your step-by-step explanation
+   - Then provide your final solution in a JSON array format within a code block
+   - Each item in the array must use EXACTLY this format: "<type>(<name>) = <integer>"
+   - No other text or formatting in the JSON array
+
+## Example of Correct Output Format:
+Your step-by-step explanation here...
+
+```json
+[
+    "SystemConstant(SomeSystemConstant) = 10",
+    "Variable(SomeVariable) = 42",
+    "Parameter(SomeParameter) = -1"
+]
+```
+
+## Additional Constraints:
+- Do not assign values to Local(...), Operation(...), or Function(...).
+- No lines like `Operation(...) = 10` or `Local(...) = 5` or `Function(...)= 1` or `SystemConstant(...) = 10`.
+- If the equation references any `Operation(...)`, break down the relevant portion into the underlying variables/parameters/constants.
+- If neither type is defined than it cannot be **global input**
+- The final output should strictly list only the direct assignments.
+- Make sure LHS = RHS holds true with your final numeric values.
+
+
+Please **derive integer values** for any `Variable(...)`, `Parameter(...)`, or `SystemConstant(...)` so that **when substituted**, the equation yields 1.
+
+---

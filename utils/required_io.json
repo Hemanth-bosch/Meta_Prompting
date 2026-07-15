@@ -1,0 +1,63 @@
+{
+  "_README": "Expert-curated Required-I/O KB, keyed by weakspot INSTANCE 'fc_name#ws_id'. Feeds M1 (required_outputs -> overrides instance_names when present) and M2 (required_inputs + required_preconds -> input/precond completeness). ONLY add an entry when you are SURE (human expert label or obvious). Missing key OR all-empty lists -> that check is SKIPPED (M1/M2 keep default behavior). RULES: required_inputs = ALTERABLE signals only (NO dT / Literals / SystemConstants -- Prompt 1 forbids altering those). required_preconds MAY include SystemConstants/Literals (a test legitimately declares a fixed const's config value in the Pre-Condition, e.g. SY_TWAN). The '_README' key is ignored by the loader.",
+  "a2mamg#0": {
+    "required_inputs": ["CNFMDWAN", "MDNORM", "TrqClt_Creep", "TrqClt_Creep_Mode"],
+    "required_preconds": ["SY_TWAN"],
+    "required_outputs": ["mkriech_w_msg", "B_creepact_msg", "mdwancan_msg"],
+    "_source": "PS-GB expert remark (col P) for the getBit weakspot ($op4). NOTE: fc#ws 'a2mamg#0' is SHARED by two weakspot ops; this plain key serves the getBit $op4 instance (fallback). outputs should be mdwancan_msg/mkriech_w_msg/B_creepact_msg; inputs should have CNFMDWAN/TrqClt_Creep/TrqClt_Creep_Mode/MDNORM; SystemConstants should have SY_TWAN"
+  },
+  "a2mamg#0#$op5": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["PT_stTraShftOp"],
+    "_source": "OP-DISAMBIGUATED: the OTHER weakspot sharing fc#ws 'a2mamg#0' is $op5 (putBit_unsigned_putBit) whose final physical output is PT_stTraShftOp (Variable). No expert input/precond list for this instance -> empty (M2 completeness SKIPPED). Resolved via 'fc#ws#op' key when weakspot_op_key='$op5'."
+  },
+  "InjRly_PwrCtrl_1_1_0#0": {
+    "required_inputs": ["T15_st", "InjRly_tiOffDly_C"],
+    "required_preconds": [],
+    "required_outputs": ["InjPwrRly_r"],
+    "_source": "PS-GB expert remark (col P): final output should be InjPwrRly_r; impl_cast is not a signal, resolve to the actual input signal (InjRly_tiOffDly_C = the turn-off delay time)"
+  },
+  "Rail_TempLim_50.8.0#2": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["Rail_trqFlTempLim"],
+    "_source": "PS-GB expert remark (col P): 'ok' (approved). Output confirmed = Rail_trqFlTempLim (== instance_names). No explicit required-input list given -> inputs left empty (skipped)."
+  },
+  "GbxFanCoorn_Sp_1_0_2#2": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["GbxFan_r"],
+    "_source": "PS-GB expert remark for GbxFanCoorn_Sp_1_0_0 (col P): GbxFan_r is an output. Output signal name matches this 1_0_2 instance. No expert input list for 1_0_2 -> inputs skipped."
+  },
+  "GearLvrPosn_Vd#0": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["Gbx_stTrsmNeutOBD"],
+    "_source": "AUTO: required_outputs = instance_names (safe; matched every expert we checked). inputs/preconds EMPTY -> M2 completeness SKIPPED until a human supplies the expert list."
+  },
+  "EGSSig_LamSymcp_1_6_0#2": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["EGSPrepn_ratLamSymcS1B1", "EGSPrepn_ratLamSymcS1B2", "EGSPrepn_ratLamSymcS2B1", "EGSPrepn_ratLamSymcS2B2"],
+    "_source": "AUTO: required_outputs = instance_names (safe; matched every expert we checked). inputs/preconds EMPTY -> M2 completeness SKIPPED until a human supplies the expert list."
+  },
+  "EGSSig_LamSymcp_1_6_0#5": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["EGSPrepn_ratLamSymcS1B1", "EGSPrepn_ratLamSymcS1B2", "EGSPrepn_ratLamSymcS2B1", "EGSPrepn_ratLamSymcS2B2"],
+    "_source": "AUTO: required_outputs = instance_names (safe; matched every expert we checked). inputs/preconds EMPTY -> M2 completeness SKIPPED until a human supplies the expert list."
+  },
+  "oilsepactr_coorr#20": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["OilSepActr_stCoorr"],
+    "_source": "AUTO: required_outputs = instance_names (safe; matched every expert we checked). inputs/preconds EMPTY -> M2 completeness SKIPPED until a human supplies the expert list."
+  },
+  "moftqptdveh_fil#0": {
+    "required_inputs": [],
+    "required_preconds": [],
+    "required_outputs": ["MoFTqPtdVeh_tqWhlXTS"],
+    "_source": "AUTO: required_outputs = instance_names (safe; matched every expert we checked). inputs/preconds EMPTY -> M2 completeness SKIPPED until a human supplies the expert list."
+  }
+}

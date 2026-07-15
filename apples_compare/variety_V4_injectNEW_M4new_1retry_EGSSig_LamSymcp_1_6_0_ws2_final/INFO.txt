@@ -1,0 +1,18 @@
+VARIETY 4: V4_injectNEW_M4new_1retry
+  weakspot=EGSSig_LamSymcp_1_6_0 ws=2 fn=LowpassT_out
+  inject_kb_guidelines=True  KB=new  max_retries=1  model=azure/gpt-4.1-mini  required_io_in_prompt=True
+  pipeline LLM calls (llm_call_*) = 10
+  M4 judge LLM calls (m4_judge_*) = 0
+  injected block length = 449 chars
+  METRICS: M1=1.0  M2=0.6666666666666666  M3=1.0  M4=0.5  M7=0.0  M8=0.0
+  weighted composite = 55.0%
+  M4 detail: [KB:LowpassT] 4/8 covered | missing: "Test with larger decrease in value of  input", "Check the maximum relative deviation of the output", "Test with different gain constant" …
+    JUDGE REASONING: 1: COVERED — TC1 Step 2 applies small input increase 5→6, expects filtered output 5.2 (not jumping to 6).
+2: COVERED — TC2 Step 2 applies larger input increase 3→10, expects filtered output 4.4.
+3: COVERED — TC3 Step 2 applies small input decrease 8→7, expects filtered output 7.9.
+4: NOT COVERED — need a test with an explicit large decrease (e.g., 10→3) and expected filtered output after the step.
+5: NOT COVERED — no test computes/compares “maximum relative deviation” against a stated limit/threshold; would need expected max relative deviation criterion and verification over time.
+6: NOT COVERED — no gain constant parameter is set/varied in any pre-condition/actions; would need tests with at least two different gain values and expected outputs.
+7: NOT COVERED — no explicit min/max input values nor min/max time-constant values are tested; would need boundary tests (input at min/max and T at min/max) with expected outputs.
+8: COVERED — TC4 uses very large T=1000 to represent “disabled/very slow” behavior; with input effectively stepping to 12, expected output barely changes to 4.008.
+  (per-step calc trace -> metrics_log.txt; scores -> metrics_components.json)

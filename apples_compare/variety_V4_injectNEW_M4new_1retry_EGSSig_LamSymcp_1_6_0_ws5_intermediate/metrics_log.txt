@@ -1,0 +1,1391 @@
+2026-07-14 15:14:27,132 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:14:27,133 INFO    extract_mbd_full: forward(): START — weakspot_op_key=$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam raster_time=10000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\EGSSig_LamSymcp_1_6_0\env_libs\EGSSig_LamSymcp_1_6_0.dll
+2026-07-14 15:14:27,133 DEBUG   extract_mbd_full: forward(): equation_json (len=12906) = {"$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "4123", "type": "Function", "instance_name": "tiConAdpn_LT_I", "function_name": "LowpassT_out", "class_method_name": "out", "sequence_number": "2", "method_name": null, "decision": null, "condition": [], "arg_names": ["in", "T"], "args": ["$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam", "$op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10523", "type": "Local", "instance_name": "_ratLamTmp", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op4_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10499", "type": "Argument", "instance_name": "arg_tiTranAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op11"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op71": {"oid": "15621", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS1B2", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op53"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS0B2", "EGSDO2_flgDynAdpnLtrS1B2", "EGSDO2_flgDynAdpnRtlS0B2", "EGSDO2_flgDynAdpnRtlS1B2", "EGSDO2_tiDlyAdpnS0B2", "EGSDO2_tiDlyAdpnS1B2", "EGSDO2_tiTranAdpnS0B2", "EGSDO2_tiTranAdpnS1B2", "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk2", "EGSPrepn_ratLamS1B2", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSSIG_SELO2SNSR0BNK2_SC", "EGSPREPN_TYPSNSR1BNK2_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}, "$op47": {"oid": "15609", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS2B1", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op29"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS1B1", "EGSDO2_flgDynAdpnLtrS2B1", "EGSDO2_flgDynAdpnRtlS1B1", "EGSDO2_flgDynAdpnRtlS2B1", "EGSDO2_tiDlyAdpnS1B1", "EGSDO2_tiDlyAdpnS2B1", "EGSDO2_tiTranAdpnS1B1", "EGSDO2_tiTranAdpnS2B1", "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk1", "EGSPrepn_ratLamS2B1", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSSIG_SELO2SNSR1BNK1_SC", "EGSPREPN_TYPSNSR2BNK1_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}, "$op23": {"oid": "15597", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS1B1", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op5"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS0B1", "EGSDO2_flgDynAdpnLtrS1B1", "EGSDO2_flgDynAdpnRtlS0B1", "EGSDO2_flgDynAdpnRtlS1B1", "EGSDO2_tiDlyAdpnS0B1", "EGSDO2_tiDlyAdpnS1B1", "EGSDO2_tiTranAdpnS0B1", "EGSDO2_tiTranAdpnS1B1", "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk1", "EGSPrepn_ratLamS1B1", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSSIG_SELO2SNSR0BNK1_SC", "EGSPREPN_TYPSNSR1BNK1_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}, "$op95": {"oid": "15633", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS2B2", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op77"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS1B2", "EGSDO2_flgDynAdpnLtrS2B2", "EGSDO2_flgDynAdpnRtlS1B2", "EGSDO2_flgDynAdpnRtlS2B2", "EGSDO2_tiDlyAdpnS1B2", "EGSDO2_tiDlyAdpnS2B2", "EGSDO2_tiTranAdpnS1B2", "EGSDO2_tiTranAdpnS2B2", "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk2", "EGSPrepn_ratLamS2B2", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSPREPN_TYPSNSR2BNK2_SC", "EGSSIG_SELO2SNSR1BNK2_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}}
+2026-07-14 15:14:27,133 DEBUG   extract_mbd_full: forward(): const_values = {"EGSPREPN_TYPSNSR1BNK1_SC": 1, "EGSPREPN_TYPSNSR2BNK1_SC": 0, "EGSSIG_SELO2SNSR1BNK1_SC": 0, "EGSSIG_SELO2SNSR0BNK2_SC": 0, "EGSPREPN_TYPSNSR2BNK2_SC": 0, "dT": "10000.0", "EGSSIG_SELO2SNSR0BNK1_SC": 1, "EGSPREPN_TYPSNSR1BNK2_SC": 0, "EGSSIG_SELO2SNSR1BNK2_SC": 0}
+2026-07-14 15:14:27,133 DEBUG   extract_mbd_full: forward(): weakspot_context (len=1470) =    LowpassT
+
+LowpassT
+
+LowpassT calculates proportional element with first order time constant.
+
+| Hint |
+| --- |
+| T cannot be negative. T should be greater than or equal to 1. |
+
+ 
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| reset | Initialization of the internal filter value(memory). |
+| compute | Computes the new low pass  filter value using the filter |
+| out | Returns the new lowpass value |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| in | input value | R32, R32U32 :real32 OneToOne   S16:sint16  S8:sint8  U16:uint16  U8:uint8  KS16:sint16 KS8:sint8 KU16:uint16 KU8:uint8 compu : user defined |
+| initValue | Initialization Value | R32, R32U32 :real32  OneToOne   S16:sint16  S8:sint8  U16:uint16  U8:uint8  KS16:sint16 KS8:sint8 KU16:uint16 KU8:uint8 compu : user defined |
+| T | gain constant | R32:uint16 R32U32:uint32 conv\_x   S16:uint16  S8:uint8  KS16:uint16 KS8:uint8 U16:uint16 U8:uint8  KU16:uint16 compu : user defined |
+| memory | Stores the lowpass Value | R32, R32U32 :real32  OneToOne   S16:sint32  S8:sint16  KS16:sint32 KS8:sint16 U16:uint32 U8:uint16  KU16:uint32 KU8:uint16  compu : user defined |
+| return | new lowpass value | R32, R32U32 :real32  OneToOne   S16:sint16  S8:sint8  U16:uint16  U8:uint8  KS16:sint16 KS8:sint8 KU16:uint16 KU8:uint8 compu : user defined |
+
+| Related Information |
+| --- |
+| LowPassT\_S16  Doors link (SRV) : LowPassT    Additional\_info |
+2026-07-14 15:14:27,133 DEBUG   extract_mbd_full: forward(): instance_names = EGSPrepn_ratLamSymcS1B2,EGSPrepn_ratLamSymcS2B1,EGSPrepn_ratLamSymcS1B1,EGSPrepn_ratLamSymcS2B2
+2026-07-14 15:14:27,134 INFO    extract_mbd_full: forward(): KB guidelines resolved (fn=LowpassT_out, +449 chars) -> kb_guidelines FIELD on Prompt 1 AND Prompt 2
+2026-07-14 15:14:27,134 INFO    extract_mbd_full: forward(): ----- Prompt 1 (context_extractor) — calling LM -----
+2026-07-14 15:14:50,595 INFO    extract_mbd_full: forward(): Prompt 1 DONE — context_analysis (len=5311)
+2026-07-14 15:14:50,597 DEBUG   extract_mbd_full: forward(): Prompt 1 context_analysis = The weakspot element identified is "$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam". This element is a Function type with the instance name "tiConAdpn_LT_I" and function name "LowpassT_out". It implements a low-pass filter with a first-order time constant, which smooths the input signal over time based on the gain constant T.
+
+The working of this element involves taking an input value ("in") and a gain constant ("T") to compute a filtered output that reduces rapid changes in the input signal, effectively acting as a smoothing filter. The gain constant T controls the filter's responsiveness and must be greater than or equal to 1 (cannot be negative). The filter maintains an internal memory state to store the previous filtered value, which is updated each time the filter computes a new output.
+
+Inputs that can be altered are the input signal "in" and the gain constant "T". The input "in" is provided by the element "$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam" (a Local variable "_ratLamTmp"), and "T" is provided by "$op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam" (an Argument "arg_tiTranAdpn"). The sample time parameter "dT" is fixed and excluded from alteration.
+
+Outputs that can be checked include the local variable "_ratLamTiConAdpn" (e.g., "$op36_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam") which depends directly on the output of the low-pass filter function. This variable represents the filtered value and is used downstream in the system.
+
+Possible test cases for this weakspot element should cover the following scenarios, as per the KB guidelines:
+
+1. Small increase in input value to verify filter response to minor changes.
+2. Larger increase in input value to test filter behavior under significant input jumps.
+3. Small decrease in input value to check filter response to minor negative changes.
+4. Larger decrease in input value to test filter under significant negative changes.
+5. Verification of maximum relative deviation of the output to ensure filter stability.
+6. Testing with different gain constants T to validate filter responsiveness.
+7. Testing with minimum and maximum input values and minimum and maximum time constants to cover boundary conditions.
+8. Testing the disabled behavior of the filter (e.g., T set to a value that effectively disables filtering).
+
+These test cases ensure comprehensive validation of the low-pass filter's behavior under various input and parameter conditions.
+
+### 1. Overview of the Weakspot Element
+- **Element Key:** $op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+- **Instance Name:** tiConAdpn_LT_I
+- **Function Name:** LowpassT_out
+- **Role and Working:**
+  - Implements a first-order low-pass filter.
+  - Smooths the input signal "in" using a gain constant "T" (time constant).
+  - Maintains internal memory to store the previous filtered value.
+  - The filter output is a weighted combination of the previous output and the current input, controlled by T.
+  - Ensures that rapid fluctuations in the input are dampened, providing a stable output signal.
+  - The gain constant T must be ≥ 1; negative values are invalid.
+
+### 2. Inputs That Can Be Altered
+| Input Name | Reference Element Key | Reference Type | Instance Name / Description |
+|------------|----------------------|----------------|-----------------------------|
+| in         | $op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam | Local Variable | _ratLamTmp (input signal to filter) |
+| T          | $op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam | Argument       | arg_tiTranAdpn (gain constant) |
+
+- **Excluded Inputs:** No sample time parameter "dT" is listed as input here; it is fixed and excluded.
+- **Note:** Both inputs are variable and can be manipulated for testing.
+
+### 3. Outputs That Can Be Checked
+| Output Variable Key | Type   | Instance Name       | Relation to Weakspot Element                      |
+|--------------------|--------|---------------------|--------------------------------------------------|
+| $op36_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam | Local  | _ratLamTiConAdpn    | Directly depends on the output of the low-pass filter function. Represents the filtered output value. |
+
+- This output variable is used downstream and can be monitored to verify the filter's behavior.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1:** Small increase in input "in" with nominal gain constant T.
+- **Testcase 2:** Large increase in input "in" with nominal gain constant T.
+- **Testcase 3:** Small decrease in input "in" with nominal gain constant T.
+- **Testcase 4:** Large decrease in input "in" with nominal gain constant T.
+- **Testcase 5:** Verify maximum relative deviation of output for stability.
+- **Testcase 6:** Vary gain constant T (e.g., minimum valid value 1, medium, and high values) to test filter responsiveness.
+- **Testcase 7:** Test with minimum and maximum input values and minimum and maximum gain constants to cover boundary conditions.
+- **Testcase 8:** Test disabled filter behavior (e.g., T set to a very high value or zero if allowed) to verify output equals input or other expected behavior.
+
+These testcases ensure the low-pass filter's correctness, stability, and robustness under various operating conditions.
+2026-07-14 15:14:50,597 INFO    extract_mbd_full: forward(): Required-I/O KB PROMPT override (fc=EGSSig_LamSymcp_1_6_0 ws=5) — Expected Results instance_names 'EGSPrepn_ratLamSymcS1B2,EGSPrepn_ratLamSymcS2B1,EGSPrepn_ratLamSymcS1B1,EGSPrepn_ratLamSymcS2B2' -> '_ratLamTiConAdpn'
+2026-07-14 15:14:50,597 INFO    extract_mbd_full: forward(): ----- Prompt 2 (testcase_generator) — calling LM -----
+2026-07-14 15:15:12,084 INFO    extract_mbd_full: forward(): Prompt 2 DONE — test_cases_raw (len=4573)
+2026-07-14 15:15:12,086 DEBUG   extract_mbd_full: forward(): Prompt 2 test_cases_raw = [
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 5.5",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 5"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 5.1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 3"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 10",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 3"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 4.4"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 8"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 2",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 8"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 6.2"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 4"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 10",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 4"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 10",
+          "T = 10"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case tests the filter responsiveness with different gain constants T. With T=1 (minimum valid), the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 0",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 16",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 16",
+          "T = 1000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This boundary test case covers minimum and maximum input values (0 and 16) and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high."
+  }
+]
+2026-07-14 15:15:12,086 INFO    extract_mbd_full: forward(): ----- Bridge: parsing Prompt 2 JSON output -----
+2026-07-14 15:15:12,086 DEBUG   extract_mbd_full: forward(): bridge — extracted JSON via regex match
+2026-07-14 15:15:12,086 INFO    extract_mbd_full: forward(): bridge — parsed 5 test case(s) from Prompt 2
+2026-07-14 15:15:12,086 DEBUG   extract_mbd_full: forward(): relations (count=2) = {'in': 'Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1)))))', 'T': 'Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1))'}
+2026-07-14 15:15:12,087 DEBUG   extract_mbd_full: forward(): equation_results_raw — 2 entr(ies)
+2026-07-14 15:15:12,087 DEBUG   extract_mbd_full: forward(): update_test_cases() -> 5 test case(s)
+2026-07-14 15:15:12,087 INFO    extract_mbd_full: forward(): extract_and_replace_equations() -> 9 equation(s) extracted
+2026-07-14 15:15:12,087 DEBUG   extract_mbd_full: forward(): equation_dict[70ed946e-f24a-452d-834d-6288e3263ca8] = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 5.5
+2026-07-14 15:15:12,088 DEBUG   extract_mbd_full: forward(): equation_dict[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 5
+2026-07-14 15:15:12,088 DEBUG   extract_mbd_full: forward(): equation_dict[87f653ce-658f-40e1-9c04-8e911a451d5b] = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 10
+2026-07-14 15:15:12,088 DEBUG   extract_mbd_full: forward(): equation_dict[5f51643e-5d1b-40e6-93a2-37bcb93932a5] = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 2
+2026-07-14 15:15:12,088 DEBUG   extract_mbd_full: forward(): equation_dict[58bb3545-6808-4131-8d59-79716dbd9ccc] = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 1
+2026-07-14 15:15:12,088 DEBUG   extract_mbd_full: forward(): equation_dict[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 10
+2026-07-14 15:15:12,088 DEBUG   extract_mbd_full: forward(): equation_dict[1c138d85-31d4-485d-bdcf-3b4e89325d34] = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 0
+2026-07-14 15:15:12,089 DEBUG   extract_mbd_full: forward(): equation_dict[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 16
+2026-07-14 15:15:12,089 DEBUG   extract_mbd_full: forward(): equation_dict[5d270637-0125-418a-aaa2-5e0d3435e443] = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 1000
+2026-07-14 15:15:12,089 DEBUG   extract_mbd_full: forward(): unique_constants referenced = ['EGSSIG_SELO2SNSR0BNK1_SC']
+2026-07-14 15:15:12,089 DEBUG   extract_mbd_full: forward(): filtered_const_values = {'EGSSIG_SELO2SNSR0BNK1_SC': 1}
+2026-07-14 15:15:12,089 INFO    extract_mbd_full: _get_function_caller: cache MISS — dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\EGSSig_LamSymcp_1_6_0\env_libs\EGSSig_LamSymcp_1_6_0.dll FCname=EGSSig_LamSymcp_1_6_0 work_dir=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data
+2026-07-14 15:15:12,090 DEBUG   extract_mbd_full: _get_function_caller: signal_sheet_list has 50 row(s)
+2026-07-14 15:15:12,090 DEBUG   extract_mbd_full: _get_function_caller: model_interface_data has 8 row(s)
+2026-07-14 15:15:13,331 INFO    extract_mbd_full: _get_function_caller: FunctionCaller initialized successfully (FCname=EGSSig_LamSymcp_1_6_0)
+2026-07-14 15:15:13,331 INFO    extract_mbd_full: forward(): function_caller=available (None means DLL verification disabled)
+2026-07-14 15:15:13,331 INFO    extract_mbd_full: forward(): merged_equation_map has 9 entr(ies) (out of 9 equation_dict entries)
+2026-07-14 15:15:13,332 INFO    extract_mbd_full: forward(): ===== Equation 1/9 (uid=70ed946e-f24a-452d-834d-6288e3263ca8) =====
+2026-07-14 15:15:13,332 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] equation_to_solve = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 5.5
+2026-07-14 15:15:13,332 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] original_equation = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1)))))
+2026-07-14 15:15:13,332 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] assignment_chain = Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(MUX,$op8,$op16,$op17) → $op18
+Operation(MUX,$op8,$op19,$op20) → $op21
+Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16
+Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17
+Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19
+Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20
+Variable(EGSPrepn_ratLamS1B1) → $op12
+Literal(0) → $op7
+2026-07-14 15:15:13,332 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] final_substituted_equation = Local(_ratLamTmp,$op12,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)
+2026-07-14 15:15:13,332 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] eq_to_solve (reversed assignment_chain, 12 line(s)) = ['Literal(0) → $op7', 'Variable(EGSPrepn_ratLamS1B1) → $op12', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8', 'Operation(MUX,$op8,$op19,$op20) → $op21', 'Operation(MUX,$op8,$op16,$op17) → $op18', 'Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', 'Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam']
+2026-07-14 15:15:13,332 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] lhs_value (target) = 5.5
+2026-07-14 15:15:13,333 INFO    extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:15:32,136 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+    "Variable(EGSPrepn_ratLamS1B1) = 5",
+    "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1",
+    "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4"
+]
+```
+2026-07-14 15:15:32,138 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] Prompt 4 attempt#1 simulated_response (6 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 5', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4']
+2026-07-14 15:15:32,138 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] locked_param_block (after first pass) = ''
+2026-07-14 15:15:32,149 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] attempt#1 final_assignments = ['$op12 = 5', '$op20 = 0', '$op19 = 1', '$op17 = 0', '$op16 = 4', '$op6 = 1', '$op8 = 1', '$op21 = 0', '$op18 = 0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0']
+2026-07-14 15:15:32,149 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] attempt#1 substitution_dict = {'$op12': '5', '$op20': '0', '$op19': '1', '$op17': '0', '$op16': '4', '$op6': '1', '$op8': '1', '$op21': '0', '$op18': '0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0'}
+2026-07-14 15:15:32,149 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] attempt#1 substituted expression = ['Local(_ratLamTmp,5,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)']
+2026-07-14 15:15:32,150 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] attempt#1 BODMAS chain (1 step(s)) = ['Local(_ratLamTmp,5,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op1']
+2026-07-14 15:15:32,151 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] attempt#1 final_check (DLL-resolved) = ['$op1 = 5']
+2026-07-14 15:15:32,151 INFO    extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] attempt#1: expected='5.5' actual='5' -> MISMATCH
+2026-07-14 15:15:32,151 INFO    extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='5.5' actual='5') -----
+2026-07-14 15:15:46,360 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] retry#1 raw variable_assignments = ```json
+[
+    "Variable(EGSPrepn_ratLamS1B1) = 6",
+    "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1",
+    "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4",
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1"
+]
+```
+2026-07-14 15:15:46,361 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] retry#1 simulated_response (6 item(s)) = ['Variable(EGSPrepn_ratLamS1B1) = 6', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1']
+2026-07-14 15:15:46,369 INFO    extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] retry#1: expected='5.5' actual='6' -> FAIL
+2026-07-14 15:15:46,370 INFO    extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] M7 inline score = 0.0 (FAIL after 1 retries — expected='5.5' actual='6')
+2026-07-14 15:15:46,370 DEBUG   extract_mbd_full: forward(): eq[70ed946e-f24a-452d-834d-6288e3263ca8] updated_dict[70ed946e-f24a-452d-834d-6288e3263ca8] = ['Variable(EGSPrepn_ratLamS1B1) = 6', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1']
+2026-07-14 15:15:46,370 INFO    extract_mbd_full: forward(): ===== Equation 2/9 (uid=a82ef372-ca8a-4d06-91ef-4afef7c57d0d) =====
+2026-07-14 15:15:46,370 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] equation_to_solve = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 5
+2026-07-14 15:15:46,370 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] original_equation = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1))
+2026-07-14 15:15:46,370 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] assignment_chain = Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_tiTranAdpnS1B1) → $op9
+Variable(EGSDO2_tiTranAdpnS0B1) → $op10
+Literal(0) → $op7
+2026-07-14 15:15:46,370 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] final_substituted_equation = Operation(MUX,Operation(NotEqual,$op6,$op7),$op9,$op10)
+2026-07-14 15:15:46,371 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] eq_to_solve (reversed assignment_chain, 5 line(s)) = ['Literal(0) → $op7', 'Variable(EGSDO2_tiTranAdpnS0B1) → $op10', 'Variable(EGSDO2_tiTranAdpnS1B1) → $op9', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8']
+2026-07-14 15:15:46,371 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] lhs_value (target) = 5
+2026-07-14 15:15:46,371 INFO    extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:15:55,625 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+  "Variable(EGSDO2_tiTranAdpnS0B1) = 5",
+  "Variable(EGSDO2_tiTranAdpnS1B1) = 5"
+]
+```
+2026-07-14 15:15:55,627 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] Prompt 4 attempt#1 simulated_response (3 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']
+2026-07-14 15:15:55,630 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] attempt#1 final_assignments = ['$op10 = 5', '$op9 = 5', '$op6 = 1', '$op8 = 1']
+2026-07-14 15:15:55,630 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] attempt#1 substitution_dict = {'$op10': '5', '$op9': '5', '$op6': '1', '$op8': '1'}
+2026-07-14 15:15:55,630 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] attempt#1 substituted expression = ['Operation(MUX,Operation(NotEqual,1,$op7),5,5)']
+2026-07-14 15:15:55,630 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] attempt#1 BODMAS chain (2 step(s)) = ['Operation(NotEqual,1,$op7) → $op1', 'Operation(MUX,$op1,5,5) → $op2']
+2026-07-14 15:15:55,634 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] attempt#1 final_check (DLL-resolved) = ['$op1 = 1', '$op2 = 5']
+2026-07-14 15:15:55,634 INFO    extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] attempt#1: expected='5' actual='5' -> PASS
+2026-07-14 15:15:55,634 INFO    extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:15:55,634 DEBUG   extract_mbd_full: forward(): eq[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] updated_dict[a82ef372-ca8a-4d06-91ef-4afef7c57d0d] = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']
+2026-07-14 15:15:55,634 INFO    extract_mbd_full: forward(): ===== Equation 3/9 (uid=87f653ce-658f-40e1-9c04-8e911a451d5b) =====
+2026-07-14 15:15:55,634 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] equation_to_solve = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 10
+2026-07-14 15:15:55,634 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] original_equation = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1)))))
+2026-07-14 15:15:55,635 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] assignment_chain = Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(MUX,$op8,$op16,$op17) → $op18
+Operation(MUX,$op8,$op19,$op20) → $op21
+Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16
+Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17
+Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19
+Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20
+Variable(EGSPrepn_ratLamS1B1) → $op12
+Literal(0) → $op7
+2026-07-14 15:15:55,635 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] final_substituted_equation = Local(_ratLamTmp,$op12,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)
+2026-07-14 15:15:55,635 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] eq_to_solve (reversed assignment_chain, 12 line(s)) = ['Literal(0) → $op7', 'Variable(EGSPrepn_ratLamS1B1) → $op12', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8', 'Operation(MUX,$op8,$op19,$op20) → $op21', 'Operation(MUX,$op8,$op16,$op17) → $op18', 'Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', 'Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam']
+2026-07-14 15:15:55,635 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] lhs_value (target) = 10
+2026-07-14 15:15:55,635 INFO    extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:16:13,389 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+    "Variable(EGSPrepn_ratLamS1B1) = 0"
+]
+```
+2026-07-14 15:16:13,389 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] Prompt 4 attempt#1 simulated_response (6 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 0']
+2026-07-14 15:16:13,398 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] attempt#1 final_assignments = ['$op12 = 0', '$op20 = 0', '$op19 = 10', '$op17 = 0', '$op16 = 0', '$op6 = 1', '$op8 = 1', '$op21 = 0', '$op18 = 0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0']
+2026-07-14 15:16:13,398 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] attempt#1 substitution_dict = {'$op12': '0', '$op20': '0', '$op19': '10', '$op17': '0', '$op16': '0', '$op6': '1', '$op8': '1', '$op21': '0', '$op18': '0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0'}
+2026-07-14 15:16:13,398 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] attempt#1 substituted expression = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)']
+2026-07-14 15:16:13,398 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] attempt#1 BODMAS chain (1 step(s)) = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op1']
+2026-07-14 15:16:13,398 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] attempt#1 final_check (DLL-resolved) = ['$op1 = 0']
+2026-07-14 15:16:13,399 INFO    extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] attempt#1: expected='10' actual='0' -> MISMATCH
+2026-07-14 15:16:13,399 INFO    extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='10' actual='0') -----
+2026-07-14 15:16:25,363 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] retry#1 raw variable_assignments = ```json
+[
+    "Variable(EGSPrepn_ratLamS1B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10",
+    "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0",
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1"
+]
+```
+2026-07-14 15:16:25,364 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] retry#1 simulated_response (6 item(s)) = ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1']
+2026-07-14 15:16:25,371 INFO    extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] retry#1: expected='10' actual='0' -> FAIL
+2026-07-14 15:16:25,372 INFO    extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] M7 inline score = 0.0 (FAIL after 1 retries — expected='10' actual='0')
+2026-07-14 15:16:25,372 DEBUG   extract_mbd_full: forward(): eq[87f653ce-658f-40e1-9c04-8e911a451d5b] updated_dict[87f653ce-658f-40e1-9c04-8e911a451d5b] = ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1']
+2026-07-14 15:16:25,372 INFO    extract_mbd_full: forward(): ===== Equation 4/9 (uid=5f51643e-5d1b-40e6-93a2-37bcb93932a5) =====
+2026-07-14 15:16:25,372 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] equation_to_solve = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 2
+2026-07-14 15:16:25,372 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] original_equation = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1)))))
+2026-07-14 15:16:25,372 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] assignment_chain = Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(MUX,$op8,$op16,$op17) → $op18
+Operation(MUX,$op8,$op19,$op20) → $op21
+Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16
+Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17
+Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19
+Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20
+Variable(EGSPrepn_ratLamS1B1) → $op12
+Literal(0) → $op7
+2026-07-14 15:16:25,372 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] final_substituted_equation = Local(_ratLamTmp,$op12,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)
+2026-07-14 15:16:25,373 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] eq_to_solve (reversed assignment_chain, 12 line(s)) = ['Literal(0) → $op7', 'Variable(EGSPrepn_ratLamS1B1) → $op12', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8', 'Operation(MUX,$op8,$op19,$op20) → $op21', 'Operation(MUX,$op8,$op16,$op17) → $op18', 'Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', 'Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam']
+2026-07-14 15:16:25,373 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] lhs_value (target) = 2
+2026-07-14 15:16:25,373 INFO    extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:16:43,551 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+  "Variable(EGSPrepn_ratLamS1B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 2"
+]
+```
+2026-07-14 15:16:43,551 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] Prompt 4 attempt#1 simulated_response (6 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 2']
+2026-07-14 15:16:43,559 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] attempt#1 final_assignments = ['$op12 = 0', '$op20 = 0', '$op19 = 0', '$op17 = 0', '$op16 = 2', '$op6 = 1', '$op8 = 1', '$op21 = 0', '$op18 = 0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0']
+2026-07-14 15:16:43,559 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] attempt#1 substitution_dict = {'$op12': '0', '$op20': '0', '$op19': '0', '$op17': '0', '$op16': '2', '$op6': '1', '$op8': '1', '$op21': '0', '$op18': '0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0'}
+2026-07-14 15:16:43,559 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] attempt#1 substituted expression = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)']
+2026-07-14 15:16:43,559 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] attempt#1 BODMAS chain (1 step(s)) = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op1']
+2026-07-14 15:16:43,560 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] attempt#1 final_check (DLL-resolved) = ['$op1 = 0']
+2026-07-14 15:16:43,560 INFO    extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] attempt#1: expected='2' actual='0' -> MISMATCH
+2026-07-14 15:16:43,560 INFO    extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='2' actual='0') -----
+2026-07-14 15:17:03,423 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] retry#1 raw variable_assignments = [
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+    "Variable(EGSPrepn_ratLamS1B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2",
+    "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0"
+]
+2026-07-14 15:17:03,424 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] retry#1 simulated_response (6 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0']
+2026-07-14 15:17:03,431 INFO    extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] retry#1: expected='2' actual='0' -> FAIL
+2026-07-14 15:17:03,431 INFO    extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] M7 inline score = 0.0 (FAIL after 1 retries — expected='2' actual='0')
+2026-07-14 15:17:03,431 DEBUG   extract_mbd_full: forward(): eq[5f51643e-5d1b-40e6-93a2-37bcb93932a5] updated_dict[5f51643e-5d1b-40e6-93a2-37bcb93932a5] = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0']
+2026-07-14 15:17:03,431 INFO    extract_mbd_full: forward(): ===== Equation 5/9 (uid=58bb3545-6808-4131-8d59-79716dbd9ccc) =====
+2026-07-14 15:17:03,431 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] equation_to_solve = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 1
+2026-07-14 15:17:03,431 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] original_equation = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1))
+2026-07-14 15:17:03,431 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] assignment_chain = Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_tiTranAdpnS1B1) → $op9
+Variable(EGSDO2_tiTranAdpnS0B1) → $op10
+Literal(0) → $op7
+2026-07-14 15:17:03,431 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] final_substituted_equation = Operation(MUX,Operation(NotEqual,$op6,$op7),$op9,$op10)
+2026-07-14 15:17:03,431 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] eq_to_solve (reversed assignment_chain, 5 line(s)) = ['Literal(0) → $op7', 'Variable(EGSDO2_tiTranAdpnS0B1) → $op10', 'Variable(EGSDO2_tiTranAdpnS1B1) → $op9', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8']
+2026-07-14 15:17:03,432 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] lhs_value (target) = 1
+2026-07-14 15:17:03,432 INFO    extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:17:14,203 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+  "Variable(EGSDO2_tiTranAdpnS0B1) = 0",
+  "Variable(EGSDO2_tiTranAdpnS1B1) = 0"
+]
+```
+2026-07-14 15:17:14,204 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] Prompt 4 attempt#1 simulated_response (3 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']
+2026-07-14 15:17:14,206 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] attempt#1 final_assignments = ['$op10 = 0', '$op9 = 0', '$op6 = 1', '$op8 = 1']
+2026-07-14 15:17:14,206 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] attempt#1 substitution_dict = {'$op10': '0', '$op9': '0', '$op6': '1', '$op8': '1'}
+2026-07-14 15:17:14,206 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] attempt#1 substituted expression = ['Operation(MUX,Operation(NotEqual,1,$op7),0,0)']
+2026-07-14 15:17:14,206 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] attempt#1 BODMAS chain (2 step(s)) = ['Operation(NotEqual,1,$op7) → $op1', 'Operation(MUX,$op1,0,0) → $op2']
+2026-07-14 15:17:14,208 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] attempt#1 final_check (DLL-resolved) = ['$op1 = 1', '$op2 = 0']
+2026-07-14 15:17:14,208 INFO    extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] attempt#1: expected='1' actual='0' -> MISMATCH
+2026-07-14 15:17:14,208 INFO    extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='1' actual='0') -----
+2026-07-14 15:17:27,495 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] retry#1 raw variable_assignments = [
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+    "Variable(EGSDO2_tiTranAdpnS0B1) = 0",
+    "Variable(EGSDO2_tiTranAdpnS1B1) = 0"
+]
+2026-07-14 15:17:27,496 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] retry#1 simulated_response (3 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']
+2026-07-14 15:17:27,502 INFO    extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] retry#1: expected='1' actual='0' -> FAIL
+2026-07-14 15:17:27,502 INFO    extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] M7 inline score = 0.0 (FAIL after 1 retries — expected='1' actual='0')
+2026-07-14 15:17:27,503 DEBUG   extract_mbd_full: forward(): eq[58bb3545-6808-4131-8d59-79716dbd9ccc] updated_dict[58bb3545-6808-4131-8d59-79716dbd9ccc] = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']
+2026-07-14 15:17:27,503 INFO    extract_mbd_full: forward(): ===== Equation 6/9 (uid=a8c34be2-499e-4c98-9eaa-c4fc92516c0d) =====
+2026-07-14 15:17:27,503 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] equation_to_solve = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 10
+2026-07-14 15:17:27,503 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] original_equation = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1))
+2026-07-14 15:17:27,503 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] assignment_chain = Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_tiTranAdpnS1B1) → $op9
+Variable(EGSDO2_tiTranAdpnS0B1) → $op10
+Literal(0) → $op7
+2026-07-14 15:17:27,503 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] final_substituted_equation = Operation(MUX,Operation(NotEqual,$op6,$op7),$op9,$op10)
+2026-07-14 15:17:27,503 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] eq_to_solve (reversed assignment_chain, 5 line(s)) = ['Literal(0) → $op7', 'Variable(EGSDO2_tiTranAdpnS0B1) → $op10', 'Variable(EGSDO2_tiTranAdpnS1B1) → $op9', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8']
+2026-07-14 15:17:27,503 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] lhs_value (target) = 10
+2026-07-14 15:17:27,503 INFO    extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:17:45,858 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+  "Variable(EGSDO2_tiTranAdpnS0B1) = 10",
+  "Variable(EGSDO2_tiTranAdpnS1B1) = 10"
+]
+```
+2026-07-14 15:17:45,859 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] Prompt 4 attempt#1 simulated_response (3 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 10', 'Variable(EGSDO2_tiTranAdpnS1B1) = 10']
+2026-07-14 15:17:45,861 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] attempt#1 final_assignments = ['$op10 = 10', '$op9 = 10', '$op6 = 1', '$op8 = 1']
+2026-07-14 15:17:45,861 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] attempt#1 substitution_dict = {'$op10': '10', '$op9': '10', '$op6': '1', '$op8': '1'}
+2026-07-14 15:17:45,862 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] attempt#1 substituted expression = ['Operation(MUX,Operation(NotEqual,1,$op7),10,10)']
+2026-07-14 15:17:45,862 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] attempt#1 BODMAS chain (2 step(s)) = ['Operation(NotEqual,1,$op7) → $op1', 'Operation(MUX,$op1,10,10) → $op2']
+2026-07-14 15:17:45,864 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] attempt#1 final_check (DLL-resolved) = ['$op1 = 1', '$op2 = 10']
+2026-07-14 15:17:45,864 INFO    extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] attempt#1: expected='10' actual='10' -> PASS
+2026-07-14 15:17:45,864 INFO    extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:17:45,864 DEBUG   extract_mbd_full: forward(): eq[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] updated_dict[a8c34be2-499e-4c98-9eaa-c4fc92516c0d] = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 10', 'Variable(EGSDO2_tiTranAdpnS1B1) = 10']
+2026-07-14 15:17:45,864 INFO    extract_mbd_full: forward(): ===== Equation 7/9 (uid=1c138d85-31d4-485d-bdcf-3b4e89325d34) =====
+2026-07-14 15:17:45,865 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] equation_to_solve = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 0
+2026-07-14 15:17:45,865 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] original_equation = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1)))))
+2026-07-14 15:17:45,865 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] assignment_chain = Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(MUX,$op8,$op16,$op17) → $op18
+Operation(MUX,$op8,$op19,$op20) → $op21
+Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16
+Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17
+Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19
+Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20
+Variable(EGSPrepn_ratLamS1B1) → $op12
+Literal(0) → $op7
+2026-07-14 15:17:45,865 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] final_substituted_equation = Local(_ratLamTmp,$op12,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)
+2026-07-14 15:17:45,865 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] eq_to_solve (reversed assignment_chain, 12 line(s)) = ['Literal(0) → $op7', 'Variable(EGSPrepn_ratLamS1B1) → $op12', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8', 'Operation(MUX,$op8,$op19,$op20) → $op21', 'Operation(MUX,$op8,$op16,$op17) → $op18', 'Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', 'Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam']
+2026-07-14 15:17:45,865 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] lhs_value (target) = 0
+2026-07-14 15:17:45,865 INFO    extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:18:01,422 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+  "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0"
+]
+```
+2026-07-14 15:18:01,423 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] Prompt 4 attempt#1 simulated_response (3 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0']
+2026-07-14 15:18:01,431 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] attempt#1 final_assignments = ['$op19 = 0', '$op16 = 0', '$op6 = 1', '$op12 = 0', '$op20 = 0', '$op17 = 0', '$op8 = 1', '$op21 = 0', '$op18 = 0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0']
+2026-07-14 15:18:01,431 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] attempt#1 substitution_dict = {'$op19': '0', '$op16': '0', '$op6': '1', '$op12': '0', '$op20': '0', '$op17': '0', '$op8': '1', '$op21': '0', '$op18': '0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0'}
+2026-07-14 15:18:01,431 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] attempt#1 substituted expression = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)']
+2026-07-14 15:18:01,431 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] attempt#1 BODMAS chain (1 step(s)) = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op1']
+2026-07-14 15:18:01,431 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] attempt#1 final_check (DLL-resolved) = ['$op1 = 0']
+2026-07-14 15:18:01,432 INFO    extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] attempt#1: expected='0' actual='0' -> PASS
+2026-07-14 15:18:01,432 INFO    extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:18:01,432 DEBUG   extract_mbd_full: forward(): eq[1c138d85-31d4-485d-bdcf-3b4e89325d34] updated_dict[1c138d85-31d4-485d-bdcf-3b4e89325d34] = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0']
+2026-07-14 15:18:01,432 INFO    extract_mbd_full: forward(): ===== Equation 8/9 (uid=94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211) =====
+2026-07-14 15:18:01,432 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] equation_to_solve = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1))))) = 16
+2026-07-14 15:18:01,432 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] original_equation = Local(_ratLamTmp,Variable(EGSPrepn_ratLamS1B1),Operation(IfThenElse,Operation(Or,Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnLtrS1B1),Variable(EGSDO2_flgDynAdpnLtrS0B1)),Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_flgDynAdpnRtlS1B1),Variable(EGSDO2_flgDynAdpnRtlS0B1)))))
+2026-07-14 15:18:01,432 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] assignment_chain = Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+Operation(MUX,$op8,$op16,$op17) → $op18
+Operation(MUX,$op8,$op19,$op20) → $op21
+Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16
+Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17
+Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19
+Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20
+Variable(EGSPrepn_ratLamS1B1) → $op12
+Literal(0) → $op7
+2026-07-14 15:18:01,433 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] final_substituted_equation = Local(_ratLamTmp,$op12,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)
+2026-07-14 15:18:01,433 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] eq_to_solve (reversed assignment_chain, 12 line(s)) = ['Literal(0) → $op7', 'Variable(EGSPrepn_ratLamS1B1) → $op12', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8', 'Operation(MUX,$op8,$op19,$op20) → $op21', 'Operation(MUX,$op8,$op16,$op17) → $op18', 'Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', 'Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam']
+2026-07-14 15:18:01,433 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] lhs_value (target) = 16
+2026-07-14 15:18:01,433 INFO    extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:18:15,842 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+  "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+  "Variable(EGSPrepn_ratLamS1B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 16",
+  "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0",
+  "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0"
+]
+```
+2026-07-14 15:18:15,843 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] Prompt 4 attempt#1 simulated_response (6 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0']
+2026-07-14 15:18:15,851 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] attempt#1 final_assignments = ['$op12 = 0', '$op20 = 0', '$op19 = 16', '$op17 = 0', '$op16 = 0', '$op6 = 1', '$op8 = 1', '$op21 = 0', '$op18 = 0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam = 0']
+2026-07-14 15:18:15,851 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] attempt#1 substitution_dict = {'$op12': '0', '$op20': '0', '$op19': '16', '$op17': '0', '$op16': '0', '$op6': '1', '$op8': '1', '$op21': '0', '$op18': '0', '$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0', '$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam': '0'}
+2026-07-14 15:18:15,851 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] attempt#1 substituted expression = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam)']
+2026-07-14 15:18:15,851 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] attempt#1 BODMAS chain (1 step(s)) = ['Local(_ratLamTmp,0,$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op1']
+2026-07-14 15:18:15,852 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] attempt#1 final_check (DLL-resolved) = ['$op1 = 0']
+2026-07-14 15:18:15,852 INFO    extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] attempt#1: expected='16' actual='0' -> MISMATCH
+2026-07-14 15:18:15,852 INFO    extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] ----- Prompt 4 RETRY #1 — calling retry LM (mismatch expected='16' actual='0') -----
+2026-07-14 15:18:31,088 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] retry#1 raw variable_assignments = [
+    "Literal(0) = 0",
+    "Variable(EGSPrepn_ratLamS1B1) = 16",
+    "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1",
+    "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0",
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1"
+]
+2026-07-14 15:18:31,091 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] retry#1 simulated_response (7 item(s)) = ['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1']
+2026-07-14 15:18:31,109 INFO    extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] retry#1: expected='16' actual='16' -> PASS
+2026-07-14 15:18:31,109 INFO    extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] M7 inline score = 0.800 (solved after 1 retry, ref=4)
+2026-07-14 15:18:31,109 DEBUG   extract_mbd_full: forward(): eq[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] updated_dict[94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211] = ['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1']
+2026-07-14 15:18:31,110 INFO    extract_mbd_full: forward(): ===== Equation 9/9 (uid=5d270637-0125-418a-aaa2-5e0d3435e443) =====
+2026-07-14 15:18:31,110 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] equation_to_solve = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1)) = 1000
+2026-07-14 15:18:31,110 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] original_equation = Operation(MUX,Operation(NotEqual,SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC),Literal(0)),Variable(EGSDO2_tiTranAdpnS1B1),Variable(EGSDO2_tiTranAdpnS0B1))
+2026-07-14 15:18:31,110 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] assignment_chain = Operation(NotEqual,$op6,$op7) → $op8
+SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6
+Variable(EGSDO2_tiTranAdpnS1B1) → $op9
+Variable(EGSDO2_tiTranAdpnS0B1) → $op10
+Literal(0) → $op7
+2026-07-14 15:18:31,111 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] final_substituted_equation = Operation(MUX,Operation(NotEqual,$op6,$op7),$op9,$op10)
+2026-07-14 15:18:31,111 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] eq_to_solve (reversed assignment_chain, 5 line(s)) = ['Literal(0) → $op7', 'Variable(EGSDO2_tiTranAdpnS0B1) → $op10', 'Variable(EGSDO2_tiTranAdpnS1B1) → $op9', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8']
+2026-07-14 15:18:31,111 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] lhs_value (target) = 1000
+2026-07-14 15:18:31,111 INFO    extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] ----- Prompt 4 (equation_solver_dll) attempt #1 — calling LM -----
+2026-07-14 15:18:46,272 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] Prompt 4 attempt#1 raw variable_assignments = ```json
+[
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+    "Variable(EGSDO2_tiTranAdpnS0B1) = 1000",
+    "Variable(EGSDO2_tiTranAdpnS1B1) = 0"
+]
+```
+2026-07-14 15:18:46,274 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] Prompt 4 attempt#1 simulated_response (3 item(s)) = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 1000', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']
+2026-07-14 15:18:46,277 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] attempt#1 final_assignments = ['$op10 = 1000', '$op9 = 0', '$op6 = 1', '$op8 = 1']
+2026-07-14 15:18:46,277 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] attempt#1 substitution_dict = {'$op10': '1000', '$op9': '0', '$op6': '1', '$op8': '1'}
+2026-07-14 15:18:46,277 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] attempt#1 substituted expression = ['Operation(MUX,Operation(NotEqual,1,$op7),0,1000)']
+2026-07-14 15:18:46,277 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] attempt#1 BODMAS chain (2 step(s)) = ['Operation(NotEqual,1,$op7) → $op1', 'Operation(MUX,$op1,0,1000) → $op2']
+2026-07-14 15:18:46,281 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] attempt#1 final_check (DLL-resolved) = ['$op1 = 1', '$op2 = 1000']
+2026-07-14 15:18:46,281 INFO    extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] attempt#1: expected='1000' actual='1000' -> PASS
+2026-07-14 15:18:46,281 INFO    extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] M7 inline score = 1.000 (solved after 0 retries, ref=4)
+2026-07-14 15:18:46,281 DEBUG   extract_mbd_full: forward(): eq[5d270637-0125-418a-aaa2-5e0d3435e443] updated_dict[5d270637-0125-418a-aaa2-5e0d3435e443] = ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 1000', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']
+2026-07-14 15:18:46,281 INFO    extract_mbd_full: forward(): M7 INLINE — score=0.5333333333333333 (DLL inline: 4 first-try + 1 retry-pass + 4 fail / 9 eqs)
+2026-07-14 15:18:46,282 INFO    extract_mbd_full: forward(): ----- Post-processing chain -----
+2026-07-14 15:18:46,282 DEBUG   extract_mbd_full: forward(): post-process — update_equation_values() done; equation_dict now = {'70ed946e-f24a-452d-834d-6288e3263ca8': ['Variable(EGSPrepn_ratLamS1B1) = 6', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], 'a82ef372-ca8a-4d06-91ef-4afef7c57d0d': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5'], '87f653ce-658f-40e1-9c04-8e911a451d5b': ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], '5f51643e-5d1b-40e6-93a2-37bcb93932a5': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0'], '58bb3545-6808-4131-8d59-79716dbd9ccc': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'a8c34be2-499e-4c98-9eaa-c4fc92516c0d': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 10', 'Variable(EGSDO2_tiTranAdpnS1B1) = 10'], '1c138d85-31d4-485d-bdcf-3b4e89325d34': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0'], '94cc0fb9-597f-4ec8-b6cd-ed08a4cf6211': ['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], '5d270637-0125-418a-aaa2-5e0d3435e443': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 1000', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']}
+2026-07-14 15:18:46,282 DEBUG   extract_mbd_full: forward(): post-process — map_equations_to_json() -> pre_final = [{'Pre-Condition': ['_ratLamTiConAdpn = 5'], 'Steps': [{'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 6', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']], 'Expected Results': ['_ratLamTiConAdpn = 5']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 5.1']}], 'Detailed Explanation': "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."}, {'Pre-Condition': ['_ratLamTiConAdpn = 3'], 'Steps': [{'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']], 'Expected Results': ['_ratLamTiConAdpn = 3']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 4.4']}], 'Detailed Explanation': "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 8'], 'Steps': [{'Actions': [['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']], 'Expected Results': ['_ratLamTiConAdpn = 8']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 6.2']}], 'Detailed Explanation': "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 4'], 'Steps': [{'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 4']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 10', 'Variable(EGSDO2_tiTranAdpnS1B1) = 10']], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}], 'Detailed Explanation': 'minimum valid, the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value.'}, {'Pre-Condition': ['_ratLamTiConAdpn = 0'], 'Steps': [{'Actions': [['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': [['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': [['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 1000', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}], 'Detailed Explanation': '0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high.'}]
+2026-07-14 15:18:46,283 DEBUG   extract_mbd_full: forward(): post-process — remove_variable_and_parameter_blocks() -> [{'Pre-Condition': ['_ratLamTiConAdpn = 5'], 'Steps': [{'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 6', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']], 'Expected Results': ['_ratLamTiConAdpn = 5']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 5.1']}], 'Detailed Explanation': "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."}, {'Pre-Condition': ['_ratLamTiConAdpn = 3'], 'Steps': [{'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']], 'Expected Results': ['_ratLamTiConAdpn = 3']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 4.4']}], 'Detailed Explanation': "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 8'], 'Steps': [{'Actions': [['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5']], 'Expected Results': ['_ratLamTiConAdpn = 8']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 6.2']}], 'Detailed Explanation': "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 4'], 'Steps': [{'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 4']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': [['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 10', 'Variable(EGSDO2_tiTranAdpnS1B1) = 10']], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}], 'Detailed Explanation': 'minimum valid, the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value.'}, {'Pre-Condition': ['_ratLamTiConAdpn = 0'], 'Steps': [{'Actions': [['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': [['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': [['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1'], ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 1000', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0']], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}], 'Detailed Explanation': '0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high.'}]
+2026-07-14 15:18:46,283 DEBUG   extract_mbd_full: forward(): post-process — flatten_precondition_and_actions() -> [{'Pre-Condition': ['_ratLamTiConAdpn = 5'], 'Steps': [{'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 6', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5'], 'Expected Results': ['_ratLamTiConAdpn = 5']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 5.1']}], 'Detailed Explanation': "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."}, {'Pre-Condition': ['_ratLamTiConAdpn = 3'], 'Steps': [{'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5'], 'Expected Results': ['_ratLamTiConAdpn = 3']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 4.4']}], 'Detailed Explanation': "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 8'], 'Steps': [{'Actions': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5'], 'Expected Results': ['_ratLamTiConAdpn = 8']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 6.2']}], 'Detailed Explanation': "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 4'], 'Steps': [{'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 4']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 10', 'Variable(EGSDO2_tiTranAdpnS1B1) = 10'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}], 'Detailed Explanation': 'minimum valid, the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value.'}, {'Pre-Condition': ['_ratLamTiConAdpn = 0'], 'Steps': [{'Actions': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 1000', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}], 'Detailed Explanation': '0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high.'}]
+2026-07-14 15:18:46,284 DEBUG   extract_mbd_full: forward(): post-process — deduplicate_actions() -> [{'Pre-Condition': ['_ratLamTiConAdpn = 5'], 'Steps': [{'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 6', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 4', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5'], 'Expected Results': ['_ratLamTiConAdpn = 5']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 5.1']}], 'Detailed Explanation': "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."}, {'Pre-Condition': ['_ratLamTiConAdpn = 3'], 'Steps': [{'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5'], 'Expected Results': ['_ratLamTiConAdpn = 3']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 4.4']}], 'Detailed Explanation': "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 8'], 'Steps': [{'Actions': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 2', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_tiTranAdpnS0B1) = 5', 'Variable(EGSDO2_tiTranAdpnS1B1) = 5'], 'Expected Results': ['_ratLamTiConAdpn = 8']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 6.2']}], 'Detailed Explanation': "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 4'], 'Steps': [{'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 4']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['Variable(EGSPrepn_ratLamS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 10', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 10', 'Variable(EGSDO2_tiTranAdpnS1B1) = 10'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}], 'Detailed Explanation': 'minimum valid, the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value.'}, {'Pre-Condition': ['_ratLamTiConAdpn = 0'], 'Steps': [{'Actions': ['SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 0', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['Literal(0) = 0', 'Variable(EGSPrepn_ratLamS1B1) = 16', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) = 1', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) = 0', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1', 'Variable(EGSDO2_tiTranAdpnS0B1) = 1000', 'Variable(EGSDO2_tiTranAdpnS1B1) = 0'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}], 'Detailed Explanation': '0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high.'}]
+2026-07-14 15:18:46,284 DEBUG   extract_mbd_full: forward(): post-process — all_unselected_vars (final) = set()
+2026-07-14 15:18:46,285 DEBUG   extract_mbd_full: forward(): post-process — clean_deduplicated_solution() -> [{'Pre-Condition': ['_ratLamTiConAdpn = 5'], 'Steps': [{'Actions': ['EGSPrepn_ratLamS1B1 = 6', 'EGSDO2_flgDynAdpnRtlS0B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 1', 'EGSDO2_flgDynAdpnLtrS0B1 = 0', 'EGSDO2_flgDynAdpnLtrS1B1 = 4', 'EGSDO2_tiTranAdpnS0B1 = 5', 'EGSDO2_tiTranAdpnS1B1 = 5'], 'Expected Results': ['_ratLamTiConAdpn = 5']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 5.1']}], 'Detailed Explanation': "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."}, {'Pre-Condition': ['_ratLamTiConAdpn = 3'], 'Steps': [{'Actions': ['EGSPrepn_ratLamS1B1 = 0', 'EGSDO2_flgDynAdpnRtlS0B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 10', 'EGSDO2_flgDynAdpnLtrS0B1 = 0', 'EGSDO2_flgDynAdpnLtrS1B1 = 0', 'EGSDO2_tiTranAdpnS0B1 = 5', 'EGSDO2_tiTranAdpnS1B1 = 5'], 'Expected Results': ['_ratLamTiConAdpn = 3']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 4.4']}], 'Detailed Explanation': "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 8'], 'Steps': [{'Actions': ['EGSPrepn_ratLamS1B1 = 0', 'EGSDO2_flgDynAdpnRtlS0B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 2', 'EGSDO2_flgDynAdpnLtrS0B1 = 0', 'EGSDO2_flgDynAdpnLtrS1B1 = 0', 'EGSDO2_tiTranAdpnS0B1 = 5', 'EGSDO2_tiTranAdpnS1B1 = 5'], 'Expected Results': ['_ratLamTiConAdpn = 8']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 6.2']}], 'Detailed Explanation': "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."}, {'Pre-Condition': ['_ratLamTiConAdpn = 4'], 'Steps': [{'Actions': ['EGSPrepn_ratLamS1B1 = 0', 'EGSDO2_flgDynAdpnRtlS0B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 10', 'EGSDO2_flgDynAdpnLtrS0B1 = 0', 'EGSDO2_flgDynAdpnLtrS1B1 = 0', 'EGSDO2_tiTranAdpnS0B1 = 0', 'EGSDO2_tiTranAdpnS1B1 = 0'], 'Expected Results': ['_ratLamTiConAdpn = 4']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['EGSPrepn_ratLamS1B1 = 0', 'EGSDO2_flgDynAdpnRtlS0B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 10', 'EGSDO2_flgDynAdpnLtrS0B1 = 0', 'EGSDO2_flgDynAdpnLtrS1B1 = 0', 'EGSDO2_tiTranAdpnS0B1 = 10', 'EGSDO2_tiTranAdpnS1B1 = 10'], 'Expected Results': ['_ratLamTiConAdpn = 10']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 10']}], 'Detailed Explanation': 'minimum valid, the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value.'}, {'Pre-Condition': ['_ratLamTiConAdpn = 0'], 'Steps': [{'Actions': ['EGSDO2_flgDynAdpnLtrS1B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 0', 'EGSDO2_tiTranAdpnS0B1 = 0', 'EGSDO2_tiTranAdpnS1B1 = 0'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['EGSPrepn_ratLamS1B1 = 16', 'EGSDO2_flgDynAdpnRtlS0B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 1', 'EGSDO2_flgDynAdpnLtrS0B1 = 0', 'EGSDO2_flgDynAdpnLtrS1B1 = 0', 'EGSDO2_tiTranAdpnS0B1 = 0', 'EGSDO2_tiTranAdpnS1B1 = 0'], 'Expected Results': ['_ratLamTiConAdpn = 0']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['EGSPrepn_ratLamS1B1 = 16', 'EGSDO2_flgDynAdpnRtlS0B1 = 0', 'EGSDO2_flgDynAdpnRtlS1B1 = 1', 'EGSDO2_flgDynAdpnLtrS0B1 = 0', 'EGSDO2_flgDynAdpnLtrS1B1 = 0', 'EGSDO2_tiTranAdpnS0B1 = 1000', 'EGSDO2_tiTranAdpnS1B1 = 0'], 'Expected Results': ['_ratLamTiConAdpn = 16']}, {'Actions': ['Wait 10000'], 'Expected Results': ['_ratLamTiConAdpn = 16']}], 'Detailed Explanation': '0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high.'}]
+2026-07-14 15:18:46,286 INFO    extract_mbd_full: forward(): post-process — remove_unselected_mux_actions() -> final_json with 5 test case(s)
+2026-07-14 15:18:46,286 DEBUG   extract_mbd_full: forward(): FINAL JSON = [
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "EGSPrepn_ratLamS1B1 = 6",
+          "EGSDO2_flgDynAdpnRtlS0B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 1",
+          "EGSDO2_flgDynAdpnLtrS0B1 = 0",
+          "EGSDO2_flgDynAdpnLtrS1B1 = 4",
+          "EGSDO2_tiTranAdpnS0B1 = 5",
+          "EGSDO2_tiTranAdpnS1B1 = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 5"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 5.1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 3"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "EGSPrepn_ratLamS1B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS0B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 10",
+          "EGSDO2_flgDynAdpnLtrS0B1 = 0",
+          "EGSDO2_flgDynAdpnLtrS1B1 = 0",
+          "EGSDO2_tiTranAdpnS0B1 = 5",
+          "EGSDO2_tiTranAdpnS1B1 = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 3"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 4.4"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 8"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "EGSPrepn_ratLamS1B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS0B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 2",
+          "EGSDO2_flgDynAdpnLtrS0B1 = 0",
+          "EGSDO2_flgDynAdpnLtrS1B1 = 0",
+          "EGSDO2_tiTranAdpnS0B1 = 5",
+          "EGSDO2_tiTranAdpnS1B1 = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 8"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 6.2"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 4"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "EGSPrepn_ratLamS1B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS0B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 10",
+          "EGSDO2_flgDynAdpnLtrS0B1 = 0",
+          "EGSDO2_flgDynAdpnLtrS1B1 = 0",
+          "EGSDO2_tiTranAdpnS0B1 = 0",
+          "EGSDO2_tiTranAdpnS1B1 = 0"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 4"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "EGSPrepn_ratLamS1B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS0B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 10",
+          "EGSDO2_flgDynAdpnLtrS0B1 = 0",
+          "EGSDO2_flgDynAdpnLtrS1B1 = 0",
+          "EGSDO2_tiTranAdpnS0B1 = 10",
+          "EGSDO2_tiTranAdpnS1B1 = 10"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      }
+    ],
+    "Detailed Explanation": "minimum valid, the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "EGSDO2_flgDynAdpnLtrS1B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 0",
+          "EGSDO2_tiTranAdpnS0B1 = 0",
+          "EGSDO2_tiTranAdpnS1B1 = 0"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "EGSPrepn_ratLamS1B1 = 16",
+          "EGSDO2_flgDynAdpnRtlS0B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 1",
+          "EGSDO2_flgDynAdpnLtrS0B1 = 0",
+          "EGSDO2_flgDynAdpnLtrS1B1 = 0",
+          "EGSDO2_tiTranAdpnS0B1 = 0",
+          "EGSDO2_tiTranAdpnS1B1 = 0"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      },
+      {
+        "Actions": [
+          "EGSPrepn_ratLamS1B1 = 16",
+          "EGSDO2_flgDynAdpnRtlS0B1 = 0",
+          "EGSDO2_flgDynAdpnRtlS1B1 = 1",
+          "EGSDO2_flgDynAdpnLtrS0B1 = 0",
+          "EGSDO2_flgDynAdpnLtrS1B1 = 0",
+          "EGSDO2_tiTranAdpnS0B1 = 1000",
+          "EGSDO2_tiTranAdpnS1B1 = 0"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      }
+    ],
+    "Detailed Explanation": "0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high."
+  }
+]
+2026-07-14 15:18:46,286 INFO    extract_mbd_full: forward(): END — test_cases_pre_postprocess (Prompt2 raw, 4573 chars), final test_cases (4494 chars), m7_inline_score=0.5333333333333333
+2026-07-14 15:18:46,286 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:18:46,302 INFO    mbd_metric: _compute_all_components: required_io KB HIT for EGSSig_LamSymcp_1_6_0#5 -> {'required_inputs': [], 'required_preconds': [], 'required_outputs': ['_ratLamTiConAdpn']}
+2026-07-14 15:18:46,302 INFO    mbd_metric: ======================================================================
+2026-07-14 15:18:46,303 INFO    mbd_metric: _compute_all_components: fc_name=EGSSig_LamSymcp_1_6_0 weakspot_id=5 weakspot_op_key=$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam raster_time=10000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\EGSSig_LamSymcp_1_6_0\env_libs\EGSSig_LamSymcp_1_6_0.dll
+2026-07-14 15:18:46,303 INFO    mbd_metric: _compute_all_components: use_pre_postprocess=True
+2026-07-14 15:18:46,303 DEBUG   mbd_metric: _compute_all_components: pre_tc_str (Prompt 2 raw / M1,M3,M4,M6 input) = [
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 5"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 5.5",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 5"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 5.1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 3"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 10",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 3"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 4.4"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 8"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 2",
+          "T = 5"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 8"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 6.2"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 4"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 10",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 4"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 10",
+          "T = 10"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 10"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This test case tests the filter responsiveness with different gain constants T. With T=1 (minimum valid), the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value."
+  },
+  {
+    "Pre-Condition": [
+      "_ratLamTiConAdpn = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "in = 0",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 16",
+          "T = 1"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      },
+      {
+        "Actions": [
+          "in = 16",
+          "T = 1000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 10000"
+        ],
+        "Expected Results": [
+          "_ratLamTiConAdpn = 16"
+        ]
+      }
+    ],
+    "Detailed Explanation": "This boundary test case covers minimum and maximum input values (0 and 16) and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high."
+  }
+]
+2026-07-14 15:18:46,303 DEBUG   mbd_metric: _compute_all_components: final_tc_str (final JSON / M2,M7,M8 input) = [{"Pre-Condition": ["_ratLamTiConAdpn = 5"], "Steps": [{"Actions": ["EGSPrepn_ratLamS1B1 = 6", "EGSDO2_flgDynAdpnRtlS0B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 1", "EGSDO2_flgDynAdpnLtrS0B1 = 0", "EGSDO2_flgDynAdpnLtrS1B1 = 4", "EGSDO2_tiTranAdpnS0B1 = 5", "EGSDO2_tiTranAdpnS1B1 = 5"], "Expected Results": ["_ratLamTiConAdpn = 5"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 5.1"]}], "Detailed Explanation": "This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly."}, {"Pre-Condition": ["_ratLamTiConAdpn = 3"], "Steps": [{"Actions": ["EGSPrepn_ratLamS1B1 = 0", "EGSDO2_flgDynAdpnRtlS0B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 10", "EGSDO2_flgDynAdpnLtrS0B1 = 0", "EGSDO2_flgDynAdpnLtrS1B1 = 0", "EGSDO2_tiTranAdpnS0B1 = 5", "EGSDO2_tiTranAdpnS1B1 = 5"], "Expected Results": ["_ratLamTiConAdpn = 3"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 4.4"]}], "Detailed Explanation": "This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes."}, {"Pre-Condition": ["_ratLamTiConAdpn = 8"], "Steps": [{"Actions": ["EGSPrepn_ratLamS1B1 = 0", "EGSDO2_flgDynAdpnRtlS0B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 2", "EGSDO2_flgDynAdpnLtrS0B1 = 0", "EGSDO2_flgDynAdpnLtrS1B1 = 0", "EGSDO2_tiTranAdpnS0B1 = 5", "EGSDO2_tiTranAdpnS1B1 = 5"], "Expected Results": ["_ratLamTiConAdpn = 8"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 6.2"]}], "Detailed Explanation": "This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes."}, {"Pre-Condition": ["_ratLamTiConAdpn = 4"], "Steps": [{"Actions": ["EGSPrepn_ratLamS1B1 = 0", "EGSDO2_flgDynAdpnRtlS0B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 10", "EGSDO2_flgDynAdpnLtrS0B1 = 0", "EGSDO2_flgDynAdpnLtrS1B1 = 0", "EGSDO2_tiTranAdpnS0B1 = 0", "EGSDO2_tiTranAdpnS1B1 = 0"], "Expected Results": ["_ratLamTiConAdpn = 4"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 10"]}, {"Actions": ["EGSPrepn_ratLamS1B1 = 0", "EGSDO2_flgDynAdpnRtlS0B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 10", "EGSDO2_flgDynAdpnLtrS0B1 = 0", "EGSDO2_flgDynAdpnLtrS1B1 = 0", "EGSDO2_tiTranAdpnS0B1 = 10", "EGSDO2_tiTranAdpnS1B1 = 10"], "Expected Results": ["_ratLamTiConAdpn = 10"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 10"]}], "Detailed Explanation": "minimum valid, the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value."}, {"Pre-Condition": ["_ratLamTiConAdpn = 0"], "Steps": [{"Actions": ["EGSDO2_flgDynAdpnLtrS1B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 0", "EGSDO2_tiTranAdpnS0B1 = 0", "EGSDO2_tiTranAdpnS1B1 = 0"], "Expected Results": ["_ratLamTiConAdpn = 0"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 0"]}, {"Actions": ["EGSPrepn_ratLamS1B1 = 16", "EGSDO2_flgDynAdpnRtlS0B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 1", "EGSDO2_flgDynAdpnLtrS0B1 = 0", "EGSDO2_flgDynAdpnLtrS1B1 = 0", "EGSDO2_tiTranAdpnS0B1 = 0", "EGSDO2_tiTranAdpnS1B1 = 0"], "Expected Results": ["_ratLamTiConAdpn = 0"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 16"]}, {"Actions": ["EGSPrepn_ratLamS1B1 = 16", "EGSDO2_flgDynAdpnRtlS0B1 = 0", "EGSDO2_flgDynAdpnRtlS1B1 = 1", "EGSDO2_flgDynAdpnLtrS0B1 = 0", "EGSDO2_flgDynAdpnLtrS1B1 = 0", "EGSDO2_tiTranAdpnS0B1 = 1000", "EGSDO2_tiTranAdpnS1B1 = 0"], "Expected Results": ["_ratLamTiConAdpn = 16"]}, {"Actions": ["Wait 10000"], "Expected Results": ["_ratLamTiConAdpn = 16"]}], "Detailed Explanation": "0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high."}]
+2026-07-14 15:18:46,303 INFO    mbd_metric: M3: ===== Structural Validity (raster_time=10000) =====
+2026-07-14 15:18:46,304 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:18:46,304 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'in': '5.5', 'T': '5'} exp={'_ratLamTiConAdpn': '5'}
+2026-07-14 15:18:46,305 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '5.1'}
+2026-07-14 15:18:46,305 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'_ratLamTiConAdpn': '5'}, 2 step(s), explanation="This test case verifies the filter's response to a small increase in input from "
+2026-07-14 15:18:46,305 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'in': '10', 'T': '5'} exp={'_ratLamTiConAdpn': '3'}
+2026-07-14 15:18:46,305 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '4.4'}
+2026-07-14 15:18:46,305 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'_ratLamTiConAdpn': '3'}, 2 step(s), explanation="This test case checks the filter's behavior under a large increase in input from"
+2026-07-14 15:18:46,305 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'in': '2', 'T': '5'} exp={'_ratLamTiConAdpn': '8'}
+2026-07-14 15:18:46,305 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '6.2'}
+2026-07-14 15:18:46,306 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'_ratLamTiConAdpn': '8'}, 2 step(s), explanation="This test case verifies the filter's response to a large decrease in input from "
+2026-07-14 15:18:46,306 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'in': '10', 'T': '1'} exp={'_ratLamTiConAdpn': '4'}
+2026-07-14 15:18:46,306 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,306 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=None act={'in': '10', 'T': '10'} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,306 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,306 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'_ratLamTiConAdpn': '4'}, 4 step(s), explanation='This test case tests the filter responsiveness with different gain constants T. '
+2026-07-14 15:18:46,306 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=None act={'in': '0', 'T': '1'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=None act={'in': '16', 'T': '1'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: _normalize_test_cases: TC5 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: _normalize_test_cases: TC5 step5 -> wait=None act={'in': '16', 'T': '1000'} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: _normalize_test_cases: TC5 step6 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'_ratLamTiConAdpn': '0'}, 6 step(s), explanation='This boundary test case covers minimum and maximum input values (0 and 16) and m'
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:18:46,307 DEBUG   mbd_metric: M3: TC1 explanation check PASS
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S1 action in=5.5 numeric check PASS
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S1 action T=5 numeric check PASS
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S1 exp _ratLamTiConAdpn=5 numeric check PASS
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S2 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S2 exp _ratLamTiConAdpn=5.1 numeric check PASS
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,308 DEBUG   mbd_metric: M3: TC1 precond/expected-overlap check FAIL (weighs 2x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,309 DEBUG   mbd_metric: M3: TC2 explanation check PASS
+2026-07-14 15:18:46,309 DEBUG   mbd_metric: M3: TC2.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,309 DEBUG   mbd_metric: M3: TC2.S1 action in=10 numeric check PASS
+2026-07-14 15:18:46,309 DEBUG   mbd_metric: M3: TC2.S1 action T=5 numeric check PASS
+2026-07-14 15:18:46,309 DEBUG   mbd_metric: M3: TC2.S1 exp _ratLamTiConAdpn=3 numeric check PASS
+2026-07-14 15:18:46,309 DEBUG   mbd_metric: M3: TC2.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,309 DEBUG   mbd_metric: M3: TC2.S2 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,310 DEBUG   mbd_metric: M3: TC2.S2 exp _ratLamTiConAdpn=4.4 numeric check PASS
+2026-07-14 15:18:46,310 DEBUG   mbd_metric: M3: TC2.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,310 DEBUG   mbd_metric: M3: TC2 precond/expected-overlap check FAIL (weighs 2x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,310 DEBUG   mbd_metric: M3: TC3 explanation check PASS
+2026-07-14 15:18:46,310 DEBUG   mbd_metric: M3: TC3.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,310 DEBUG   mbd_metric: M3: TC3.S1 action in=2 numeric check PASS
+2026-07-14 15:18:46,310 DEBUG   mbd_metric: M3: TC3.S1 action T=5 numeric check PASS
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC3.S1 exp _ratLamTiConAdpn=8 numeric check PASS
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC3.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC3.S2 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC3.S2 exp _ratLamTiConAdpn=6.2 numeric check PASS
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC3.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC3 precond/expected-overlap check FAIL (weighs 2x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC4 explanation check PASS
+2026-07-14 15:18:46,311 DEBUG   mbd_metric: M3: TC4.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S1 action in=10 numeric check PASS
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S1 action T=1 numeric check PASS
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S1 exp _ratLamTiConAdpn=4 numeric check PASS
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S2 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S2 exp _ratLamTiConAdpn=10 numeric check PASS
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S3 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,312 DEBUG   mbd_metric: M3: TC4.S3 action in=10 numeric check PASS
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC4.S3 action T=10 numeric check PASS
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC4.S3 exp _ratLamTiConAdpn=10 numeric check PASS
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC4.S3 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC4.S4 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC4.S4 exp _ratLamTiConAdpn=10 numeric check PASS
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC4.S4 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC4 precond/expected-overlap check FAIL (weighs 2x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,313 DEBUG   mbd_metric: M3: TC5 explanation check PASS
+2026-07-14 15:18:46,314 DEBUG   mbd_metric: M3: TC5.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,314 DEBUG   mbd_metric: M3: TC5.S1 action in=0 numeric check PASS
+2026-07-14 15:18:46,314 DEBUG   mbd_metric: M3: TC5.S1 action T=1 numeric check PASS
+2026-07-14 15:18:46,314 DEBUG   mbd_metric: M3: TC5.S1 exp _ratLamTiConAdpn=0 numeric check PASS
+2026-07-14 15:18:46,314 DEBUG   mbd_metric: M3: TC5.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,314 DEBUG   mbd_metric: M3: TC5.S2 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,314 DEBUG   mbd_metric: M3: TC5.S2 exp _ratLamTiConAdpn=0 numeric check PASS
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S3 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S3 action in=16 numeric check PASS
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S3 action T=1 numeric check PASS
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S3 exp _ratLamTiConAdpn=0 numeric check PASS
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S3 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S4 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S4 exp _ratLamTiConAdpn=16 numeric check PASS
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S4 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S5 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:18:46,315 DEBUG   mbd_metric: M3: TC5.S5 action in=16 numeric check PASS
+2026-07-14 15:18:46,316 DEBUG   mbd_metric: M3: TC5.S5 action T=1000 numeric check PASS
+2026-07-14 15:18:46,316 DEBUG   mbd_metric: M3: TC5.S5 exp _ratLamTiConAdpn=16 numeric check PASS
+2026-07-14 15:18:46,316 DEBUG   mbd_metric: M3: TC5.S5 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,316 DEBUG   mbd_metric: M3: TC5.S6 Wait check PASS (w=10000 is multiple of dT=10000)
+2026-07-14 15:18:46,316 DEBUG   mbd_metric: M3: TC5.S6 exp _ratLamTiConAdpn=16 numeric check PASS
+2026-07-14 15:18:46,316 DEBUG   mbd_metric: M3: TC5.S6 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:18:46,316 DEBUG   mbd_metric: M3: TC5 precond/expected-overlap check FAIL (weighs 2x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,316 INFO    mbd_metric: M3: OUTPUT-PINNED-AS-PRECONDITION: 5 TC(s), each weighed 2x a normal check
+2026-07-14 15:18:46,316 INFO    mbd_metric: M3: RESULT score=0.8592 (61/71 weighted checks passed)
+2026-07-14 15:18:46,316 INFO    mbd_metric: M3: failed checks: TC1: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC2: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC3: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC4: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC5: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']
+2026-07-14 15:18:46,317 INFO    mbd_metric: M1: ===== I/O Classification =====
+2026-07-14 15:18:46,317 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:18:46,317 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'in': '5.5', 'T': '5'} exp={'_ratLamTiConAdpn': '5'}
+2026-07-14 15:18:46,317 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '5.1'}
+2026-07-14 15:18:46,317 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'_ratLamTiConAdpn': '5'}, 2 step(s), explanation="This test case verifies the filter's response to a small increase in input from "
+2026-07-14 15:18:46,317 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'in': '10', 'T': '5'} exp={'_ratLamTiConAdpn': '3'}
+2026-07-14 15:18:46,317 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '4.4'}
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'_ratLamTiConAdpn': '3'}, 2 step(s), explanation="This test case checks the filter's behavior under a large increase in input from"
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'in': '2', 'T': '5'} exp={'_ratLamTiConAdpn': '8'}
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '6.2'}
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'_ratLamTiConAdpn': '8'}, 2 step(s), explanation="This test case verifies the filter's response to a large decrease in input from "
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'in': '10', 'T': '1'} exp={'_ratLamTiConAdpn': '4'}
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=None act={'in': '10', 'T': '10'} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,318 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'_ratLamTiConAdpn': '4'}, 4 step(s), explanation='This test case tests the filter responsiveness with different gain constants T. '
+2026-07-14 15:18:46,319 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=None act={'in': '0', 'T': '1'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,319 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,319 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=None act={'in': '16', 'T': '1'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,319 DEBUG   mbd_metric: _normalize_test_cases: TC5 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,319 DEBUG   mbd_metric: _normalize_test_cases: TC5 step5 -> wait=None act={'in': '16', 'T': '1000'} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,319 DEBUG   mbd_metric: _normalize_test_cases: TC5 step6 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,319 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'_ratLamTiConAdpn': '0'}, 6 step(s), explanation='This boundary test case covers minimum and maximum input values (0 and 16) and m'
+2026-07-14 15:18:46,320 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:18:46,320 DEBUG   mbd_metric: M1: weakspot output signals (required_io KB) = {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,320 DEBUG   mbd_metric: M1: fixed_vars (SystemConstant/Literal/dT) = set()
+2026-07-14 15:18:46,320 DEBUG   mbd_metric: M1: TC1 precond_vars={'_ratLamTiConAdpn'} action_vars={'T', 'in'} expected_vars={'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,320 DEBUG   mbd_metric: M1: TC1 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:18:46,320 DEBUG   mbd_metric: M1: TC1 output-verified check PASS
+2026-07-14 15:18:46,320 DEBUG   mbd_metric: M1: TC1 output-not-set-as-input check FAIL (weighs 1x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC2 precond_vars={'_ratLamTiConAdpn'} action_vars={'T', 'in'} expected_vars={'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC2 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC2 output-verified check PASS
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC2 output-not-set-as-input check FAIL (weighs 1x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC3 precond_vars={'_ratLamTiConAdpn'} action_vars={'T', 'in'} expected_vars={'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC3 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC3 output-verified check PASS
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC3 output-not-set-as-input check FAIL (weighs 1x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC4 precond_vars={'_ratLamTiConAdpn'} action_vars={'T', 'in'} expected_vars={'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,321 DEBUG   mbd_metric: M1: TC4 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:18:46,322 DEBUG   mbd_metric: M1: TC4 output-verified check PASS
+2026-07-14 15:18:46,322 DEBUG   mbd_metric: M1: TC4 output-not-set-as-input check FAIL (weighs 1x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,322 DEBUG   mbd_metric: M1: TC5 precond_vars={'_ratLamTiConAdpn'} action_vars={'T', 'in'} expected_vars={'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,322 DEBUG   mbd_metric: M1: TC5 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:18:46,322 DEBUG   mbd_metric: M1: TC5 output-verified check PASS
+2026-07-14 15:18:46,322 DEBUG   mbd_metric: M1: TC5 output-not-set-as-input check FAIL (weighs 1x): {'_ratLamTiConAdpn'}
+2026-07-14 15:18:46,322 INFO    mbd_metric: M1: RESULT score=0.6667 (10/15 checks passed)
+2026-07-14 15:18:46,322 INFO    mbd_metric: M1: failed checks: TC1: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC2: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC3: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC4: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC5: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']
+2026-07-14 15:18:46,323 INFO    mbd_metric: M4: ===== Test Coverage (weakspot_op_key=$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam, KB_LOADED=True) =====
+2026-07-14 15:18:46,323 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:18:46,323 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'in': '5.5', 'T': '5'} exp={'_ratLamTiConAdpn': '5'}
+2026-07-14 15:18:46,323 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '5.1'}
+2026-07-14 15:18:46,323 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'_ratLamTiConAdpn': '5'}, 2 step(s), explanation="This test case verifies the filter's response to a small increase in input from "
+2026-07-14 15:18:46,323 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'in': '10', 'T': '5'} exp={'_ratLamTiConAdpn': '3'}
+2026-07-14 15:18:46,323 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '4.4'}
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'_ratLamTiConAdpn': '3'}, 2 step(s), explanation="This test case checks the filter's behavior under a large increase in input from"
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'in': '2', 'T': '5'} exp={'_ratLamTiConAdpn': '8'}
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '6.2'}
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'_ratLamTiConAdpn': '8'}, 2 step(s), explanation="This test case verifies the filter's response to a large decrease in input from "
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'in': '10', 'T': '1'} exp={'_ratLamTiConAdpn': '4'}
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=None act={'in': '10', 'T': '10'} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'_ratLamTiConAdpn': '4'}, 4 step(s), explanation='This test case tests the filter responsiveness with different gain constants T. '
+2026-07-14 15:18:46,324 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=None act={'in': '0', 'T': '1'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,325 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,325 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=None act={'in': '16', 'T': '1'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:46,325 DEBUG   mbd_metric: _normalize_test_cases: TC5 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,325 DEBUG   mbd_metric: _normalize_test_cases: TC5 step5 -> wait=None act={'in': '16', 'T': '1000'} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,325 DEBUG   mbd_metric: _normalize_test_cases: TC5 step6 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:46,325 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'_ratLamTiConAdpn': '0'}, 6 step(s), explanation='This boundary test case covers minimum and maximum input values (0 and 16) and m'
+2026-07-14 15:18:46,325 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:18:46,326 DEBUG   mbd_metric: M4: weakspot op_entry function_name/class_method_name/method_name = 'LowpassT_out'
+2026-07-14 15:18:46,326 DEBUG   mbd_metric: M4: resolve_guidelines('LowpassT_out') -> source=KB block_type='LowpassT' (8 guideline(s))
+2026-07-14 15:18:46,326 DEBUG   mbd_metric: M4: guidelines_text=
+1: Test with small increase in value of input
+2: Test with larger increase in value of  input
+3: Test with small decrease in value of input
+4: Test with larger decrease in value of  input
+5: Check the maximum relative deviation of the output
+6: Test with different gain constant
+7: Test with min-max input and min - max time constant
+8: Test the disabled behavior of the filter
+2026-07-14 15:18:46,326 DEBUG   mbd_metric: M4: full test-case text for judge=
+TC1:
+  Pre-Condition: {'_ratLamTiConAdpn': '5'}
+  Step 1: Wait=None, Actions={'in': '5.5', 'T': '5'}, Expected Results={'_ratLamTiConAdpn': '5'}
+  Step 2: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '5.1'}
+  Explanation: This test case verifies the filter's response to a small increase in input from 5 to 5.5 with a nominal gain constant T=5. The initial filtered output is 5. After one sample time, the output should move slightly towards the input, demonstrating smoothing behavior. This also implicitly tests a small decrease scenario if input were to decrease slightly.
+TC2:
+  Pre-Condition: {'_ratLamTiConAdpn': '3'}
+  Step 1: Wait=None, Actions={'in': '10', 'T': '5'}, Expected Results={'_ratLamTiConAdpn': '3'}
+  Step 2: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '4.4'}
+  Explanation: This test case checks the filter's behavior under a large increase in input from 3 to 10 with T=5. The output should increase towards the input but not jump immediately, showing the filter's smoothing effect on significant input changes.
+TC3:
+  Pre-Condition: {'_ratLamTiConAdpn': '8'}
+  Step 1: Wait=None, Actions={'in': '2', 'T': '5'}, Expected Results={'_ratLamTiConAdpn': '8'}
+  Step 2: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '6.2'}
+  Explanation: This test case verifies the filter's response to a large decrease in input from 8 to 2 with T=5. The output should decrease gradually, demonstrating the filter's ability to smooth rapid negative changes.
+TC4:
+  Pre-Condition: {'_ratLamTiConAdpn': '4'}
+  Step 1: Wait=None, Actions={'in': '10', 'T': '1'}, Expected Results={'_ratLamTiConAdpn': '4'}
+  Step 2: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '10'}
+  Step 3: Wait=None, Actions={'in': '10', 'T': '10'}, Expected Results={'_ratLamTiConAdpn': '10'}
+  Step 4: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '10'}
+  Explanation: This test case tests the filter responsiveness with different gain constants T. With T=1 (minimum valid), the filter output should immediately follow the input after one sample time. With T=10 (higher), the output should be more stable and less responsive, but since input remains constant, output stays at input value.
+TC5:
+  Pre-Condition: {'_ratLamTiConAdpn': '0'}
+  Step 1: Wait=None, Actions={'in': '0', 'T': '1'}, Expected Results={'_ratLamTiConAdpn': '0'}
+  Step 2: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '0'}
+  Step 3: Wait=None, Actions={'in': '16', 'T': '1'}, Expected Results={'_ratLamTiConAdpn': '0'}
+  Step 4: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '16'}
+  Step 5: Wait=None, Actions={'in': '16', 'T': '1000'}, Expected Results={'_ratLamTiConAdpn': '16'}
+  Step 6: Wait=10000, Actions={}, Expected Results={'_ratLamTiConAdpn': '16'}
+  Explanation: This boundary test case covers minimum and maximum input values (0 and 16) and minimum and very high gain constants (T=1 and T=1000). It also tests the disabled filter behavior by setting T very high, where the output should remain stable and close to previous output, effectively disabling rapid changes. The output should follow input immediately when T=1 and remain stable when T is very high.
+2026-07-14 15:18:46,326 INFO    mbd_metric: M4: calling TestCoverageJudge LLM (block_type=LowpassT, 8 guideline(s), 5 test case(s))
+2026-07-14 15:18:46,327 INFO    mbd_metric: M4: judge LM dedicated to azure/gpt-5.2 (independent of the inference LM)
+2026-07-14 15:18:57,873 DEBUG   mbd_metric: M4: judge raw covered_indices='1,2,4,6,7'
+2026-07-14 15:18:57,874 DEBUG   mbd_metric: M4: judge parsed covered set = {1, 2, 4, 6, 7}
+2026-07-14 15:18:57,875 DEBUG   mbd_metric: M4: judge coverage_reasoning = 1: COVERED — TC1 applies a small input increase (in: 5 → 5.5 with T=5) and expects output to move slightly (5 → 5.1 after 10000).
+2: COVERED — TC2 applies a large input increase (in: 3 → 10 with T=5) and expects a partial rise (3 → 4.4 after 10000), i.e., no immediate jump.
+3: NOT COVERED — no test applies a *small* decrease (e.g., in: 5 → 4.5) with an expected small downward output change; TC3 is a large decrease.
+4: COVERED — TC3 applies a large input decrease (in: 8 → 2 with T=5) and expects output to decrease gradually (8 → 6.2 after 10000).
+5: NOT COVERED — none of the test cases defines/assesses a “maximum relative deviation” metric (no explicit relative error/deviation calculation or threshold in expected results).
+6: COVERED — TC4 explicitly varies gain/time constant T (T=1 then T=10) and checks the resulting behavior (with T=1 output reaches 10 after 10000; demonstrates different T settings are exercised).
+7: COVERED — TC5 exercises min/max input (0 and 16) and min/max-ish T (T=1 and T=1000) with explicit expected outputs (e.g., after T=1 step output goes 0 → 16).
+8: NOT COVERED — no explicit “disabled” control/state is stimulated and verified; setting T=1000 in TC5 still expects output to equal input (16), not an explicit disabled/bypass/freeze behavior. A needed test would set the block into its defined disabled mode (if such an enable/disable exists) and expect bypass or held output accordingly.
+2026-07-14 15:18:57,875 INFO    mbd_metric: M4: RESULT score=0.6250 [KB:LowpassT] 5/8 covered | missing: "Test with small decrease in value of input", "Check the maximum relative deviation of the output", "Test the disabled behavior of the filter"
+    JUDGE REASONING: 1: COVERED — TC1 applies a small input increase (in: 5 → 5.5 with T=5) and expects output to move slightly (5 → 5.1 after 10000).
+2: COVERED — TC2 applies a large input increase (in: 3 → 10 with T=5) and expects a partial rise (3 → 4.4 after 10000), i.e., no immediate jump.
+3: NOT COVERED — no test applies a *small* decrease (e.g., in: 5 → 4.5) with an expected small downward output change; TC3 is a large decrease.
+4: COVERED — TC3 applies a large input decrease (in: 8 → 2 with T=5) and expects output to decrease gradually (8 → 6.2 after 10000).
+5: NOT COVERED — none of the test cases defines/assesses a “maximum relative deviation” metric (no explicit relative error/deviation calculation or threshold in expected results).
+6: COVERED — TC4 explicitly varies gain/time constant T (T=1 then T=10) and checks the resulting behavior (with T=1 output reaches 10 after 10000; demonstrates different T settings are exercised).
+7: COVERED — TC5 exercises min/max input (0 and 16) and min/max-ish T (T=1 and T=1000) with explicit expected outputs (e.g., after T=1 step output goes 0 → 16).
+8: NOT COVERED — no explicit “disabled” control/state is stimulated and verified; setting T=1000 in TC5 still expects output to equal input (16), not an explicit disabled/bypass/freeze behavior. A needed test would set the block into its defined disabled mode (if such an enable/disable exists) and expect bypass or held output accordingly.
+2026-07-14 15:18:57,875 INFO    mbd_metric: M2: ===== Signal Resolution (final JSON) =====
+2026-07-14 15:18:57,875 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:18:57,875 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '6', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '1', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '4', 'EGSDO2_tiTranAdpnS0B1': '5', 'EGSDO2_tiTranAdpnS1B1': '5'} exp={'_ratLamTiConAdpn': '5'}
+2026-07-14 15:18:57,875 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '5.1'}
+2026-07-14 15:18:57,875 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'_ratLamTiConAdpn': '5'}, 2 step(s), explanation="This test case verifies the filter's response to a small increase in input from "
+2026-07-14 15:18:57,875 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '10', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '5', 'EGSDO2_tiTranAdpnS1B1': '5'} exp={'_ratLamTiConAdpn': '3'}
+2026-07-14 15:18:57,876 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '4.4'}
+2026-07-14 15:18:57,876 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'_ratLamTiConAdpn': '3'}, 2 step(s), explanation="This test case checks the filter's behavior under a large increase in input from"
+2026-07-14 15:18:57,876 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '2', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '5', 'EGSDO2_tiTranAdpnS1B1': '5'} exp={'_ratLamTiConAdpn': '8'}
+2026-07-14 15:18:57,876 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '6.2'}
+2026-07-14 15:18:57,876 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'_ratLamTiConAdpn': '8'}, 2 step(s), explanation="This test case verifies the filter's response to a large decrease in input from "
+2026-07-14 15:18:57,876 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '10', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '0', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '4'}
+2026-07-14 15:18:57,877 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:57,877 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '10', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '10', 'EGSDO2_tiTranAdpnS1B1': '10'} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:57,877 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:57,877 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'_ratLamTiConAdpn': '4'}, 4 step(s), explanation='minimum valid, the filter output should immediately follow the input after one s'
+2026-07-14 15:18:57,877 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=None act={'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '0', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:57,877 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:57,877 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=None act={'EGSPrepn_ratLamS1B1': '16', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '1', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '0', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:57,878 DEBUG   mbd_metric: _normalize_test_cases: TC5 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:57,878 DEBUG   mbd_metric: _normalize_test_cases: TC5 step5 -> wait=None act={'EGSPrepn_ratLamS1B1': '16', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '1', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '1000', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:57,878 DEBUG   mbd_metric: _normalize_test_cases: TC5 step6 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:57,878 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'_ratLamTiConAdpn': '0'}, 6 step(s), explanation='0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also test'
+2026-07-14 15:18:57,878 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:18:57,879 DEBUG   mbd_metric: M2: known_names count=56 (signalsheet+model_interface+equation)
+2026-07-14 15:18:57,880 DEBUG   mbd_metric: M2: var='_ratLamTiConAdpn' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,880 DEBUG   mbd_metric: M2: var='EGSPrepn_ratLamS1B1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,880 DEBUG   mbd_metric: M2: var='EGSDO2_flgDynAdpnRtlS0B1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,880 DEBUG   mbd_metric: M2: var='EGSDO2_flgDynAdpnRtlS1B1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,880 DEBUG   mbd_metric: M2: var='EGSDO2_flgDynAdpnLtrS0B1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,881 DEBUG   mbd_metric: M2: var='EGSDO2_flgDynAdpnLtrS1B1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,881 DEBUG   mbd_metric: M2: var='EGSDO2_tiTranAdpnS0B1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,881 DEBUG   mbd_metric: M2: var='EGSDO2_tiTranAdpnS1B1' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:18:57,881 INFO    mbd_metric: M2: RESULT score=1.0000 (8/8 UNIQUE vars resolved)
+2026-07-14 15:18:57,881 INFO    mbd_metric: M7: ===== DLL Pass Rate (using INLINE score from forward()) =====
+2026-07-14 15:18:57,881 INFO    mbd_metric: M7: RESULT score=0.5333 (DLL inline: 4 first-try + 1 retry-pass + 4 fail / 9 eqs) [inline, from Prompt 4 retry loop]
+2026-07-14 15:18:57,881 INFO    mbd_metric: M8: ===== Functional Correctness (sequential DLL, final JSON) =====
+2026-07-14 15:18:57,882 DEBUG   mbd_metric: _normalize_test_cases: parsed 5 raw test case(s) from input
+2026-07-14 15:18:57,882 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '6', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '1', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '4', 'EGSDO2_tiTranAdpnS0B1': '5', 'EGSDO2_tiTranAdpnS1B1': '5'} exp={'_ratLamTiConAdpn': '5'}
+2026-07-14 15:18:57,882 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '5.1'}
+2026-07-14 15:18:57,882 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'_ratLamTiConAdpn': '5'}, 2 step(s), explanation="This test case verifies the filter's response to a small increase in input from "
+2026-07-14 15:18:57,882 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '10', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '5', 'EGSDO2_tiTranAdpnS1B1': '5'} exp={'_ratLamTiConAdpn': '3'}
+2026-07-14 15:18:57,882 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '4.4'}
+2026-07-14 15:18:57,882 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'_ratLamTiConAdpn': '3'}, 2 step(s), explanation="This test case checks the filter's behavior under a large increase in input from"
+2026-07-14 15:18:57,883 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '2', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '5', 'EGSDO2_tiTranAdpnS1B1': '5'} exp={'_ratLamTiConAdpn': '8'}
+2026-07-14 15:18:57,883 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '6.2'}
+2026-07-14 15:18:57,883 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'_ratLamTiConAdpn': '8'}, 2 step(s), explanation="This test case verifies the filter's response to a large decrease in input from "
+2026-07-14 15:18:57,883 DEBUG   mbd_metric: _normalize_test_cases: TC4 step1 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '10', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '0', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '4'}
+2026-07-14 15:18:57,883 DEBUG   mbd_metric: _normalize_test_cases: TC4 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:57,884 DEBUG   mbd_metric: _normalize_test_cases: TC4 step3 -> wait=None act={'EGSPrepn_ratLamS1B1': '0', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '10', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '10', 'EGSDO2_tiTranAdpnS1B1': '10'} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:57,884 DEBUG   mbd_metric: _normalize_test_cases: TC4 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '10'}
+2026-07-14 15:18:57,884 DEBUG   mbd_metric: _normalize_test_cases: TC4 -> precond={'_ratLamTiConAdpn': '4'}, 4 step(s), explanation='minimum valid, the filter output should immediately follow the input after one s'
+2026-07-14 15:18:57,884 DEBUG   mbd_metric: _normalize_test_cases: TC5 step1 -> wait=None act={'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '0', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:57,884 DEBUG   mbd_metric: _normalize_test_cases: TC5 step2 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:57,885 DEBUG   mbd_metric: _normalize_test_cases: TC5 step3 -> wait=None act={'EGSPrepn_ratLamS1B1': '16', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '1', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '0', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '0'}
+2026-07-14 15:18:57,885 DEBUG   mbd_metric: _normalize_test_cases: TC5 step4 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:57,885 DEBUG   mbd_metric: _normalize_test_cases: TC5 step5 -> wait=None act={'EGSPrepn_ratLamS1B1': '16', 'EGSDO2_flgDynAdpnRtlS0B1': '0', 'EGSDO2_flgDynAdpnRtlS1B1': '1', 'EGSDO2_flgDynAdpnLtrS0B1': '0', 'EGSDO2_flgDynAdpnLtrS1B1': '0', 'EGSDO2_tiTranAdpnS0B1': '1000', 'EGSDO2_tiTranAdpnS1B1': '0'} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:57,885 DEBUG   mbd_metric: _normalize_test_cases: TC5 step6 -> wait=10000 act={} exp={'_ratLamTiConAdpn': '16'}
+2026-07-14 15:18:57,885 DEBUG   mbd_metric: _normalize_test_cases: TC5 -> precond={'_ratLamTiConAdpn': '0'}, 6 step(s), explanation='0 and 16 and minimum and very high gain constants (T=1 and T=1000). It also test'
+2026-07-14 15:18:57,885 DEBUG   mbd_metric: _normalize_test_cases: produced 5 canonical test case(s)
+2026-07-14 15:18:57,885 INFO    mbd_metric: M8: 5 final test case(s) to verify
+2026-07-14 15:18:57,886 INFO    mbd_metric: M8: GATED to 0.0 (wrong I/O) — output signal driven as input: ['_ratlamticonadpn'] | measurable outputs=['_ratlamticonadpn']
+2026-07-14 15:18:57,886 INFO    mbd_metric: ======================================================================
+2026-07-14 15:18:57,886 INFO    mbd_metric: _compute_all_components: SUMMARY OF ALL METRIC SCORES
+2026-07-14 15:18:57,886 INFO    mbd_metric:   M1 (I/O Classification,  15%) = 0.6667 | TC1: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC2: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC3: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC4: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']; TC5: output signal set as input (weighs 1x): ['_ratLamTiConAdpn']
+2026-07-14 15:18:57,886 INFO    mbd_metric:   M2 (Signal Resolution,   15%) = 1.0000 | All signals resolved
+2026-07-14 15:18:57,886 INFO    mbd_metric:   M3 (Structural Validity, 10%) = 0.8592 | TC1: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC2: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC3: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC4: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']; TC5: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['_ratLamTiConAdpn']
+2026-07-14 15:18:57,886 INFO    mbd_metric:   M4 (Test Coverage,       20%) = 0.6250 | [KB:LowpassT] 5/8 covered | missing: "Test with small decrease in value of input", "Check the maximum relative deviation of the output", "Test the disabled behavior of the filter"
+    JUDGE REASONING: 1: COVERED — TC1 applies a small input increase (in: 5 → 5.5 with T=5) and expects output to move slightly (5 → 5.1 after 10000).
+2: COVERED — TC2 applies a large input increase (in: 3 → 10 with T=5) and expects a partial rise (3 → 4.4 after 10000), i.e., no immediate jump.
+3: NOT COVERED — no test applies a *small* decrease (e.g., in: 5 → 4.5) with an expected small downward output change; TC3 is a large decrease.
+4: COVERED — TC3 applies a large input decrease (in: 8 → 2 with T=5) and expects output to decrease gradually (8 → 6.2 after 10000).
+5: NOT COVERED — none of the test cases defines/assesses a “maximum relative deviation” metric (no explicit relative error/deviation calculation or threshold in expected results).
+6: COVERED — TC4 explicitly varies gain/time constant T (T=1 then T=10) and checks the resulting behavior (with T=1 output reaches 10 after 10000; demonstrates different T settings are exercised).
+7: COVERED — TC5 exercises min/max input (0 and 16) and min/max-ish T (T=1 and T=1000) with explicit expected outputs (e.g., after T=1 step output goes 0 → 16).
+8: NOT COVERED — no explicit “disabled” control/state is stimulated and verified; setting T=1000 in TC5 still expects output to equal input (16), not an explicit disabled/bypass/freeze behavior. A needed test would set the block into its defined disabled mode (if such an enable/disable exists) and expect bypass or held output accordingly.
+2026-07-14 15:18:57,886 INFO    mbd_metric:   M7 (DLL Pass Rate,       20%) = 0.5333 | DLL inline: 4 first-try + 1 retry-pass + 4 fail / 9 eqs
+2026-07-14 15:18:57,886 INFO    mbd_metric:   M8 (Functional Correct., 20%) = 0.0000 | M8=0 (wrong I/O): output signal driven as input: ['_ratlamticonadpn']; measurable output(s)=['_ratlamticonadpn']
+2026-07-14 15:18:57,886 INFO    mbd_metric: ======================================================================

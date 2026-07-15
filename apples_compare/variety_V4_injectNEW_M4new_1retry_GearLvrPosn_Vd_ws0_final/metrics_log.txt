@@ -1,0 +1,431 @@
+2026-07-14 15:00:56,338 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:00:56,338 INFO    extract_mbd_full: forward(): START — weakspot_op_key=$op21 raster_time=10000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\GearLvrPosn_Vd\env_libs\GearLvrPosn_Vd.dll
+2026-07-14 15:00:56,338 DEBUG   extract_mbd_full: forward(): equation_json (len=5134) = {"$op21": {"oid": "41711", "type": "Function", "instance_name": "getBit_unsigned_U8", "function_name": "getBit_unsigned_getBit", "class_method_name": "getBit", "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": ["bitLeiste", "bitPosition"], "args": ["$op19", "$op20"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["Gbx_SigSrcEval"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [null, null]}, "$op22": {"oid": "41564", "type": "Operation", "instance_name": "Not", "function_name": "Not", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op21"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["Gbx_SigSrcEval"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op19": {"oid": "41618", "type": "Variable", "instance_name": "Gbx_SigSrcEval", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["Gbx_SigSrcEval"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op20": {"oid": "41602", "type": "Literal", "instance_name": "2", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op8": {"oid": "1054", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op6"], "arg_names": [], "args": ["$op7"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op14": {"oid": "41575", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op12"], "arg_names": [], "args": ["$op13"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Gbx_bNPos", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op16": {"oid": "41580", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "Else", "condition": ["$op12"], "arg_names": [], "args": ["$op15"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Gbx_bNPos", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op28": {"oid": "41534", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "Else", "condition": ["$op24"], "arg_names": [], "args": ["$op27"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["Gbx_SigSrcEval", "PT_stTraType", "GbxPos_flgGNSPrsntVD"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op26": {"oid": "41530", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op24"], "arg_names": [], "args": ["$op25"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["Gbx_SigSrcEval", "PT_stTraType", "GbxPos_flgGNSPrsntVD"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op10": {"oid": "1160", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "Else", "condition": ["$op6"], "arg_names": [], "args": ["$op9"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}}
+2026-07-14 15:00:56,339 DEBUG   extract_mbd_full: forward(): const_values = {"TRA_MT": 0, "dT": "10.0"}
+2026-07-14 15:00:56,339 DEBUG   extract_mbd_full: forward(): weakspot_context (len=560) =    getBit\_unsigned
+
+getBit\_unsigned
+
+Returns the value of the bit at selected position for a unsigned input value.
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| getBit | Returns the value of the bit at selected position for a unsigned input value |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| bitPosition | Position of the bit that needs to be fetched. | uint8 OneToOne |
+| bitLeiste | Input value | u16:uint16 u32:uint32  u8:uint8  OneToOne |
+| return | The value of selected bit. | uint8 |
+2026-07-14 15:00:56,339 DEBUG   extract_mbd_full: forward(): instance_names = Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD
+2026-07-14 15:00:56,339 INFO    extract_mbd_full: forward(): KB guidelines resolved (fn=getBit_unsigned_getBit, +335 chars) -> kb_guidelines FIELD on Prompt 1 AND Prompt 2
+2026-07-14 15:00:56,339 INFO    extract_mbd_full: forward(): ----- Prompt 1 (context_extractor) — calling LM -----
+2026-07-14 15:01:13,623 INFO    extract_mbd_full: forward(): Prompt 1 DONE — context_analysis (len=4279)
+2026-07-14 15:01:13,624 DEBUG   extract_mbd_full: forward(): Prompt 1 context_analysis = The weakspot element identified is "$op21", which corresponds to the function "getBit_unsigned_getBit" with the instance name "getBit_unsigned_U8". This function is designed to extract the value of a specific bit from an unsigned integer input. The bit position to be extracted is provided as an input parameter. The function returns the logical value (0 or 1) of the bit at the specified position.
+
+The inputs to this function are:
+- "bitLeiste": the unsigned input value from which a bit is to be extracted. This is linked to "$op19", which is a variable named "Gbx_SigSrcEval" of type uint8 (unsigned 8-bit integer).
+- "bitPosition": the position of the bit to extract. This is linked to "$op20", which is a literal with value "2".
+
+The sample time parameter "dT" is not part of this function's inputs and is fixed, so it is excluded.
+
+The output of this function is the bit value at the specified position, which is used as input to the next operation "$op22" (a logical NOT operation). The output can be checked by verifying the returned bit value against expected logical values for given inputs.
+
+Test cases should cover:
+- Setting the input variable "Gbx_SigSrcEval" to various 8-bit values.
+- Providing different bit positions (including boundary cases like 0 and 7).
+- Verifying that the output matches the logical value of the bit at the specified position.
+- Ensuring correct behavior for all valid bit positions within the data size.
+
+The Bosch BU test guideline mandates validating the bit extraction operation by setting the input variable and bit position, then checking the output logical status of the bit.
+
+### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op21
+- **Instance Name:** getBit_unsigned_U8
+- **Function Name:** getBit_unsigned_getBit
+- **Role and Working:**
+  - This element implements a bit extraction function that returns the value of a specific bit from an unsigned integer input.
+  - It takes two inputs: the unsigned input value ("bitLeiste") and the bit position ("bitPosition").
+  - The function returns the logical value (0 or 1) of the bit at the specified position.
+  - This is critical for bit-level signal evaluation or control logic where individual bits represent flags or statuses.
+
+### 2. Inputs That Can Be Altered
+| Input Parameter | Reference Key | Type Information | Notes |
+|-----------------|---------------|------------------|-------|
+| bitLeiste       | $op19         | Variable: "Gbx_SigSrcEval", uint8 | Can be varied to test different input values |
+| bitPosition     | $op20         | Literal: "2"     | Fixed literal in this context, but test cases should consider varying this |
+
+- The input "bitLeiste" is a variable and can be changed to test different bit patterns.
+- The input "bitPosition" is currently a literal (fixed at 2), but for comprehensive testing, different bit positions should be considered.
+- The sample time parameter "dT" is not an input here and is excluded.
+
+### 3. Outputs That Can Be Checked
+- The output is the bit value at the specified position, returned as a uint8 logical value (0 or 1).
+- This output is directly produced by the weakspot element and is used as input to the next operation ($op22).
+- The output can be checked by comparing the returned bit value against the expected bit value extracted from the input variable.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1: Extract bit 0 from input 0x01 (binary 00000001)**
+  - Input: Gbx_SigSrcEval = 0x01, bitPosition = 0
+  - Expected Output: 1
+- **Testcase 2: Extract bit 2 from input 0x04 (binary 00000100)**
+  - Input: Gbx_SigSrcEval = 0x04, bitPosition = 2
+  - Expected Output: 1
+- **Testcase 3: Extract bit 7 from input 0x80 (binary 10000000)**
+  - Input: Gbx_SigSrcEval = 0x80, bitPosition = 7
+  - Expected Output: 1
+- **Testcase 4: Extract bit 3 from input 0x00 (binary 00000000)**
+  - Input: Gbx_SigSrcEval = 0x00, bitPosition = 3
+  - Expected Output: 0
+
+These testcases cover boundary bits and zero/one bit values, ensuring the function correctly extracts bits across the full range of an 8-bit input.
+
+The test guideline requires verifying the bit extraction operation by setting the input variable and bit position, then checking the output logical status, which these testcases fulfill.
+2026-07-14 15:01:13,624 INFO    extract_mbd_full: forward(): Required-I/O KB PROMPT override (fc=GearLvrPosn_Vd ws=0) — Expected Results instance_names 'Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD,Gbx_stTrsmNeutOBD' -> 'Gbx_stTrsmNeutOBD'
+2026-07-14 15:01:13,624 INFO    extract_mbd_full: forward(): ----- Prompt 2 (testcase_generator) — calling LM -----
+2026-07-14 15:01:29,360 INFO    extract_mbd_full: forward(): Prompt 2 DONE — test_cases_raw (len=2959)
+2026-07-14 15:01:29,362 DEBUG   extract_mbd_full: forward(): Prompt 2 test_cases_raw = [
+    {
+        "Pre-Condition": [
+            "bitPosition = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the extraction of bit 0 (least significant bit) from the input variable. Setting bitPosition to 0 in the pre-condition ensures the function extracts the correct bit. The first step sets Gbx_SigSrcEval to 1 (binary 00000001), where bit 0 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 0 is cleared, expecting output 0. This confirms correct extraction of the lowest bit."
+    },
+    {
+        "Pre-Condition": [
+            "bitPosition = 2"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 4"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the extraction of bit 2 (a middle bit) from the input variable. Setting bitPosition to 2 in the pre-condition targets the third bit. The first step sets Gbx_SigSrcEval to 4 (binary 00000100), where bit 2 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 2 is cleared, expecting output 0. This confirms correct extraction of a middle bit."
+    },
+    {
+        "Pre-Condition": [
+            "bitPosition = 7"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 128"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the extraction of bit 7 (most significant bit) from the input variable. Setting bitPosition to 7 in the pre-condition targets the highest bit in the 8-bit input. The first step sets Gbx_SigSrcEval to 128 (binary 10000000), where bit 7 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 7 is cleared, expecting output 0. This confirms correct extraction of the highest bit."
+    }
+]
+2026-07-14 15:01:29,362 INFO    extract_mbd_full: forward(): ----- Bridge: parsing Prompt 2 JSON output -----
+2026-07-14 15:01:29,362 DEBUG   extract_mbd_full: forward(): bridge — extracted JSON via regex match
+2026-07-14 15:01:29,362 INFO    extract_mbd_full: forward(): bridge — parsed 3 test case(s) from Prompt 2
+2026-07-14 15:01:29,362 DEBUG   extract_mbd_full: forward(): relations (count=2) = {'bitLeiste': 'Variable(Gbx_SigSrcEval)', 'bitPosition': 'Literal(2)'}
+2026-07-14 15:01:29,362 DEBUG   extract_mbd_full: forward(): equation_results_raw — 2 entr(ies)
+2026-07-14 15:01:29,363 DEBUG   extract_mbd_full: forward(): update_test_cases() -> 3 test case(s)
+2026-07-14 15:01:29,363 INFO    extract_mbd_full: forward(): extract_and_replace_equations() -> 0 equation(s) extracted
+2026-07-14 15:01:29,363 DEBUG   extract_mbd_full: forward(): unique_constants referenced = []
+2026-07-14 15:01:29,363 DEBUG   extract_mbd_full: forward(): filtered_const_values = {}
+2026-07-14 15:01:29,364 INFO    extract_mbd_full: _get_function_caller: cache MISS — dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\GearLvrPosn_Vd\env_libs\GearLvrPosn_Vd.dll FCname=GearLvrPosn_Vd work_dir=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data
+2026-07-14 15:01:29,364 DEBUG   extract_mbd_full: _get_function_caller: signal_sheet_list has 10 row(s)
+2026-07-14 15:01:29,364 DEBUG   extract_mbd_full: _get_function_caller: model_interface_data has 1 row(s)
+2026-07-14 15:01:30,645 INFO    extract_mbd_full: _get_function_caller: FunctionCaller initialized successfully (FCname=GearLvrPosn_Vd)
+2026-07-14 15:01:30,645 INFO    extract_mbd_full: forward(): function_caller=available (None means DLL verification disabled)
+2026-07-14 15:01:30,645 INFO    extract_mbd_full: forward(): merged_equation_map has 0 entr(ies) (out of 0 equation_dict entries)
+2026-07-14 15:01:30,645 INFO    extract_mbd_full: forward(): M7 INLINE — score=None (DLL unavailable — no inline M7)
+2026-07-14 15:01:30,645 INFO    extract_mbd_full: forward(): no equations to solve (equation_dict empty) — run.py:888 path
+2026-07-14 15:01:30,645 DEBUG   extract_mbd_full: forward(): final_json (no-equation path) = [{'Pre-Condition': ['2 = 0'], 'Steps': [{'Actions': ['Gbx_SigSrcEval = 1'], 'Expected Results': ['out = 1']}, {'Actions': ['Gbx_SigSrcEval = 0'], 'Expected Results': ['out = 0']}], 'Detailed Explanation': 'least significant bit from the input variable. Setting bitPosition to 0 in the pre-condition ensures the function extracts the correct bit. The first step sets Gbx_SigSrcEval to 1 (binary 00000001), where bit 0 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 0 is cleared, expecting output 0. This confirms correct extraction of the lowest bit.'}, {'Pre-Condition': ['2 = 2'], 'Steps': [{'Actions': ['Gbx_SigSrcEval = 4'], 'Expected Results': ['out = 1']}, {'Actions': ['Gbx_SigSrcEval = 0'], 'Expected Results': ['out = 0']}], 'Detailed Explanation': 'a middle bit from the input variable. Setting bitPosition to 2 in the pre-condition targets the third bit. The first step sets Gbx_SigSrcEval to 4 (binary 00000100), where bit 2 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 2 is cleared, expecting output 0. This confirms correct extraction of a middle bit.'}, {'Pre-Condition': ['2 = 7'], 'Steps': [{'Actions': ['Gbx_SigSrcEval = 128'], 'Expected Results': ['out = 1']}, {'Actions': ['Gbx_SigSrcEval = 0'], 'Expected Results': ['out = 0']}], 'Detailed Explanation': 'most significant bit from the input variable. Setting bitPosition to 7 in the pre-condition targets the highest bit in the 8-bit input. The first step sets Gbx_SigSrcEval to 128 (binary 10000000), where bit 7 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 7 is cleared, expecting output 0. This confirms correct extraction of the highest bit.'}]
+2026-07-14 15:01:30,646 INFO    extract_mbd_full: forward(): END — test_cases_pre_postprocess (Prompt2 raw, 2959 chars), final test_cases (1775 chars), m7_inline_score=None
+2026-07-14 15:01:30,646 INFO    extract_mbd_full: ======================================================================
+2026-07-14 15:01:30,648 INFO    mbd_metric: _compute_all_components: required_io KB HIT for GearLvrPosn_Vd#0 -> {'required_inputs': [], 'required_preconds': [], 'required_outputs': ['Gbx_stTrsmNeutOBD']}
+2026-07-14 15:01:30,649 INFO    mbd_metric: ======================================================================
+2026-07-14 15:01:30,649 INFO    mbd_metric: _compute_all_components: fc_name=GearLvrPosn_Vd weakspot_id=0 weakspot_op_key=$op21 raster_time=10000 dll_path=C:\Users\BHS1RNG\OneDrive - Bosch Group\AIQ-212\Code\meta-prompting\MBD\weakspot_code_to_run_2\data\GearLvrPosn_Vd\env_libs\GearLvrPosn_Vd.dll
+2026-07-14 15:01:30,649 INFO    mbd_metric: _compute_all_components: use_pre_postprocess=True
+2026-07-14 15:01:30,649 DEBUG   mbd_metric: _compute_all_components: pre_tc_str (Prompt 2 raw / M1,M3,M4,M6 input) = [
+    {
+        "Pre-Condition": [
+            "bitPosition = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 1"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the extraction of bit 0 (least significant bit) from the input variable. Setting bitPosition to 0 in the pre-condition ensures the function extracts the correct bit. The first step sets Gbx_SigSrcEval to 1 (binary 00000001), where bit 0 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 0 is cleared, expecting output 0. This confirms correct extraction of the lowest bit."
+    },
+    {
+        "Pre-Condition": [
+            "bitPosition = 2"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 4"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the extraction of bit 2 (a middle bit) from the input variable. Setting bitPosition to 2 in the pre-condition targets the third bit. The first step sets Gbx_SigSrcEval to 4 (binary 00000100), where bit 2 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 2 is cleared, expecting output 0. This confirms correct extraction of a middle bit."
+    },
+    {
+        "Pre-Condition": [
+            "bitPosition = 7"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 128"
+                ],
+                "Expected Results": [
+                    "out = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 0"
+                ],
+                "Expected Results": [
+                    "out = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case verifies the extraction of bit 7 (most significant bit) from the input variable. Setting bitPosition to 7 in the pre-condition targets the highest bit in the 8-bit input. The first step sets Gbx_SigSrcEval to 128 (binary 10000000), where bit 7 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 7 is cleared, expecting output 0. This confirms correct extraction of the highest bit."
+    }
+]
+2026-07-14 15:01:30,649 DEBUG   mbd_metric: _compute_all_components: final_tc_str (final JSON / M2,M7,M8 input) = [{"Pre-Condition": ["2 = 0"], "Steps": [{"Actions": ["Gbx_SigSrcEval = 1"], "Expected Results": ["out = 1"]}, {"Actions": ["Gbx_SigSrcEval = 0"], "Expected Results": ["out = 0"]}], "Detailed Explanation": "least significant bit from the input variable. Setting bitPosition to 0 in the pre-condition ensures the function extracts the correct bit. The first step sets Gbx_SigSrcEval to 1 (binary 00000001), where bit 0 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 0 is cleared, expecting output 0. This confirms correct extraction of the lowest bit."}, {"Pre-Condition": ["2 = 2"], "Steps": [{"Actions": ["Gbx_SigSrcEval = 4"], "Expected Results": ["out = 1"]}, {"Actions": ["Gbx_SigSrcEval = 0"], "Expected Results": ["out = 0"]}], "Detailed Explanation": "a middle bit from the input variable. Setting bitPosition to 2 in the pre-condition targets the third bit. The first step sets Gbx_SigSrcEval to 4 (binary 00000100), where bit 2 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 2 is cleared, expecting output 0. This confirms correct extraction of a middle bit."}, {"Pre-Condition": ["2 = 7"], "Steps": [{"Actions": ["Gbx_SigSrcEval = 128"], "Expected Results": ["out = 1"]}, {"Actions": ["Gbx_SigSrcEval = 0"], "Expected Results": ["out = 0"]}], "Detailed Explanation": "most significant bit from the input variable. Setting bitPosition to 7 in the pre-condition targets the highest bit in the 8-bit input. The first step sets Gbx_SigSrcEval to 128 (binary 10000000), where bit 7 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 7 is cleared, expecting output 0. This confirms correct extraction of the highest bit."}]
+2026-07-14 15:01:30,649 INFO    mbd_metric: M3: ===== Structural Validity (raster_time=10000) =====
+2026-07-14 15:01:30,650 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-14 15:01:30,651 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Gbx_SigSrcEval': '1'} exp={'out': '1'}
+2026-07-14 15:01:30,651 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,651 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'bitPosition': '0'}, 2 step(s), explanation='This test case verifies the extraction of bit 0 (least significant bit) from the'
+2026-07-14 15:01:30,651 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Gbx_SigSrcEval': '4'} exp={'out': '1'}
+2026-07-14 15:01:30,651 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'bitPosition': '2'}, 2 step(s), explanation='This test case verifies the extraction of bit 2 (a middle bit) from the input va'
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Gbx_SigSrcEval': '128'} exp={'out': '1'}
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'bitPosition': '7'}, 2 step(s), explanation='This test case verifies the extraction of bit 7 (most significant bit) from the '
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: M3: TC1 explanation check PASS
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: M3: TC1.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: M3: TC1.S1 action Gbx_SigSrcEval=1 numeric check PASS
+2026-07-14 15:01:30,652 DEBUG   mbd_metric: M3: TC1.S1 exp out=1 numeric check PASS
+2026-07-14 15:01:30,653 DEBUG   mbd_metric: M3: TC1.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:01:30,653 DEBUG   mbd_metric: M3: TC1.S2 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:01:30,653 DEBUG   mbd_metric: M3: TC1.S2 action Gbx_SigSrcEval=0 numeric check PASS
+2026-07-14 15:01:30,653 DEBUG   mbd_metric: M3: TC1.S2 exp out=0 numeric check PASS
+2026-07-14 15:01:30,653 DEBUG   mbd_metric: M3: TC1.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:01:30,653 DEBUG   mbd_metric: M3: TC1 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:01:30,653 DEBUG   mbd_metric: M3: TC2 explanation check PASS
+2026-07-14 15:01:30,654 DEBUG   mbd_metric: M3: TC2.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:01:30,654 DEBUG   mbd_metric: M3: TC2.S1 action Gbx_SigSrcEval=4 numeric check PASS
+2026-07-14 15:01:30,654 DEBUG   mbd_metric: M3: TC2.S1 exp out=1 numeric check PASS
+2026-07-14 15:01:30,654 DEBUG   mbd_metric: M3: TC2.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:01:30,654 DEBUG   mbd_metric: M3: TC2.S2 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:01:30,654 DEBUG   mbd_metric: M3: TC2.S2 action Gbx_SigSrcEval=0 numeric check PASS
+2026-07-14 15:01:30,654 DEBUG   mbd_metric: M3: TC2.S2 exp out=0 numeric check PASS
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC2.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC2 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC3 explanation check PASS
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC3.S1 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC3.S1 action Gbx_SigSrcEval=128 numeric check PASS
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC3.S1 exp out=1 numeric check PASS
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC3.S1 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:01:30,655 DEBUG   mbd_metric: M3: TC3.S2 Wait check SKIP (no Wait — instantaneous step, not penalised)
+2026-07-14 15:01:30,656 DEBUG   mbd_metric: M3: TC3.S2 action Gbx_SigSrcEval=0 numeric check PASS
+2026-07-14 15:01:30,656 DEBUG   mbd_metric: M3: TC3.S2 exp out=0 numeric check PASS
+2026-07-14 15:01:30,656 DEBUG   mbd_metric: M3: TC3.S2 act/exp-overlap check PASS (no overlap)
+2026-07-14 15:01:30,656 DEBUG   mbd_metric: M3: TC3 precond/expected-overlap check PASS (no overlap)
+2026-07-14 15:01:30,656 INFO    mbd_metric: M3: RESULT score=1.0000 (24/24 weighted checks passed)
+2026-07-14 15:01:30,656 INFO    mbd_metric: M1: ===== I/O Classification =====
+2026-07-14 15:01:30,656 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-14 15:01:30,656 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Gbx_SigSrcEval': '1'} exp={'out': '1'}
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'bitPosition': '0'}, 2 step(s), explanation='This test case verifies the extraction of bit 0 (least significant bit) from the'
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Gbx_SigSrcEval': '4'} exp={'out': '1'}
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'bitPosition': '2'}, 2 step(s), explanation='This test case verifies the extraction of bit 2 (a middle bit) from the input va'
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Gbx_SigSrcEval': '128'} exp={'out': '1'}
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,657 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'bitPosition': '7'}, 2 step(s), explanation='This test case verifies the extraction of bit 7 (most significant bit) from the '
+2026-07-14 15:01:30,658 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-14 15:01:30,658 DEBUG   mbd_metric: M1: weakspot output signals (required_io KB) = {'Gbx_stTrsmNeutOBD'}
+2026-07-14 15:01:30,658 DEBUG   mbd_metric: M1: fixed_vars (SystemConstant/Literal/dT) = {'2'}
+2026-07-14 15:01:30,658 DEBUG   mbd_metric: M1: TC1 precond_vars={'bitPosition'} action_vars={'Gbx_SigSrcEval'} expected_vars={'out'}
+2026-07-14 15:01:30,658 DEBUG   mbd_metric: M1: TC1 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:01:30,658 DEBUG   mbd_metric: M1: TC1 output-verified check FAIL (weighs 1x, expected={'out'})
+2026-07-14 15:01:30,659 DEBUG   mbd_metric: M1: TC1 output-not-set-as-input check PASS
+2026-07-14 15:01:30,659 DEBUG   mbd_metric: M1: TC2 precond_vars={'bitPosition'} action_vars={'Gbx_SigSrcEval'} expected_vars={'out'}
+2026-07-14 15:01:30,659 DEBUG   mbd_metric: M1: TC2 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:01:30,659 DEBUG   mbd_metric: M1: TC2 output-verified check FAIL (weighs 1x, expected={'out'})
+2026-07-14 15:01:30,659 DEBUG   mbd_metric: M1: TC2 output-not-set-as-input check PASS
+2026-07-14 15:01:30,659 DEBUG   mbd_metric: M1: TC3 precond_vars={'bitPosition'} action_vars={'Gbx_SigSrcEval'} expected_vars={'out'}
+2026-07-14 15:01:30,659 DEBUG   mbd_metric: M1: TC3 fixed-vars check PASS (no fixed var used as I/O)
+2026-07-14 15:01:30,660 DEBUG   mbd_metric: M1: TC3 output-verified check FAIL (weighs 1x, expected={'out'})
+2026-07-14 15:01:30,660 DEBUG   mbd_metric: M1: TC3 output-not-set-as-input check PASS
+2026-07-14 15:01:30,660 INFO    mbd_metric: M1: RESULT score=0.6667 (6/9 checks passed)
+2026-07-14 15:01:30,660 INFO    mbd_metric: M1: failed checks: TC1: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['out']; TC2: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['out']; TC3: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['out']
+2026-07-14 15:01:30,660 INFO    mbd_metric: M4: ===== Test Coverage (weakspot_op_key=$op21, KB_LOADED=True) =====
+2026-07-14 15:01:30,660 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-14 15:01:30,660 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Gbx_SigSrcEval': '1'} exp={'out': '1'}
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'bitPosition': '0'}, 2 step(s), explanation='This test case verifies the extraction of bit 0 (least significant bit) from the'
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Gbx_SigSrcEval': '4'} exp={'out': '1'}
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'bitPosition': '2'}, 2 step(s), explanation='This test case verifies the extraction of bit 2 (a middle bit) from the input va'
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Gbx_SigSrcEval': '128'} exp={'out': '1'}
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:30,661 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'bitPosition': '7'}, 2 step(s), explanation='This test case verifies the extraction of bit 7 (most significant bit) from the '
+2026-07-14 15:01:30,662 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-14 15:01:30,662 DEBUG   mbd_metric: M4: weakspot op_entry function_name/class_method_name/method_name = 'getBit_unsigned_getBit'
+2026-07-14 15:01:30,662 DEBUG   mbd_metric: M4: resolve_guidelines('getBit_unsigned_getBit') -> source=newKB block_type='getBit_unsigned_getBit' (1 guideline(s))
+2026-07-14 15:01:30,662 DEBUG   mbd_metric: M4: guidelines_text=
+1: Checking the Bit Operation : GetBit — Set: Set the input variable X = xxxxxxxx (data size may be 8-bit,16-bit or 32-bit); Set: Give the Position number to get the logical value of the bit.; Check: Output = Logical status of the position Number
+2026-07-14 15:01:30,662 DEBUG   mbd_metric: M4: full test-case text for judge=
+TC1:
+  Pre-Condition: {'bitPosition': '0'}
+  Step 1: Wait=None, Actions={'Gbx_SigSrcEval': '1'}, Expected Results={'out': '1'}
+  Step 2: Wait=None, Actions={'Gbx_SigSrcEval': '0'}, Expected Results={'out': '0'}
+  Explanation: This test case verifies the extraction of bit 0 (least significant bit) from the input variable. Setting bitPosition to 0 in the pre-condition ensures the function extracts the correct bit. The first step sets Gbx_SigSrcEval to 1 (binary 00000001), where bit 0 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 0 is cleared, expecting output 0. This confirms correct extraction of the lowest bit.
+TC2:
+  Pre-Condition: {'bitPosition': '2'}
+  Step 1: Wait=None, Actions={'Gbx_SigSrcEval': '4'}, Expected Results={'out': '1'}
+  Step 2: Wait=None, Actions={'Gbx_SigSrcEval': '0'}, Expected Results={'out': '0'}
+  Explanation: This test case verifies the extraction of bit 2 (a middle bit) from the input variable. Setting bitPosition to 2 in the pre-condition targets the third bit. The first step sets Gbx_SigSrcEval to 4 (binary 00000100), where bit 2 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 2 is cleared, expecting output 0. This confirms correct extraction of a middle bit.
+TC3:
+  Pre-Condition: {'bitPosition': '7'}
+  Step 1: Wait=None, Actions={'Gbx_SigSrcEval': '128'}, Expected Results={'out': '1'}
+  Step 2: Wait=None, Actions={'Gbx_SigSrcEval': '0'}, Expected Results={'out': '0'}
+  Explanation: This test case verifies the extraction of bit 7 (most significant bit) from the input variable. Setting bitPosition to 7 in the pre-condition targets the highest bit in the 8-bit input. The first step sets Gbx_SigSrcEval to 128 (binary 10000000), where bit 7 is set, expecting output 1. The second step sets Gbx_SigSrcEval to 0 (binary 00000000), where bit 7 is cleared, expecting output 0. This confirms correct extraction of the highest bit.
+2026-07-14 15:01:30,662 INFO    mbd_metric: M4: calling TestCoverageJudge LLM (block_type=getBit_unsigned_getBit, 1 guideline(s), 3 test case(s))
+2026-07-14 15:01:30,663 INFO    mbd_metric: M4: judge LM dedicated to azure/gpt-5.2 (independent of the inference LM)
+2026-07-14 15:01:33,588 DEBUG   mbd_metric: M4: judge raw covered_indices='1'
+2026-07-14 15:01:33,590 DEBUG   mbd_metric: M4: judge parsed covered set = {1}
+2026-07-14 15:01:33,590 DEBUG   mbd_metric: M4: judge coverage_reasoning = 1: COVERED — TC1/TC2/TC3 explicitly set input X via Actions (Gbx_SigSrcEval=1,4,128 and 0) and set Position via Pre-Condition (bitPosition=0,2,7); Expected Results verify out equals the logical status of that bit (out=1 when the target bit is set, out=0 when cleared).
+2026-07-14 15:01:33,590 INFO    mbd_metric: M4: RESULT score=1.0000 [newKB:getBit_unsigned_getBit] 1/1 covered | missing: none
+    JUDGE REASONING: 1: COVERED — TC1/TC2/TC3 explicitly set input X via Actions (Gbx_SigSrcEval=1,4,128 and 0) and set Position via Pre-Condition (bitPosition=0,2,7); Expected Results verify out equals the logical status of that bit (out=1 when the target bit is set, out=0 when cleared).
+2026-07-14 15:01:33,590 INFO    mbd_metric: M2: ===== Signal Resolution (final JSON) =====
+2026-07-14 15:01:33,590 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Gbx_SigSrcEval': '1'} exp={'out': '1'}
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'2': '0'}, 2 step(s), explanation='least significant bit from the input variable. Setting bitPosition to 0 in the p'
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Gbx_SigSrcEval': '4'} exp={'out': '1'}
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'2': '2'}, 2 step(s), explanation='a middle bit from the input variable. Setting bitPosition to 2 in the pre-condit'
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Gbx_SigSrcEval': '128'} exp={'out': '1'}
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'2': '7'}, 2 step(s), explanation='most significant bit from the input variable. Setting bitPosition to 7 in the pr'
+2026-07-14 15:01:33,591 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-14 15:01:33,592 DEBUG   mbd_metric: M2: known_names count=12 (signalsheet+model_interface+equation)
+2026-07-14 15:01:33,592 DEBUG   mbd_metric: M2: var='2' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:01:33,592 DEBUG   mbd_metric: M2: var='Gbx_SigSrcEval' -> RESOLVED (normalized match in namespace)
+2026-07-14 15:01:33,592 DEBUG   mbd_metric: M2: var='out' -> ABSTRACT (generic placeholder, not a real signal)
+2026-07-14 15:01:33,593 INFO    mbd_metric: M2: RESULT score=0.6667 (2/3 UNIQUE vars resolved)
+2026-07-14 15:01:33,593 INFO    mbd_metric: M2: unresolved/abstract/missing: Abstract: out
+2026-07-14 15:01:33,593 INFO    mbd_metric: M7: ===== DLL Pass Rate (post-hoc fallback path) =====
+2026-07-14 15:01:33,593 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-14 15:01:33,593 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Gbx_SigSrcEval': '1'} exp={'out': '1'}
+2026-07-14 15:01:33,593 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'2': '0'}, 2 step(s), explanation='least significant bit from the input variable. Setting bitPosition to 0 in the p'
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Gbx_SigSrcEval': '4'} exp={'out': '1'}
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'2': '2'}, 2 step(s), explanation='a middle bit from the input variable. Setting bitPosition to 2 in the pre-condit'
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Gbx_SigSrcEval': '128'} exp={'out': '1'}
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'2': '7'}, 2 step(s), explanation='most significant bit from the input variable. Setting bitPosition to 7 in the pr'
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-14 15:01:33,594 DEBUG   mbd_metric: M7: equation_results_json has 2 entr(ies)
+2026-07-14 15:01:33,595 INFO    mbd_metric: M7: weakspot $op21 is a function call (getBit_unsigned_getBit) — Prompt 4 arithmetic solving N/A; functional correctness measured by M8. score=0.5 (neutral)
+2026-07-14 15:01:33,595 INFO    mbd_metric: M8: ===== Functional Correctness (sequential DLL, final JSON) =====
+2026-07-14 15:01:33,595 DEBUG   mbd_metric: _normalize_test_cases: parsed 3 raw test case(s) from input
+2026-07-14 15:01:33,595 DEBUG   mbd_metric: _normalize_test_cases: TC1 step1 -> wait=None act={'Gbx_SigSrcEval': '1'} exp={'out': '1'}
+2026-07-14 15:01:33,595 DEBUG   mbd_metric: _normalize_test_cases: TC1 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,595 DEBUG   mbd_metric: _normalize_test_cases: TC1 -> precond={'2': '0'}, 2 step(s), explanation='least significant bit from the input variable. Setting bitPosition to 0 in the p'
+2026-07-14 15:01:33,595 DEBUG   mbd_metric: _normalize_test_cases: TC2 step1 -> wait=None act={'Gbx_SigSrcEval': '4'} exp={'out': '1'}
+2026-07-14 15:01:33,595 DEBUG   mbd_metric: _normalize_test_cases: TC2 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,595 DEBUG   mbd_metric: _normalize_test_cases: TC2 -> precond={'2': '2'}, 2 step(s), explanation='a middle bit from the input variable. Setting bitPosition to 2 in the pre-condit'
+2026-07-14 15:01:33,596 DEBUG   mbd_metric: _normalize_test_cases: TC3 step1 -> wait=None act={'Gbx_SigSrcEval': '128'} exp={'out': '1'}
+2026-07-14 15:01:33,596 DEBUG   mbd_metric: _normalize_test_cases: TC3 step2 -> wait=None act={'Gbx_SigSrcEval': '0'} exp={'out': '0'}
+2026-07-14 15:01:33,596 DEBUG   mbd_metric: _normalize_test_cases: TC3 -> precond={'2': '7'}, 2 step(s), explanation='most significant bit from the input variable. Setting bitPosition to 7 in the pr'
+2026-07-14 15:01:33,596 DEBUG   mbd_metric: _normalize_test_cases: produced 3 canonical test case(s)
+2026-07-14 15:01:33,596 INFO    mbd_metric: M8: 3 final test case(s) to verify
+2026-07-14 15:01:33,597 INFO    mbd_metric: M8: GATED to 0.0 (wrong I/O) — verifies no real measurable output | measurable outputs=['gbx_sttrsmneutobd']
+2026-07-14 15:01:33,597 INFO    mbd_metric: ======================================================================
+2026-07-14 15:01:33,597 INFO    mbd_metric: _compute_all_components: SUMMARY OF ALL METRIC SCORES
+2026-07-14 15:01:33,597 INFO    mbd_metric:   M1 (I/O Classification,  15%) = 0.6667 | TC1: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['out']; TC2: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['out']; TC3: Expected Results verify no real output ['Gbx_stTrsmNeutOBD'] (weighs 1x); got ['out']
+2026-07-14 15:01:33,597 INFO    mbd_metric:   M2 (Signal Resolution,   15%) = 0.6667 | Abstract: out
+2026-07-14 15:01:33,597 INFO    mbd_metric:   M3 (Structural Validity, 10%) = 1.0000 | All structural checks passed
+2026-07-14 15:01:33,597 INFO    mbd_metric:   M4 (Test Coverage,       20%) = 1.0000 | [newKB:getBit_unsigned_getBit] 1/1 covered | missing: none
+    JUDGE REASONING: 1: COVERED — TC1/TC2/TC3 explicitly set input X via Actions (Gbx_SigSrcEval=1,4,128 and 0) and set Position via Pre-Condition (bitPosition=0,2,7); Expected Results verify out equals the logical status of that bit (out=1 when the target bit is set, out=0 when cleared).
+2026-07-14 15:01:33,597 INFO    mbd_metric:   M7 (DLL Pass Rate,       20%) = 0.5000 | N/A — function-call weakspot (getBit_unsigned_getBit); see M8 for functional correctness
+2026-07-14 15:01:33,598 INFO    mbd_metric:   M8 (Functional Correct., 20%) = 0.0000 | M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['gbx_sttrsmneutobd']
+2026-07-14 15:01:33,598 INFO    mbd_metric: ======================================================================

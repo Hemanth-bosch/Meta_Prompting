@@ -1,0 +1,50 @@
+[
+  {
+    "Pre-Condition": [
+      "Gbx_stTrsmNeutOBD = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Gbx_SigSrcEval = 4"
+        ],
+        "Expected Results": [
+          "Gbx_stTrsmNeutOBD = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "0 as per the provided expected results list, ensuring the bit extraction does not affect unrelated variables. This validates that the function correctly identifies a bit set at position 2."
+  },
+  {
+    "Pre-Condition": [
+      "Gbx_stTrsmNeutOBD = 1"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Gbx_SigSrcEval = 0"
+        ],
+        "Expected Results": [
+          "Gbx_stTrsmNeutOBD = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "0. The weakspot operation should extract bit 2 as 0. The expected result is that Gbx_stTrsmNeutOBD remains 1, confirming that the bit extraction correctly identifies the bit as cleared without altering other variables. This test validates the function's ability to detect a cleared bit at position 2."
+  },
+  {
+    "Pre-Condition": [
+      "Gbx_stTrsmNeutOBD = 2"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "Gbx_SigSrcEval = 255"
+        ],
+        "Expected Results": [
+          "Gbx_stTrsmNeutOBD = 2"
+        ]
+      }
+    ],
+    "Detailed Explanation": "binary 11111111 for Gbx_SigSrcEval, where all bits including bit position 2 are set to 1. The weakspot operation should extract bit 2 as 1. The expected result is that Gbx_stTrsmNeutOBD remains 2, ensuring that the bit extraction correctly identifies the bit set in a boundary condition. This validates the function's behavior on the maximum input value."
+  }
+]

@@ -1,0 +1,78 @@
+[[ ## reasoning ## ]]
+The weakspot operation $op21 corresponds to the function "getBit_unsigned_getBit" which extracts the bit value at a fixed position 2 from an 8-bit unsigned integer input "Gbx_SigSrcEval". The bit position is fixed and cannot be changed, so the only input that can be varied is the value of "Gbx_SigSrcEval". The test cases must verify that the function correctly returns the bit value (0 or 1) at position 2 for different input values.
+
+To comprehensively test this weakspot, the test cases should cover scenarios where the bit at position 2 is both cleared (0) and set (1). This ensures the function correctly identifies the bit status regardless of other bits in the input.
+
+The test cases include:
+- Input with bit 2 cleared (0), e.g., 0x00 (binary 00000000) and 0xFB (binary 11111011).
+- Input with bit 2 set (1), e.g., 0x04 (binary 00000100) and 0xFF (binary 11111111).
+
+Each test case sets the input variable "Gbx_SigSrcEval" to a specific value, waits for one raster (dT = 10.0), and then checks that the output bit value matches the expected logical bit at position 2.
+
+This approach satisfies the KB guideline to check the bit operation by setting the input variable and verifying the output bit status. It also ensures coverage of both bit set and bit cleared conditions at the fixed bit position.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 0"
+                ],
+                "Expected Results": [
+                    "Wait 10.0",
+                    "getBit_unsigned_U8 = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets the input variable Gbx_SigSrcEval to 0x00 (binary 00000000), where bit position 2 is cleared (0). The function getBit_unsigned_getBit should return 0 for bit 2. Waiting for one raster ensures the function processes the input. This verifies the function correctly identifies a cleared bit."
+    },
+    {
+        "Pre-Condition": [],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 4"
+                ],
+                "Expected Results": [
+                    "Wait 10.0",
+                    "getBit_unsigned_U8 = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets Gbx_SigSrcEval to 0x04 (binary 00000100), where bit position 2 is set (1). The function should return 1 for bit 2. Waiting for one raster allows the function to update the output. This confirms the function correctly detects a set bit."
+    },
+    {
+        "Pre-Condition": [],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 255"
+                ],
+                "Expected Results": [
+                    "Wait 10.0",
+                    "getBit_unsigned_U8 = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "Here, Gbx_SigSrcEval is set to 0xFF (binary 11111111), with all bits set including bit 2. The function should return 1 for bit 2. This test verifies correct operation when all bits are set."
+    },
+    {
+        "Pre-Condition": [],
+        "Steps": [
+            {
+                "Actions": [
+                    "Gbx_SigSrcEval = 251"
+                ],
+                "Expected Results": [
+                    "Wait 10.0",
+                    "getBit_unsigned_U8 = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test case sets Gbx_SigSrcEval to 0xFB (binary 11111011), where bit 2 is cleared (0) despite other bits being set. The function should return 0 for bit 2. This ensures the function correctly isolates the bit of interest regardless of other bits."
+    }
+]
+
+[[ ## completed ## ]]

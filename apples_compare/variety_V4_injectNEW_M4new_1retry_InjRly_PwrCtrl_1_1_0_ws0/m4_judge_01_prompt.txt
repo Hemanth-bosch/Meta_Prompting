@@ -1,0 +1,95 @@
+================ role: system ================
+Your input fields are:
+1. `block_type` (str): ASCET block type name (e.g., 'Srv_Debounce', 'Srv_RampSwitch', 'LowpassT')
+2. `guidelines` (str): Numbered list of required test guidelines for this block type. Format: '1: <guideline text>\n2: <guideline text>\n...'
+3. `test_cases` (str): The full generated test cases to judge. Each test case includes its Pre-Conditions, its ordered Steps (Actions / Wait / Expected Results), and a Detailed Explanation. Format: 'TC1:\n  Pre-Condition: ...\n  Step 1: Actions=..., Expected Results=...\n  Explanation: ...\nTC2: ...'
+Your output fields are:
+1. `covered_indices` (str): Comma-separated list of guideline numbers that are covered by at least one test case. Example: '1,3,4' or '1,2,3,4,5'. Empty string '' if no guidelines are covered. Only output the numbers, nothing else.
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## block_type ## ]]
+{block_type}
+
+[[ ## guidelines ## ]]
+{guidelines}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## covered_indices ## ]]
+{covered_indices}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Rigorously judge which required testing guidelines are ACTUALLY exercised by the generated
+        MBD test cases for a specific ASCET block type.
+        
+        You are given the FULL generated test cases — each with its Pre-Conditions, ordered Steps
+        (Actions / Wait / Expected Results) and a Detailed Explanation. Judge each numbered guideline
+        INDEPENDENTLY and STRICTLY against the ACTUAL test-case content (the concrete input values,
+        preconditions, steps and Expected Results), not merely the prose explanation. A guideline counts
+        as COVERED only if at least one test case EXPLICITLY exercises that exact scenario — i.e. it
+        provides BOTH (a) the concrete stimulus the guideline calls for (the specific input value / edge /
+        state / boundary / branch / parameter setting, visible in its Pre-Conditions/Actions) AND (b) the
+        expected resulting behavior or output for that scenario (visible in its Expected Results and/or
+        explanation). Be conservative:
+          • Merely naming the block, or generically "testing"/"reading"/"using" it, does NOT count.
+          • Partial, tangential, implied, or restated-guideline mentions do NOT count.
+          • A scenario without a concrete stimulus AND an expected result does NOT count.
+          • When in doubt, mark it NOT covered.
+        One test case may cover several guidelines only if it genuinely exercises each distinct scenario.
+        Distinct scenarios must be distinguished — do not mark two different guidelines covered from a
+        single generic test case that fits neither specifically.
+
+================ role: user ================
+[[ ## block_type ## ]]
+Srv_TrnOffDly
+
+[[ ## guidelines ## ]]
+1: Checking the Delay of falling edge — Initialize the Delay parameter and set the input to zero; Set: = desired value; Set: Input = FALSE; Check: Output = Input = FALSE
+2: Checking on rising edge — Given: Output = Input = FALSE; Set: Input = TRUE; Check: Output = Input immediately
+3: Checking the output when the input is at FALSE for less than the delay time — Given: Output = Input = TRUE; Set: Input = FALSE and then set it to TRUE before the delay time; Check: Output = TRUE - does not change to TRUE
+4: Checking the delay on falling edge — Given: Output = Input = TRUE; Set: Input = FALSE; Wait: Delay time (XXX_tiYYYDly_C); Check: Output = FALSE after the delay time
+5: Repeat all the above cases with maximum value for the turn off delay mentioned in the design
+6: Repeat all the above cases with minimum value for the turn-off delay mentioned in the design
+7: Repeat all the above cases with a value of zero for the turn-off delay and check whether there is no delay between input and output
+
+[[ ## test_cases ## ]]
+TC1:
+  Pre-Condition: {'delayTime': '20000'}
+  Step 1: Wait=None, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '0'}
+  Step 2: Wait=None, Actions={'signal': '1'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Explanation: This testcase verifies that when the input signal is initially FALSE, the output is also FALSE immediately. Then, when the input signal transitions to TRUE, the output immediately becomes TRUE without delay. This tests the immediate output response on the rising edge of the input signal, satisfying KB guidelines 1 and 2.
+TC2:
+  Pre-Condition: {'delayTime': '20000'}
+  Step 1: Wait=None, Actions={'signal': '1'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 2: Wait=1, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 3: Wait=1, Actions={}, Expected Results={'_flgDlydlnPostDrive': '0'}
+  Explanation: This testcase verifies the delayed turn-off behavior on the falling edge. Starting with input TRUE and output TRUE, the input is set to FALSE. Immediately after, the output remains TRUE due to the delay. After waiting the delay time (one raster of 20000), the output switches to FALSE. This confirms the turn-off delay logic works correctly, satisfying KB guideline 4.
+TC3:
+  Pre-Condition: {'delayTime': '20000'}
+  Step 1: Wait=None, Actions={'signal': '1'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 2: Wait=1, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 3: Wait=None, Actions={'signal': '1'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Explanation: This testcase verifies that if the input toggles back to TRUE before the delay expires, the output remains TRUE and does not switch to FALSE. Starting with input and output TRUE, the input is set to FALSE and held for less than the delay time, then set back to TRUE. The output remains TRUE throughout, confirming the debounce behavior and satisfying KB guideline 3.
+TC4:
+  Pre-Condition: {'delayTime': '0'}
+  Step 1: Wait=None, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '0'}
+  Step 2: Wait=None, Actions={'signal': '1'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 3: Wait=None, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '0'}
+  Explanation: This testcase repeats the previous scenarios with zero delay time. The output should immediately follow the input without any delay on falling edge. This verifies that the turn-off delay logic correctly handles zero delay, satisfying KB guideline 7.
+TC5:
+  Pre-Condition: {'delayTime': '-2147483648'}
+  Step 1: Wait=None, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '0'}
+  Step 2: Wait=None, Actions={'signal': '1'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 3: Wait=1, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 4: Wait=1, Actions={}, Expected Results={'_flgDlydlnPostDrive': '0'}
+  Explanation: This testcase repeats the delayed turn-off behavior with the minimum possible delay value (minimum 32-bit signed integer). It verifies that the function handles the minimum delay parameter correctly, ensuring the output remains TRUE for the delay duration and then switches to FALSE, satisfying KB guideline 6.
+TC6:
+  Pre-Condition: {'delayTime': '2147483647'}
+  Step 1: Wait=None, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '0'}
+  Step 2: Wait=None, Actions={'signal': '1'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Step 3: Wait=1, Actions={'signal': '0'}, Expected Results={'_flgDlydlnPostDrive': '1'}
+  Explanation: This testcase repeats the delayed turn-off behavior with the maximum possible delay value (maximum 32-bit signed integer). It verifies that the output remains TRUE for at least one raster after input falls to FALSE, confirming the function handles maximum delay values correctly, satisfying KB guideline 5.
+
+Respond with the corresponding output fields, starting with the field `[[ ## covered_indices ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

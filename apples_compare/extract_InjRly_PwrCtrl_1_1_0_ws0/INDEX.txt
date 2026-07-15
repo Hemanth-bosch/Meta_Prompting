@@ -1,0 +1,13 @@
+weakspot : InjRly_PwrCtrl_1_1_0 ws=0
+model    : azure/gpt-4.1-mini
+inject_kb_guidelines: False (== run.py)
+max_retries: 1 (== run.py)
+LLM calls captured: 2
+
+Expected call order:
+  call 1  = PROMPT 1 (context_extractor)
+  call 2  = PROMPT 2 (testcase_generator)
+  call 3+ = PROMPT 4 (equation_solver_dll) per equation, each optionally + 1 retry
+
+llm_call_01: prompt=10853 chars, response=5215 chars
+llm_call_02: prompt=15600 chars, response=5177 chars

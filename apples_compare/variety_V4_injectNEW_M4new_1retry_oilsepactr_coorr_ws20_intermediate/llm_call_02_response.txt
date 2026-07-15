@@ -1,0 +1,236 @@
+[[ ## reasoning ## ]]
+The weakspot element $op187 implements a turn-on delay logic that requires the input signal to remain true continuously for a configured delay time before the output switches to true. The output immediately switches to false when the input is false. The test cases must validate this behavior comprehensively, including boundary conditions for the delay parameter (minimum, maximum, zero) and transitions of the input signal.
+
+The KB guidelines specify seven key scenarios that must be covered:
+1. Immediate false output when input is false.
+2. Output switches to true only after input remains true for the delay time.
+3. Immediate false output on falling edge.
+4. Output remains false if input true duration is less than delay.
+5. Repeat above with maximum delay.
+6. Repeat above with minimum delay.
+7. Repeat above with zero delay (no delay expected).
+
+To satisfy these, the test cases are designed as follows:
+
+- Test Case 1: Immediate false output on false input with a nominal delay (e.g., 3 units).
+- Test Case 2: Delayed true output on sustained true input with nominal delay.
+- Test Case 3: Immediate false output on falling edge with nominal delay.
+- Test Case 4: No output change if input true duration is less than delay with nominal delay.
+- Test Case 5: Repeat the above four scenarios with maximum delay (e.g., 10 units).
+- Test Case 6: Repeat the above four scenarios with minimum delay (e.g., 1 unit).
+- Test Case 7: Repeat the above four scenarios with zero delay (0 units), expecting no delay.
+
+Each test case includes pre-conditions to set delayTime and initial signal/output states, followed by steps that manipulate the input signal and wait appropriate times (multiples of dT=0.1s) to verify the output behavior. The output variable checked is OilSepActr_flgSpdShdwn.
+
+This approach ensures all KB guidelines are exercised at least once, covering normal and boundary conditions, and validating the turn-on delay logic thoroughly.
+
+[[ ## test_cases ## ]]
+[
+    {
+        "Pre-Condition": [
+            "delayTime = 3",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test verifies that when the input signal is false, the output immediately remains false regardless of the delay time. It confirms the immediate reset behavior of the turn-on delay element."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 3",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 3"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test validates that the output switches to true only after the input signal remains true continuously for the configured delay time (3 units). It confirms the correct turn-on delay behavior."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 3",
+            "signal = 1"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test checks that the output immediately switches to false when the input signal falls from true to false, regardless of the delay time. It confirms the immediate reset on falling edge."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 3",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 2"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test ensures that if the input signal is true for less than the delay time (2 units < 3 units), the output does not switch to true. It verifies that transient true signals do not cause premature activation."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 10",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 10"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 5"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test repeats the main scenarios with the maximum delay time (10 units). It verifies immediate false output on false input, delayed true output after sustained true input, immediate false output on falling edge, and no output change if input true duration is less than delay."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 1",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 1"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1",
+                    "Wait 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test repeats the main scenarios with the minimum delay time (1 unit). It confirms the turn-on delay logic behaves correctly at the lower boundary of delay time."
+    },
+    {
+        "Pre-Condition": [
+            "delayTime = 0",
+            "signal = 0"
+        ],
+        "Steps": [
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 0"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 0"
+                ]
+            },
+            {
+                "Actions": [
+                    "signal = 1"
+                ],
+                "Expected Results": [
+                    "OilSepActr_flgSpdShdwn = 1"
+                ]
+            }
+        ],
+        "Detailed Explanation": "This test repeats the main scenarios with zero delay time, expecting no delay between input and output. The output should immediately follow the input signal transitions."
+    }
+]
+
+[[ ## completed ## ]]

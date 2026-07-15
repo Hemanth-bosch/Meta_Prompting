@@ -442,8 +442,8 @@ class TournamentConfig:
         if getattr(args, "gepa_auto", None):
             kwargs["gepa_configs"] = [{"name": f"gepa_{args.gepa_auto}", "auto": args.gepa_auto,
                                        "use_merge": True, "track_stats": True}]
-        if getattr(args, "gepa_reflection_images", False):
-            kwargs["gepa_reflection_images"] = True
+        if getattr(args, "gepa_reflection_images", None) is not None:
+            kwargs["gepa_reflection_images"] = args.gepa_reflection_images
         if getattr(args, "gepa_reflection_detail", None):
             kwargs["gepa_reflection_image_detail"] = args.gepa_reflection_detail
         if getattr(args, "gepa_reflection_max_images", None) is not None:

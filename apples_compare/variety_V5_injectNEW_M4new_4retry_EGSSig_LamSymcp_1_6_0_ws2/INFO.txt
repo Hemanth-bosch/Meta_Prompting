@@ -1,0 +1,7 @@
+VARIETY 5: V5_injectNEW_M4new_4retry
+  weakspot=EGSSig_LamSymcp_1_6_0 ws=2 fn=LowpassT_out
+  inject_kb_guidelines=True  KB=new  max_retries=4  model=azure/gpt-4.1-mini
+  pipeline LLM calls (llm_call_*) = 36
+  M4 judge LLM calls (m4_judge_*) = 1
+  injected block length = 449 chars
+  M4 score = 1.0  ([KB:LowpassT] 8/8 covered | missing: none)

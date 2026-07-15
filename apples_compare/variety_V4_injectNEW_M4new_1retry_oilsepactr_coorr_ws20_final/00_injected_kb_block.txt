@@ -1,0 +1,8 @@
+## Validated test guidelines for Srv_TrnOnDly (newKB) — cover these scenarios:
+1. Checking the Delay of rising edge — Initialize the Delay parameter and set the input to zero; Set: = desired value; Set: Input = FALSE; Check: Output = Input = FALSE
+2. Checking the delay on rising edge — Given: Output = Input = FALSE; Set: Input = TRUE; Wait: Delay time (XXX_tiYYYDly_C); Check: Output = Input after the delay time
+3. Checking on falling edge — Given: Output = Input = TRUE; Set: Input = FALSE; Check: Output = FALSE immediately
+4. Checking the output when the input is at TRUE for less than the delay time — Given: Output = Input = FALSE; Set: Input = TRUE and then set it to FALSE before the delay time; Check: Output = FALSE - does not change to TRUE
+5. Repeat all the above cases with maximum value for the turn-on delay mentioned in the design
+6. Repeat all the above cases with minimum value for the turn-on delay mentioned in the design
+7. Repeat all the above cases with a value of zero for the turn-on delay and check whether there is no delay between input and output

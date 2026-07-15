@@ -1,0 +1,85 @@
+**Detailed Context for Weakspot Element**
+
+---
+
+### 1. Overview of the Weakspot Element
+
+- **Weakspot Element Key:** `$op21`
+- **Instance Name:** `getBit_unsigned_U8`
+- **Function Name:** `getBit_unsigned_getBit`
+- **Role and Working:**
+
+  The weakspot element `$op21` represents a function call to `getBit_unsigned_getBit`, which is a method designed to extract the value of a specific bit from an unsigned 8-bit input value (`uint8`). The function takes two inputs:
+
+  - `bitLeiste`: The unsigned 8-bit input value from which a bit is to be extracted.
+  - `bitPosition`: The position of the bit to be fetched (0-based or 1-based depending on implementation, typically 0-based).
+
+  The function returns the value of the bit at the specified position as a `uint8` (0 or 1).
+
+  This element is critical in bit-level data extraction, often used in embedded systems or signal processing where individual bits represent flags or status indicators.
+
+---
+
+### 2. Inputs That Can Be Altered
+
+| Input Parameter | Reference Key | Referenced Element Type | Instance Name / Description | Notes |
+|-----------------|---------------|-------------------------|-----------------------------|-------|
+| `bitLeiste`     | `$op19`       | Variable                | `Gbx_SigSrcEval` (uint8)    | Variable input, unsigned 8-bit value (range 0-255) |
+| `bitPosition`   | `$op20`       | Literal                 | `2`                         | Literal value, fixed at 2 (bit position 2) - excluded from alteration |
+
+- **Summary:**
+
+  - Only `bitLeiste` (`$op19`) is an alterable input parameter.
+  - `bitPosition` is a literal constant (2) and thus fixed, not alterable.
+  - `$op19` is a variable of type `uint8` with a physical type `uint32` but data type `uint8`, with a value range from 0 to 255.
+
+---
+
+### 3. Outputs That Can Be Checked
+
+- The weakspot element `$op21` produces an output that is used as input to `$op22` (a `Not` operation).
+- There is no direct variable output named in `$op21` itself, but the output of `$op21` is used in further operations.
+- To identify local or variable outputs depending on `$op21`, we look for variables that depend on `$op22` or `$op21`.
+
+From the provided data, no explicit variable output is directly linked to `$op21`. However, since `$op21` is a function returning a bit value, its output is likely used in logical decisions or assignments downstream.
+
+- **Potential outputs to check:**
+
+  - The boolean result of the bit extraction (0 or 1).
+  - The negated output `$op22` (Not of `$op21`), which may be assigned or used in conditions.
+
+- **Conclusion:**
+
+  - The direct output of `$op21` is the bit value extracted.
+  - This output can be checked by verifying the correctness of the bit extraction from the input variable `Gbx_SigSrcEval`.
+
+---
+
+### 4. Possible Testcases for Weakspot Element
+
+| Testcase Description | Input Conditions | Expected Outcome | Purpose |
+|----------------------|------------------|------------------|---------|
+| **Testcase 1: Bit set at position 2** | `Gbx_SigSrcEval` = value with bit 2 set (e.g., 0b00000100 = 4) | Output of `$op21` = 1 | Verify function correctly identifies bit set to 1 |
+| **Testcase 2: Bit cleared at position 2** | `Gbx_SigSrcEval` = value with bit 2 cleared (e.g., 0b00000000 = 0 or 0b00000010 = 2) | Output of `$op21` = 0 | Verify function correctly identifies bit set to 0 |
+| **Testcase 3: Boundary values** | `Gbx_SigSrcEval` = 0 and 255 (all bits cleared and all bits set) | Output of `$op21` = 0 for 0, 1 for 255 | Verify function behavior on extreme input values |
+
+- **Notes:**
+
+  - Since `bitPosition` is fixed at 2, testcases focus on varying the input value to check the bit at position 2.
+  - Minimal testcases cover bit set, bit cleared, and boundary conditions.
+  - These testcases validate the correctness of bit extraction logic in the weakspot element.
+
+---
+
+**Summary:**
+
+| Aspect                  | Details                                      |
+|-------------------------|----------------------------------------------|
+| Weakspot Element        | `$op21` - `getBit_unsigned_U8` function      |
+| Role                    | Extracts bit at position 2 from 8-bit input  |
+| Alterable Inputs        | `bitLeiste` (`$op19` - `Gbx_SigSrcEval`)     |
+| Fixed Inputs            | `bitPosition` (`$op20` - literal 2)           |
+| Outputs to Check        | Bit value output of `$op21` (0 or 1)          |
+| Testcases               | Bit set, bit cleared, boundary values         |
+
+This detailed context enables focused testing and validation of the bit extraction functionality represented by the weakspot element `$op21`.

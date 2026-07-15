@@ -1,0 +1,223 @@
+================ role: system ================
+Your input fields are:
+1. `context_analysis` (str): 
+2. `equation_json` (str): 
+3. `const_values` (str): 
+4. `weakspot_operation` (str): 
+5. `instance_names` (str): 
+6. `example_explanation_output` (str): 
+7. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, the test cases you generate MUST satisfy EVERY guideline listed here: at minimum each guideline must be exercised by at least one test case, and NONE may be skipped — treat them as hard BU requirements (extra cases are fine). If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `test_cases` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## instance_names ## ]]
+{instance_names}
+
+[[ ## example_explanation_output ## ]]
+{example_explanation_output}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Generate **test cases** for the identified weakspot.
+        
+        ### Output Requirements:
+        First give the "Detailed Explanation" of the testcase.
+        The output should have single JSON for all the test cases and should have the following structure:
+        ```json
+        [
+            {
+                "Pre-Condition": ["...", "...", ...],
+                "Steps": [
+                    {
+                        "Actions": ["...", "...", ...],
+                        "Expected Results": ["...", "...", ...]
+                    },
+                    ...
+                ],
+                "Detailed Explanation": "..."
+            },
+            ...
+        ]
+        ```
+        
+        ### Formatting Guidelines:
+        1. **Detailed Explanation**:
+           - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+        
+        2. **Pre-Condition**:
+           - Only include value assignments in the format: "<value_name> = <value>".
+           - Do not include any variables which are part of present in Action.
+        
+        3. **Steps**:
+           - Each step should consist of:
+             - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+             - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+        
+        4. **String Types**:
+           - Only use the following types of strings in the output:
+             - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+             - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+             - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+        
+        ### Additional Constraints:
+        - **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+        - **NOTE** Pre-Condition and Actions **cannot be same variables**
+        - Do not add new constant values that are not part of the provided input.
+        - DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+        - Ensure all steps are logically consistent with the input equation and constants.
+        - Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+        
+        EXAMPLE:
+        (An example test-case in the exact expected format is provided in the `example_explanation_output` input field.)
+        
+        ### Input Details:
+        
+        **Constant Values**: provided in the `const_values` input field
+        **Weakspot Operation**: provided in the `weakspot_operation` input field
+        **Weakspot Context**: provided in the `context_analysis` input field
+        **use this Expected Results**: provided in the `instance_names` input field
+        
+        From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+        Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+        **DO NOT** generate values for dT in the testcases.
+        
+        Using the provided JSON data, generate the test cases as specified.
+        
+        (The equation JSON is provided in the `equation_json` input field.)
+        
+        ### Task:
+        Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+        Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+        Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+        
+        Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+        The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+================ role: user ================
+[[ ## context_analysis ## ]]
+### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op21
+- **Instance Name:** getBit_unsigned_U8
+- **Function Name:** getBit_unsigned_getBit
+- **Role and Working:**
+  The element $op21 implements the function `getBit` for unsigned integer inputs. It extracts the logical value (0 or 1) of a specific bit at a given position from an unsigned input value. The input value can be of types u8, u16, or u32, and the bit position is specified as an 8-bit unsigned integer. The function returns the bit value at the requested position, which is useful for bit-level signal evaluation or control logic.
+
+### 2. Inputs That Can Be Altered
+| Parameter Name | Reference Key | Type Information | Notes |
+|----------------|---------------|------------------|-------|
+| bitLeiste      | $op19         | Variable: Gbx_SigSrcEval, physical_type: uint32, data_type: uint8 | Input unsigned value from which the bit is extracted |
+| bitPosition    | $op20         | Literal: 2 (constant) | Fixed literal value, not alterable |
+
+- The parameter `bitPosition` is a literal constant (value 2) and thus fixed.
+- The parameter `bitLeiste` is a variable input and can be altered for testing.
+
+### 3. Outputs That Can Be Checked
+- The output of $op21 is the bit value at the specified position.
+- This output is used as input to $op22 (Not operation), but the direct output of $op21 can be checked as a local or variable output.
+- Since $op21 is a function element, its output is the logical bit value (uint8) extracted from the input variable `Gbx_SigSrcEval`.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1: Bit Extraction at Position 2**
+  - Set `Gbx_SigSrcEval` to a known 8-bit or 32-bit value with a known bit pattern.
+  - Verify that the output of $op21 correctly returns the bit value at position 2.
+- **Testcase 2: Boundary Bit Positions**
+  - Although the current bitPosition is fixed at 2, testing with other bit positions (if possible in other contexts) would be recommended.
+- **Testcase 3: Input Value Variations**
+  - Test with input values where bit 2 is 0 and where bit 2 is 1 to confirm correct bit extraction.
+- These testcases ensure the bit extraction logic is correct and consistent with the guidelines.
+
+The test guideline explicitly requires checking the bit operation by setting the input variable and verifying the output bit value at the given position, which aligns with the above testcases.
+
+The weakspot element $op21, named `getBit_unsigned_U8`, implements the `getBit` function that extracts a single bit from an unsigned integer input. It takes two inputs: `bitLeiste` (the unsigned input value) and `bitPosition` (the bit index to extract). In this context, `bitLeiste` is linked to the variable `Gbx_SigSrcEval`, which is a uint8 or uint32 type variable representing the input signal or data from which a bit is to be extracted. The `bitPosition` is a fixed literal with value 2, meaning the function always extracts the bit at position 2.
+
+The output of this function is the logical value (0 or 1) of the bit at position 2 in the input variable. This output is then used by the subsequent operation $op22 (a logical Not operation), indicating that the bit extraction is part of a larger logical evaluation or control decision.
+
+For testing, the only input that can be varied is `Gbx_SigSrcEval` since `bitPosition` is fixed. The output to be checked is the bit value returned by $op21. The test should confirm that for any given input value, the bit at position 2 is correctly extracted and returned.
+
+The provided KB guideline mandates testing the bit extraction by setting the input variable and verifying the output bit value at the specified position, which is exactly the role of this weakspot element. Therefore, test scenarios should focus on varying `Gbx_SigSrcEval` to cover cases where bit 2 is set and cleared, ensuring the function behaves correctly.
+
+In summary, $op21 is a critical function for bit-level signal evaluation, and its correctness directly impacts downstream logic that depends on the extracted bit value.
+
+[[ ## equation_json ## ]]
+{"$op21": {"oid": "41711", "type": "Function", "instance_name": "getBit_unsigned_U8", "function_name": "getBit_unsigned_getBit", "class_method_name": "getBit", "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": ["bitLeiste", "bitPosition"], "args": ["$op19", "$op20"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["Gbx_SigSrcEval"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [null, null]}, "$op22": {"oid": "41564", "type": "Operation", "instance_name": "Not", "function_name": "Not", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op21"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["Gbx_SigSrcEval"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op19": {"oid": "41618", "type": "Variable", "instance_name": "Gbx_SigSrcEval", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["Gbx_SigSrcEval"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op20": {"oid": "41602", "type": "Literal", "instance_name": "2", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op8": {"oid": "1054", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op6"], "arg_names": [], "args": ["$op7"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op10": {"oid": "1160", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "Else", "condition": ["$op6"], "arg_names": [], "args": ["$op9"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op26": {"oid": "41530", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op24"], "arg_names": [], "args": ["$op25"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["Gbx_SigSrcEval", "PT_stTraType", "GbxPos_flgGNSPrsntVD"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op28": {"oid": "41534", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "Else", "condition": ["$op24"], "arg_names": [], "args": ["$op27"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["Gbx_SigSrcEval", "PT_stTraType", "GbxPos_flgGNSPrsntVD"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op14": {"oid": "41575", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op12"], "arg_names": [], "args": ["$op13"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Gbx_bNPos", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}, "$op16": {"oid": "41580", "type": "Variable", "instance_name": "Gbx_stTrsmNeutOBD", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "Else", "condition": ["$op12"], "arg_names": [], "args": ["$op15"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["PT_stTraType", "Gbx_bNPos", "Com_bPedSigMonEna"], "unique_params": [], "unique_consts": ["TRA_MT"], "unique_class_items": [], "unique_chartables": [], "min_max_range": [0.0, 255.0]}}
+
+[[ ## const_values ## ]]
+{"TRA_MT": 0, "dT": "10.0"}
+
+[[ ## weakspot_operation ## ]]
+$op21
+
+[[ ## instance_names ## ]]
+getBit_unsigned_U8
+
+[[ ## example_explanation_output ## ]]
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#     {
+#         "Pre-Condition": [],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                    "signal = 10",
+# 				   "bit position = 3"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 25",
+# 					"bit position = 5"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+# 			 {
+#                 "Actions": [
+#                     "signal = 55",
+# 					"bit position = 0"
+# 
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             }
+#         ]
+#     }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+[[ ## kb_guidelines ## ]]
+## Validated test guidelines for getBit_unsigned_getBit (newKB) — cover these scenarios:
+1. Checking the Bit Operation : GetBit — Set: Set the input variable X = xxxxxxxx (data size may be 8-bit,16-bit or 32-bit); Set: Give the Position number to get the logical value of the bit.; Check: Output = Logical status of the position Number
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## test_cases ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

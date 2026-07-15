@@ -1,0 +1,15 @@
+{
+  "m1": 0.6666666666666666,
+  "m1_details": "TC1: Expected Results verify no real output ['putBit_unsigned'] (weighs 1x); got ['PT_stTraShftOp']; TC2: Expected Results verify no real output ['putBit_unsigned'] (weighs 1x); got ['PT_stTraShftOp']",
+  "m2": 1.0,
+  "m2_details": "All signals resolved",
+  "m3": 0.5,
+  "m3_details": "TC1.S1: var in both act+exp (weighs 2x): ['PT_stTraShftOp']; TC1: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['PT_stTraShftOp']; TC2.S1: var in both act+exp (weighs 2x): ['PT_stTraShftOp']; TC2: OUTPUT PINNED AS PRECONDITION (also verified, weighs 2x): ['PT_stTraShftOp']",
+  "m4": 0.0,
+  "m4_details": "[newKB:putBit_unsigned_putBit] 0/1 covered | missing: \"Checking the Bit Operation : SetBit — Set: Set the input var\"\n    JUDGE REASONING: 1: NOT COVERED — Guideline requires explicitly setting a chosen bit position to TRUE and checking the output bit status; TC1/TC2 do not provide an explicit “position number” input/stimulus nor do they explicitly check “logical status of the position” (they instead overwrite the whole variable in Actions and check the whole variable value). Needed: a test that drives X to a known pattern (e.g., 0x00/0xAA), provides an explicit bit position parameter N to set TRUE, and expects output showing bit N = 1 (and other bits unchanged).",
+  "m7": 0.5,
+  "m7_details": "N/A — function-call weakspot (putBit_unsigned_putBit); see M8 for functional correctness",
+  "m8": 0.0,
+  "m8_details": "M8=0 (wrong I/O): verifies no real measurable output; measurable output(s)=['putbit_unsigned']",
+  "_weighted_composite_pct": 43.333333333333336
+}

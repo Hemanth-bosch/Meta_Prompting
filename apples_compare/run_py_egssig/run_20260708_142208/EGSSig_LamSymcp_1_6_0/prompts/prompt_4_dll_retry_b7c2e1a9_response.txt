@@ -1,0 +1,62 @@
+Step-by-step explanation:
+
+Given the equation:
+
+['Literal(0) → $op7', 'Variable(EGSPrepn_ratLamS1B1) → $op12', 'Variable(EGSDO2_flgDynAdpnRtlS0B1) → $op20', 'Variable(EGSDO2_flgDynAdpnRtlS1B1) → $op19', 'Variable(EGSDO2_flgDynAdpnLtrS0B1) → $op17', 'Variable(EGSDO2_flgDynAdpnLtrS1B1) → $op16', 'SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) → $op6', 'Operation(NotEqual,$op6,$op7) → $op8', 'Operation(MUX,$op8,$op19,$op20) → $op21', 'Operation(MUX,$op8,$op16,$op17) → $op18', 'Operation(Or,$op18,$op21) → $op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam', 'Operation(IfThenElse,$op2_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam) → $op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam']
+
+- SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1 (given)
+- Literal(0) = 0
+- Operation(NotEqual,1,0) → true (1)
+- So $op8 = 1 (true)
+
+MUX operations with $op8 = 1 select the first argument:
+
+- $op21 = MUX(1, $op19, $op20) = $op19 = Variable(EGSDO2_flgDynAdpnRtlS1B1)
+- $op18 = MUX(1, $op16, $op17) = $op16 = Variable(EGSDO2_flgDynAdpnLtrS1B1)
+
+Then Or($op18, $op21) = $op2 = Variable(EGSDO2_flgDynAdpnLtrS1B1) OR Variable(EGSDO2_flgDynAdpnRtlS1B1)
+
+The final output is the IfThenElse of $op2, which presumably returns $op2 as the output.
+
+We want the final output to be 7.
+
+Previously, the values were:
+
+- Variable(EGSDO2_flgDynAdpnLtrS1B1) = 7
+- Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0
+
+OR(7,0) = 7 (bitwise OR)
+
+So the output should be 7.
+
+But the DLL output was 0, meaning the OR operation resulted in 0.
+
+This suggests that the variable Variable(EGSDO2_flgDynAdpnLtrS1B1) was 0 in the DLL run.
+
+To fix this, only change Variable(EGSDO2_flgDynAdpnLtrS1B1) to 7, keep others 0.
+
+All other variables remain 0.
+
+SystemConstant is 1.
+
+No parameters are mentioned, so none assigned.
+
+Final assignments:
+
+- SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1
+- Variable(EGSPrepn_ratLamS1B1) = 0
+- Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0
+- Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0
+- Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0
+- Variable(EGSDO2_flgDynAdpnLtrS1B1) = 7
+
+```json
+[
+    "SystemConstant(EGSSIG_SELO2SNSR0BNK1_SC) = 1",
+    "Variable(EGSPrepn_ratLamS1B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnRtlS1B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS0B1) = 0",
+    "Variable(EGSDO2_flgDynAdpnLtrS1B1) = 7"
+]
+```

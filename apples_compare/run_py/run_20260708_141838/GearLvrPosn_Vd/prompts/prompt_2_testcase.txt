@@ -1,0 +1,202 @@
+Generate **test cases** for the identified weakspot.
+
+### Output Requirements:
+First give the "Detailed Explanation" of the testcase.
+The output should have single JSON for all the test cases and should have the following structure:
+```json
+[
+    {
+        "Pre-Condition": ["...", "...", ...],
+        "Steps": [
+            {
+                "Actions": ["...", "...", ...],
+                "Expected Results": ["...", "...", ...]
+            },
+            ...
+        ],
+        "Detailed Explanation": "..."
+    },
+    ...
+]
+```
+
+### Formatting Guidelines:
+1. **Detailed Explanation**:
+   - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+
+2. **Pre-Condition**:
+   - Only include value assignments in the format: "<value_name> = <value>".
+   - Do not include any variables which are part of present in Action.
+
+3. **Steps**:
+   - Each step should consist of:
+     - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+     - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+
+4. **String Types**:
+   - Only use the following types of strings in the output:
+     - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+     - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+     - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+
+### Additional Constraints:
+- **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+- **NOTE** Pre-Condition and Actions **cannot be same variables**
+- Do not add new constant values that are not part of the provided input.
+- DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+- Ensure all steps are logically consistent with the input equation and constants.
+- Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+
+EXAMPLE:
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#     {
+#         "Pre-Condition": [],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                    "signal = 10",
+# 				   "bit position = 3"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 25",
+# 					"bit position = 5"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+# 			 {
+#                 "Actions": [
+#                     "signal = 55",
+# 					"bit position = 0"
+# 
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             }
+#         ]
+#     }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+### Input Details:
+
+**Constant Values**: {'TRA_MT': 0, 'dT': '10.0'}
+**Weakspot Operation**: $op21
+**Weakspot Context**:
+**Detailed Context for Weakspot Element**
+
+---
+
+### 1. Overview of the Weakspot Element
+
+- **Weakspot Element Key:** `$op21`
+- **Instance Name:** `getBit_unsigned_U8`
+- **Function Name:** `getBit_unsigned_getBit`
+- **Role and Working:**
+
+  The weakspot element `$op21` represents a function call to `getBit_unsigned_getBit`, which is a method designed to extract the value of a specific bit from an unsigned 8-bit input value (`uint8`). The function takes two inputs:
+
+  - `bitLeiste`: The unsigned 8-bit input value from which a bit is to be extracted.
+  - `bitPosition`: The position of the bit to be fetched (0-based or 1-based depending on implementation, typically 0-based).
+
+  The function returns the value of the bit at the specified position as a `uint8` (0 or 1).
+
+  This element is critical in bit-level data extraction, often used in embedded systems or signal processing where individual bits represent flags or status indicators.
+
+---
+
+### 2. Inputs That Can Be Altered
+
+| Input Parameter | Reference Key | Referenced Element Type | Instance Name / Description | Notes |
+|-----------------|---------------|-------------------------|-----------------------------|-------|
+| `bitLeiste`     | `$op19`       | Variable                | `Gbx_SigSrcEval` (uint8)    | Variable input, unsigned 8-bit value (range 0-255) |
+| `bitPosition`   | `$op20`       | Literal                 | `2`                         | Literal value, fixed at 2 (bit position 2) - excluded from alteration |
+
+- **Summary:**
+
+  - Only `bitLeiste` (`$op19`) is an alterable input parameter.
+  - `bitPosition` is a literal constant (2) and thus fixed, not alterable.
+  - `$op19` is a variable of type `uint8` with a physical type `uint32` but data type `uint8`, with a value range from 0 to 255.
+
+---
+
+### 3. Outputs That Can Be Checked
+
+- The weakspot element `$op21` produces an output that is used as input to `$op22` (a `Not` operation).
+- There is no direct variable output named in `$op21` itself, but the output of `$op21` is used in further operations.
+- To identify local or variable outputs depending on `$op21`, we look for variables that depend on `$op22` or `$op21`.
+
+From the provided data, no explicit variable output is directly linked to `$op21`. However, since `$op21` is a function returning a bit value, its output is likely used in logical decisions or assignments downstream.
+
+- **Potential outputs to check:**
+
+  - The boolean result of the bit extraction (0 or 1).
+  - The negated output `$op22` (Not of `$op21`), which may be assigned or used in conditions.
+
+- **Conclusion:**
+
+  - The direct output of `$op21` is the bit value extracted.
+  - This output can be checked by verifying the correctness of the bit extraction from the input variable `Gbx_SigSrcEval`.
+
+---
+
+### 4. Possible Testcases for Weakspot Element
+
+| Testcase Description | Input Conditions | Expected Outcome | Purpose |
+|----------------------|------------------|------------------|---------|
+| **Testcase 1: Bit set at position 2** | `Gbx_SigSrcEval` = value with bit 2 set (e.g., 0b00000100 = 4) | Output of `$op21` = 1 | Verify function correctly identifies bit set to 1 |
+| **Testcase 2: Bit cleared at position 2** | `Gbx_SigSrcEval` = value with bit 2 cleared (e.g., 0b00000000 = 0 or 0b00000010 = 2) | Output of `$op21` = 0 | Verify function correctly identifies bit set to 0 |
+| **Testcase 3: Boundary values** | `Gbx_SigSrcEval` = 0 and 255 (all bits cleared and all bits set) | Output of `$op21` = 0 for 0, 1 for 255 | Verify function behavior on extreme input values |
+
+- **Notes:**
+
+  - Since `bitPosition` is fixed at 2, testcases focus on varying the input value to check the bit at position 2.
+  - Minimal testcases cover bit set, bit cleared, and boundary conditions.
+  - These testcases validate the correctness of bit extraction logic in the weakspot element.
+
+---
+
+**Summary:**
+
+| Aspect                  | Details                                      |
+|-------------------------|----------------------------------------------|
+| Weakspot Element        | `$op21` - `getBit_unsigned_U8` function      |
+| Role                    | Extracts bit at position 2 from 8-bit input  |
+| Alterable Inputs        | `bitLeiste` (`$op19` - `Gbx_SigSrcEval`)     |
+| Fixed Inputs            | `bitPosition` (`$op20` - literal 2)           |
+| Outputs to Check        | Bit value output of `$op21` (0 or 1)          |
+| Testcases               | Bit set, bit cleared, boundary values         |
+
+This detailed context enables focused testing and validation of the bit extraction functionality represented by the weakspot element `$op21`.
+**use this Expected Results**:
+['Gbx_stTrsmNeutOBD', 'Gbx_stTrsmNeutOBD', 'Gbx_stTrsmNeutOBD', 'Gbx_stTrsmNeutOBD', 'Gbx_stTrsmNeutOBD', 'Gbx_stTrsmNeutOBD']
+
+From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+**DO NOT** generate values for dT in the testcases.
+
+Using the provided JSON data, generate the test cases as specified.
+
+{'const_values': {'TRA_MT': 0, 'dT': '10.0'}, 'weakspot_operation': '$op21', 'equation': {'$op21': {'oid': '41711', 'type': 'Function', 'instance_name': 'getBit_unsigned_U8', 'function_name': 'getBit_unsigned_getBit', 'class_method_name': 'getBit', 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': ['bitLeiste', 'bitPosition'], 'args': ['$op19', '$op20'], 'read': True, 'write': False, 'physical_type': '', 'data_type': '', 'unique_variables': ['Gbx_SigSrcEval'], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [None, None]}, '$op22': {'oid': '41564', 'type': 'Operation', 'instance_name': 'Not', 'function_name': 'Not', 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': ['$op21'], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': ['Gbx_SigSrcEval'], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op19': {'oid': '41618', 'type': 'Variable', 'instance_name': 'Gbx_SigSrcEval', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': [], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['Gbx_SigSrcEval'], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op20': {'oid': '41602', 'type': 'Literal', 'instance_name': '2', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': None, 'condition': [], 'arg_names': [], 'args': [], 'read': False, 'write': False, 'physical_type': None, 'data_type': None, 'unique_variables': [], 'unique_params': [], 'unique_consts': [], 'unique_class_items': [], 'unique_chartables': []}, '$op10': {'oid': '1160', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'Else', 'condition': ['$op6'], 'arg_names': [], 'args': ['$op9'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op8': {'oid': '1054', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op6'], 'arg_names': [], 'args': ['$op7'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op28': {'oid': '41534', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'Else', 'condition': ['$op24'], 'arg_names': [], 'args': ['$op27'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['Gbx_SigSrcEval', 'PT_stTraType', 'GbxPos_flgGNSPrsntVD'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op14': {'oid': '41575', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op12'], 'arg_names': [], 'args': ['$op13'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Gbx_bNPos', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op16': {'oid': '41580', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'Else', 'condition': ['$op12'], 'arg_names': [], 'args': ['$op15'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['PT_stTraType', 'Gbx_bNPos', 'Com_bPedSigMonEna'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}, '$op26': {'oid': '41530', 'type': 'Variable', 'instance_name': 'Gbx_stTrsmNeutOBD', 'function_name': None, 'class_method_name': None, 'sequence_number': None, 'method_name': None, 'decision': 'If', 'condition': ['$op24'], 'arg_names': [], 'args': ['$op25'], 'read': True, 'write': False, 'physical_type': 'uint32', 'data_type': 'uint8', 'unique_variables': ['Gbx_SigSrcEval', 'PT_stTraType', 'GbxPos_flgGNSPrsntVD'], 'unique_params': [], 'unique_consts': ['TRA_MT'], 'unique_class_items': [], 'unique_chartables': [], 'min_max_range': [0.0, 255.0]}}}
+
+### Task:
+Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+
+Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+---

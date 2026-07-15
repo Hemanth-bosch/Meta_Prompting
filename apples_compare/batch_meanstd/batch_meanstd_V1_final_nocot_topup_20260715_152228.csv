@@ -1,0 +1,8 @@
+model,variety,metric,mean,std
+azure/gpt-4.1-mini,V1,m1,0.8000,0.0000
+azure/gpt-4.1-mini,V1,m2,0.8367,0.0000
+azure/gpt-4.1-mini,V1,m3,0.9519,0.0000
+azure/gpt-4.1-mini,V1,m4,0.3750,0.0000
+azure/gpt-4.1-mini,V1,m7,0.3250,0.0000
+azure/gpt-4.1-mini,V1,m8,0.0800,0.0000
+azure/gpt-4.1-mini,V1,composite,56.4038,0.0000

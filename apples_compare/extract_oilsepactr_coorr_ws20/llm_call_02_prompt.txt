@@ -1,0 +1,252 @@
+================ role: system ================
+Your input fields are:
+1. `context_analysis` (str): 
+2. `equation_json` (str): 
+3. `const_values` (str): 
+4. `weakspot_operation` (str): 
+5. `instance_names` (str): 
+6. `example_explanation_output` (str):
+Your output fields are:
+1. `reasoning` (str): 
+2. `test_cases` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## instance_names ## ]]
+{instance_names}
+
+[[ ## example_explanation_output ## ]]
+{example_explanation_output}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Generate **test cases** for the identified weakspot.
+        
+        ### Output Requirements:
+        First give the "Detailed Explanation" of the testcase.
+        The output should have single JSON for all the test cases and should have the following structure:
+        ```json
+        [
+            {
+                "Pre-Condition": ["...", "...", ...],
+                "Steps": [
+                    {
+                        "Actions": ["...", "...", ...],
+                        "Expected Results": ["...", "...", ...]
+                    },
+                    ...
+                ],
+                "Detailed Explanation": "..."
+            },
+            ...
+        ]
+        ```
+        
+        ### Formatting Guidelines:
+        1. **Detailed Explanation**:
+           - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+        
+        2. **Pre-Condition**:
+           - Only include value assignments in the format: "<value_name> = <value>".
+           - Do not include any variables which are part of present in Action.
+        
+        3. **Steps**:
+           - Each step should consist of:
+             - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+             - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+        
+        4. **String Types**:
+           - Only use the following types of strings in the output:
+             - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+             - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+             - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+        
+        ### Additional Constraints:
+        - **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+        - **NOTE** Pre-Condition and Actions **cannot be same variables**
+        - Do not add new constant values that are not part of the provided input.
+        - DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+        - Ensure all steps are logically consistent with the input equation and constants.
+        - Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+        
+        EXAMPLE:
+        (An example test-case in the exact expected format is provided in the `example_explanation_output` input field.)
+        
+        ### Input Details:
+        
+        **Constant Values**: provided in the `const_values` input field
+        **Weakspot Operation**: provided in the `weakspot_operation` input field
+        **Weakspot Context**: provided in the `context_analysis` input field
+        **use this Expected Results**: provided in the `instance_names` input field
+        
+        From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+        Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+        **DO NOT** generate values for dT in the testcases.
+        
+        Using the provided JSON data, generate the test cases as specified.
+        
+        (The equation JSON is provided in the `equation_json` input field.)
+        
+        ### Task:
+        Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+        Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+        Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+        
+        Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+        The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+================ role: user ================
+[[ ## context_analysis ## ]]
+### 1. Overview of the Weakspot Element
+- **Weakspot Element Key:** $op187
+- **Instance Name:** OilSepActr_ShwdnTOnD_I
+- **Function Name:** Srv_TrnOnDly_out
+- **Role and Working:**
+  The element $op187 implements a turn-on delay function, specifically the "Srv_TrnOnDly_out" method. This function debounces the transition of an input signal from false to true. The output is set to false immediately when the input signal is false. When the input signal becomes true, the output remains false until the input has been continuously true for at least the specified delay time. After this delay, the output switches to true. This behavior prevents false triggering due to transient or noisy signals.
+
+  The function takes three inputs:
+  - **Dt:** The sample time interval, representing the time step for the delay calculation.
+  - **delayTime:** The required delay duration before the output switches to true.
+  - **signal:** The input logical signal to be delayed.
+
+  The output is a logical signal indicating the delayed state of the input.
+
+### 2. Inputs That Can Be Altered
+| Input Name | Reference Key | Type Information | Notes |
+|------------|---------------|------------------|-------|
+| Dt         | $op181        | Variable, sint32 | Represents the sample time interval. This is a fixed parameter and should not be altered. |
+| delayTime  | $op183        | ImplementationCast, sint32 | Represents the delay time. This input can be altered to test different delay durations. |
+| signal     | $op186        | Operation (And), logical | The input signal is a logical AND operation of multiple conditions. This input can be altered by changing the inputs to the AND operation. |
+
+- **Exclusion:** The Dt input ($op181) is fixed and should not be altered as per the instructions.
+
+### 3. Outputs That Can Be Checked
+- The output of $op187 is connected to the local variable $op188 (OilSepActr_flgSpdShdwn), which is a boolean logical variable.
+- This output variable can be checked to verify the correct delayed behavior of the input signal.
+- Since $op188 is a Local type variable with boolean data type, it is suitable for output verification.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1: Immediate False Input**
+  - Input signal is false.
+  - Expected output: false immediately.
+- **Testcase 2: Input True Less Than Delay Time**
+  - Input signal switches to true but remains true for less than the delayTime.
+  - Expected output: remains false.
+- **Testcase 3: Input True Longer Than Delay Time**
+  - Input signal switches to true and remains true for longer than delayTime.
+  - Expected output: output switches to true after delayTime.
+- **Testcase 4: Input Fluctuates**
+  - Input signal toggles between true and false rapidly.
+  - Expected output: output remains false unless input is true continuously for delayTime.
+
+These testcases cover the core functionality of the turn-on delay element, ensuring it debounces the input signal correctly.
+
+The weakspot element $op187 (OilSepActr_ShwdnTOnD_I) is a critical timing function that ensures the stability of a control signal by implementing a turn-on delay. This is essential in automotive or control systems where transient signals or noise could cause premature or false activation of downstream components.
+
+The element uses a sample time (Dt) and a configurable delay time (delayTime) to determine when the input signal has been stable long enough to be considered valid. The input signal is a logical AND of several conditions, indicating that multiple criteria must be met before the delay timer starts.
+
+The output of this element is used locally as OilSepActr_flgSpdShdwn ($op188), which likely controls a speed shutdown flag in the oil separator actuator system. Ensuring the correct operation of this delay element is vital to prevent false shutdowns or delayed responses.
+
+The context notes also highlight a potential risk: if the output of this class is used in multiple places without a local process variable, the delay calculation might be performed multiple times, leading to inconsistent results. This suggests careful management of the output variable is necessary in the broader system.
+
+In summary, the weakspot element is a debouncing delay function that stabilizes a logical input signal before allowing it to propagate as a true output, preventing false triggering in the control logic.
+
+[[ ## equation_json ## ]]
+{"$op187": {"oid": "1006", "type": "Function", "instance_name": "OilSepActr_ShwdnTOnD_I", "function_name": "Srv_TrnOnDly_out", "class_method_name": "out", "sequence_number": "14", "method_name": "Proc_100ms", "decision": null, "condition": [], "arg_names": ["Dt", "delayTime", "signal"], "args": ["$op181", "$op183", "$op186"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C", "dT", "OilSepActr_tiDlyShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op188": {"oid": "497", "type": "Local", "instance_name": "OilSepActr_flgSpdShdwn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op187"], "read": true, "write": false, "physical_type": "log", "data_type": "bool", "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C", "dT", "OilSepActr_tiDlyShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "1.0"]}, "$op181": {"oid": "1024", "type": "Variable", "instance_name": "dT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_params": ["dT"], "unique_variables": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147.483648", "2147.483647"]}, "$op183": {"oid": "1694", "type": "ImplementationCast", "instance_name": "Time_DT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op182"], "read": false, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": [], "unique_params": ["OilSepActr_tiDlyShdwn_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147.483648", "2147.483647"]}, "$op186": {"oid": "278", "type": "Operation", "instance_name": "And", "function_name": "And", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op184", "$op180", "$op185"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": []}, "$op215": {"oid": "148", "type": "Variable", "instance_name": "OilSepActr_stCoorr", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op214"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["flgStCoorr"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "255.0"]}}
+
+[[ ## const_values ## ]]
+{"COENG_ST_AUTOSTOPPING": 0, "COENG_ST_READY": 0, "dT": "0.1", "COENG_ST_RUNNING": 0, "POSTDRV_SOFTRST_SY": 0, "COENG_ST_STARTING": 0}
+
+[[ ## weakspot_operation ## ]]
+$op187
+
+[[ ## instance_names ## ]]
+OilSepActr_stCoorr
+
+[[ ## example_explanation_output ## ]]
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#     {
+#         "Pre-Condition": [
+#             "delayTime = 5000",
+#             "signal = 0"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "signal = 0"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 1",
+#                     "Wait delayTime"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             }
+#         ]
+#     },
+#     {
+#         "Pre-Condition": [
+#             "delayTime = 3000"
+#         ],
+#         "Steps": [
+#             {
+#                 "Actions": [
+#                     "signal = 1",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 0",
+#                     "Wait @"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 0"
+#                 ]
+#             },
+#             {
+#                 "Actions": [
+#                     "signal = 1",
+#                     "Wait delayTime"
+#                 ],
+#                 "Expected Results": [
+#                     "out = 1"
+#                 ]
+#             }
+#         ]
+#     }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## test_cases ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

@@ -1,0 +1,267 @@
+================ role: system ================
+Your input fields are:
+1. `context_analysis` (str): 
+2. `equation_json` (str): 
+3. `const_values` (str): 
+4. `weakspot_operation` (str): 
+5. `instance_names` (str): 
+6. `example_explanation_output` (str): 
+7. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, the test cases you generate MUST satisfy EVERY guideline listed here: at minimum each guideline must be exercised by at least one test case, and NONE may be skipped — treat them as hard BU requirements (extra cases are fine). If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `test_cases` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## instance_names ## ]]
+{instance_names}
+
+[[ ## example_explanation_output ## ]]
+{example_explanation_output}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## test_cases ## ]]
+{test_cases}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        Generate **test cases** for the identified weakspot.
+        
+        ### Output Requirements:
+        First give the "Detailed Explanation" of the testcase.
+        The output should have single JSON for all the test cases and should have the following structure:
+        ```json
+        [
+            {
+                "Pre-Condition": ["...", "...", ...],
+                "Steps": [
+                    {
+                        "Actions": ["...", "...", ...],
+                        "Expected Results": ["...", "...", ...]
+                    },
+                    ...
+                ],
+                "Detailed Explanation": "..."
+            },
+            ...
+        ]
+        ```
+        
+        ### Formatting Guidelines:
+        1. **Detailed Explanation**:
+           - Provide a detailed explanation of the test case, including why the steps are necessary and how they validate the weakspot.
+        
+        2. **Pre-Condition**:
+           - Only include value assignments in the format: "<value_name> = <value>".
+           - Do not include any variables which are part of present in Action.
+        
+        3. **Steps**:
+           - Each step should consist of:
+             - Actions: Only use **value assignments** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+             - Expected Results: Only use **value checks** ("<value_name> = <value>") and **wait time information** ("Wait <wait time>").
+        
+        4. **String Types**:
+           - Only use the following types of strings in the output:
+             - **Value Assignment**: "<value_name> = <value>"   (value can only be a number, do not use any equation expansion or variable names)
+             - **Wait Time**: "Wait <wait time>" (time can only be a number, variable, or `'@'` for 1 raster. !!Time can only be in multiples of the dT value!!)
+             - **Value Check**: "<value_name> = <value>"  (value can only be a number, comparision can only be equals operation)
+        
+        ### Additional Constraints:
+        - **NOTE** Pre-Condition and Expected Results **cannot be same variables**
+        - **NOTE** Pre-Condition and Actions **cannot be same variables**
+        - Do not add new constant values that are not part of the provided input.
+        - DO NOT ADD ANY VALUES from constant values in the precondition or action or result. It is only for reference.
+        - Ensure all steps are logically consistent with the input equation and constants.
+        - Do not leave any placeholder values. Fill all placeholders with a value or variable. Never use the "$opX" representation for the variables.
+        
+        EXAMPLE:
+        (An example test-case in the exact expected format is provided in the `example_explanation_output` input field.)
+        
+        ### Input Details:
+        
+        **Constant Values**: provided in the `const_values` input field
+        **Weakspot Operation**: provided in the `weakspot_operation` input field
+        **Weakspot Context**: provided in the `context_analysis` input field
+        **use this Expected Results**: provided in the `instance_names` input field
+        
+        From the context, check each input type and DO NOT consider any **Literal** or **SystemConstant** as input that can be altered in the testcases.
+        Here, "dT" is the raster sample time and the functions can be called for every raster and values updated accordingly.
+        **DO NOT** generate values for dT in the testcases.
+        
+        Using the provided JSON data, generate the test cases as specified.
+        
+        (The equation JSON is provided in the `equation_json` input field.)
+        
+        ### Task:
+        Using the provided JSON data and context, generate detailed test cases for possible scenarios following the structure and guidelines above.
+        Ensure that the test cases are unique and tailored to the specific weakspot without duplicating the example provided.
+        Keep the number of testcases to a **MINIMUM**. Two or three are ideal and have four or five testcases at max.
+        
+        Please ensure the response has the specified JSON format and adheres strictly to the outlined instructions.
+        The output prompt text will include the example explanation text as desired. Adjust any of the literal values or formatting as needed for your specific use case.
+
+================ role: user ================
+[[ ## context_analysis ## ]]
+The weakspot element identified is "$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam". According to the equation JSON, this element is a Function type with the instance name "tiConAdpn_LT_I" and function name "LowpassT_out". This indicates that it implements a low-pass filter with a first-order time constant, which smooths the input signal over time.
+
+The weakspot context provides detailed information about the LowpassT function: it calculates a proportional element with a first-order time constant, where the time constant T must be greater than or equal to 1 and cannot be negative. The function has methods for reset, compute, and out, with the "out" method returning the filtered output value.
+
+From the equation JSON, the weakspot element has two input arguments: "in" and "T". The "in" argument is linked to "$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam", which is a Local variable named "_ratLamTmp". The "T" argument is linked to "$op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam", which is an Argument named "arg_tiTranAdpn". The constant "dT" (sample time) is fixed and not an input here.
+
+The outputs that can be checked are Local or Variable types that depend on this weakspot element. The JSON shows several Local variables named "_ratLamTiConAdpn" that depend on this weakspot element, but these are Local and not directly accessible outputs. However, Variables such as "EGSPrepn_ratLamSymcS1B1" and similar variables for other banks depend on the output of this lowpass filter (via "$op72" references). These Variables are of type uint16 and represent the filtered lambda ratio signals, which can be checked.
+
+The KB guidelines specify mandatory test scenarios for LowpassT, including testing small and large increases and decreases in input, checking maximum relative deviation, testing different gain constants, min-max input and time constants, and disabled filter behavior.
+
+Therefore, the testcases for this weakspot element should cover:
+
+- Small and large step changes in input signal to verify filter response.
+- Small and large decreases in input signal.
+- Different values of the gain constant T, including boundary values (minimum 1 and maximum).
+- Min and max input values to verify filter stability and output range.
+- Disabled filter behavior to verify that the filter output behaves correctly when disabled.
+- Checking the maximum relative deviation of the output to ensure filter accuracy.
+
+This minimal set of testcases ensures full coverage of the LowpassT filter behavior as per the KB guidelines.
+
+### 1. Overview of the Weakspot Element
+- **Element Key:** $op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+- **Instance Name:** tiConAdpn_LT_I
+- **Function Name:** LowpassT_out
+- **Role and Working:**
+  - Implements a first-order low-pass filter that smooths the input signal.
+  - Calculates the proportional element with a time constant T.
+  - The filter output is updated based on the input and the time constant.
+  - Ensures that the time constant T is ≥ 1 and not negative.
+  - Provides methods for initialization (reset), computation (compute), and output retrieval (out).
+  - Used to filter the lambda ratio signal in the system.
+
+### 2. Inputs That Can Be Altered
+| Input Parameter | Reference Key | Type Information | Description |
+|-----------------|---------------|------------------|-------------|
+| in              | $op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam | Local variable, instance_name: _ratLamTmp | Input signal to be filtered (lambda ratio temporary value) |
+| T               | $op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam | Argument, instance_name: arg_tiTranAdpn | Gain constant (time constant) for the low-pass filter |
+
+- **Excluded Inputs:** No fixed parameters like sample time (dT) are inputs here.
+- **Note:** Both inputs are variable and can be manipulated for testing.
+
+### 3. Outputs That Can Be Checked
+- The direct output of the weakspot element is used by Local variables named "_ratLamTiConAdpn" (Local type, not directly checkable).
+- The filtered lambda ratio signals are stored in Variables such as:
+  - EGSPrepn_ratLamSymcS1B1 ($op23)
+  - EGSPrepn_ratLamSymcS2B1 ($op47)
+  - EGSPrepn_ratLamSymcS1B2 ($op71)
+  - EGSPrepn_ratLamSymcS2B2 ($op95)
+- These Variables depend on the output of the low-pass filter and are of type uint16, physical_type real64.
+- These Variables represent the filtered lambda ratio signals and are suitable for output verification.
+
+### 4. Possible Testcases for Weakspot Element
+- **Testcase 1:** Small increase in input value
+  - Verify filter output smoothly increases.
+- **Testcase 2:** Large increase in input value
+  - Verify filter output response and settling behavior.
+- **Testcase 3:** Small decrease in input value
+  - Verify filter output smoothly decreases.
+- **Testcase 4:** Large decrease in input value
+  - Verify filter output response and settling behavior.
+- **Testcase 5:** Different gain constants (T)
+  - Test with minimum allowed T (≥1) and larger values.
+- **Testcase 6:** Min and max input values
+  - Verify filter stability and output range.
+- **Testcase 7:** Disabled filter behavior
+  - Verify output behavior when filter is disabled (e.g., output equals input or remains constant).
+- **Testcase 8:** Maximum relative deviation check
+  - Verify output deviation does not exceed expected limits.
+
+This set of testcases ensures comprehensive validation of the LowpassT filter behavior in the system, fulfilling the Bosch BU test guidelines.
+
+[[ ## equation_json ## ]]
+{"$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "4123", "type": "Function", "instance_name": "tiConAdpn_LT_I", "function_name": "LowpassT_out", "class_method_name": "out", "sequence_number": "2", "method_name": null, "decision": null, "condition": [], "arg_names": ["in", "T"], "args": ["$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam", "$op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op36_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op43_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op63_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10573", "type": "Local", "instance_name": "_ratLamTiConAdpn", "function_name": null, "class_method_name": null, "sequence_number": "2", "method_name": null, "decision": "If", "condition": ["$op33_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op7_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10523", "type": "Local", "instance_name": "_ratLamTmp", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": "If", "condition": ["$op3_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "arg_names": [], "args": ["$op4_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op9_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam": {"oid": "10499", "type": "Argument", "instance_name": "arg_tiTranAdpn", "function_name": null, "class_method_name": null, "sequence_number": "1", "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op11"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": [], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": []}, "$op47": {"oid": "15609", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS2B1", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op29"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS2B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS1B1", "EGSDO2_flgDynAdpnLtrS2B1", "EGSDO2_flgDynAdpnRtlS1B1", "EGSDO2_flgDynAdpnRtlS2B1", "EGSDO2_tiDlyAdpnS1B1", "EGSDO2_tiDlyAdpnS2B1", "EGSDO2_tiTranAdpnS1B1", "EGSDO2_tiTranAdpnS2B1", "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk1", "EGSPrepn_ratLamS2B1", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSSIG_SELO2SNSR1BNK1_SC", "EGSPREPN_TYPSNSR2BNK1_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}, "$op23": {"oid": "15597", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS1B1", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op5"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS0B1", "EGSDO2_flgDynAdpnLtrS1B1", "EGSDO2_flgDynAdpnRtlS0B1", "EGSDO2_flgDynAdpnRtlS1B1", "EGSDO2_tiDlyAdpnS0B1", "EGSDO2_tiDlyAdpnS1B1", "EGSDO2_tiTranAdpnS0B1", "EGSDO2_tiTranAdpnS1B1", "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk1", "EGSPrepn_ratLamS1B1", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSSIG_SELO2SNSR0BNK1_SC", "EGSPREPN_TYPSNSR1BNK1_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}, "$op71": {"oid": "15621", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS1B2", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op53"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS1B2_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS0B2", "EGSDO2_flgDynAdpnLtrS1B2", "EGSDO2_flgDynAdpnRtlS0B2", "EGSDO2_flgDynAdpnRtlS1B2", "EGSDO2_tiDlyAdpnS0B2", "EGSDO2_tiDlyAdpnS1B2", "EGSDO2_tiTranAdpnS0B2", "EGSDO2_tiTranAdpnS1B2", "EGSPrepn_flgEgSnsrPrsntSnsr1Bnk2", "EGSPrepn_ratLamS1B2", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSSIG_SELO2SNSR0BNK2_SC", "EGSPREPN_TYPSNSR1BNK2_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}, "$op95": {"oid": "15633", "type": "Variable", "instance_name": "EGSPrepn_ratLamSymcS2B2", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": "If", "condition": ["$op77"], "arg_names": [], "args": ["$op72_EGSSig_LamSymcS2B2_I_EGSSig_LamSymcClass_calc_ratLam"], "read": true, "write": false, "physical_type": "real64", "data_type": "uint16", "unique_variables": ["EGSDO2_flgDynAdpnLtrS1B2", "EGSDO2_flgDynAdpnLtrS2B2", "EGSDO2_flgDynAdpnRtlS1B2", "EGSDO2_flgDynAdpnRtlS2B2", "EGSDO2_tiDlyAdpnS1B2", "EGSDO2_tiDlyAdpnS2B2", "EGSDO2_tiTranAdpnS1B2", "EGSDO2_tiTranAdpnS2B2", "EGSPrepn_flgEgSnsrPrsntSnsr2Bnk2", "EGSPrepn_ratLamS2B2", "flgAdpnFilOld"], "unique_params": ["EGSSig_tiConTrigFil_C"], "unique_consts": ["EGSPREPN_TYPSNSR2BNK2_SC", "EGSSIG_SELO2SNSR1BNK2_SC"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "15.999755859375"]}}
+
+[[ ## const_values ## ]]
+{"EGSPREPN_TYPSNSR1BNK1_SC": 1, "EGSPREPN_TYPSNSR2BNK1_SC": 0, "EGSSIG_SELO2SNSR1BNK1_SC": 0, "EGSSIG_SELO2SNSR0BNK2_SC": 0, "EGSPREPN_TYPSNSR2BNK2_SC": 0, "dT": "10000.0", "EGSSIG_SELO2SNSR0BNK1_SC": 1, "EGSPREPN_TYPSNSR1BNK2_SC": 0, "EGSSIG_SELO2SNSR1BNK2_SC": 0}
+
+[[ ## weakspot_operation ## ]]
+$op35_EGSSig_LamSymcS1B1_I_EGSSig_LamSymcClass_calc_ratLam
+
+[[ ## instance_names ## ]]
+EGSPrepn_ratLamSymcS2B1,EGSPrepn_ratLamSymcS1B1,EGSPrepn_ratLamSymcS1B2,EGSPrepn_ratLamSymcS2B2
+
+[[ ## example_explanation_output ## ]]
+
+
+        # !!!EXAMPLE ONLY!!!
+        # [
+#   {
+#     "Pre-Condition": [],
+#     "Steps": [
+#       {
+#         "Actions": [
+#           "reset = false",
+#           "compute = false",
+# 		  "T = 5",
+# 		  "in = 10",
+# 		  "initValue = 20"
+#         ],
+#         "Expected Results": [
+#           "out = 0"
+#         ]
+#       },
+#       {
+#         "Actions": [
+#           "reset = true",
+#           "compute = false",
+# 		  "T = 5",
+# 		  "in = 10",
+# 		  "initValue = 20"
+#         ],
+#         "Expected Results": [
+#           "out = initValue"
+#         ]
+#       },
+#       {
+#         "Actions": [
+#           "reset = false",
+#           "compute = true",
+# 		  "T = 0.2",
+# 		  "in = 10",
+# 		  "initValue = 20"
+#         ],
+#         "Expected Results": [
+#           "out = ((@/T)*(in-out(t-@)))+out(t-@)"
+#         ]
+#       }
+#     ]
+#   }
+# ]
+        # !!!EXAMPLE ONLY!!!
+
+        
+
+[[ ## kb_guidelines ## ]]
+## Validated test guidelines for LowpassT (KB) — cover these scenarios:
+1. Test with small increase in value of input
+2. Test with larger increase in value of  input
+3. Test with small decrease in value of input
+4. Test with larger decrease in value of  input
+5. Check the maximum relative deviation of the output
+6. Test with different gain constant
+7. Test with min-max input and min - max time constant
+8. Test the disabled behavior of the filter
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## test_cases ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

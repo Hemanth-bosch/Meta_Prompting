@@ -1,0 +1,145 @@
+================ role: system ================
+Your input fields are:
+1. `equation_json` (str): 
+2. `const_values` (str): 
+3. `weakspot_operation` (str): 
+4. `weakspot_context` (str): 
+5. `kb_guidelines` (str): MANDATORY Bosch BU test guidelines (may be empty). If NON-EMPTY, your context analysis and the test scenarios you identify MUST reflect and require EVERY guideline listed here — treat them as hard, non-negotiable BU requirements; none may be skipped. If EMPTY, ignore this field.
+Your output fields are:
+1. `reasoning` (str): 
+2. `context_analysis` (str):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## equation_json ## ]]
+{equation_json}
+
+[[ ## const_values ## ]]
+{const_values}
+
+[[ ## weakspot_operation ## ]]
+{weakspot_operation}
+
+[[ ## weakspot_context ## ]]
+{weakspot_context}
+
+[[ ## kb_guidelines ## ]]
+{kb_guidelines}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## context_analysis ## ]]
+{context_analysis}
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        You are provided with the following information (supplied in the input fields below):
+        
+        Below is the data you should use:
+        - **Equation JSON**: provided in the `equation_json` input field
+        - **Constant Values**: provided in the `const_values` input field
+        - **Weakspot Element**: provided in the `weakspot_operation` input field
+        - **Weakspot Context**: provided in the `weakspot_context` input field
+        
+        ### 1. Equation JSON
+        This JSON describes a complex equation broken down into multiple elements. Each element is identified by a unique key and includes properties such as:
+        - **instance_name** -- the name of the variable or component represented by the element.
+        - **function_name** -- the function or operation that this element performs.
+        - **arg_names** -- a list of names for the input arguments used by the element.
+        - **args** -- a list of references (by key) to other elements that supply the input values for this element.
+        
+        ### 2. Constant Values
+        A dictionary of constant values that are used within the equation.
+        
+        ### 3. Weakspot Information
+        - **Weakspot Element**: This is the unique key of the weakspot element in the equation.
+        - **Weakspot Context**: A text description providing details on how the weakspot element is intended to work (its behavior, role, and impact).
+        
+        **Note:** The parameter representing the raster sample time (e.g. "dT") should be considered fixed and must not be listed among the inputs that can be altered.
+        ---
+        
+        ### Task:
+        Using the provided data, generate a detailed context for the identified weakspot element. Your response should include:
+        
+        1. **Overview of the Weakspot Element:**
+           - Identify the weakspot element by its unique key.
+           - Describe its role using its "instance_name" and "function_name".
+           - Describe in full detail, the working of the weakspot element.
+        
+        2. **Inputs That Can Be Altered:**
+           - Extract and list the names of the input parameters for the weakspot element (from its "arg_names" field).
+           - For each input, specify the corresponding reference from the "args" list that provides its value.
+           - Get the type information about these input operations from the equations json dictionary.
+           - **Exclude** any parameter that is fixed (for example, the sample time parameter or Literals or System Constants).
+        
+        3. **Outputs That Can Be Checked:**
+           - Identify any output variables that are directly produced by or depend on the weakspot element.
+           - Describe how these outputs are connected to the weakspot element.
+           - Only Local or Variable type output values can be checked.
+        
+        4. **Possible Testcases for Weakspot Element:**
+           - Provide a brief overview of the types of test cases that can be generated for the weakspot element.
+           - Include any specific conditions or scenarios that should be tested to validate the weakspot element.
+           - Keep the number of testcases to a minimum, checking the full working with the least number of testcases.
+        
+        Your answer should be clear and well organized, using headings, bullet points, and tables as needed. Generate the detailed context now.
+
+================ role: user ================
+[[ ## equation_json ## ]]
+{"$op187": {"oid": "1006", "type": "Function", "instance_name": "OilSepActr_ShwdnTOnD_I", "function_name": "Srv_TrnOnDly_out", "class_method_name": "out", "sequence_number": "14", "method_name": "Proc_100ms", "decision": null, "condition": [], "arg_names": ["Dt", "delayTime", "signal"], "args": ["$op181", "$op183", "$op186"], "read": true, "write": false, "physical_type": "", "data_type": "", "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C", "dT", "OilSepActr_tiDlyShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["None", "None"]}, "$op188": {"oid": "497", "type": "Local", "instance_name": "OilSepActr_flgSpdShdwn", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op187"], "read": true, "write": false, "physical_type": "log", "data_type": "bool", "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C", "dT", "OilSepActr_tiDlyShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "1.0"]}, "$op181": {"oid": "1024", "type": "Variable", "instance_name": "dT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": [], "read": true, "write": true, "physical_type": "real64", "data_type": "sint32", "unique_params": ["dT"], "unique_variables": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147.483648", "2147.483647"]}, "$op183": {"oid": "1694", "type": "ImplementationCast", "instance_name": "Time_DT", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op182"], "read": false, "write": false, "physical_type": "real64", "data_type": "sint32", "unique_variables": [], "unique_params": ["OilSepActr_tiDlyShdwn_C"], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["-2147.483648", "2147.483647"]}, "$op186": {"oid": "278", "type": "Operation", "instance_name": "And", "function_name": "And", "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op184", "$op180", "$op185"], "read": false, "write": false, "physical_type": null, "data_type": null, "unique_variables": ["CoEng_stMai", "Epm_nEng", "OilSepActr_flgNormActv"], "unique_params": ["OilSepActr_nMaxShdwn_C"], "unique_consts": ["COENG_ST_RUNNING"], "unique_class_items": [], "unique_chartables": []}, "$op215": {"oid": "148", "type": "Variable", "instance_name": "OilSepActr_stCoorr", "function_name": null, "class_method_name": null, "sequence_number": null, "method_name": null, "decision": null, "condition": [], "arg_names": [], "args": ["$op214"], "read": true, "write": false, "physical_type": "uint32", "data_type": "uint8", "unique_variables": ["flgStCoorr"], "unique_params": [], "unique_consts": [], "unique_class_items": [], "unique_chartables": [], "min_max_range": ["0.0", "255.0"]}}
+
+[[ ## const_values ## ]]
+{"COENG_ST_AUTOSTOPPING": 0, "COENG_ST_READY": 0, "dT": "0.1", "COENG_ST_RUNNING": 0, "POSTDRV_SOFTRST_SY": 0, "COENG_ST_STARTING": 0}
+
+[[ ## weakspot_operation ## ]]
+$op187
+
+[[ ## weakspot_context ## ]]
+   Srv\_TrnOnDly
+
+Srv\_TrnOnDly
+
+The turn on delay debounces the false to true transition. This means that if the input is false the output is set to false immediately. The output is set to true if the input has been true for at least the delay time.
+
+ 
+
+| Hint | |
+| --- | --- |
+| This class does not contain sequence numbers for the class methods.  The out value has to be connected to a variable to compute the class.  if the output is used in multiple places, there is a risk that the class output might be calculated twice. To avoid this use a process local variable at the output of the class(incase output is used in multiple places). | |
+
+Example Implementation:
+
+Methods:
+
+| Method | Description |
+| --- | --- |
+| set\_Time | The internal time value is set to the value provide by TimeVal: |
+| out | The method "out" calculates the delay element and delivers the result on the out port of the element. |
+
+Parameter:
+
+| Parameter | Description | Implementation |
+| --- | --- | --- |
+| delayTime | Delay time | sint32 |
+| Dt | Dt sample time  Attention:  Dt element and Dt port must have the same conversion formula.  Hint:  If using Per\_Dur as implementation for Dt element in BDE, simulation does not work for time dependent elements. Therefore it is recommended to use Time\_Dt. | sint32 Time\_Dt |
+| out | Calculation of delay element and returning result on the out port | uint8 ident(logical signal is returned) |
+| return | returns flase if the input is false the output is set to false immediately. returns  true if the input has been true for at least the delay time. | uint8 ident(logical) |
+| signal | Input signal | uint8 ident (logical signal is expected at the input) |
+| time | static element for holding the time value . | sint32 Time\_Dt  same memory location as set in the TrnOffDly class Settings->Memory Location of Instance |
+| timeVal | Time value for initialization of the time value | sint32 Time\_Dt |
+
+| Related information | |
+| --- | --- |
+| TurnOnDelayA , Srv\_TrnOffDly ,TurnOffDelayA  SRV: SrvX\_TrnOnDlyBoolean\_B  Doors link(SRV): SrvX\_trnOnDly | |
+
+[[ ## kb_guidelines ## ]]
+## Validated test guidelines for Srv_TrnOnDly (newKB) — cover these scenarios:
+1. Checking the Delay of rising edge — Initialize the Delay parameter and set the input to zero; Set: = desired value; Set: Input = FALSE; Check: Output = Input = FALSE
+2. Checking the delay on rising edge — Given: Output = Input = FALSE; Set: Input = TRUE; Wait: Delay time (XXX_tiYYYDly_C); Check: Output = Input after the delay time
+3. Checking on falling edge — Given: Output = Input = TRUE; Set: Input = FALSE; Check: Output = FALSE immediately
+4. Checking the output when the input is at TRUE for less than the delay time — Given: Output = Input = FALSE; Set: Input = TRUE and then set it to FALSE before the delay time; Check: Output = FALSE - does not change to TRUE
+5. Repeat all the above cases with maximum value for the turn-on delay mentioned in the design
+6. Repeat all the above cases with minimum value for the turn-on delay mentioned in the design
+7. Repeat all the above cases with a value of zero for the turn-on delay and check whether there is no delay between input and output
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## context_analysis ## ]]`, and then ending with the marker for `[[ ## completed ## ]]`.

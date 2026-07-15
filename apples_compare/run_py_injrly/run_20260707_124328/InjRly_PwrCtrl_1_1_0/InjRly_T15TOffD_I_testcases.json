@@ -1,0 +1,96 @@
+[
+  {
+    "Pre-Condition": [
+      "InjPwrRly_r = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "T15_st = 1"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 1"
+        ]
+      }
+    ],
+    "Detailed Explanation": "1, the output '_flgDlydlnPostDrive' should immediately become true (1) regardless of the delay time. This confirms that the debounce logic does not delay the rising edge of the input signal, ensuring prompt response to true inputs."
+  },
+  {
+    "Pre-Condition": [
+      "InjPwrRly_r = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "T15_st = 1"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "T15_st = 0",
+          "impl_cast = 60000",
+          "Wait 20000"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 40000"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "0, the output should remain true for the specified delay time (60000 ms). The test waits for one sample time (20000 ms) and checks that the output is still true, confirming the delay is active. After waiting the remaining delay time (40000 ms), the output should switch to false (0), verifying that the debounce delay correctly holds the output before turning it off."
+  },
+  {
+    "Pre-Condition": [
+      "InjPwrRly_r = 0"
+    ],
+    "Steps": [
+      {
+        "Actions": [
+          "T15_st = 0",
+          "impl_cast = 40000",
+          "Wait 20000"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 0"
+        ]
+      },
+      {
+        "Actions": [
+          "T15_st = 1",
+          "Wait 20000"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "T15_st = 0",
+          "Wait 20000"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 1"
+        ]
+      },
+      {
+        "Actions": [
+          "Wait 20000"
+        ],
+        "Expected Results": [
+          "_flgDlydlnPostDrive = 0"
+        ]
+      }
+    ],
+    "Detailed Explanation": "40000 ms. The test waits in increments of the sample time (20000 ms) to verify the output remains true during the delay and switches to false only after the full delay has elapsed. This confirms that the function is called once per process step and the timer increments properly without running too fast or resetting incorrectly."
+  }
+]
