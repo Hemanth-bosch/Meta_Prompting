@@ -16,7 +16,13 @@ import pandas as pd
 
 XLSX = sys.argv[1] if len(sys.argv) > 1 else os.path.join("results", "dca_experiments.xlsx")
 OUT = os.path.join("results", "plots", "dca_datapoints.csv")
-TOUR = os.path.join("results", "excel", "tournament_top2.xlsx")
+TOUR = os.path.join("results", "excel", "combined_tournaments_single_run.xlsx")
+# Full tournaments (seed->bootstrap->miprov2->gepa). 4a/4b are "Only seeds"
+# experiments (not tournaments) and are excluded.
+FULL_TOURNAMENTS = {"1a", "1b", "2", "3", "5"}
+# Deck slides 29 & 37: this run used the v1-MiDAS prompt as the optimizer seed.
+# Every other tournament used the CR-default signature seed.
+TOUR_V1_RUNS = {"20260504234953"}
 
 _FLOAT = re.compile(r"(?<![\d.])(0?\.\d{2,4}|1\.0{1,3})(?![\d])")
 
@@ -123,20 +129,27 @@ def main():
                              seed_source=(seed_from(seed4, c15) or "cr-default"),
                              cot=cot_flag(cat, hp), scores=scores))
 
-    # Tournament best-score per instance (from the tournament excel)
+    # Tournament best-score per full-tournament run (from the combined excel, which
+    # carries run-IDs). Seed source per run-ID comes from the deck (slides 29/37):
+    # run 20260504234953 = v1-MiDAS seed; all other tournaments = CR-default.
     tour = 0
     if os.path.exists(TOUR):
         td = pd.read_excel(TOUR, sheet_name=0, dtype=str)
         cm = {str(c).strip().lower(): c for c in td.columns}
         for _, tr in td.iterrows():
-            if cm.get("selection") and str(tr[cm["selection"]]).strip().lower() != "best score":
+            tname = str(tr.get(cm.get("tournament"), "")).strip()
+            if tname not in FULL_TOURNAMENTS:
+                continue
+            if str(tr.get(cm.get("selection"), "")).strip().lower() != "best score":
                 continue
             sc = floats_in(tr.get(cm.get("total score")))
             if not sc:
                 continue
-            rows.append(dict(src=f"tournament_top2", optimizer="tournament", prompt_version="",
+            run = str(tr.get(cm.get("reference (prompt + log)"), "")).strip()
+            rows.append(dict(src=f"tour:{run}", optimizer="tournament", prompt_version="",
                              prompt_type="", model=norm_model(tr.get(cm.get("inference model"))),
-                             seed_source="cr-default", cot="nocot", scores=sc[:1]))
+                             seed_source=("v1" if run in TOUR_V1_RUNS else "cr-default"),
+                             cot="nocot", scores=sc[:1]))
             tour += 1
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
