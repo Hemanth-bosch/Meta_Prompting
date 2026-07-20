@@ -1,3 +1,10 @@
+"""DCA task contract — the ``DCAImageComparison`` DSPy Signature.
+
+Declares the inputs (original + re-imaged document images) and outputs
+(``discard_image``, ``changes``). The decision policy lives in the signature's
+instruction docstring; field descriptions are kept empty (instructions-only mode)
+so the optimizers have a single clean surface to improve.
+"""
 import dspy
 from typing import Optional
 

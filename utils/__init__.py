@@ -1,3 +1,4 @@
+"""DCA data utilities: dataset loading, stratified splitting, and optional PDF→image."""
 from utils.data_loading import load_dca_dataset
 from utils.splitting import stratified_split_dca_dataset
 from utils.pdf_processing import (

@@ -1,3 +1,4 @@
+"""Stratified train/val/test splitting for the DCA image-pair dataset (seeded, reproducible)."""
 import dspy
 from typing import List
 import random

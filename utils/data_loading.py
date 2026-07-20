@@ -1,3 +1,4 @@
+"""DCA dataset loading — build labelled ``dspy.Example``s from image pairs + ground-truth JSON."""
 import dspy
 from typing import List
 import json

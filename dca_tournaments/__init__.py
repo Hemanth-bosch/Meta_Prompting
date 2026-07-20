@@ -1,3 +1,4 @@
+"""DCA multi-stage tournament optimization package (Seed -> Bootstrap -> MIPROv2 -> GEPA)."""
 from dca_tournaments.tour_config import TournamentConfig
 from dca_tournaments.leaderboard import OptimizationLeaderboard, CandidateEntry
 from dca_tournaments.seed_prompt_generator import SeedPromptGenerator
