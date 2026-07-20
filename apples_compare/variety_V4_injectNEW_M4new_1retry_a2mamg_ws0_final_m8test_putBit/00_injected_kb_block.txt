@@ -1,2 +1,0 @@
-## Validated test guidelines for putBit_unsigned_putBit (newKB) — cover these scenarios:
-1. Checking the Bit Operation : SetBit — Set: Set the input variable X = xxxxxxxx (data size may be 8-bit,16-bit or 32-bit); Set: Give the Position number to be set to TRUE; Check: Output = Logical status of the position Number is set to TRUE

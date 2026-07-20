@@ -400,7 +400,9 @@ def create_lm(model_name: Optional[str] = None,
     lm_params = {                                          # [wrapper-only] kwargs for dspy.LM (replaces run.py call_llm transport)
         "model": model_name,                              # [wrapper-only] litellm model id (~) cfg.AZURE_OPENAI_DEPLOYMENT
         "cache": cache,                                    # [wrapper-only] DSPy response cache toggle (no run.py analog)
-        **kwargs,                                          # [wrapper-only] pass through any extra caller params
+        "num_retries": 4,                                 # [wrapper-only] retry transient Azure ConnectTimeout (WinError 10060) instead of failing the example
+        "timeout": 300,                                   # [wrapper-only] per-request timeout (s) — a stalled connection fails fast then retries
+        **kwargs,                                          # [wrapper-only] pass through any extra caller params (can override num_retries/timeout)
     }
 
     if provider == "azure":                               # azure/* branch (~) llm_client._make_azure_client

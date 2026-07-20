@@ -2,7 +2,7 @@
 
 **Who this guide is for:** A developer adding a new document-processing or image-analysis use case to this repository.
 
-**What you will end up with:** A fully working pipeline that loads your data, optimizes a prompt automatically using DSPy, evaluates it, and saves the best result — following the same patterns as the existing DCA, JO, and YANASE use cases.
+**What you will end up with:** A fully working pipeline that loads your data, optimizes a prompt automatically using DSPy, evaluates it, and saves the best result — following the same patterns as the existing DCA use case.
 
 ---
 
@@ -27,7 +27,7 @@ Your use case needs:
   extract_<usecase>.py         ← the main script that ties it all together
 ```
 
-Existing use cases to refer to: **DCA** (image-pair comparison, most complete), **JO** (Japanese Order extraction), **YANASE** (parts order extraction).
+Reference use case to model yours on: **DCA** (image-pair comparison) — `signatures/dca.py`, `evaluation/dca_metric.py`, `utils/data_loading.py`, `extract_dca.py`, `dca_tournaments/`.
 
 ---
 
@@ -138,7 +138,7 @@ from signatures.<usecase> import MyUseCaseSignature
 **Tips:**
 - Use `Optional[dspy.Image]` when an input image may be absent (DCA does this for one-sided pairs).
 - Be very specific in output field `desc` values: list allowed values, format requirements, and edge cases. These directly affect prompt quality before any optimization.
-- For structured sub-objects (like a list of line items), see `yanase.py` for the nested Signature pattern.
+- For structured sub-objects (like a list of line items), use a nested `dspy.Signature` / Pydantic model as the output field type.
 - For the DCA use case, all guidance lives in the docstring and field `desc` values are empty (`desc=""`). This is the P1 "instructions-only" mode. New use cases can start with full `desc` values and switch later.
 
 ---
@@ -503,4 +503,4 @@ dca_tournaments/run_tournament.py
 
 ---
 
-*For questions or issues, open a ticket or check existing use cases: DCA (`signatures/dca.py`, `extract_dca.py`, `dca_tournaments/`), JO (`signatures/jo.py`, `extract_jo.py`), YANASE (`signatures/yanase.py`, `extract_yanase.py`).*
+*For questions or issues, open a ticket or check the DCA reference implementation: `signatures/dca.py`, `extract_dca.py`, `evaluation/dca_metric.py`, `dca_tournaments/`.*

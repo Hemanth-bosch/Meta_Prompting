@@ -73,7 +73,7 @@ from typing import List
 import dotenv
 import dspy
 
-from config import reconfigure_lm, reflectin_lm
+from config import reconfigure_lm, reflectin_lm, create_lm
 from signatures.dca import DCAImageComparison
 from utils import load_dca_dataset, stratified_split_dca_dataset
 from evaluation.dca_metric import dca_comparison_metric, dca_comparison_metric_with_feedback
@@ -162,6 +162,66 @@ parser.add_argument("--run-timestamp", type=str, default=None,
                          "guarantee uniqueness across parallel runs. Falls back to datetime.now() "
                          "when running extract_dca.py directly.")
 
+# ── Un-hardcoded optimizer knobs (all previously fixed in code) ──────────────
+# Split + evaluation
+parser.add_argument("--split-seed", type=int, default=42,
+                    help="Seed for the stratified train/val/test split (default: 42)")
+parser.add_argument("--train-ratio", type=float, default=0.6, help="Train split ratio (default: 0.6)")
+parser.add_argument("--val-ratio", type=float, default=0.2, help="Val split ratio (default: 0.2)")
+parser.add_argument("--test-ratio", type=float, default=0.2, help="Test split ratio (default: 0.2)")
+parser.add_argument("--eval-num-threads", type=int, default=4,
+                    help="Threads for dspy.Evaluate scoring (default: 4)")
+# Bootstrap knobs
+parser.add_argument("--bootstrap-labeled-demos", type=int, default=1,
+                    help="Bootstrap: max labeled demos (default: 1)")
+parser.add_argument("--bootstrap-bootstrapped-demos", type=int, default=1,
+                    help="Bootstrap: max bootstrapped demos (default: 1)")
+parser.add_argument("--bootstrap-num-candidate-programs", type=int, default=1,
+                    help="Bootstrap: random-search candidate programs (default: 1)")
+parser.add_argument("--bootstrap-max-rounds", type=int, default=1,
+                    help="Bootstrap: bootstrapping rounds (default: 1)")
+parser.add_argument("--bootstrap-num-threads", type=int, default=4,
+                    help="Bootstrap: parallel eval threads (default: 4)")
+# MIPROv2 knobs
+parser.add_argument("--miprov2-num-threads", type=int, default=4,
+                    help="MIPROv2: parallel eval threads (default: 4)")
+# GEPA knobs
+parser.add_argument("--gepa-num-threads", type=int, default=4,
+                    help="GEPA: parallel eval threads (default: 4)")
+parser.add_argument("--gepa-track-stats", action=argparse.BooleanOptionalAction, default=True,
+                    help="GEPA: track detailed_results for in-pass best-score (default: True)")
+parser.add_argument("--gepa-use-merge", action=argparse.BooleanOptionalAction, default=True,
+                    help="GEPA: merge candidate programs (default: True)")
+parser.add_argument("--gepa-reflection-images", action=argparse.BooleanOptionalAction, default=True,
+                    help="GEPA: send document image-pairs to the reflection LM (multimodal) (default: True)")
+parser.add_argument("--gepa-reflection-detail", type=str, default="auto",
+                    choices=["low", "high", "auto"],
+                    help="GEPA: image detail level for multimodal reflection (default: auto)")
+parser.add_argument("--gepa-reflection-max-images", type=int, default=6,
+                    help="GEPA: max images per reflection call (default: 6)")
+# SimBA knobs
+parser.add_argument("--simba-labeled-demos", type=int, default=4,
+                    help="SimBA: max labeled demos (default: 4)")
+parser.add_argument("--simba-num-threads", type=int, default=4,
+                    help="SimBA: parallel threads (default: 4)")
+parser.add_argument("--simba-bsize", type=int, default=32,
+                    help="SimBA: minibatch size (default: 32)")
+parser.add_argument("--simba-num-candidates", type=int, default=6,
+                    help="SimBA: candidates per step (default: 6)")
+# Teacher / prompt / reflection model overrides (default None -> use student LM;
+# GEPA reflection defaults to the .env REFLECTION_LM_NAME, typically gpt-5.2)
+parser.add_argument("--bootstrap-teacher-model", type=str, default=None,
+                    help="Teacher LM for Bootstrap demo generation (default: student model)")
+parser.add_argument("--miprov2-teacher-model", type=str, default=None,
+                    help="Teacher LM for MIPROv2 demo generation (default: student model)")
+parser.add_argument("--miprov2-prompt-model", type=str, default=None,
+                    help="Proposer LM for MIPROv2 instruction generation (default: student model)")
+parser.add_argument("--gepa-reflection-model", type=str, default=None,
+                    help="Reflection LM for GEPA (default: env REFLECTION_LM_NAME, e.g. azure/gpt-5.2)")
+parser.add_argument("--teacher-reasoning-effort", type=str, default=None,
+                    choices=["low", "medium", "high"],
+                    help="reasoning_effort applied to teacher/prompt/reflection LMs (default: None)")
+
 args = parser.parse_args()
 
 # Central flag — purely driven by the explicit switch
@@ -169,8 +229,8 @@ _should_clear_descs: bool = args.clear_field_descs
 
 pairs_dir = args.pairs_dir
 gt_dir = args.gt_dir
-split_seed = 42
-_split_ratios = {"train": 0.6, "val": 0.2, "test": 0.2}
+split_seed = args.split_seed
+_split_ratios = {"train": args.train_ratio, "val": args.val_ratio, "test": args.test_ratio}
 _split_stratify_by = ["expected_discard_image", "expected_human_label_category", "doubt"]
 
 
@@ -607,10 +667,52 @@ print(f"Seed state saved   -> {_seed_prompt_path}\n")
 evaluate = dspy.Evaluate(
     devset=None,
     metric=dca_comparison_metric,
-    num_threads=4,
+    num_threads=args.eval_num_threads,
     display_progress=True,
     display_table=True,
 )
+
+
+# ── Teacher / prompt / reflection LMs + optional multimodal GEPA reflection ───
+# All optimizer models are CLI-driven (no hard-coding). Teacher/prompt overrides
+# default to None -> the student LM is used (unchanged behavior). GEPA reflection
+# defaults to the .env REFLECTION_LM_NAME (reflectin_lm, typically gpt-5.2).
+def _build_aux_lm(model_name):
+    """Build an auxiliary LM (teacher/prompt/reflection) from a name, or None."""
+    if not model_name:
+        return None
+    _kw = {"cache": cache_enabled}
+    if args.teacher_reasoning_effort:
+        _kw["reasoning_effort"] = args.teacher_reasoning_effort
+    return create_lm(model_name, **_kw)
+
+_bootstrap_teacher_lm = _build_aux_lm(args.bootstrap_teacher_model)
+_miprov2_teacher_lm   = _build_aux_lm(args.miprov2_teacher_model)
+_miprov2_prompt_lm    = _build_aux_lm(args.miprov2_prompt_model)
+
+# GEPA reflection LM: explicit override, else the .env reflection LM (gpt-5.2).
+_gepa_reflection_lm   = _build_aux_lm(args.gepa_reflection_model) or reflectin_lm
+_metric_with_feedback = dca_comparison_metric_with_feedback
+
+# Multimodal GEPA reflection (parity with the tournament): send the document
+# image-pairs to the reflection LM so it can SEE what changed. Reuses the same
+# machinery as dca_tournaments (image store + reflective-dataset patch).
+_gepa_multimodal = bool(args.gepa_reflection_images) and args.optimizer in ("gepa", "all")
+if _gepa_multimodal:
+    from dca_tournaments.gepa_utils import (
+        MultimodalReflectionLM,
+        make_image_storing_metric,
+        patch_gepa_reflective_dataset,
+    )
+    patch_gepa_reflective_dataset(send_images=True)
+    _gepa_reflection_lm = MultimodalReflectionLM(
+        base_lm=_gepa_reflection_lm,
+        detail=args.gepa_reflection_detail,
+        max_images=args.gepa_reflection_max_images,
+    )
+    _metric_with_feedback = make_image_storing_metric(dca_comparison_metric_with_feedback)
+    print(f"GEPA multimodal reflection ENABLED (detail={args.gepa_reflection_detail}, "
+          f"max_images={args.gepa_reflection_max_images}).\n")
 
 
 # ── Optimization Strategies ──────────────────────────────────────
@@ -627,12 +729,12 @@ if args.optimizer in ("bootstrap", "all"):
         create_bootstrap_strategy(
             name="Balanced_DCA_Bootstrap",
             description="Balanced approach with equal labeled and bootstrapped demos for DCA classification",
-            max_labeled_demos=1,        # Image context overhead; each demo adds tokens
-            max_bootstrapped_demos=1,   # Teacher-generated demos drawn from correct train predictions
-            num_candidate_programs=1,  # Random candidates to evaluate; more = better coverage
-            num_candidate_traces=(2,5), # Generate 2-5 candidate traces per example for bootstrapping
-            num_threads=4,              # Parallel LLM calls during candidate evaluation
-            max_rounds=1,               # Second round refines demo quality; >2 risks overfitting
+            max_labeled_demos=args.bootstrap_labeled_demos,
+            max_bootstrapped_demos=args.bootstrap_bootstrapped_demos,
+            num_candidate_programs=args.bootstrap_num_candidate_programs,
+            num_threads=args.bootstrap_num_threads,
+            max_rounds=args.bootstrap_max_rounds,
+            teacher_lm=_bootstrap_teacher_lm,   # None -> student LM (unchanged default)
         )
     )
     # _register_strategy(
@@ -656,7 +758,9 @@ if args.optimizer in ("miprov2", "all"):
             auto=args.miprov2_auto,
             max_labeled_demos=args.max_labeled_demos,
             max_bootstrapped_demos=args.max_bootstrapped_demos,
-            num_threads=4,
+            num_threads=args.miprov2_num_threads,
+            teacher_lm=_miprov2_teacher_lm,   # None -> student LM
+            prompt_lm=_miprov2_prompt_lm,     # None -> student LM (proposer)
         )
     )
 
@@ -666,9 +770,10 @@ if args.optimizer in ("gepa", "all"):
             name=f"GEPA_DCA_{args.gepa_auto.capitalize()}",
             description=f"GEPA ({args.gepa_auto}) -- reflection-LM guided prompt improvement",
             auto=args.gepa_auto,
-            num_threads=4,
-            track_stats=True,
-            use_merge=True,
+            num_threads=args.gepa_num_threads,
+            track_stats=args.gepa_track_stats,
+            use_merge=args.gepa_use_merge,
+            reflection_lm=_gepa_reflection_lm,   # plain gpt-5.2 or multimodal wrapper
         )
     )
 
@@ -678,10 +783,10 @@ if args.optimizer in ("simba", "all"):
             name=f"SimBA_DCA_Steps{args.simba_max_steps}",
             description=f"SimBA ({args.simba_max_steps} steps) -- iterative prompt refinement",
             max_steps=args.simba_max_steps,
-            max_labeled_demos=4,
-            num_threads=4,
-            bsize=32,
-            num_candidates=6,
+            max_labeled_demos=args.simba_labeled_demos,
+            num_threads=args.simba_num_threads,
+            bsize=args.simba_bsize,
+            num_candidates=args.simba_num_candidates,
         )
     )
 
@@ -695,8 +800,8 @@ runner = OptimizationRunner(
     train_set=train_set,
     val_set=val_set,
     evaluate_fn=evaluate,
-    metric_with_feedback=dca_comparison_metric_with_feedback,
-    reflection_lm=reflectin_lm,
+    metric_with_feedback=_metric_with_feedback,
+    reflection_lm=_gepa_reflection_lm,
 )
 
 print(f"\n{'='*80}")

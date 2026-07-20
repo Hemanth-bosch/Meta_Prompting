@@ -1,8 +1,0 @@
-## Validated test guidelines for Srv_TrnOffDly (newKB) — cover these scenarios:
-1. Checking the Delay of falling edge — Initialize the Delay parameter and set the input to zero; Set: = desired value; Set: Input = FALSE; Check: Output = Input = FALSE
-2. Checking on rising edge — Given: Output = Input = FALSE; Set: Input = TRUE; Check: Output = Input immediately
-3. Checking the output when the input is at FALSE for less than the delay time — Given: Output = Input = TRUE; Set: Input = FALSE and then set it to TRUE before the delay time; Check: Output = TRUE - does not change to TRUE
-4. Checking the delay on falling edge — Given: Output = Input = TRUE; Set: Input = FALSE; Wait: Delay time (XXX_tiYYYDly_C); Check: Output = FALSE after the delay time
-5. Repeat all the above cases with maximum value for the turn off delay mentioned in the design
-6. Repeat all the above cases with minimum value for the turn-off delay mentioned in the design
-7. Repeat all the above cases with a value of zero for the turn-off delay and check whether there is no delay between input and output

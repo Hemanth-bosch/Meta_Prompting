@@ -1,4 +1,0 @@
-[[ ## covered_indices ## ]]
-2,7
-
-[[ ## completed ## ]]

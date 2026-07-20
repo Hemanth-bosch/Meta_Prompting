@@ -1,2 +1,0 @@
-## Validated test guidelines for getBit_unsigned_getBit (newKB) — cover these scenarios:
-1. Checking the Bit Operation : GetBit — Set: Set the input variable X = xxxxxxxx (data size may be 8-bit,16-bit or 32-bit); Set: Give the Position number to get the logical value of the bit.; Check: Output = Logical status of the position Number

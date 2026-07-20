@@ -345,6 +345,111 @@ def evaluate_candidate_at_temperature(
 
 
 # ═══════════════════════════════════════════════════════════════════
+# Eval-result trustworthiness guard
+# ═══════════════════════════════════════════════════════════════════
+
+def is_eval_result_trustworthy(
+    result: dict,
+    *,
+    max_error_rate: float = 0.20,
+    min_tokens: float = 500,
+) -> bool:
+    """Check whether an evaluation result is reliable enough to persist.
+
+    Returns False (= discard / keep previous values) when:
+      - All examples failed (n_evaluated == 0)
+      - Error rate exceeds ``max_error_rate`` (default 20%)
+      - Token data is null/missing despite a supposedly successful run
+      - Token count is implausibly low (below ``min_tokens`` per sample)
+
+    Use at every boundary where eval results are written to the leaderboard
+    or candidate entries, to prevent Azure outages or transient errors from
+    poisoning the persisted state.
+    """
+    n_evaluated = result.get("n_evaluated", 0)
+    if n_evaluated == 0:
+        return False
+
+    n_errors = result.get("n_errors", 0)
+    error_rate = n_errors / n_evaluated
+    if error_rate > max_error_rate:
+        return False
+
+    avg_tok = result.get("avg_total_tokens")
+    if avg_tok is None:
+        return False
+    if avg_tok < min_tokens:
+        # Sanity floor: a real DCA inference always uses >500 tokens
+        # (prompt alone is ~2.5k). A low value indicates demos were
+        # silently dropped or the eval didn't actually run properly.
+        return False
+
+    return True
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Demo key normalization
+# ═══════════════════════════════════════════════════════════════════
+
+def normalize_demos(program) -> int:
+    """Fix ``expected_*`` prefixed demo keys so they survive save/load.
+
+    DSPy's labeled demos (from training data, non-augmented) store output
+    fields as ``expected_<field>``.  In memory, ``dspy.Example.__getattr__``
+    silently maps ``example.<field>`` → ``example.expected_<field>``, so
+    everything works.  But after ``program.save()`` + ``program.load()``
+    the demos become **plain dicts** — the ``expected_*`` prefix is now a
+    dead literal key that ``ChatAdapter`` cannot match to the signature's
+    output fields, so the demo is silently dropped from the prompt.
+
+    This function:
+      1. Renames ``expected_<output_field>`` → ``<output_field>``
+      2. Drops non-signature metadata keys (``pair_name``, ``doubt``, etc.)
+      3. Sets ``augmented = True`` on fixed demos (signals bare-key format)
+
+    Call this **before** ``program.save()`` and **after** ``program.load()``.
+
+    Returns the number of demos that were fixed.
+    """
+    demos = getattr(program, "demos", None)
+    if not demos:
+        return 0
+
+    sig = getattr(program, "signature", None)
+    if sig is None:
+        return 0
+
+    output_fields = set(sig.output_fields.keys())
+    allowed_keys = set(sig.fields.keys()) | {"augmented"}
+
+    fixed = 0
+    normalized = []
+    for demo in demos:
+        items = demo.items() if isinstance(demo, dict) else list(demo._store.items())
+        needs_fix = any(
+            k.startswith("expected_") and k[len("expected_"):] in output_fields
+            for k, _ in items
+        )
+        if not needs_fix:
+            normalized.append(demo if isinstance(demo, dict) else dict(items))
+            continue
+
+        new_demo: dict = {}
+        for k, v in items:
+            if k.startswith("expected_") and k[len("expected_"):] in output_fields:
+                new_demo[k[len("expected_"):]] = v
+            elif k in allowed_keys:
+                new_demo[k] = v
+            # else: drop non-signature metadata (pair_name, doubt, etc.)
+        new_demo["augmented"] = True
+        normalized.append(new_demo)
+        fixed += 1
+
+    program.demos = normalized
+    return fixed
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Save / Load candidates
 # ═══════════════════════════════════════════════════════════════════
 

@@ -1,9 +1,0 @@
-## Validated test guidelines for LowpassT (KB) — cover these scenarios:
-1. Test with small increase in value of input
-2. Test with larger increase in value of  input
-3. Test with small decrease in value of input
-4. Test with larger decrease in value of  input
-5. Check the maximum relative deviation of the output
-6. Test with different gain constant
-7. Test with min-max input and min - max time constant
-8. Test the disabled behavior of the filter

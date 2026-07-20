@@ -1,6 +1,0 @@
-## Validated test guidelines for Srv_Debounce (newKB) — cover these scenarios:
-1. Checking the correct initialization of the debounce — Initialize the debounce; Check: Output = initialization value
-2. Checking the delay on rising edge — Set: Input = FALSE; Wait: Output = FALSE; Change the input from FALSE to TRUE; Set: Input = TRUE; Wait: Till the debounce time is over; Check: Output = TRUE
-3. Checking the suppressing on falling signal change smaller than debouncing time — Set the input from true to false and before time DEBOUNCE back to true; Set: Input = FALSE & then before debounce time is over set input = TRUE; Check: Output = TRUE after debounce time is over
-4. Checking the delay on falling edge — Change the input from TRUE to FALSE; Set: Input = FALSE; Wait: Till the debounce time is over; Check: Output = FALSE
-5. Checking the suppressing on rising signal change smaller than debouncing time — Set the input from false to true and before time DEBOUNCE back to false; Set: Input = TRUE & then before debounce time is over set input = FALSE; Check: Output = FALSE after debounce time is over

@@ -1,7 +1,0 @@
-VARIETY 1: V1_M4old_noinject_1retry
-  weakspot=EGSSig_LamSymcp_1_6_0 ws=2 fn=LowpassT_out
-  inject_kb_guidelines=False  KB=old  max_retries=1  model=azure/gpt-4.1-mini
-  pipeline LLM calls (llm_call_*) = 13
-  M4 judge LLM calls (m4_judge_*) = 1
-  injected block length = 0 chars
-  M4 score = 0.25  ([KB:LowpassT] 2/8 covered | missing: "Test with small increase in value of input", "Test with small decrease in value of input", "Test with larger decrease in value of  input" …)

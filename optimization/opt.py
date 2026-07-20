@@ -303,7 +303,11 @@ class OptimizationRunner:
             }
             if config.num_threads is not None:  # [wrapper-only] only pass num_threads when the config set it
                 bootstrap_kwargs["num_threads"] = config.num_threads  # [wrapper-only] DSPy parallelism knob
+            if config.get_param("teacher_lm") is not None:  # teacher LM override for demo generation (else student LM)
+                bootstrap_kwargs["teacher_settings"] = {"lm": config.get_param("teacher_lm")}
             for param_name, param_value in config.optimizer_params.items():  # [wrapper-only] fold in any extra non-None optimizer_params
+                if param_name in ("teacher_lm", "prompt_lm", "reflection_lm"):  # aux LM objects handled explicitly; not ctor kwargs
+                    continue
                 if param_name not in bootstrap_kwargs and param_value is not None:  # [wrapper-only] don't clobber explicit kwargs / skip Nones
                     bootstrap_kwargs[param_name] = param_value  # [wrapper-only] passthrough extra kwarg
             bootstrap_kwargs = self._filter_supported_kwargs(  # [wrapper-only] drop kwargs the installed DSPy version no longer accepts
@@ -427,7 +431,13 @@ class OptimizationRunner:
         }
         if config.num_threads is not None:  # [wrapper-only] only pass num_threads when configured
             miprov2_params["num_threads"] = config.num_threads  # [wrapper-only] DSPy parallelism knob
+        if config.get_param("teacher_lm") is not None:  # teacher LM override for demo generation (else student LM)
+            miprov2_params["teacher_settings"] = {"lm": config.get_param("teacher_lm")}
+        if config.get_param("prompt_lm") is not None:  # proposer LM override for instruction generation (else student LM)
+            miprov2_params["prompt_model"] = config.get_param("prompt_lm")
         for param_name, param_value in config.optimizer_params.items():  # [wrapper-only] fold in extra non-None optimizer_params
+            if param_name in ("teacher_lm", "prompt_lm", "reflection_lm"):  # aux LM objects handled explicitly; not ctor kwargs
+                continue
             if param_name not in miprov2_params and param_value is not None:  # [wrapper-only] don't clobber explicit kwargs / skip Nones
                 miprov2_params[param_name] = param_value  # [wrapper-only] passthrough extra kwarg
         print(f"MIPROv2 parameters: {miprov2_params}")  # [wrapper-only] progress print of the resolved kwargs
