@@ -60,29 +60,29 @@ dca_tournaments/
 source .venv/bin/activate         # Windows: .venv\Scripts\activate
 
 # Default run: seed → bootstrap → miprov2 → gepa, student = gpt-4.1-mini
-uv run python -m dca_tournaments.run_tournament
+python -m dca_tournaments.run_tournament
 
 # Dry run — print config and estimated API calls, then exit
-uv run python -m dca_tournaments.run_tournament --dry-run
+python -m dca_tournaments.run_tournament --dry-run
 
 # Stage 0 only — smoke test with 1 seed candidate
-uv run python -m dca_tournaments.run_tournament --stages seed --n-seed-candidates 1
+python -m dca_tournaments.run_tournament --stages seed --n-seed-candidates 1
 
 # Full pipeline including GEPA
-uv run python -m dca_tournaments.run_tournament --stages seed,bootstrap,miprov2,gepa
+python -m dca_tournaments.run_tournament --stages seed,bootstrap,miprov2,gepa
 
 # Skip seed generation, use an existing saved program as starting point
-uv run python -m dca_tournaments.run_tournament \
+python -m dca_tournaments.run_tournament \
     --seed-from-file .cache/my_best.json \
     --stages bootstrap,miprov2
 
 # Run with parallel optimizers and parallel seed evaluations
-uv run python -m dca_tournaments.run_tournament \
+python -m dca_tournaments.run_tournament \
     --max-parallel 4 \
     --seed-parallel-evaluations 4
 
 # Resume an interrupted run
-uv run python -m dca_tournaments.run_tournament \
+python -m dca_tournaments.run_tournament \
     --resume-from .cache/tournament/tournament_20260428234355
 ```
 
@@ -314,7 +314,7 @@ Each `program.meta.json` sidecar records:
 Pass `--resume-from <output_dir>` to continue an interrupted run:
 
 ```bash
-uv run python -m dca_tournaments.run_tournament \
+python -m dca_tournaments.run_tournament \
     --resume-from .cache/tournament/tournament_20260428234355
 ```
 

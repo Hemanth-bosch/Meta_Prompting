@@ -1,6 +1,6 @@
 # Signatures
 
-This folder contains DSPy Signature definitions for all extraction and classification tasks in the repository.
+This folder contains the DSPy Signature definition for the DCA image-pair comparison task.
 
 ---
 
@@ -21,8 +21,6 @@ Optimizers like MIPROv2 and GEPA can rewrite the docstring and field description
 | File | Task | Key Fields |
 |------|------|------------|
 | `dca.py` | DCA image-pair comparison | `image_original`, `image_reimage` → `discard_image`, `changes` |
-| `jo.py` | Japanese Order extraction | Order document image → 13 structured fields |
-| `yanase.py` | YANASE parts order extraction | Order document image → 16 structured fields |
 
 ---
 

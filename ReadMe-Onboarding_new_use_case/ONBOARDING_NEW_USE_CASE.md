@@ -56,7 +56,7 @@ Reference use case to model yours on: **DCA** (image-pair comparison) — `signa
 | **Branch** | Create a new feature branch **from `dca`** — it has the most complete pipeline (stratified splits, LLM-judge metric, grid runner, val/test eval scripts). |
 | **Python environment** | Run `uv sync` from the repo root, then activate with `source .venv/bin/activate` (or `.venv\Scripts\activate` on Windows). |
 | **Azure / LLM access** | Copy `env.template` to `.env` and fill in your credentials. Run `az login` if using Azure CLI auth without an API key. |
-| **Verify setup** | Run `uv run python -c "import dspy; print(dspy.__version__)"` to confirm the environment is working. |
+| **Verify setup** | Run `python -c "import dspy; print(dspy.__version__)"` to confirm the environment is working. |
 
 ---
 
@@ -409,13 +409,13 @@ print(f'train={len(train)}  val={len(val)}  test={len(test)}')
 "
 
 # Step 2: Run a fast zero-shot baseline (no optimization, just score the initial prompt)
-uv run python extract_<usecase>.py --optimizer miprov2 --miprov2-auto light --no-cache
+python extract_<usecase>.py --optimizer miprov2 --miprov2-auto light --no-cache
 
 # Step 3: Full optimization run
-uv run python extract_<usecase>.py --optimizer miprov2 --miprov2-auto medium --save-model --no-cache
+python extract_<usecase>.py --optimizer miprov2 --miprov2-auto medium --save-model --no-cache
 
 # Step 4: Verify saved model loads and runs
-uv run python extract_<usecase>.py --load-extractor .cache/<saved_model>.json
+python extract_<usecase>.py --load-extractor .cache/<saved_model>.json
 ```
 
 **What to check:**

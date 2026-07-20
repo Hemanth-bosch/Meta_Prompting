@@ -1,6 +1,6 @@
 # Evaluation
 
-This folder contains all evaluation metrics, analysis scripts, and evaluation runners for the DCA, Japanese Order, and YANASE tasks.
+This folder contains the DCA evaluation metric and evaluation runners.
 
 ---
 
@@ -8,11 +8,7 @@ This folder contains all evaluation metrics, analysis scripts, and evaluation ru
 
 ```
 evaluation/
-├── dca_metric.py              # DCA composite scoring metric (used everywhere)
-├── jo_metric.py               # Japanese Order field extraction metric
-├── yanase_metric.py           # YANASE order extraction metric
-├── common.py                  # Shared helpers: text normalization, fuzzy matching
-├── posthoc_analysis.py        # Post-hoc performance analysis and reporting
+├── dca_metric.py              # DCA composite scoring metric + LLM judge + hybrid metrics
 ├── dca_baseline_runs/         # Human-prompt baseline experiments for DCA
 │   ├── human_prompts/         #   Prompt markdown files (v0–v5)
 │   ├── run_human_prompts/     #   Single run, batch orchestration, category coding scripts
