@@ -75,6 +75,28 @@ All on the val set (n=82), temp 0.1, teacher/seed/reflection = `gpt-5.2`.
 | **Tournament (Pareto)** | **92.28%** | best — GEPA was the winning stage |
 | Tournament (Hybrid Linear) | 92.84% @ 6,624 tok | best cost-efficiency |
 
+![DCA — human baselines vs optimizers (gpt-4.1 inference, CR-default seed, val)](results/plots/figures/dca_gpt41_crseed.png)
+
+### gpt-4.1-mini — detailed (val set, n=82)
+
+`gpt-4.1-mini` is the **recommended default student model**: ~5× cheaper than `gpt-4.1`, strong results, and its optimized prompt transfers up to larger models. Optimizers use the CR-default signature as the seed unless noted; teacher/seed/reflection = `gpt-5.2`.
+
+| Run | DCA (mean) | Best | # data points |
+|-----|:----------:|:----:|:-------------:|
+| MiDAS pipeline — v1 human prompt, **non-DSPy** | 46.2% | 47.0% | 10 |
+| v1 human prompt (through **DSPy** signature) | 62.0% | 65.2% | 10 |
+| v2 (CR) human prompt (through DSPy signature) | 70.4% | 75.8% | 10 |
+| Bootstrap (optimized) | 86.3% | 94.0% | 37 |
+| MIPROv2 (optimized) | 85.1% | 89.4% | 106 |
+| GEPA (optimized, multimodal) | 86.2% | 89.0% | 4 |
+| **Tournament** (full cascade) | **87.2%** | 87.7% | 5 |
+
+- Running the *same* v1 human prompt through a DSPy signature lifts it **46.2% → 62.0%** (DSPy reorganizes the prompt into structured fields); optimizers add ~15 pp more over the v2 human baseline.
+- **Repeatability** (n=10 repeated runs): MIPROv2-Light **88.4% ±0.9**, Bootstrap **88.3% ±1.1**, GEPA **89% ±0.8**.
+- Per-run scatter plots (individual data points + mean, CoT vs No-CoT): `results/plots/figures/dca_gpt41mini_*.png`.
+
+![DCA — human baselines vs optimizers (gpt-4.1-mini inference, CR-default seed, val)](results/plots/figures/dca_gpt41mini_crseed.png)
+
 **Cross-model transfer** (prompt optimized on `gpt-4.1-mini`, run on larger models): gpt-4.1-mini 86.5% → gpt-4.1 90.0% → gpt-5.2 **90.5%** (vs. 91.8% best human on gpt-5.2).
 
 **Key findings:** Pareto selection beats best-score (+2.43 pp and ~1.9× fewer tokens); **GEPA with multimodal reflection is the single most impactful stage** (won 9 of ~15 tournament runs); hybrid metrics reliably keep prompts small (<5K tokens/sample).
@@ -114,6 +136,23 @@ az login
 > **Windows note:** prefix runs with `$env:PYTHONIOENCODING="utf-8"`. If `uv` isn't installed, call the venv Python directly, e.g. `.\.meta-prompting\Scripts\python.exe extract_dca.py ...`.
 
 The frozen train/val/test split is created on first run and cached under `.cache/splits/` — don't delete it (evaluation reproducibility depends on it).
+
+### Using gpt-4.1-mini as the student model
+
+`gpt-4.1-mini` is the **default student (inference) model** — ~5× cheaper than `gpt-4.1`, ~87% DCA via the tournament, and its optimized prompt transfers up to larger models (see [§3](#3-results)). Three ways to select it:
+
+```bash
+# 1. Default — .env already sets it (no flag needed):
+MODEL_NAME=azure/gpt-4.1-mini
+
+# 2. Tournament — explicit flag:
+python -m dca_tournaments.run_tournament --student-model azure/gpt-4.1-mini
+
+# 3. Single optimizer (extract_dca.py):
+python extract_dca.py --optimizer gepa --gepa-auto medium --model-name azure/gpt-4.1-mini --skip-load
+```
+
+Only the **student** LM runs at inference time, so gpt-4.1-mini keeps inference cost low. The teacher / seed / reflection LMs stay `gpt-5.2` (they only generate and critique prompts during optimization) — set those with `REFLECTION_LM_NAME` (`.env`) or the tournament's `--seed-model` / `--reflection-model` / `--*-teacher-model` flags.
 
 ---
 
