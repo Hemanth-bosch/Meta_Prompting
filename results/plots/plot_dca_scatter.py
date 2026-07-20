@@ -71,8 +71,8 @@ def scatter_mean(groups, title, outfile, ylabel="DCA Total Score (val set)"):
     ax.set_axisbelow(True)
     ax.margins(x=0.06)
     handles = [
-        Line2D([], [], marker="o", ls="", mfc=DOT, mec="#7a4400", label="Individual run — No-CoT"),
-        Line2D([], [], marker="^", ls="", mfc=DOT, mec="#7a4400", label="Individual run — CoT"),
+        Line2D([], [], marker="o", ls="", mfc=DOT, mec="#7a4400", label="Data point — No-CoT"),
+        Line2D([], [], marker="^", ls="", mfc=DOT, mec="#7a4400", label="Data point — CoT"),
         Line2D([], [], marker="D", ls="", mfc=MEAN, mec="black", label="Mean"),
     ]
     ax.legend(handles=handles, loc="upper left", fontsize=8.5, framealpha=0.9)

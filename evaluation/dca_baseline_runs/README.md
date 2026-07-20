@@ -37,7 +37,7 @@ Located in `human_prompts/`:
 |------|-------------|
 | `v0_prompt_midas.md` | Original MIDAS prompt |
 | `v1_prompt_midas.md` | Adapted to latest rules and decision table after rounds of discussion |
-| `v2_prompt_cr.md` | Decision tree style format, written with Claude 4.6 Opus |
+| `v2_prompt_cr.md` | Decision tree style format (LLM-assisted, human-reviewed) |
 | `v3_prompt_cr.md` | Same as v2 but adds an extra `thinking_area` key in the JSON output (not reasoning tokens — just an output field instructing the model to explain its reasoning in the JSON) |
 | `v4_prompt_cr.md` | Multi-step triage + diff pipeline — uses `run_v4_human_prompt.py` |
 | `v5_prompt_cr.md` | Latest version — updated rules and formatting |
