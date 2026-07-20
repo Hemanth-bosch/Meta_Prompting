@@ -1,40 +1,47 @@
 # DCA scatter-plus-mean plots
 
-Reproducible plots of DCA total score with **individual run data points + the mean marker only** (no box, no median). All on the **val set**.
+DCA total score with **individual run points + the mean marker only** (no box, no median), on the **val set**.
 
 ## Pipeline
 
-```
-dca_experiments.xlsx (val sheet)  ─┐
-excel/tournament_top2.xlsx        ─┤─►  build_datapoints.py  ─►  dca_datapoints.csv  ─►  plot_dca_scatter.py  ─►  figures/*.png
-```
-
 ```bash
-python results/plots/build_datapoints.py   # xlsx -> dca_datapoints.csv (auditable)
-python results/plots/plot_dca_scatter.py   # csv  -> figures/*.png
+python results/plots/build_datapoints.py    # dca_experiments.xlsx + tournament_top2.xlsx -> dca_datapoints.csv
+python results/plots/plot_dca_scatter.py    # dca_datapoints.csv -> figures/*.png
 ```
 
-- **`dca_datapoints.csv`** — one row per individual run: `source_row, optimizer, prompt_version, model, seed_source, cot, score`. `source_row` traces each point back to the spreadsheet (or `tournament_top2:<instance>`), so every point is auditable.
-- **Data guard:** a val-sheet row's score is only trusted as the *total* when that same row also carries cls + chg (filters mis-aligned rows where col-7 held a classification list). Repeatability rows expand to one point each. Validated against the deck (v1-mini ≈ 0.46, v2-mini ≈ 0.68, tournament gpt-4.1 ≈ 0.92).
+- **`dca_datapoints.csv`** — one row per individual run: `source_row, optimizer, prompt_version, prompt_type, model, seed_source, cot, score`. `source_row` traces each point back to the spreadsheet, so every point is auditable.
 
-## Figures (`figures/`)
+## The 6 figures (`figures/`)
 
-| File | What it shows |
-|------|---------------|
-| `dca_cr_default_gpt41mini.png` | gpt-4.1-mini, CR-default seed: human v1 · human v2 · bootstrap · miprov2 · gepa · tournament |
-| `dca_cr_default_gpt41.png` | same, gpt-4.1 |
-| `dca_seed_source_miprov2_gpt41mini.png` | MIPROv2 (gpt-4.1-mini) by starting seed: CR-default vs v1 vs v2 |
-| `dca_model_compare_cr_default.png` | each optimizer, gpt-4.1-mini vs gpt-4.1 |
-| `dca_cot_vs_nocot_miprov2_gpt41mini.png` | MIPROv2 (gpt-4.1-mini): CoT vs No-CoT |
-| `dca_human_v2_by_model.png` | v2 (CR) human prompt across gpt-4.1-mini / gpt-4.1 / gpt-5-mini / gpt-5.2 |
+`2 inference models × 3 optimizer seed-sources`. Every plot uses the same x-axis:
+
+```
+MiDAS pipeline (v1, non-DSPy) | v1 human (DSPy) | v2 human (DSPy) | bootstrap | miprov2 | gepa | tournament
+```
+
+| File | Inference model | Optimizer seed |
+|------|-----------------|----------------|
+| `dca_gpt41mini_crseed.png` | gpt-4.1-mini | CR-default signature |
+| `dca_gpt41mini_v1seed.png` | gpt-4.1-mini | v1 (MiDAS) prompt |
+| `dca_gpt41mini_v2seed.png` | gpt-4.1-mini | v2 (CR) prompt |
+| `dca_gpt41_crseed.png` | gpt-4.1 | CR-default signature |
+| `dca_gpt41_v1seed.png` | gpt-4.1 | v1 (MiDAS) prompt |
+| `dca_gpt41_v2seed.png` | gpt-4.1 | v2 (CR) prompt |
+
+**Markers:** ● circle = No-CoT run, ▲ triangle = CoT run, ◆ green diamond = mean. Categories with no matching run stay on the axis and show a **"no run yet"** box.
+
+## How the columns are sourced
+
+- **MiDAS pipeline (v1, non-DSPy)** = val rows labelled `"using midas like image passing prompt"` (the human prompt run through the *original* MiDAS pipeline, no DSPy).
+- **v1 / v2 human (DSPy)** = rows labelled `"using DSPY style signature"` (same human prompt, but reorganised into a DSPy signature — this changes performance). Where a model has no explicit DSPy-labelled row (gpt-4.1), the single unlabelled human run is used.
+- **Optimizer seed source** from col "Type of initial seed prompt" (`signature`→CR-default, `v1-prompt`, `v2-prompt`); GEPA carries its seed in the notes column (`v1`/`v2`).
+- Optimizer scores are trusted from col-7 only when cls + chg are also present (guards mis-aligned rows).
+
+## Data-availability caveats
+
+- **v1 / v2 seed** optimizer data exists mainly for **MIPROv2** (+ one GEPA point each). **Bootstrap** and **tournament** have no v1/v2-seed runs → those columns show "no run yet".
+- Nearly all val inference is temp 0.1, so a temperature slice isn't supported by this data.
 
 ## Adding a plot
 
-Add one `scatter_mean([...], title, outfile)` call in `plot_dca_scatter.py`; each group is `(label, sc(optimizer=..., model=..., seed_source=..., cot=...))`.
-
-## Caveats (data availability)
-
-- **Tournament** points are the per-instance "Best Score" candidate from `tournament_top2.xlsx`, tagged `cr-default`; the one v1-seed tournament run (`20260504234953`) is included in the gpt-4.1 tournament group.
-- **v1 / v2 seed** data exists only for MIPROv2 in the sheet, so the seed-source plot is MIPROv2-only.
-- **Temperature** is ≈0.1 for nearly all val inference, so a clean temperature slice isn't supported by this data.
-- The **non-DSPy MiDAS-pipeline** baseline (classification-only, `initial_classification_eval/`) is not a DCA-total score and is not plotted here.
+Add a `scatter_mean([...], title, outfile)` call in `plot_dca_scatter.py`; each group is `(label, sub(optimizer=..., model=..., seed_source=..., cot=...))`.
