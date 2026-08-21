@@ -212,10 +212,16 @@ def _azure_cli_token_provider() -> str:
 
 
 
-def _get_azure_client(auth_mode: str = "cli"):
+def _get_azure_client(auth_mode: Optional[str] = None):
     global _azure_fallback_client
     if _azure_fallback_client is not None:
         return _azure_fallback_client
+
+    # Auto-select auth: prefer the API key when it's set (works on any machine),
+    # otherwise fall back to the az-login bearer token. Callers can still force a
+    # mode explicitly by passing auth_mode="key" / "cli".
+    if auth_mode is None:
+        auth_mode = "key" if AZURE_API_KEY else "cli"
 
     ca_bundle = _build_ca_bundle()
     print(f"Using CA bundle: {ca_bundle}")
@@ -310,6 +316,20 @@ def _get_default_max_tokens(model_name: str) -> int:
     name_lower = model_name.lower()
     # Strip provider prefix for matching (e.g. "azure/gpt-4o-mini" → "gpt-4o-mini")
     base = name_lower.split("/", 1)[-1] if "/" in name_lower else name_lower
+
+    # Optional STUDENT/WORKER output cap for the DCA tournament A/B against the agentic
+    # loop: set by run_tournament's --worker-max-tokens (exported as DCA_WORKER_MAX_TOKENS).
+    # Applies ONLY to the gpt-4.1 / gpt-4o student worker (matching the agentic loop's
+    # --worker-max-tokens 2048), bounding repetition blow-ups so the token comparison is
+    # fair. gpt-5.2 seed/reflection/teacher helpers keep their full budget. No-op (and
+    # byte-identical) when the env var is unset. Only affects calls that don't pass an
+    # explicit max_tokens (all the student create_lm sites do exactly that).
+    _wcap = os.environ.get("DCA_WORKER_MAX_TOKENS")
+    if _wcap and ("gpt-4.1" in base or "gpt-4o" in base):
+        try:
+            return int(_wcap)
+        except (TypeError, ValueError):
+            pass
 
     # Model-specific limits (output token limits from provider docs)
 

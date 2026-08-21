@@ -9,6 +9,7 @@ plus the source spreadsheet row so every point is traceable.
 Run:  python results/plots/build_datapoints.py [path/to/dca_experiments.xlsx]
 """
 import csv
+import json
 import os
 import re
 import sys
@@ -152,17 +153,43 @@ def main():
                              cot="nocot", scores=sc[:1]))
             tour += 1
 
+    # Agentic meta-optimizer runs (aiq212-prompt-optimization agentic loop on DCA).
+    # One best-val DCA Total Score per (inference model) run, curated into
+    # results/agentic/dca_agentic_results.json by collect_agentic_dca.py.
+    # The agentic v0 seed = dspy.Predict(DCAImageComparison) = the CR-default
+    # signature, so seed_source is "cr-default"; the loop uses Predict (No-CoT).
+    agentic = 0
+    AGENTIC_JSON = os.path.join("results", "agentic", "dca_agentic_results.json")
+    if os.path.exists(AGENTIC_JSON):
+        with open(AGENTIC_JSON, encoding="utf-8") as f:
+            agentic_recs = json.load(f)
+        for i, rec in enumerate(agentic_recs):
+            try:
+                score = round(float(rec["val_score"]), 4)
+            except (KeyError, TypeError, ValueError):
+                continue
+            if not (0.30 <= score <= 1.0):
+                continue
+            rows.append(dict(src=rec.get("source", f"agentic:{i}"), optimizer="agentic",
+                             prompt_version="", prompt_type="",
+                             model=norm_model(rec.get("model")),
+                             seed_source=rec.get("seed_source", "cr-default"),
+                             cot=rec.get("cot", "nocot"),
+                             optimistic=bool(rec.get("optimistic", False)), scores=[score]))
+            agentic += 1
+
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["source_row", "optimizer", "prompt_version", "prompt_type",
-                    "model", "seed_source", "cot", "score"])
+                    "model", "seed_source", "cot", "score", "optimistic"])
         for rr in rows:
             for s in rr["scores"]:
                 w.writerow([rr["src"], rr["optimizer"], rr["prompt_version"], rr["prompt_type"],
-                            rr["model"], rr["seed_source"], rr["cot"], s])
+                            rr["model"], rr["seed_source"], rr["cot"], s, rr.get("optimistic", "")])
     n = sum(len(rr["scores"]) for rr in rows)
-    print(f"Wrote {OUT}: {len(rows)} run-groups -> {n} points ({tour} tournament)")
+    print(f"Wrote {OUT}: {len(rows)} run-groups -> {n} points "
+          f"({tour} tournament, {agentic} agentic)")
 
 
 if __name__ == "__main__":

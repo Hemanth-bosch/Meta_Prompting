@@ -1,0 +1,83 @@
+[
+  {
+    "source": "agentic:20260728_190959",
+    "val_score": 0.8849,
+    "model": "gpt-4.1-mini",
+    "seed_source": "cr-default",
+    "cot": "nocot",
+    "optimistic": false,
+    "note": "CR seed; controller-verified (9/9 agentic iters real work); best_val v4 (held-out val)"
+  },
+  {
+    "source": "agentic:dca_verify_15it-4",
+    "val_score": 0.8708,
+    "model": "gpt-4.1-mini",
+    "seed_source": "cr-default",
+    "cot": "nocot",
+    "optimistic": false,
+    "note": "CR seed; 15 iters, dev!=val, unbalanced; best_val v8 (held-out val), test 0.8370"
+  },
+  {
+    "source": "agentic:dca_verify_15it-10",
+    "val_score": 0.8739,
+    "model": "gpt-4.1-mini",
+    "seed_source": "cr-default",
+    "cot": "nocot",
+    "optimistic": false,
+    "note": "CR seed; 20 iters, dev!=val, balanced-20, LOW image detail, GEPA 200/400; best_val v12 (held-out val), test 0.8461"
+  },
+  {
+    "source": "agentic:dca_verify_15it-8-old",
+    "val_score": 0.8869,
+    "model": "gpt-4.1-mini",
+    "seed_source": "cr-default",
+    "cot": "nocot",
+    "optimistic": true,
+    "note": "CR seed; dev=val + balanced-15; INTERRUPTED at iter 8; best over v0-v7 on 82 val (dev=val -> optimistic)"
+  },
+  {
+    "source": "agentic:dca_verify_15it-8",
+    "val_score": 0.8846,
+    "model": "gpt-4.1-mini",
+    "seed_source": "cr-default",
+    "cot": "nocot",
+    "optimistic": true,
+    "note": "CR seed; 15 iters, dev=val + balanced-15; completed; val@best_val_v10 = 0.8846 (dev=val -> optimistic), test 0.9021"
+  },
+  {
+    "source": "agentic:dca_verify_15it-5",
+    "val_score": 0.8716,
+    "model": "gpt-4.1-mini",
+    "seed_source": "v1",
+    "cot": "nocot",
+    "optimistic": false,
+    "note": "v1-MiDAS seed; 20 iters, dev!=val, unbalanced; best_val v18=0.8716 over 82 val (held-out); val post-hoc"
+  },
+  {
+    "source": "agentic:dca_verify_15it-6",
+    "val_score": 0.8016,
+    "model": "gpt-4.1-mini",
+    "seed_source": "v1",
+    "cot": "nocot",
+    "optimistic": true,
+    "note": "v1-MiDAS seed; 15 iters, dev=val, UNBALANCED; completed; val@best_val_v11 = 0.8016 (dev=val -> optimistic), test 0.7714"
+  },
+  {
+    "source": "agentic:dca_verify_15it-7",
+    "val_score": 0.8305,
+    "model": "gpt-4.1-mini",
+    "seed_source": "v1",
+    "cot": "nocot",
+    "optimistic": true,
+    "note": "v1-MiDAS seed; 15 iters, dev=val, balanced-15; completed; val@best_val_v13 = 0.8305 (dev=val -> optimistic), test 0.8115"
+  },
+  {
+    "source": "agentic:dca_verify_15it-9",
+    "val_score": 0.8227,
+    "model": "gpt-4.1-mini",
+    "seed_source": "v1",
+    "cot": "nocot",
+    "optimistic": true,
+    "note": "v1-MiDAS seed; 15 iters, dev=val, balanced-15; completed; val@best_val_v13 = 0.8227 (dev=val -> optimistic), test 0.7596"
+  }
+]

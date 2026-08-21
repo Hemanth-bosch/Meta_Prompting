@@ -99,6 +99,10 @@ def main():
                 ("gepa", sub(optimizer="gepa", model=model, seed_source=seed)),
                 ("tournament", sub(optimizer="tournament", model=model, seed_source=seed)),
             ]
+            # Agentic meta-optimizer (aiq212-prompt-optimization / LAMP). Placed LAST
+            # (right-most) so it reads as the final method column. Shown for EVERY seed
+            # source now (cr-default: 190959+it4; v1-MiDAS: it5); empty -> "no run yet".
+            groups.append(("agentic", sub(optimizer="agentic", model=model, seed_source=seed)))
             scatter_mean(
                 groups,
                 f"DCA — human baselines vs optimizers (inference: {model} · optimizer seed: {seed_lbl} · val)",

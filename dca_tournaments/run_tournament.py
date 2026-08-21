@@ -349,6 +349,12 @@ def build_parser() -> argparse.ArgumentParser:
     g = p.add_argument_group("Models")
     g.add_argument("--student-model", type=str, default=None,
                    help="Student LM (default: azure/gpt-4.1-mini)")
+    g.add_argument("--worker-max-tokens", type=int, default=None, metavar="N",
+                   help="Cap the STUDENT/worker LM (gpt-4.1/gpt-4o) max output tokens in ALL "
+                        "eval paths (seed, bootstrap, miprov2, gepa, final val/test), matching "
+                        "the agentic loop's --worker-max-tokens so a repetition blow-up can't "
+                        "dominate measured tokens. gpt-5.2 seed/reflection/teacher LMs are NOT "
+                        "capped. Default: model default (16384).")
     g.add_argument("--seed-model", type=str, default=None,
                    help="Seed LM for Stage 0 meta-prompt (default: azure/gpt-5.2)")
     g.add_argument("--reflection-model", type=str, default=None,
@@ -582,6 +588,15 @@ def main():
     """
     parser = build_parser()
     args = parser.parse_args()
+
+    # ── Worker output cap (student-only) ─────────────────────────
+    # Export BEFORE any create_lm() so config._get_default_max_tokens() caps the gpt-4.1/
+    # gpt-4o student worker everywhere (incl. the spawned optimizer subprocess, which
+    # inherits this env var). gpt-5.2 helpers are untouched. No-op when the flag is unset.
+    if getattr(args, "worker_max_tokens", None) is not None:
+        os.environ["DCA_WORKER_MAX_TOKENS"] = str(int(args.worker_max_tokens))
+        print(f"  [worker] student max_tokens capped to {args.worker_max_tokens} "
+              f"(DCA_WORKER_MAX_TOKENS; gpt-5.2 helpers uncapped)")
 
     # ── Build config ─────────────────────────────────────────────
     config = TournamentConfig.from_cli_args(args)
