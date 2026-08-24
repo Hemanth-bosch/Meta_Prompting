@@ -223,32 +223,34 @@ def _get_azure_client(auth_mode: Optional[str] = None):
     if auth_mode is None:
         auth_mode = "key" if AZURE_API_KEY else "cli"
 
+    # Always pass an explicit http_client so httpx doesn't call certifi.where()
+    # internally. Use the CA bundle if one exists (corporate TLS proxy), otherwise
+    # verify=False (encrypted but unverified — fine for trusted Azure endpoints).
     ca_bundle = _build_ca_bundle()
-    print(f"Using CA bundle: {ca_bundle}")
+    ca_bundle_valid = Path(ca_bundle).exists()
+    http_client = DefaultHttpxClient(verify=ca_bundle if ca_bundle_valid else False)
+    if ca_bundle_valid:
+        print(f"Using CA bundle: {ca_bundle}")
 
     if auth_mode == "key":
         print("Creating Azure OpenAI client with direct API Key...")
-
         _azure_fallback_client = AzureOpenAI(
             api_key=AZURE_API_KEY,
             azure_endpoint=AZURE_ENDPOINT,
             api_version=AZURE_API_VERSION,
-            http_client=DefaultHttpxClient(verify=ca_bundle),
+            http_client=http_client,
         )
     else:                                                  # az-login token path
         print("Initializing Azure CLI credential...")
-
         print("Creating token provider...")
         def token_provider():
             return _azure_cli_token_provider()
-
         print("Creating Azure OpenAI client with token provider...")
-
         _azure_fallback_client = AzureOpenAI(
             azure_endpoint=AZURE_ENDPOINT,
             azure_ad_token_provider=token_provider,
             api_version=AZURE_API_VERSION,
-            http_client=DefaultHttpxClient(verify=ca_bundle),
+            http_client=http_client,
         )
 
     print("Azure Client created successfully.")
