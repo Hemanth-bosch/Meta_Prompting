@@ -20,5 +20,8 @@ dependencies = [
     "matplotlib>=3.7.0",
 ]
 
+[tool.setuptools]
+packages = []
+
 [tool.uv]
 prerelease = "allow"
