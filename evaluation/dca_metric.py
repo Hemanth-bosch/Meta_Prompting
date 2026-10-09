@@ -328,7 +328,132 @@ def dca_comparison_metric(example, prediction, trace=None):
 
     return compute_total_score(cls_score, change_score)
 
+def get_dca_score_breakdown(example, prediction):
+    """
+    Calculate the individual DCA scores used by adaptive sampling.
+    """
 
+    expected_discard = str(
+        getattr(example, "expected_discard_image", "")
+    ).strip().lower()
+
+    predicted_discard = str(
+        getattr(prediction, "discard_image", "")
+    ).strip().lower()
+
+    expected_changes = str(
+        getattr(example, "expected_changes", "")
+    ).strip()
+
+    predicted_changes = str(
+        getattr(prediction, "changes", "")
+    ).strip()
+
+    true_values = {"true", "yes", "1"}
+
+    expected_bool = expected_discard in true_values
+    predicted_bool = predicted_discard in true_values
+
+    cls_score = compute_classification_score(
+        expected_bool,
+        predicted_bool,
+    )
+
+    change_score = judge_summary_metric(
+        expected_changes,
+        predicted_changes,
+    )
+
+    if change_score is None:
+        change_score = 0.0
+
+    total_score = compute_total_score(
+        cls_score,
+        change_score,
+    )
+
+    error = 1.0 - total_score
+
+    return {
+        "classification_score": cls_score,
+        "change_score": change_score,
+        "total_score": total_score,
+        "error": error,
+    }
+# HARD EXAMPLE SAMPLING
+# ────────────────────────────────────────────────────────────────
+
+def select_hard_examples(
+    examples,
+    comparator,
+    metric,
+    sample_size,
+):
+    """Select the lowest-scoring examples as hard examples."""
+
+    scored_examples = []
+
+    print("\n" + "=" * 80)
+    print("HARD EXAMPLE SAMPLING")
+    print("=" * 80)
+
+    for idx, example in enumerate(examples):
+        try:
+            prediction = comparator(
+                image_original=example.image_original,
+                image_reimage=example.image_reimage,
+            )
+
+            score = float(
+                metric(example, prediction)
+            )
+
+            scored_examples.append(
+                (score, idx, example)
+            )
+
+        except Exception as exc:
+            print(
+                f"[WARNING] Could not score example "
+                f"{idx}: {exc}"
+            )
+
+    if len(scored_examples) < sample_size:
+        raise ValueError(
+            f"Only {len(scored_examples)} examples were scored, "
+            f"but {sample_size} are required."
+        )
+
+    # Lower score = harder example
+    scored_examples.sort(
+        key=lambda x: x[0]
+    )
+
+    selected = scored_examples[:sample_size]
+
+    print("\nHard examples selected:")
+
+    for rank, (score, idx, example) in enumerate(
+        selected,
+        start=1
+    ):
+        print(
+            f"{rank:3d}. "
+            f"index={idx:4d} "
+            f"score={score:.4f}"
+        )
+
+    print("=" * 80)
+    print(f"Successfully scored : {len(scored_examples)}")
+    print(f"Selected             : {len(selected)}")
+    print("=" * 80)
+
+    return [
+        example
+        for score, idx, example in selected
+    ]
+    
+    
 def judge_summary_metric(human, model):
     """Score model change summary against human ground truth.
 
@@ -625,3 +750,16 @@ def make_hybrid_metric(
             return dspy.Prediction(score=adjusted, feedback=result.feedback)
 
     return hybrid_metric, hybrid_metric_with_feedback
+
+def dca_passed(example, prediction):
+    """
+    Return True if the DCA prediction is completely correct,
+    otherwise return False.
+    """
+
+    score = dca_comparison_metric(
+        example,
+        prediction,
+    )
+
+    return score >= 1.0

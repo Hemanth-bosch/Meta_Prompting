@@ -161,7 +161,7 @@ class TournamentConfig:
     gepa_reflection_image_detail: str = "auto"  # "low" | "high" | "auto"
     gepa_reflection_max_images: int = 6
     gepa_reflection_model: Optional[str] = "azure/gpt-5.2"
-    gepa_reflection_minibatch_size: int = 5  # GEPA reflection_minibatch_size param
+    gepa_reflection_minibatch_size: int = 5# GEPA reflection_minibatch_size param
     gepa_train_size: Optional[int] = None    # per-GEPA train subset (None → use global)
     gepa_val_size: Optional[int] = None      # per-GEPA val subset (None → use global)
     gepa_add_format_failure_as_feedback: bool = True  # include format failures in GEPA reflection

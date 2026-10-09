@@ -111,17 +111,23 @@ class OptimizationRunner:
                  metric,
                  student_model,
                  train_set,
+                 dev_set,
                  val_set,
                  evaluate_fn,
                  metric_with_feedback=None,
-                 reflection_lm=None):
+                 reflection_lm=None,
+                 apex_eval_set=None,
+                 apex_controller=None):
         self.metric = metric
         self.metric_with_feedback = metric_with_feedback or metric
         self.student_model = student_model
         self.train_set = train_set
+        self.dev_set = dev_set
         self.val_set = val_set
         self.evaluate_fn = evaluate_fn
         self.reflection_lm = reflection_lm
+        self.apex_controller = apex_controller
+        self.apex_eval_set = apex_eval_set
 
         self.default_strategies = []
         self.run_summary = {}
@@ -354,36 +360,80 @@ class OptimizationRunner:
             "trainset": self.train_set,
         }
         # SIMBA works entirely on trainset; it does not accept valset
-        if config.optimizer_type != "simba":
+        
+        if config.optimizer_type == "gepa":
+            if self.apex_eval_set is not None:
+                compile_kwargs["valset"] = self.apex_eval_set
+            else:
+                compile_kwargs["valset"] = self.dev_set
+        elif config.optimizer_type != "simba":
             compile_kwargs["valset"] = self.val_set
-
 
         # instruction seeds. NOTE (see project memory): compile() is itself launched inside an
         # isolated subprocess (optimizer_subprocess.py) by the caller because nested DSPy thread
         # pools zero-scored in-process; this method only assembles the optimizer + kwargs.
         optimized_extractor = optimizer.compile(**compile_kwargs)
 
-        # Prefer the optimizer's OWN best valset score (already measured during compile())
-        # over a fresh re-evaluation. Re-evaluating here is redundant work AND, with caching
-        # off + a non-deterministic pipeline, an independent noisy draw that can discard a
-        # genuine improvement (GEPA measured its winner at 60.7% in-pass; a re-eval here drew
-        # 52.9% and the gate in run_optimization() then rejected it). GEPA attaches
-        # detailed_results when track_stats=True; its val_aggregate_scores are fractions
-        # (0-1), so scale by 100 to match dspy.Evaluate's score (a 0-100 percentage:
-        # round(100 * ncorrect / ntotal, 2)). Fall back to a single eval only when no internal
-        # score exists, so other optimizers / configs without one keep their prior behavior.
-        print(f"Evaluating {config.name}...")
-        gepa_res = getattr(optimized_extractor, "detailed_results", None)
-        if gepa_res is not None and getattr(gepa_res, "val_aggregate_scores", None):
-            _bi = getattr(gepa_res, "best_idx", 0)
-            score = gepa_res.val_aggregate_scores[_bi] * 100.0
+           # GEPA optimizes using its internal dev set.
+        # After optimization, evaluate the resulting program separately
+        # on the held-out validation set. The validation score is used
+        # for comparing optimization rounds/strategies.
 
-            # conditions as `score` — so improvement is apples-to-apples (and exactly 0 when the seed is kept).
-            # This lets run_optimization DROP its own redundant, differently-drawn baseline pass for GEPA.
-            self.gepa_baseline_score = gepa_res.val_aggregate_scores[0] * 100.0
+        print(f"Evaluating {config.name}...")
+
+        # ---------------------------------------------------------
+        # 1. GEPA INTERNAL DEV SCORE
+        # ---------------------------------------------------------
+        gepa_res = getattr(optimized_extractor, "detailed_results", None)
+
+        if (
+            gepa_res is not None
+            and getattr(gepa_res, "val_aggregate_scores", None)
+        ):
+            _bi = getattr(gepa_res, "best_idx", 0)
+
+            dev_score = (
+                gepa_res.val_aggregate_scores[_bi] * 100.0
+            )
+
+            self.gepa_baseline_score = (
+                gepa_res.val_aggregate_scores[0] * 100.0
+            )
+
             self.gepa_seed_retained = (_bi == 0)
+
         else:
-            score = self.evaluate_fn(optimized_extractor, devset=self.val_set).score
+            dev_result = self.evaluate_fn(
+                optimized_extractor,
+                devset=self.dev_set
+            )
+
+            dev_score = dev_result.score
+
+        # ---------------------------------------------------------
+        # 2. SEPARATE VALIDATION SET EVALUATION
+        # ---------------------------------------------------------
+        validation_result = self.evaluate_fn(
+            optimized_extractor,
+            devset=self.val_set
+        )
+
+        validation_score = validation_result.score
+
+        print("\n" + "=" * 80)
+        print(f"{config.name} EVALUATION RESULTS")
+        print("=" * 80)
+
+        print(f"GEPA Dev Score       : {dev_score:.1f}%")
+        print(f"Validation Score     : {validation_score:.1f}%")
+
+        print("=" * 80)
+
+        # ---------------------------------------------------------
+        # 3. RETURN VALIDATION SCORE
+        # ---------------------------------------------------------
+        score = validation_score
+
         return optimized_extractor, score
 
     @staticmethod
