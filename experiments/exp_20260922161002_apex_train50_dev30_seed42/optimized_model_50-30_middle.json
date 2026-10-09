@@ -1,0 +1,40 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nTASK: Ultra-conservative “keep vs discard” classifier + visual diff for up to 2 document images (often UML/sequence diagrams).\n\nYou will be given:\n- image_original = Image 1 (old/original) [may be the only image]\n- image_reimage  = Image 2 (new/updated) OR may be None/missing\n\nReturn ONLY one JSON object with exactly two keys:\n- \"discard_image\": boolean\n- \"changes\": string\n\nCORE INTENT\nThis is a filtering step to KEEP only images that contain meaningful, document-relevant information, or verified meaningful changes between two versions.\nBe extremely strict and evidence-based: if you cannot PROVE a meaningful difference by clear visual evidence, treat it as NO CHANGE and DISCARD.\n\nABSOLUTE OUTPUT RULES\n- Output ONLY a single JSON object. No markdown, no explanation, no extra keys.\n- Default when no verified meaningful difference:\n  {\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n\nANTI-HALLUCINATION / VISUAL-EVIDENCE-ONLY RULES\n1) Never invent differences. If you cannot clearly see it, it does not exist.\n2) Only claim a change if you can locate the same region in BOTH images and identify BOTH versions.\n3) For any text change you report, you MUST quote the old and new strings verbatim (exact characters you can read).\n4) If text is too small/blurred/uncertain, DO NOT report a change (treat as no change).\n5) Ignore trivial differences: layout shifts, scaling, resolution/aliasing, line thickness, minor color shade, compression artifacts, punctuation-only changes, or watermark/logo overlays—unless they clearly indicate the whole image is crossed out (see Cross-out gate).\n\nDOMAIN-SPECIFIC “NON-INFORMATIONAL” DISCARD RULES (IMPORTANT)\nTreat as NON-INFORMATIONAL (discard) if the image contains ONLY:\n- a logo/brand (e.g., “general motors”, “GM”) or confidentiality/watermark text\n- blank/near-blank blocks, divider lines, or decorative shapes\n- a standalone small label/heading/section tag with no substantive content\n  (e.g., “Use Case 1”, a single node title, a short heading by itself)\nWatermarks/brand/confidentiality marks alone are NON-INFORMATIONAL even if large/diagonal.\n\nWHAT COUNTS AS INFORMATIONAL (KEEP-ELIGIBLE CONTENT)\n- Readable sentences/paragraphs with substantive content (not just a title)\n- Tables with readable values\n- Diagrams/sequence diagrams/flowcharts with multiple labeled elements AND readable messages/notes\n- Any page conveying process/data beyond a minimal tag/heading\n\nTWO-IMAGE CASE (both images provided)\nApply gates in this order:\n\nStep 1) Readability gate\n- If either image is corrupted/tiny/unreadable such that meaningful comparison is not possible:\n  {\"discard_image\": false, \"changes\": \"Could not infer\"}\n\nStep 2) Cross-out gate (CRITICAL)\n- If a whole image is clearly crossed out (large X/strikethrough spanning the page, indicating deletion/invalidating the entire image), this is ALWAYS a meaningful change.\n  Return:\n  {\"discard_image\": false, \"changes\": \"Image 1 has been crossed out\"} OR\n  {\"discard_image\": false, \"changes\": \"Image 2 has been crossed out\"}\nNotes:\n- Do NOT dismiss big cross-out marks as “annotation” or “trivial”. Treat as meaningful removal/invalidating.\n- This rule exists because prior failures incorrectly discarded crossed-out updated images.\n\nStep 3) Informational classification\n- If BOTH images are non-informational:\n  {\"discard_image\": true, \"changes\": \"Both images are non informational and contain only logos / etc..\"}\n- If EXACTLY ONE image is informational and the other is non-informational:\n  - discard_image MUST be false\n  - changes MUST explicitly say only one image is informational and briefly describe what the informational image visibly contains (no inferred intent).\n  Example format (not mandatory wording):\n  \"Only Image 1 is informational: it contains a sequence diagram with multiple labeled lifelines and message arrows; Image 2 contains only a logo/watermark.\"\n\nStep 4) Diffing (ONLY if BOTH images are informational)\n- If identical or only trivial differences (as defined above):\n  {\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n- If and ONLY if you find VERIFIED meaningful differences:\n  {\"discard_image\": false, \"changes\": \"<use CHANGES TEMPLATE below>\"}\n\nDIAGRAM-SPECIFIC DIFF RULES (UML / sequence diagrams / flowcharts)\nOnly claim changes if clearly legible in BOTH images, such as:\n- added/removed/renamed participant/lifeline\n- changed message/arrow text (must quote old/new verbatim)\n- changed arrow direction\n- added/removed/changed alt/loop/ref blocks or their labels (must quote if text)\n- changed note text (must quote old/new verbatim)\nIf you cannot read the message/note text precisely, do not claim it changed.\nDo not infer process/intent; report only what is visibly different.\n\nIMPORTANT NOTE ON “IMPROVEMENT” FEEDBACK (HOW TO WRITE CHANGES)\nWhen images are clearly different but contain many elements (e.g., two different sequence diagrams), you may summarize at a high level without trying to quote every label—BUT:\n- Only describe differences that are visually obvious and confidently readable.\n- Prefer mentioning clearly readable titles/headers and clearly visible structural differences (e.g., different set of lifeline names) ONLY if you can read them.\n- Do not name actors or titles you cannot read.\n\nONE-IMAGE CASE (image_reimage missing/None)\n1) If the single image is corrupted/tiny/unreadable:\n   {\"discard_image\": false, \"changes\": \"Could not infer\"}\n2) If the single image is NON-INFORMATIONAL:\n   {\"discard_image\": true, \"changes\": \"Only one image which is non-informational and it contains logo (or watermark / blank block / single line / standalone section number / etc.).\"}\n3) If the single image is INFORMATIONAL:\n   {\"discard_image\": false, \"changes\": \"NoMatchFound\"}\n\nCHANGES STRING TEMPLATE (use ONLY when VERIFIED meaningful differences exist)\n\"OVERVIEW: <1–3 short sentences summarizing meaningful change(s).> | DETAILS (Each Change): 1) <Location/Region>: '<old verbatim>' (Image 1) has been changed to '<new verbatim>' (Image 2); 2) ...\"\n\nDEFAULT BEHAVIOR (MOST IMPORTANT)\nWhen in doubt, choose NO CHANGE and DISCARD:\n{\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.0.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}

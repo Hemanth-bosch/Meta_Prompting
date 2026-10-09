@@ -1,0 +1,40 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nTASK: VISUAL DIFF + DISCARD CLASSIFIER (STRICT JSON OUTPUT, ZERO MARKDOWN)\n\nYou will be given either:\n- TWO images: image_original (Image 1 / “old”) and image_reimage (Image 2 / “new”), OR\n- ONE image only.\n\nGOAL\nReturn ONLY one JSON object with exactly these keys:\n{\"discard_image\": true/false, \"changes\": \"<string>\"}\n\nDECISION YOU MUST MAKE\nA) discard_image=true ONLY when the sample is NOT useful for downstream content-change tracking because:\n   1) Images are informational but identical or only trivially different, OR\n   2) Both sides are non-informational (logos, icons-only, blank blocks, dividers, standalone section number/label), OR\n   3) One-image case and the single image is non-informational.\n\nB) discard_image=false when:\n   1) Any meaningful informational content differs (including the entire page/diagram being different), OR\n   2) One side is informational and the other is non-informational, OR\n   3) Either image is unreadable/corrupt/tiny such that you cannot reliably compare (then changes=\"Could not infer\"), OR\n   4) One-image case and the single image is informational (then changes=\"NoMatchFound\").\n\nCRITICAL FIX (BASED ON FAILURES)\n1) STYLE-ONLY CHANGES ARE TRIVIAL → DISCARD\n   - Do NOT treat font weight (bold vs not bold), italics, underline, color shade, or minor formatting as meaningful if the words themselves did not change.\n   - Example failure: reporting “removed bold formatting” must be treated as NO meaningful change ⇒ discard_image=true (if nothing else changed).\n\n2) “ICON / BADGE / TIER MARKER” IS NON-INFORMATIONAL (UNLESS IT CONTAINS SUBSTANTIVE DOCUMENT CONTENT)\n   - Small circular badges like “Tier 1”, small labels/icons, watermarks, tiny corner marks are considered non-informational by default.\n   - Example failure: a single “Tier 1” badge in a one-image input must be discarded:\n     discard_image=true and changes must state it is non-informational.\n\nMEANINGFUL VS TRIVIAL (STRICT)\nMEANINGFUL (discard_image=false; list changes you can verify):\n- Any change to actual wording/numbers/dates/values.\n- Any change to headings/titles/section names when the text differs.\n- Diagram changes: participants/boxes/arrows/steps added/removed/renamed/reconnected.\n- Entire page/diagram replaced by another page/diagram (even if they “don’t match”).\n- Large cross-out/strikethrough/X invalidating content.\n\nTRIVIAL (discard_image=true if nothing else meaningful changed):\n- Layout shifts, cropping, scaling, compression artifacts, blur, minor color differences.\n- Punctuation-only differences.\n- Watermark/logo styling differences.\n- Bold/regular changes, font changes, line thickness changes, dashed vs dotted when conveying no new information (treat as trivial unless explicitly altering meaning and you can prove it).\n\nABSOLUTE ANTI-HALLUCINATION RULE (MANDATORY)\nOnly claim a specific content change if BOTH are true:\n1) You can locate the same region in both images, AND\n2) You can unambiguously read/see that the content differs.\n\nIf you cannot read the exact text (or are uncertain), do NOT report that as a change.\n\nTEXT-CHANGE REPORTING REQUIREMENT\nWhen you report a text change, you MUST quote BOTH strings verbatim:\nold (image1) vs new (image2)\n\nIf you cannot quote exactly, either:\n- omit that detail, or\n- only state a high-level replacement (e.g., “Entire diagram/page changed”) WITHOUT guessing.\n\nNON-INFORMATIONAL HANDLING\nNon-informational examples: only a logo/brand mark/watermark, tiny badge (“Tier 1”), blank/solid color block, simple divider line, standalone section number.\n\nRules:\n- If BOTH images are non-informational:\n  discard_image=true\n  changes=\"Both images are non informational and contain only logos / etc..\"\n  (Do NOT describe logo styling differences.)\n- If ONE is non-informational and the OTHER is informational:\n  discard_image=false\n  changes must state that only one image is informational and briefly what it contains (only what you can read/see).\n\nONE-IMAGE CASES\n- If only one image is provided and it is non-informational:\n  discard_image=true\n  changes=\"Only one image which is non-informational and it contains logo (or watermark / blank block / single line / standalone section number / icon badge / etc.)\"\n- If only one image is provided and it is informational:\n  discard_image=false\n  changes=\"NoMatchFound\"\n\nUNREADABLE / CORRUPT / TOO TINY\nIf either image is corrupted, too tiny, or unreadable such that comparison is unreliable:\ndiscard_image=false\nchanges=\"Could not infer\"\n\nCROSSED-OUT SPECIAL CASE\nIf Image 1 or Image 2 has a visible large X/strikethrough indicating invalidation:\ndiscard_image=false\nchanges must start with:\n\"Image 1 has been crossed out\" OR \"Image 2 has been crossed out\"\nThen optionally append additional verified changes using the template below.\n\nCHANGES FIELD FORMAT (STRICT)\n1) If discarding due to no meaningful differences:\n{\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n\n2) If NOT discarded and meaningful differences exist, use EXACT template:\n\"OVERVIEW: <brief summary> | DETAILS (Each Change): 1) <location>: <what changed, quoting old (image1) and new (image2) text verbatim when text differs>; 2) ...\"\n\n3) If discard due to both non-informational:\nUse the exact sentence given in NON-INFORMATIONAL HANDLING.\n\nFINAL OUTPUT RULES\n- Output ONLY the JSON object (no markdown, no extra keys, no reasoning).\n- If style-only differences are the only differences → treat as identical → discard_image=true.",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.0.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}

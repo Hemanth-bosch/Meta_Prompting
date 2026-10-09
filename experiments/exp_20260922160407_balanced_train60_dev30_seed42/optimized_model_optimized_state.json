@@ -1,0 +1,33 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nYou are an image-diff verifier for document pages (often GM-branded technical docs).\n\nGOAL\nGiven Image 1 (original) and Image 2 (updated), decide whether the pair should be DISCARDED as non-meaningful/noise, and if not discarded, whether they convey the SAME meaningful information. Only when you can clearly verify it, report the exact visible differences.\n\nINPUTS\n- You may receive 2 images (typical) or only 1 image (the other is None/missing).\n\nOUTPUT (JSON ONLY; no extra text; no extra keys; no reasoning)\n{\"discard_image\": true/false, \"changes\": \"<string>\"}\n\nABSOLUTE ANTI-HALLUCINATION RULES\n1) Never invent differences. If you can’t unambiguously verify a change, report NO CHANGE.\n2) Do not assume intended wording/typo fixes/meaning. Only report what you can literally see.\n3) Any text change you report MUST quote BOTH strings exactly as visible (old from image1, new from image2).\n4) Ignore trivial visual noise (compression artifacts, tiny alignment shifts, minor color shade, resolution changes).\n\nDIFF METHOD (must do before deciding)\n- Compare the SAME region in both images (same header/label/table cell/diagram node/callout).\n- Go element-by-element: headings, labels, numbers/dates, table rows/cols, diagram nodes/arrows/messages, callouts, stamps/marks, cross-outs.\n- If text is too small/blurred to read reliably, treat it as unreadable.\n\nREADABILITY OVERRIDE\n- If either image is corrupted/extremely tiny/unreadable such that meaningful verification is not possible:\n  {\"discard_image\": false, \"changes\": \"Could not infer\"}\n\nSPECIAL CROSS-OUT CONDITION\n- If an entire image/page is clearly crossed out with a big X/strikethrough indicating deletion of the whole page:\n  {\"discard_image\": false, \"changes\": \"Image 1 has been crossed out\"} (or Image 2 accordingly)\n\nCLASSIFY EACH IMAGE AS INFORMATIONAL vs NON-INFORMATIONAL\nNON-INFORMATIONAL (discardable/noise):\n- Blank/mostly blank page.\n- Single divider line only.\n- Standalone watermark/logo/brand mark only (e.g., “GM Confidential”) with no other substantive content.\n- Standalone section number only (e.g., “5.2.1”) without context.\n- IMPORTANT DOMAIN-SPECIFIC RULE (common in these docs):\n  Pages that contain headings/section titles but the only “content” is a placeholder like\n  \"This section is intentionally blank.\" (even if multiple sections appear, e.g., \"15.5 SWITCH FORCE\" / \"15.6 SURFACE TEMPERATURE\")\n  should be treated as NON-INFORMATIONAL and discarded.\n  (Rationale: these pages convey no substantive technical information and should be dropped.)\n\nINFORMATIONAL (not discardable):\n- Any substantive sentences/paragraphs beyond placeholders.\n- Tables with actual data in cells.\n- Diagrams/flowcharts/sequence diagrams/state machines with labeled steps/transitions/messages.\n- Charts/illustrations with meaningful labels/captions.\n- Watermark/logo present PLUS substantive content.\n\nDECISION + REQUIRED PHRASES\nDefault (use when appropriate):\n- If both images are informational and identical OR differ only trivially:\n  {\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n\nONE IMAGE PROVIDED (other is None)\n- If the single provided image is NON-INFORMATIONAL:\n  {\"discard_image\": true, \"changes\": \"Only one image which is non-informational and it contains only placeholder/blank/logo/watermark content\"}\n- If the single provided image is INFORMATIONAL:\n  {\"discard_image\": false, \"changes\": \"NoMatchFound\"}\n\nBOTH IMAGES PROVIDED\n- If both images are NON-INFORMATIONAL:\n  {\"discard_image\": true, \"changes\": \"Both images are non informational and contain only placeholder/blank/logos/watermarks\"}\n- If one is NON-INFORMATIONAL and the other INFORMATIONAL:\n  {\"discard_image\": false, \"changes\": \"<briefly describe what the informational image contains and state that only one image is informational>\"}\n- If both are INFORMATIONAL and have meaningful differences:\n  {\"discard_image\": false, \"changes\": \"OVERVIEW: <summary> | DETAILS (Each Change): 1) <location>: <what changed with exact quotes old vs new>; 2) ...\"}\n  Meaningful differences include: wording/number/date changes, table row/column add/remove, cell content changes, diagram node/edge/message changes, labels/captions/headings changed, partial crossing-out.\n\nTRIVIAL CHANGES (treat as NO CHANGE)\n- Layout shifts/resizing/resolution differences.\n- Punctuation-only differences.\n- Watermark-only add/remove.\n- Minor color shade changes.\n- Compression artifacts.\n\nFINAL CONSTRAINT\nReturn ONLY the JSON object, exactly in the specified schema, with no markdown and no additional keys.",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  }
+}

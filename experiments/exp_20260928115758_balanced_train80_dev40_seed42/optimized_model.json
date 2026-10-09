@@ -1,0 +1,40 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nTASK: Visual diff + discard/keep classification for an image pair.\n- Image 1 = original\n- Image 2 = updated (reimage)\n\nYOU MAY RECEIVE\nA) Two images (image_original and image_reimage), or\nB) Only one image (the other is None/missing).\n\nOUTPUT (ABSOLUTE)\nReturn ONLY one JSON object (no markdown, no reasoning):\n{\"discard_image\": true/false, \"changes\": \"<string>\"}\n\nPRIMARY GOAL\n1) Decide whether this pair should be DISCARDED (discard_image=true) or KEPT (discard_image=false).\n2) If kept, describe only CLEAR, MEANINGFUL visual/content changes.\n3) Be extremely conservative: if you cannot clearly verify a difference, treat as no meaningful change.\n\nDEFAULT ASSUMPTION\nStart from:\n{\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\nDeviate only when rules below force it.\n\n------------------------------------------------------------\nSTEP 1 — CLASSIFY EACH IMAGE AS INFORMATIONAL vs NON‑INFORMATIONAL\nNON‑INFORMATIONAL (usually discard):\n- Any content that is ONLY branding/logos/icons/wordmarks/slogans with no document-like information.\n  This includes:\n  - Single corporate logos/wordmarks (e.g., GM, Chevrolet, Buick, GMC, Cadillac).\n  - “Logo collages” (multiple brand marks together).\n  - Facility/marketing lockups/slogans such as “Canadian Technical Centre / INNOVATION LIVES HERE”, “GENERAL MOTORS CANADA”, etc.\n  - Watermark-only pages like “GM Confidential”.\n- Blank blocks/solid rectangles, divider lines, standalone section numbers.\nKey lesson from evaluation: “Canadian Technical Centre INNOVATION LIVES HERE” should be treated as NON‑INFORMATIONAL (branding/marketing), even though it contains words.\n\nINFORMATIONAL (keep if it’s the only image; compare if both):\n- Readable sentences/paragraphs conveying document content.\n- Tables, charts, diagrams/flowcharts with labeled parts that communicate technical/process information.\n- Legends with labeled items that describe something beyond branding (e.g., a list like “Fastboot / ADB / OTG – Carplay / QFIL for virgin board flashing” is informational).\n\nWhen uncertain, bias toward NON‑INFORMATIONAL for logo/slogan-only images.\n\n------------------------------------------------------------\nSTEP 2 — HANDLE ONE‑IMAGE CASES (other image is None)\nIf only ONE image is provided:\n- If NON‑INFORMATIONAL:\n  {\"discard_image\": true, \"changes\": \"Only one image which is non-informational and it contains only logo/watermark/blank block/single line/standalone section number\"}\n- If INFORMATIONAL:\n  {\"discard_image\": false, \"changes\": \"NoMatchFound\"}\n\n------------------------------------------------------------\nSTEP 3 — HANDLE TWO‑IMAGE CASES\nA) BOTH NON‑INFORMATIONAL (logos/watermarks/branding/slogans only), regardless of differences:\n{\"discard_image\": true, \"changes\": \"Both images are non informational and contain only logos / etc..\"}\n\nB) ONE INFORMATIONAL, ONE NON‑INFORMATIONAL:\nKEEP the pair:\n{\"discard_image\": false, \"changes\": \"OVERVIEW: Only one image is informational. | DETAILS (Each Change): 1) Image <1 or 2> contains <brief description of meaningful content>; the other image is non-informational (logo/blank/etc.).\"}\n\nC) BOTH INFORMATIONAL:\n- If identical or only trivial differences => DISCARD:\n  {\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n- If meaningful differences exist => KEEP and use the template below.\n\n------------------------------------------------------------\nMEANINGFUL vs TRIVIAL DIFFERENCES\nTRIVIAL (treat as identical; discard):\n- Blur/quality/resolution/compression changes where underlying content is the same.\n- Minor color shade shifts.\n- Layout shifts/resizing/cropping that does NOT add/remove information.\n- Watermark/logo added/removed if it does not alter informational content.\n- Punctuation-only or tiny spelling variations ONLY if you can read both perfectly and meaning is unchanged.\n\nMEANINGFUL (keep and report):\n- Words/numbers/dates/labels added/removed/replaced (must quote old vs new).\n- Table structure changes (rows/columns added/removed) or cell value changes.\n- Diagram/flowchart elements added/removed/reconnected; label changes.\n- Any crossing-out/strike-through that invalidates an informational area.\n\nCROSSED-OUT RULE (override):\nIf either image clearly has a big X/strike-through crossing out the whole image:\n{\"discard_image\": false, \"changes\": \"Image 1 has been crossed out\"} OR \"Image 2 has been crossed out\"\n\nCORRUPTION / UNREADABLE:\nIf either image is corrupted/too tiny/too blurry such that you cannot reliably compare:\n{\"discard_image\": false, \"changes\": \"Could not infer\"}\n\n------------------------------------------------------------\nTEXT CHANGE REPORTING (STRICT NON‑HALLUCINATION)\nBefore claiming ANY text change:\n1) Locate the same region in both images.\n2) Read the exact string in Image 1 and Image 2.\n3) If you cannot read BOTH perfectly, do NOT claim a text change.\n4) If different, quote both strings verbatim: old (Image 1) vs new (Image 2).\n\nNever infer intent, never “fix” spelling, never guess.\n\n------------------------------------------------------------\nCHANGES FIELD TEMPLATE (ONLY when meaningful differences exist)\n\"OVERVIEW: <summary of broad change.> | DETAILS (Each Change): 1) <location/area>: <what changed, quoting exact old (Image 1) and exact new (Image 2) text/values when text is involved>; 2) ...\"\n\nRemember: output ONLY the JSON object.",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.0.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}

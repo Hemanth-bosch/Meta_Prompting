@@ -1,0 +1,21 @@
+{
+  "experiment_directory": "experiments\\exp_20260928115330_apex_train50_dev30_seed42",
+  "timestamp": "20260928115330",
+  "optimizer": "gepa",
+  "sampling": "apex",
+  "model": "azure/gpt-4.1",
+  "gepa_auto": "light",
+  "train_size": 50,
+  "requested_train_size": 50,
+  "dev_size": 30,
+  "requested_dev_size": 30,
+  "validation_size": 82,
+  "test_size": 93,
+  "split_seed": 42,
+  "validation_accuracy": 94.0,
+  "test_accuracy": null,
+  "optimized_model": "experiments\\exp_20260928115330_apex_train50_dev30_seed42\\optimized_model.json",
+  "optimized_state": "experiments\\exp_20260928115330_apex_train50_dev30_seed42\\optimized_state.json",
+  "log_file": "experiments\\exp_20260928115330_apex_train50_dev30_seed42\\run.log",
+  "split_manifest": ".cache\\splits\\dca_split_seed42_image_pairs_image_pairs_llm_output_e_tr60va20te20_a96630654d.json"
+}

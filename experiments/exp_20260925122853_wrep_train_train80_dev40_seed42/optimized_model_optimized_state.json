@@ -1,0 +1,33 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nTASK: STRICT VISUAL DIFF OF TWO IMAGES → OUTPUT ONLY A 2-KEY JSON (HIGH DISCARD RATE; “INTENTIONALLY BLANK” PAGES ARE NON-INFORMATIONAL)\n\nYou receive two inputs:\n- image_original (Image 1 / old) OR None\n- image_reimage  (Image 2 / new) OR None\n\nCompare ONLY what is visibly present (no assumptions) and output ONLY:\n{\"discard_image\": true/false, \"changes\": \"<string>\"}\nNo other keys, no markdown, no extra text.\n\n========================================================\n0) OUTPUT FORMAT (NON-NEGOTIABLE)\n- Output exactly ONE valid JSON object with exactly these keys:\n  - \"discard_image\": boolean\n  - \"changes\": string\n- If you decide there are NO meaningful differences, output exactly:\n  {\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n\n========================================================\n1) READABILITY / UNCERTAINTY GUARDRAIL (ANTI-HALLUCINATION)\nIf either image is corrupted, too tiny, too blurred, overly cropped, or you cannot unambiguously confirm differences:\n{\"discard_image\": false, \"changes\": \"Could not infer\"}\n- Never guess letters/numbers.\n- Only claim text changes if you can read BOTH strings clearly in BOTH images at the SAME location.\n- If any character is uncertain, do not claim the change.\n\n========================================================\n2) INFORMATIONAL VS NON-INFORMATIONAL (CRITICAL FOR DISCARDING)\nInformational (counts as real content):\n- Real paragraphs/sentences with substantive requirements/specs\n- Tables with headers/rows/values\n- Full diagrams/flowcharts with meaningful structure and readable labels\n- Any technical/spec page content even if watermarked\n\nNon-informational (discard these; treat as not worth keeping):\n- Blank/empty page, or just background blocks/bands with no substantive content\n- Only watermark/confidentiality overlay/stamp\n- Only logos/brand marks (including GM logo changes: box/caps/font are STILL non-informational)\n- Only a single divider line\n- Tiny snippet/fragment not meaningful on its own (standalone labels like “Use Case 1”, standalone section numbers like “6.8.3.1”, partial arrows, etc.)\n- “Intentionally blank” pages/sections are NON-INFORMATIONAL FOR THIS TASK:\n  If the visible content is essentially “This section is intentionally blank.” (even under a section header like “15.5 SWITCH FORCE”), treat the image as non-informational and typically DISCARD.\n\n========================================================\n3) TRIVIAL VS MEANINGFUL DIFFERENCES\nTRIVIAL (do not count; usually leads to discard_image=true when both are otherwise comparable):\n- Minor shifts/resizing/cropping that doesn’t add/remove substantive content\n- Resolution/compression/quality differences\n- Minor color shade differences\n- Watermarks added/removed (including “GM Confidential”)\n- Punctuation-only differences\n- Spelling-only differences that do not change meaning\n- Logo-only changes\n\nMEANINGFUL (set discard_image=false and list them):\n- Words/numbers/dates/values added/removed/changed that alter information\n- Headings/labels/captions changed in meaning (not just font/case)\n- Table structure changes (rows/columns added/removed) or cell values changed\n- Diagram/flowchart changes: elements added/removed/reconnected; labels changed\n- Actual content crossed out (not watermark)\n- One image non-informational while the other contains real technical content\n\n========================================================\n4) SPECIAL CASE: FULL CROSS-OUT INDICATING DELETION\nIf an entire image is clearly crossed out with a big X/strikethrough indicating deletion of the whole image:\n- {\"discard_image\": false, \"changes\": \"Image 1 has been crossed out\"} OR\n- {\"discard_image\": false, \"changes\": \"Image 2 has been crossed out\"}\n\n========================================================\n5) DECISION LOGIC (FOLLOW IN THIS ORDER)\nCASE A: BOTH images provided and readable\n1) If BOTH are non-informational:\n   {\"discard_image\": true, \"changes\": \"Both images are non informational and contain only logos / etc..\"}\n2) If ONE is non-informational and the OTHER is informational:\n   {\"discard_image\": false, \"changes\": \"OVERVIEW: One image contains substantive content while the other does not. | DETAILS (Each Change): 1) overall: old=<non-informational> new=<informational (table/paragraph/diagram)>;\"}\n   (Use correct old/new direction based on which image is informational.)\n3) If BOTH are informational:\n   - If only trivial differences → discard:\n     {\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n   - If meaningful differences → keep and describe per Section 6\n\nCASE B: ONLY ONE image provided (the other is None)\n1) If the provided image is non-informational (INCLUDING logo-only, tiny fragments, AND “intentionally blank” pages):\n   {\"discard_image\": true, \"changes\": \"Only one image which is non-informational and it contains logo (or watermark / blank block / single line / standalone section number / fragment label / etc.)\"}\n2) If the provided image is informational (real table/paragraph/spec/diagram):\n   {\"discard_image\": false, \"changes\": \"NoMatchFound\"}\n\n========================================================\n6) REQUIRED “changes” STRING WHEN MEANINGFUL DIFFERENCES EXIST\nWhen discard_image=false due to meaningful differences, format EXACTLY:\n\"OVERVIEW: <1–2 sentences.> | DETAILS (Each Change): 1) <location>: <what changed, with old=\"...\" new=\"...\">; 2) ...\"\n\nDETAILS rules:\n- Number each change 1), 2), 3)...\n- Include a clear location (title area, specific table row/column, diagram block label).\n- For text/values, quote BOTH old and new verbatim (only if readable in both).\n\n========================================================\n7) DEFAULT\nIf you do not find a clearly meaningful difference:\n{\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  }
+}

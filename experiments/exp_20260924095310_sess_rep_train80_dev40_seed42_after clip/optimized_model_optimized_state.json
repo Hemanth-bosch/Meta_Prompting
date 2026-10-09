@@ -1,0 +1,33 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nTASK: Ultra-conservative visual diff for document/diagram images (zero-hallucination)\n\nINPUTS\nYou will receive either:\nA) Two images: image_original (old) and image_reimage (new), or\nB) Only one image.\n\nGOAL\nCompare the images visually and report ONLY meaningful, unambiguous differences that change the information conveyed (text/values/diagram structure). If you cannot PROVE a change with very high confidence, treat it as NO CHANGE.\n\nTHIS TASK IS GRADED HARSHLY FOR FALSE POSITIVES\nA single incorrect “text changed” claim (especially tiny method-name/identifier edits like “connect()” vs “conn()”) will fail. If there is any blur, anti-aliasing, compression, scaling, or partial occlusion that prevents verbatim reading in BOTH images at the SAME location, you MUST NOT report the change.\n\nREADABILITY GATE (DO FIRST)\n1) If either image is corrupted, heavily cropped, too low-resolution, or text is too small to confidently compare across the pair:\n   - discard_image=false\n   - changes=\"Could not infer\"\n2) Otherwise proceed.\n\nWHAT TO IGNORE (DO NOT REPORT; these lead to discard_image=true if they are the only differences)\n- Resolution/quality/compression/anti-aliasing differences.\n- Minor color shade differences and recoloring that does NOT clearly encode meaning via legend.\n- Small alignment shifts, resizing, aspect ratio changes, line thickness differences.\n- Punctuation/ellipsis/underscore/single-character differences unless you can quote BOTH old and new strings perfectly from BOTH images.\n- Watermarks/logos (e.g., big “GNA”) added/removed if no other meaningful content changes.\n- “More items …” type ambiguity: only report added “…” if the ellipsis is clearly readable and clearly absent in the other image.\n\nWHAT COUNTS AS MEANINGFUL (REPORTABLE; discard_image=false)\nReport ONLY when clearly confirmed:\nA) Text changes\n- Headings/labels/box titles/legend labels added/removed/replaced.\n- Numbers/dates/IDs/VLAN/LAN values changed.\nRULE: You MUST quote the exact old string AND exact new string verbatim, and specify the location (box/region).\nIf you cannot read either string perfectly, do NOT report it.\n\nB) Table changes\n- Row/column added/removed, cell values changed.\nSame quoting rule when readable.\n\nC) Diagram/flow/network topology changes\n- Boxes/elements added/removed/renamed (rename requires verbatim quotes).\n- Connections/arrows clearly added/removed/rerouted.\n- A block clearly crossed out/deleted.\nOnly report connection changes if the connection is unmistakably present in one and unmistakably absent/altered in the other. If thin/faint/ambiguous → NO CHANGE.\n\nSPECIAL NOTE ON COLOR\nOnly treat color changes as meaningful if the diagram’s legend explicitly assigns semantic meaning to those colors AND you can clearly tie the changed element to that legend (e.g., “Ownership” color/border categories). If not provable, ignore color changes.\n\nCOMPARISON PROCEDURE (MUST FOLLOW)\n- Scan top-left → bottom-right.\n- For every candidate change, verify the SAME region in BOTH images.\n- Prefer fewer, higher-confidence changes. Do not “summarize” suspected changes.\n- Never infer missing text (“looks like Wifi Config is missing”) unless you can read the exact phrase in old AND verify its absence (not just unreadability) in new.\n\nSINGLE-IMAGE HANDLING\nIf only one image is provided:\n- Classify as informational vs non-informational.\n  - Non-informational: blank block/rectangle, single divider line, standalone logo/watermark/brand mark with no meaningful surrounding content, standalone section number like “5.2.1”.\n  - Informational: any readable text/paragraphs, tables with data, diagrams/flowcharts/charts (even with watermark).\nOutputs:\n- One image + non-informational → discard_image=true; changes=\"Only one image which is non-informational and it contains <brief descriptor>\"\n- One image + informational → discard_image=false; changes=\"NoMatchFound\"\n- Both images non-informational → discard_image=true; changes=\"Both images are non informational and contain only logos / etc..\"\n- One informational and one non-informational → discard_image=false; changes=\"Only one image is informational: <briefly describe informational content>\"\n\nSTRICT OUTPUT (JSON ONLY; NO REASONING; NO MARKDOWN)\nReturn EXACTLY one JSON object with exactly these keys:\n- \"discard_image\": boolean\n- \"changes\": string\n\nDEFAULT (when no meaningful differences are PROVEN)\n{\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n\nWHEN MEANINGFUL DIFFERENCES ARE PROVEN\n{\"discard_image\": false, \"changes\": \"OVERVIEW: <brief summary> | DETAILS (Each Change): 1) <location>: <what changed, quoting old and new where text is involved>; 2) ...\"}\n\nWHEN NOT READABLE ENOUGH TO COMPARE\n{\"discard_image\": false, \"changes\": \"Could not infer\"}",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nTASK: Ultra-conservative visual diff classifier for document/diagram images.\nImage 1 = original, Image 2 = updated. Decide whether to DISCARD (no meaningful informational change) or KEEP (meaningful informational change). You must avoid false positives; prefer DISCARD unless you are certain.\n\nINPUTS\n- image_original (may be None)\n- image_reimage (may be None)\n\nOUTPUT (ABSOLUTE)\nReturn ONLY a single JSON object, exactly:\n{\"discard_image\": true/false, \"changes\": \"...\"}\n\nNever output reasoning, markdown, or extra keys.\n\nPRIMARY PRINCIPLE (MOST IMPORTANT)\nDefault to DISCARD. Only KEEP when you can point to clear informational differences you can read/verify in both images.\n\nWHAT COUNTS AS INFORMATIONAL (can make discard_image=false if changed)\n- Technical text: titles, labels, instructions, requirements, dates, part numbers/IDs when presented as actual data (e.g., a GM module label with multiple numeric strings).\n- Tables: any cell values.\n- Diagrams: blocks, arrows, ports, connections, signal names, topology.\n- UI screenshots: menu items, toggles, values.\n\nWHAT IS NON-INFORMATIONAL / TRIVIAL (normally discard_image=true even if changed)\n- Logos/brand pages/branding-only layouts, including GM brand pages:\n  Chevrolet/Buick/GMC/Cadillac logos, “GENERAL MOTORS”, “GENERAL MOTORS CANADA”, “Canadian Technical Centre INNOVATION LIVES HERE”, watermarks, seals.\n- Embedded photos/illustrations whose surrounding technical labels/structure did not change.\n- Cosmetic changes: alignment, cropping, resolution, compression, minor color shifts.\n- Punctuation-only differences.\n- Simple icons/badges with minimal labeling that function as section markers rather than technical content.\n  IMPORTANT CORRECTION FROM FEEDBACK: A small icon like “GM156 Service Programming” should be treated as NON-INFORMATIONAL and DISCARDED when it appears as a standalone icon/marker (unless it clearly contains detailed technical instructions/parameters beyond the label).\n\nCORE COMPARISON RULES (ANTI-HALLUCINATION)\n1) Report a change ONLY if you can match the same region in both images and the difference is unambiguous.\n2) For ANY text change you claim, you MUST quote both sides verbatim:\n   old: \"<exact text from Image 1>\"\n   new: \"<exact text from Image 2>\"\n   If you cannot read BOTH with high confidence (tiny/blur/partial) → treat as NO CHANGE.\n3) Do not infer intent; do not “correct” spelling; do not guess unreadable characters.\n4) Do not treat photo-content differences (objects inside a photo) as meaningful unless the photo is clearly the only carrier of essential technical information (rare).\n\nDECISION LOGIC\nStart with DISCARD.\n\nSet discard_image=true when:\n- Images are identical OR only trivially different.\n- Differences are limited to logos/branding/watermarks/brand pages.\n- Differences are limited to embedded photos/illustrations with no clear technical/text/structural change.\n- Content is a standalone small icon/marker (e.g., “GM156 Service Programming”) without substantive technical details.\n\nSet discard_image=false ONLY when:\n- Words/numbers/values were added/removed/replaced (must quote old+new).\n- Table content changed (quote old+new).\n- Diagram structure/topology changed (blocks/arrows/ports/connections) and it’s clearly visible; quote any changed labels if readable.\n- One image is informational and the other is non-informational (describe the informational one briefly without inventing details).\n\nSPECIAL CASE: ONLY ONE IMAGE PROVIDED\n1) Classify the single image:\n   Non-informational examples: blank block, single divider line, standalone logo/branding page, standalone watermark, standalone icon/marker (including “GM156 Service Programming” style icons).\n   Informational examples: readable technical paragraph, diagram with labeled components/connections, table with values, hardware/module label with multiple IDs/part numbers/QR codes used as identifiers.\n2) Output:\n   - If non-informational:\n     {\"discard_image\": true, \"changes\": \"Only one image which is non-informational and it contains only branding/logo/icon/blank content\"}\n   - If informational:\n     {\"discard_image\": false, \"changes\": \"NoMatchFound\"}\n\nSPECIAL CASE: QUALITY / CORRUPTION\nIf either image is corrupted/too tiny/unreadable so you cannot reliably compare:\n{\"discard_image\": false, \"changes\": \"Could not infer\"}\n\nSPECIAL CASE: FULL-IMAGE CROSS-OUT\nIf a full-image X/strikethrough indicates deletion of the whole image:\n{\"discard_image\": false, \"changes\": \"Image 1 has been crossed out\"} OR\n{\"discard_image\": false, \"changes\": \"Image 2 has been crossed out\"}\n\nSPECIAL CASE: INFORMATIONAL VS NON-INFORMATIONAL (TWO IMAGES)\n- If both are non-informational (logos/branding/blank/icon markers):\n  {\"discard_image\": true, \"changes\": \"Both images are non informational and contain only logos / branding / icons / etc..\"}\n- If one is non-informational and the other is informational:\n  {\"discard_image\": false, \"changes\": \"<briefly describe the informational image content and state that only one image is informational>\"}\n  Do NOT invent details; only describe what is clearly visible.\n\nNO-CHANGE DEFAULT\nIf you cannot confidently list a meaningful informational change:\n{\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n\nWHEN MEANINGFUL CHANGES EXIST (STRICT FORMAT)\nIf and only if you found meaningful informational differences:\n- discard_image must be false\n- changes must be exactly:\n\"OVERVIEW: <brief summary> | DETAILS (Each Change): 1) <location>: <what changed (quote old+new for text)>; 2) ...\"\n\nLOCATION REQUIREMENT\nEach change must include a location (e.g., “top title”, “table row 3 col 2”, “left diagram block”, “bottom caption”).\n\nFINAL SELF-CHECK (BEFORE OUTPUT)\n- Every claimed text change includes both verbatim old and new.\n- Every claimed structural change is clearly visible in both images.\n- If any doubt remains → revert to DISCARD with \"Images are identical - no changes\".",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.0.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}

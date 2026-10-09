@@ -1,0 +1,40 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "text\nTASK: Compare one or two images and output a strict JSON decision about discarding and (if kept) the clearly verifiable visual/content changes.\n\nINPUTS\nYou will receive up to two images:\n- image_original (Image 1 / old) OR None\n- image_reimage  (Image 2 / new) OR None\n\nYOUR JOB\n1) Decide whether to DISCARD this input (based on rules below).\n2) If not discarded, report ONLY clearly visible, meaningful changes between Image 1 and Image 2.\n\nABSOLUTE OUTPUT REQUIREMENT\nReturn ONLY ONE JSON object with EXACTLY these keys (no extra keys, no markdown, no reasoning):\n{\"discard_image\": true/false, \"changes\": \"...\"}\n\nANTI-HALLUCINATION (MOST IMPORTANT)\nBe extremely literal and conservative.\n- ONLY report a change if you can locate the same region in both images and you can clearly see/read that it differs.\n- If text is blurry/tiny/cropped in either image such that characters cannot be read reliably, DO NOT guess.\n- If lines/connectors are too faint or dense to confirm routing/endpoints, DO NOT guess.\n- If you cannot reliably compare meaningful content, output:\n  {\"discard_image\": false, \"changes\": \"Could not infer\"}\n\nDOMAIN CONTEXT / WHAT THESE IMAGES OFTEN ARE\nMany inputs are engineering diagrams (e.g., UML/sequence diagrams with swimlanes, message arrows, alt/loop fragments, timers, and labels) such as RTOS/QNX/Android/VIP/SoC flows. In such diagrams, “meaningful changes” include:\n- Different title (top label)\n- Added/removed/renamed swimlanes/actors (columns)\n- Added/removed/renamed messages, calls, conditions, timers\n- Added/removed/changed boxes/notes\n- Changed arrow endpoints or direction\nThese can be subtle—scan systematically and do NOT conclude “no changes” without checking the whole diagram.\n\nCROSS-OUT / BIG X RULE (IMPORTANT; fixes prior failures)\nIf either image has a full-image cross-out (large X/diagonal lines indicating deletion/invalid), you MUST NOT discard as “identical”.\nReturn:\n- {\"discard_image\": false, \"changes\": \"Image 1 has been crossed out\"}\n  OR\n- {\"discard_image\": false, \"changes\": \"Image 2 has been crossed out\"}\nEven if underlying content seems the same.\n\nNON-INFORMATIONAL CONTENT (TYPICALLY DISCARD)\nTreat as NON-INFORMATIONAL:\n- Logo/branding-only tiles (including logo redesign comparisons—ALWAYS discard)\n- Watermarks/icons/decorative elements/page chrome only\n- Blank blocks / separators\n- Standalone short labels like “Tier 1”, single section header only, cropped fragments with no substantive info\n- Standalone legend/key panels shown alone\n\nDISCARD / KEEP RULES (GROUND-TRUTH ALIGNED)\n1) If only ONE image is provided (other is None):\n   a) If that single image is NON-INFORMATIONAL:\n      {\"discard_image\": true,\n       \"changes\": \"Only one image which is non-informational and it contains logo (or watermark / blank block / single line / standalone section number / etc.)\"}\n   b) If that single image is INFORMATIONAL:\n      {\"discard_image\": false, \"changes\": \"NoMatchFound\"}\n\n2) If either image is corrupted/too tiny/too blurry/unreadable such that you cannot verify/compare meaningful content:\n   {\"discard_image\": false, \"changes\": \"Could not infer\"}\n\n3) If either image shows a full-image cross-out (big X/strikethrough across the whole figure):\n   {\"discard_image\": false, \"changes\": \"Image 1 has been crossed out\"}\n   OR\n   {\"discard_image\": false, \"changes\": \"Image 2 has been crossed out\"}\n\n4) If BOTH images are NON-INFORMATIONAL (including branding/logo-only pairs):\n   {\"discard_image\": true, \"changes\": \"Both images are non informational and contain only logos / etc..\"}\n\n5) If ONE image is NON-INFORMATIONAL and the OTHER is INFORMATIONAL:\n   {\"discard_image\": false,\n    \"changes\": \"<briefly describe what the informational image contains> and explicitly state only one image is informational.\"}\n\n6) If BOTH images are INFORMATIONAL:\n   - If identical or only TRIVIAL differences → discard:\n     {\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}\n   - If MEANINGFUL differences → keep:\n     {\"discard_image\": false, \"changes\": \"<use changes template below>\"}\n\nTRIVIAL vs MEANINGFUL\nTRIVIAL (discard as identical):\n- Minor layout shifts that don’t change meaning (slight repositioning with same endpoints/logic)\n- Pure resizing or cropping that does NOT add/remove information\n- Resolution/compression/color shade differences\n- Watermark/logo added/removed\n- Punctuation-only or styling differences that do not change meaning (and only if you can read them)\n\nMEANINGFUL (do NOT discard):\n- Any added/removed/replaced words/numbers/values/dates/IDs (only if clearly readable)\n- Table row/column edits\n- Diagram structure changes: nodes/boxes added/removed, arrows re-routed, connections/endpoints changed\n- Partial cross-out of a sub-part of a figure/diagram\n- Any change you can clearly verify in corresponding locations\n\nBLUR PITFALL (CRITICAL)\nDo NOT output “Images are identical - no changes” if blur prevents verification.\nIf you cannot confidently verify all meaningful content matches, output:\n{\"discard_image\": false, \"changes\": \"Could not infer\"}\n\nHOW TO COMPARE (REQUIRED METHOD TO AVOID MISSING SUBTLE CHANGES)\n- Do a structured scan: (1) title/header, (2) swimlane/actor names left-to-right, (3) each major fragment (alt/loop/ref blocks), (4) message arrows and their endpoints, (5) notes/callouts, (6) bottom sections/timers.\n- Only claim “identical” if you have checked the full figure and can verify no meaningful differences.\n\nCHANGES FIELD TEMPLATE (USE ONLY WHEN MEANINGFUL DIFFERENCES EXIST)\n\"OVERVIEW: <1–2 sentences> | DETAILS (Each Change): 1) <location>: '<image1 text/element>' → '<image2 text/element>'; 2) ...\"\n\n- Quote old/new text verbatim when readable.\n- For diagrams, name the element and specify added/removed/renamed/reconnected.\n- If you can’t read the exact text, don’t invent it; either describe the non-textual change or use “Could not infer” if the change cannot be verified.\n\nDEFAULT\nIf (and only if) you can verify both informational images match in all meaningful content:\n{\"discard_image\": true, \"changes\": \"Images are identical - no changes\"}",
+      "fields": [
+        {
+          "prefix": "Image Original:",
+          "description": ""
+        },
+        {
+          "prefix": "Image Reimage:",
+          "description": ""
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Discard Image:",
+          "description": ""
+        },
+        {
+          "prefix": "Changes:",
+          "description": ""
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.0.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}
